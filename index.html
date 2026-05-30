@@ -149,8 +149,8 @@ header{background:var(--n);padding:0 32px;height:56px;display:flex;align-items:c
         <h3>📋 Información personal</h3>
         <div class="fg" style="gap:13px;">
           <div class="field full"><label>Nombre completo *</label><input id="c-nombre" type="text" placeholder="Como aparece en su cédula" autocomplete="name"/></div>
-          <div class="field"><label>Cédula de ciudadanía *</label><input id="c-cedula" type="text" placeholder="Ej: 52.456.789.012"/></div>
-          <div class="field"><label>Lugar de expedición *</label><input id="c-lugar" type="text" placeholder="Ej: Bogotá"/></div>
+          <div class="field"><label>Cédula de ciudadanía *</label><input id="c-cedula" type="text" placeholder="Ej: 1.000.150.006"/></div>
+          <div class="field"><label>Ciudad donde fue expedida *</label><input id="c-lugar" type="text" placeholder="Ej: Bogotá"/></div>
           <div class="field full"><label>Dirección de domicilio *</label><input id="c-dir" type="text" placeholder="Dirección completa de su residencia" autocomplete="street-address"/></div>
           <div class="field"><label>Correo electrónico *</label><input id="c-email" type="email" placeholder="su@correo.com" autocomplete="email"/></div>
           <div class="field"><label>Celular *</label><input id="c-cel" type="tel" placeholder="Ej: 315 987 6543" autocomplete="tel"/></div>
@@ -307,7 +307,7 @@ header{background:var(--n);padding:0 32px;height:56px;display:flex;align-items:c
       </div>
       <div class="field">
         <label>Fecha congelación precio</label>
-        <input type="text" id="fecha-cong" placeholder="Ej: 30 de junio de 2026"/>
+        <input type="date" id="fecha-cong"/>
       </div>
     </div>
     <div id="pagos-rows"></div>
@@ -617,6 +617,14 @@ async function generarContrato(){
     const f=fs?new Date(fs+'T12:00:00'):new Date();
     const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 
+    const fcRaw = g('fecha-cong');
+    let fcTexto = fcRaw;
+    if(fcRaw && fcRaw.includes('-')){
+      const [fy,fm,fd] = fcRaw.split('-');
+      const meses2=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+      fcTexto = parseInt(fd)+' de '+meses2[parseInt(fm)-1]+' de '+fy;
+    }
+
     const datos={
       tipo,
       nombre:g('nombre'), cedula:g('cedula'), lugar_exp:g('lugar-exp'),
@@ -624,20 +632,33 @@ async function generarContrato(){
       proyecto:g('proyecto'), torre:g('torre'), apto:g('apto'),
       cotizacion:g('cotizacion'),
       valor_total:vt, congelacion:cong,
-      fecha_cong:g('fecha-cong')||'30 de junio de 2026',
+      fecha_cong: fcTexto||'30 de junio de 2026',
       dia:f.getDate().toString(), mes:meses[f.getMonth()],
     };
 
-    // Generar directamente sin API externa
-    const campos = {
-      pct_cong: Math.round((cong/vt)*100),
-      pct_anticipo: tipo==='visualizza' ? 50 : Math.round(((vt-cong)*0.50/vt)*100),
-    };
-    await generarDocxFinal(datos, campos);
+    // Llamar al servidor para generar con la minuta original
+    const resp = await fetch('/.netlify/functions/generar', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(datos)
+    });
+    
+    if(!resp.ok){
+      const err = await resp.json();
+      throw new Error(err.error || 'Error del servidor');
+    }
+    
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${datos.cotizacion.replace('CO-','CON-')}_${datos.nombre.split(' ')[0]}.docx`;
+    a.click();
+    URL.revokeObjectURL(url);
 
     document.getElementById('overlay').classList.remove('show');
     const carpeta = tipo==='gran_central'?'CLIENTES GRAN CENTRAL':tipo==='visualizza'?'Clientes Visualizza':'CLIENTES '+datos.proyecto.toUpperCase();
-    document.getElementById('msg-ok').textContent=`Contrato ${campos.numero_contrato||datos.cotizacion.replace('CO-','CON-')} de ${datos.nombre} generado.`;
+    document.getElementById('msg-ok').textContent=`Contrato ${datos.cotizacion.replace('CO-','CON-')} de ${datos.nombre} generado.`;
     document.getElementById('msg-ruta').innerHTML=`📂 Guarda en OneDrive:<br><strong>2-Comercial / 1. Clientes / ${carpeta} / ${datos.nombre} / CONTRATO /</strong>`;
     try{localStorage.removeItem('visco_cliente_pendiente');}catch(e){}
     setView(6);
@@ -855,4 +876,3 @@ function notif(msg){
 </script>
 </body>
 </html>
-
