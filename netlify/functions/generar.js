@@ -86,7 +86,7 @@ exports.handler = async (event) => {
     'visualizza': 'Contrato clientes visualizza.docx',
     'gran_central': 'CON - XXXX - 2026 NOMBRE CLIENTE Gran central.docx',
   };
-    const minutaPath = path.join(__dirname, '../../', minutaNames[tipo]);
+    const minutaPath = path.join(process.cwd(), minutaNames[tipo]);
     const docxBuffer = fs.readFileSync(minutaPath);
 
     const vt = valor_total;
