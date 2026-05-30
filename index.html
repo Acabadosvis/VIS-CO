@@ -1,1 +1,858 @@
-file:///C:/Users/cuent/Downloads/index.html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIS-CO · AcabadosVIS</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--r:#C0392B;--ro:#8B1A10;--rc:#FDF0EE;--n:#0F0F0F;--g:#6B6B6B;--gc:#F5F4F2;--b:#FAFAF8;--brd:#E5E2DC;--gold:#C9A84C;--wa:#25D366;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--b);color:var(--n);min-height:100vh;}
+header{background:var(--n);padding:0 32px;height:56px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;}.logo span{color:var(--r);}
+.hbadge{margin-left:auto;font-size:10px;color:#555;letter-spacing:.06em;text-transform:uppercase;}
+.hnum{font-size:11px;color:#444;margin-left:10px;}
+.tabs{background:#fff;border-bottom:1px solid var(--brd);display:flex;overflow-x:auto;}
+.tab{padding:14px 20px;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#AAA;border-bottom:3px solid transparent;display:flex;align-items:center;gap:7px;white-space:nowrap;}
+.tab.active{color:var(--r);border-bottom-color:var(--r);}
+.tab.done{color:#27AE60;border-bottom-color:#27AE60;}
+.tn{width:19px;height:19px;border-radius:50%;background:var(--gc);font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;color:#AAA;}
+.tab.active .tn{background:var(--r);color:#fff;}
+.tab.done .tn{background:#27AE60;color:#fff;}
+.wrap{max-width:680px;margin:0 auto;padding:40px 18px;}
+.view{display:none;}.view.active{display:block;}
+.sh{margin-bottom:26px;}
+.sh h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:5px;}
+.sh p{color:var(--g);font-size:13px;line-height:1.7;}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.fg .full{grid-column:1/-1;}
+.fg .third{grid-column:span 1;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--g);}
+.field input,.field select{padding:11px 13px;border:1.5px solid var(--brd);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--n);background:#fff;outline:none;transition:border-color .15s;}
+.field input:focus,.field select:focus{border-color:var(--r);}
+.field input::placeholder{color:#C8C0B8;}
+.fhint{font-size:10px;color:#B8B0A8;margin-top:2px;}
+/* TIPO SELECTOR */
+.tipo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;}
+.tipo-btn{padding:16px 10px;border:2px solid var(--brd);border-radius:10px;cursor:pointer;background:#fff;text-align:center;transition:all .15s;}
+.tipo-btn:hover{border-color:#CCC;}
+.tipo-btn.sel{border-color:var(--r);background:var(--rc);}
+.tb-icon{font-size:24px;margin-bottom:6px;}
+.tb-n{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--n);}
+.tb-s{font-size:10px;color:var(--g);margin-top:3px;}
+/* BOXES */
+.info-box{background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:9px;padding:14px 16px;margin-bottom:18px;}
+.info-box .it{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#1D4ED8;margin-bottom:4px;}
+.info-box .ib{font-size:12px;color:#1E3A6E;line-height:1.6;}
+.wa-box{background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:9px;padding:16px;margin-bottom:18px;}
+.wa-box .wt{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#15803D;margin-bottom:10px;}
+.wa-preview{background:#fff;border-radius:8px;padding:12px 14px;font-size:12px;color:#222;line-height:1.6;margin-bottom:12px;border:1px solid #D1FAE5;white-space:pre-wrap;}
+.btn-wa{display:inline-flex;align-items:center;gap:8px;background:var(--wa);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:all .15s;text-transform:uppercase;}
+.btn-wa:hover{background:#1DB954;}
+/* PAGOS */
+.pcard{background:#fff;border:1.5px solid var(--brd);border-radius:11px;padding:20px;margin-bottom:14px;}
+.pcard h3{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;margin-bottom:3px;}
+.pcard .pss{font-size:11px;color:var(--g);margin-bottom:16px;}
+.pr{display:grid;grid-template-columns:22px 1fr 40px 110px;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--gc);}
+.pr:last-child{border-bottom:none;padding-bottom:0;}
+.pnum{width:20px;height:20px;background:var(--rc);color:var(--ro);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'Syne',sans-serif;font-weight:800;}
+.pd{font-size:11px;color:var(--n);line-height:1.3;}
+.pd span{display:block;font-size:10px;color:var(--g);margin-top:1px;}
+.ppct{font-size:10px;font-weight:700;color:var(--r);text-align:right;}
+.pi{width:100%;padding:6px 8px;border:1.5px solid var(--brd);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:11px;text-align:right;outline:none;transition:border-color .15s;}
+.pi:focus{border-color:var(--r);}
+.trow{display:flex;justify-content:space-between;align-items:center;padding:12px 0 0;margin-top:4px;border-top:2px solid var(--n);}
+.trow .tl{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
+.trow .tv{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--r);}
+.alerta{display:none;background:#FEF9E7;border:1.5px solid #E8C84A;border-radius:8px;padding:10px 13px;font-size:11px;color:#7D6608;margin-bottom:12px;}
+/* RESUMEN */
+.res-card{background:var(--n);color:#fff;border-radius:11px;padding:22px;margin-bottom:22px;}
+.res-card h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:16px;}
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.ri .rl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#666;margin-bottom:2px;}
+.ri .rv{font-size:12px;color:#E8E4DC;}
+.ri.hl .rv{color:var(--gold);font-weight:700;font-size:13px;}
+.etag{display:inline-block;font-family:'Syne',sans-serif;font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px;}
+.etag.acab{background:var(--rc);color:var(--ro);}
+.etag.vis{background:#EAF0FB;color:#1A4E9A;}
+.etag.gran{background:#FFFBEA;color:#7D6608;}
+/* BOTONES */
+.actions{margin-top:22px;display:flex;gap:9px;justify-content:flex-end;}
+.btn{padding:10px 22px;border-radius:8px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.05em;cursor:pointer;border:none;transition:all .15s;text-transform:uppercase;}
+.btn-p{background:var(--r);color:#fff;}.btn-p:hover{background:var(--ro);transform:translateY(-1px);}
+.btn-s{background:#fff;color:var(--n);border:1.5px solid var(--brd);}.btn-s:hover{border-color:var(--n);}
+.btn-g{background:var(--n);color:#fff;display:flex;align-items:center;gap:7px;padding:12px 26px;font-size:12px;}
+.btn-g:hover{background:#333;transform:translateY(-1px);}
+.btn-g:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+/* OVERLAY */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;}
+.overlay.show{display:flex;}
+.ov-box{background:#fff;border-radius:14px;padding:36px 40px;text-align:center;max-width:320px;width:90%;}
+.ov-box .ob-ic{font-size:36px;margin-bottom:12px;}
+.ov-box h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;}
+.ov-box p{font-size:12px;color:var(--g);line-height:1.6;}
+.spinner{width:28px;height:28px;border:3px solid var(--rc);border-top-color:var(--r);border-radius:50%;animation:spin .8s linear infinite;margin:12px auto 0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+/* SUCCESS */
+.sv{text-align:center;padding:52px 0;}
+.sv .si{width:64px;height:64px;background:#EAFAF1;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:28px;}
+.sv h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:8px;}
+.sv p{color:var(--g);max-width:380px;margin:0 auto 6px;line-height:1.6;font-size:12px;}
+.sv .ruta{font-size:11px;color:var(--g);background:var(--gc);border-radius:8px;padding:10px 14px;margin:14px auto 0;max-width:440px;text-align:left;line-height:1.7;}
+.sv-acts{display:flex;gap:9px;justify-content:center;margin-top:22px;flex-wrap:wrap;}
+/* NOTIF */
+.notif{position:fixed;bottom:18px;right:18px;background:var(--n);color:#fff;padding:11px 16px;border-radius:8px;font-size:12px;transform:translateY(60px);opacity:0;transition:all .3s;z-index:999;max-width:280px;}
+.notif.show{transform:translateY(0);opacity:1;}
+/* VISTA CLIENTE */
+.cl-header{background:var(--n);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:center;}
+.cl-wrap{max-width:500px;margin:0 auto;padding:36px 16px;}
+.cl-top{text-align:center;margin-bottom:26px;}
+.cl-top h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:7px;}
+.cl-top p{color:var(--g);font-size:13px;line-height:1.7;}
+.cl-card{background:#fff;border:1.5px solid var(--brd);border-radius:13px;padding:26px;}
+.cl-card h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--brd);}
+.btn-env{width:100%;margin-top:20px;padding:14px;background:var(--r);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:all .15s;}
+.btn-env:hover{background:var(--ro);}
+.privacy{margin-top:12px;font-size:11px;color:#AAA;text-align:center;line-height:1.5;}
+.cl-ok{text-align:center;padding:52px 0;}
+.cl-ok .si{width:64px;height:64px;background:#EAFAF1;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:28px;}
+.cl-ok h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px;}
+.cl-ok p{color:var(--g);font-size:13px;line-height:1.7;max-width:320px;margin:0 auto;}
+.res-env{margin-top:18px;background:var(--gc);border-radius:10px;padding:14px 16px;text-align:left;font-size:12px;}
+.res-env strong{display:block;margin-bottom:8px;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g);}
+@media(max-width:560px){
+  .fg{grid-template-columns:1fr;}.fg .full,.fg .third{grid-column:1;}
+  .tipo-grid{grid-template-columns:1fr;}
+  .tabs{overflow-x:auto;}.tab{padding:12px 13px;}
+  header{padding:0 14px;}.wrap{padding:28px 12px;}
+  .pr{grid-template-columns:20px 1fr;}.ppct,.pi{display:none;}
+  .rg{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ VISTA CLIENTE ══ -->
+<div id="vista-cliente" style="display:none;">
+  <div class="cl-header">
+    <div class="logo" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;">VIS<span style="color:var(--r);">-CO</span></div>
+  </div>
+  <div class="cl-wrap">
+    <div id="cl-form">
+      <div class="cl-top">
+        <h1>Datos para tu contrato</h1>
+        <p>Diligencie sus datos personales para generar su contrato de obra. Solo toma 2 minutos y sus datos están seguros.</p>
+      </div>
+      <div class="cl-card">
+        <h3>📋 Información personal</h3>
+        <div class="fg" style="gap:13px;">
+          <div class="field full"><label>Nombre completo *</label><input id="c-nombre" type="text" placeholder="Como aparece en su cédula" autocomplete="name"/></div>
+          <div class="field"><label>Cédula de ciudadanía *</label><input id="c-cedula" type="text" placeholder="Ej: 52.456.789.012"/></div>
+          <div class="field"><label>Lugar de expedición *</label><input id="c-lugar" type="text" placeholder="Ej: Bogotá"/></div>
+          <div class="field full"><label>Dirección de domicilio *</label><input id="c-dir" type="text" placeholder="Dirección completa de su residencia" autocomplete="street-address"/></div>
+          <div class="field"><label>Correo electrónico *</label><input id="c-email" type="email" placeholder="su@correo.com" autocomplete="email"/></div>
+          <div class="field"><label>Celular *</label><input id="c-cel" type="tel" placeholder="Ej: 315 987 6543" autocomplete="tel"/></div>
+          <div class="field"><label>Nombre del proyecto *</label><input id="c-proyecto" type="text" placeholder="Ej: Gran Central, Well..."/></div>
+          <div class="field"><label>Torre *</label><input id="c-torre" type="text" placeholder="Ej: Torre 3"/></div>
+          <div class="field"><label>Apartamento *</label><input id="c-apto" type="text" placeholder="Ej: 802"/></div>
+        </div>
+        <button class="btn-env" onclick="enviarCliente()">Enviar mis datos →</button>
+        <div class="privacy">🔒 Sus datos se usan únicamente para generar su contrato de obra.<br>AcabadosVIS.com · NIT 901.426.973-9</div>
+      </div>
+    </div>
+    <div id="cl-ok" class="cl-ok" style="display:none;">
+      <div class="si">✅</div>
+      <h2>¡Datos enviados!</h2>
+      <p>Su asesor comercial recibió su información y generará el contrato pronto. Lo contactaremos para los siguientes pasos.</p>
+      <div class="res-env"><strong>Resumen enviado:</strong><div id="cl-resumen"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ VISTA COMERCIAL ══ -->
+<div id="vista-comercial" style="display:none;">
+<header>
+  <div class="logo">VIS<span>-CO</span></div>
+  <span class="hbadge">Módulo contratos · Comercial</span>
+  <span class="hnum" id="hdr-num">Nuevo</span>
+</header>
+<div class="tabs">
+  <div class="tab active" id="tab1"><div class="tn">1</div>Tipo</div>
+  <div class="tab" id="tab2"><div class="tn">2</div>WhatsApp</div>
+  <div class="tab" id="tab3"><div class="tn">3</div>Cliente</div>
+  <div class="tab" id="tab4"><div class="tn">4</div>Pagos</div>
+  <div class="tab" id="tab5"><div class="tn">5</div>Generar</div>
+</div>
+
+<!-- PASO 1: TIPO DE CONTRATO -->
+<div class="wrap view active" id="view1">
+  <div class="sh"><h2>Tipo de contrato</h2><p>Selecciona la empresa. Esto define la minuta y condiciones que se usan.</p></div>
+
+  <div class="tipo-grid">
+    <div class="tipo-btn sel" id="tipo-acab" onclick="selTipo('acabadosvis')">
+      <div class="tb-icon">🏗️</div>
+      <div class="tb-n">ACABADOSVIS</div>
+      <div class="tb-s">Minuta AcabadosVIS · 60 días</div>
+    </div>
+    <div class="tipo-btn" id="tipo-vis" onclick="selTipo('visualizza')">
+      <div class="tb-icon">🏢</div>
+      <div class="tb-n">VISUALIZZA</div>
+      <div class="tb-s">Minuta Visualizza · 65 días</div>
+    </div>
+    <div class="tipo-btn" id="tipo-gran" onclick="selTipo('gran_central')">
+      <div class="tb-icon">🎫</div>
+      <div class="tb-n">GRAN CENTRAL</div>
+      <div class="tb-s">Minuta Gran Central · 65 días</div>
+    </div>
+  </div>
+
+  <div class="field" style="margin-bottom:18px;">
+    <label>N° de cotización (CO-XXXX-2026) *</label>
+    <input id="cotizacion" type="text" placeholder="Ej: CO-00456-2026"/>
+    <div class="fhint">Con esto VISIO identifica la carpeta del cliente y tiene referencia del valor</div>
+  </div>
+
+  <div class="field" style="margin-bottom:18px;">
+    <label>Tu correo comercial</label>
+    <input id="correo-comercial" type="email" value="contacto@acabadosvis.com"/>
+    <div class="fhint">Aquí llega la notificación cuando el cliente envía sus datos</div>
+  </div>
+
+  <div class="info-box" id="info-tipo">
+    <div class="it" id="info-title">📋 Minuta: AcabadosVIS</div>
+    <div class="ib" id="info-body">Vigencia 60 días. Congelación $5.000.000 fija + anticipo 50% del resto + 20/20/10. Cuenta Banco de Bogotá a nombre de ACABADOSVIS.COM.</div>
+  </div>
+
+  <div class="actions"><button class="btn btn-p" onclick="irPaso2()">Generar link cliente →</button></div>
+</div>
+
+<!-- PASO 2: WHATSAPP -->
+<div class="wrap view" id="view2">
+  <div class="sh"><h2>Enviar link al cliente</h2><p>El cliente abre el link, llena sus datos y tú recibes notificación por correo.</p></div>
+
+  <div class="wa-box">
+    <div class="wt">📱 Mensaje listo para WhatsApp</div>
+    <div class="wa-preview" id="wa-preview"></div>
+    <button class="btn-wa" onclick="abrirWA()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Abrir WhatsApp
+    </button>
+  </div>
+
+  <div class="info-box">
+    <div class="it">📧 Notificación automática</div>
+    <div class="ib">Cuando el cliente envíe sus datos, se abrirá automáticamente un correo a <strong id="correo-display"></strong> con toda la información.</div>
+  </div>
+
+  <div class="info-box" style="background:#F0FDF4;border-color:#86EFAC;">
+    <div class="it" style="color:#15803D;">✅ ¿Cliente ya diligenció?</div>
+    <div class="ib" style="color:#14532D;">Si el cliente ya envió sus datos, haz clic en "Continuar" para ver si están cargados.</div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-s" onclick="irPaso1()">← Volver</button>
+    <button class="btn btn-p" onclick="irPaso3()">Continuar →</button>
+  </div>
+</div>
+
+<!-- PASO 3: DATOS CLIENTE -->
+<div class="wrap view" id="view3">
+  <div class="sh"><h2>Datos del cliente</h2><p>Precargados si el cliente diligenció el formulario. Revisa y completa.</p></div>
+
+  <div class="info-box" id="alerta-datos" style="display:none;background:#F0FDF4;border-color:#86EFAC;">
+    <div class="it" style="color:#15803D;">✅ Datos del cliente cargados automáticamente</div>
+    <div class="ib" style="color:#14532D;">El cliente ya diligenció el formulario. Revisa que todo esté correcto.</div>
+  </div>
+
+  <div class="fg">
+    <div class="field full"><label>Nombre completo *</label><input id="nombre" type="text" placeholder="Nombre completo"/></div>
+    <div class="field"><label>Cédula *</label><input id="cedula" type="text" placeholder="52.456.789.012"/></div>
+    <div class="field"><label>Lugar expedición *</label><input id="lugar-exp" type="text" placeholder="Bogotá"/></div>
+    <div class="field full"><label>Dirección domicilio *</label><input id="direccion" type="text" placeholder="Dirección completa"/></div>
+    <div class="field"><label>Correo *</label><input id="correo" type="email" placeholder="correo@email.com"/></div>
+    <div class="field"><label>Celular *</label><input id="celular" type="tel" placeholder="315 987 6543"/></div>
+    <div class="field full"><label>Nombre del proyecto *</label><input id="proyecto" type="text" placeholder="Ej: Gran Central, Well, Corner View..."/></div>
+    <div class="field"><label>Torre *</label><input id="torre" type="text" placeholder="Ej: Torre 3"/></div>
+    <div class="field"><label>Apartamento *</label><input id="apto" type="text" placeholder="Ej: 802"/></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-s" onclick="irPaso2()">← Volver</button>
+    <button class="btn btn-p" onclick="irPaso4()">Continuar a pagos →</button>
+  </div>
+</div>
+
+<!-- PASO 4: PAGOS -->
+<div class="wrap view" id="view4">
+  <div class="sh"><h2>Plan de pagos</h2><p>Solo el equipo comercial ve y diligencia esta sección.</p></div>
+
+  <div class="pcard">
+    <h3>Valor y distribución</h3>
+    <div class="pss" id="pss-desc">Ingresa el valor total y los pagos se calculan automáticamente.</div>
+    <div class="fg" style="margin-bottom:16px;">
+      <div class="field">
+        <label>Valor total del contrato *</label>
+        <input type="number" id="valor-total" placeholder="Ej: 38000000" oninput="calcPagos()"/>
+      </div>
+      <div class="field" id="campo-cong-wrap">
+        <label>Valor congelación *</label>
+        <input type="number" id="valor-cong" placeholder="Ej: 5000000" value="5000000" oninput="calcPagos()"/>
+        <div class="fhint">Se resta del anticipo de inicio de obra</div>
+      </div>
+      <div class="field">
+        <label>Fecha firma</label>
+        <input type="date" id="fecha-firma"/>
+      </div>
+      <div class="field">
+        <label>Fecha congelación precio</label>
+        <input type="text" id="fecha-cong" placeholder="Ej: 30 de junio de 2026"/>
+      </div>
+    </div>
+    <div id="pagos-rows"></div>
+    <div class="trow"><div class="tl">Total</div><div class="tv" id="tot-pag">$0</div></div>
+  </div>
+  <div class="alerta" id="al-suma">⚠️ La suma de los pagos no coincide con el valor total del contrato.</div>
+  <div class="actions">
+    <button class="btn btn-s" onclick="irPaso3()">← Volver</button>
+    <button class="btn btn-p" onclick="irPaso5()">Revisar →</button>
+  </div>
+</div>
+
+<!-- PASO 5: REVISAR -->
+<div class="wrap view" id="view5">
+  <div class="sh"><h2>Revisar y generar</h2><p>Se generará el Word sobre la minuta oficial sin modificar ninguna letra.</p></div>
+  <div class="res-card" id="res-card"></div>
+  <div class="actions">
+    <button class="btn btn-s" onclick="irPaso4()">← Editar</button>
+    <button class="btn btn-g" id="btn-gen" onclick="generarContrato()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      Generar contrato Word
+    </button>
+  </div>
+</div>
+
+<!-- ÉXITO -->
+<div class="wrap view" id="view6">
+  <div class="sv">
+    <div class="si">✅</div>
+    <h2>¡Contrato generado!</h2>
+    <p id="msg-ok">El contrato fue descargado correctamente.</p>
+    <div class="ruta" id="msg-ruta"></div>
+    <div class="sv-acts"><button class="btn btn-p" onclick="nuevo()">Nuevo contrato</button></div>
+  </div>
+</div>
+</div><!-- fin comercial -->
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="ov-box">
+    <div class="ob-ic">📄</div>
+    <h3>Generando contrato...</h3>
+    <p>Aplicando datos sobre la minuta oficial. Solo un momento.</p>
+    <div class="spinner"></div>
+  </div>
+</div>
+<div class="notif" id="notif"></div>
+
+<script>
+// ── ESTADO
+let tipo = 'acabadosvis';
+
+const TIPOS = {
+  acabadosvis: {
+    nombre:'AcabadosVIS', dias:60, congelacion:true,
+    info:'Vigencia 60 días. Congelación fija + anticipo 50% del resto + 20/20/10. Cuenta Banco de Bogotá a nombre de ACABADOSVIS.COM.',
+    pagos:['Congelación','Anticipo inicio obra','Avance obra civil','Carpintería 70%','Pago final'],
+    desc:['Congelar precio','Para dar inicio a trabajos','Paredes, piso y techo','Al 70% carpintería','8 días antes de entrega'],
+  },
+  visualizza: {
+    nombre:'Grupo Visualizza', dias:65, congelacion:false,
+    info:'Vigencia 65 días. Sin congelación. Pagos: 50/20/20/10 sobre valor total. Cuenta Banco de Bogotá a nombre de GRUPO VISUALIZZA S.A.S.',
+    pagos:['Anticipo inicio obra','Avance obra civil','Carpintería 70%','Pago final'],
+    desc:['Para dar inicio a trabajos','Paredes, piso y techo','Al 70% carpintería','8 días antes de entrega'],
+  },
+  gran_central: {
+    nombre:'Gran Central', dias:65, congelacion:true,
+    info:'Vigencia 65 días. Congelación + anticipo 50% del resto + 20/20/10. Cuenta Banco de Bogotá a nombre de GRUPO VISUALIZZA S.A.S.',
+    pagos:['Congelación','Anticipo inicio obra','Avance obra civil','Carpintería 70%','Pago final'],
+    desc:['Congelar precio','Para dar inicio a trabajos','Paredes, piso y techo','Al 70% carpintería','8 días antes de entrega'],
+  },
+};
+
+// ── DETECTAR MODO
+(function(){
+  const p = new URLSearchParams(window.location.search);
+  if(p.get('modo')==='cliente'){
+    document.getElementById('vista-cliente').style.display='block';
+  } else {
+    document.getElementById('vista-comercial').style.display='block';
+    cargarDatos();
+  }
+})();
+
+// ── TIPO
+function selTipo(t){
+  tipo=t;
+  ['acab','vis','gran'].forEach(k=>document.getElementById('tipo-'+k).classList.remove('sel'));
+  const map={acabadosvis:'acab',visualizza:'vis',gran_central:'gran'};
+  document.getElementById('tipo-'+map[t]).classList.add('sel');
+  const info=TIPOS[t];
+  document.getElementById('info-title').textContent=`📋 Minuta: ${info.nombre}`;
+  document.getElementById('info-body').textContent=info.info;
+}
+
+// ── NAVEGACIÓN
+function setView(n){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('active','done');});
+  document.getElementById('view'+n).classList.add('active');
+  const tab=document.getElementById('tab'+n);
+  if(tab) tab.classList.add('active');
+  for(let i=1;i<n;i++){const t=document.getElementById('tab'+i);if(t){t.classList.remove('active');t.classList.add('done');}}
+  window.scrollTo(0,0);
+}
+
+function irPaso1(){setView(1);}
+
+function irPaso2(){
+  if(!document.getElementById('cotizacion').value.trim()){
+    notif('⚠️ Ingresa el número de cotización'); return;
+  }
+  const base=window.location.href.split('?')[0];
+  const link=base+'?modo=cliente';
+  const cot=document.getElementById('cotizacion').value.trim();
+  const msg=`Hola! 👋 Soy tu asesor de *AcabadosVIS.com*.\n\nPara continuar con tu proyecto (cotización ${cot}), necesitamos que diligencies tus datos personales para el contrato de obra.\n\nEs muy rápido, solo toma 2 minutos:\n👉 ${link}\n\nCualquier duda estoy a tu disposición. 🏗️`;
+  document.getElementById('wa-preview').textContent=msg;
+  document.getElementById('correo-display').textContent=document.getElementById('correo-comercial').value;
+  setView(2);
+}
+
+function abrirWA(){
+  const msg=document.getElementById('wa-preview').textContent;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+function irPaso3(){
+  cargarDatos();
+  if(!document.getElementById('fecha-firma').value)
+    document.getElementById('fecha-firma').value=new Date().toISOString().split('T')[0];
+  setView(3);
+}
+
+function irPaso4(){
+  const reqs=['nombre','cedula','lugar-exp','direccion','correo','celular','proyecto','torre','apto'];
+  for(const id of reqs){
+    if(!document.getElementById(id).value.trim()){
+      notif('⚠️ Completa todos los campos del cliente');
+      document.getElementById(id).focus(); return;
+    }
+  }
+  // Mostrar/ocultar campo congelación
+  const t=TIPOS[tipo];
+  document.getElementById('campo-cong-wrap').style.display=t.congelacion?'block':'none';
+  renderPagos();
+  setView(4);
+}
+
+function irPaso5(){
+  const vt=parseV(document.getElementById('valor-total').value);
+  if(!vt){notif('⚠️ Ingresa el valor total');return;}
+  const rows=document.querySelectorAll('.pi');
+  const suma=Array.from(rows).reduce((a,r)=>a+parseV(r.value),0);
+  const diff=Math.abs(suma-vt);
+  document.getElementById('al-suma').style.display=diff>1000?'block':'none';
+  if(diff>1000){notif('⚠️ La suma de pagos no cuadra con el total');return;}
+  buildResumen(); setView(5);
+}
+
+// ── CARGAR DATOS CLIENTE
+function cargarDatos(){
+  try{
+    const d=JSON.parse(localStorage.getItem('visco_cliente_pendiente')||'{}');
+    if(d.nombre){
+      document.getElementById('nombre').value=d.nombre||'';
+      document.getElementById('cedula').value=d.cedula||'';
+      document.getElementById('lugar-exp').value=d.lugar||'';
+      document.getElementById('direccion').value=d.dir||'';
+      document.getElementById('correo').value=d.email||'';
+      document.getElementById('celular').value=d.cel||'';
+      document.getElementById('proyecto').value=d.proyecto||'';
+      document.getElementById('torre').value=d.torre||'';
+      document.getElementById('apto').value=d.apto||'';
+      document.getElementById('alerta-datos').style.display='block';
+    }
+  }catch(e){}
+}
+
+// ── CLIENTE ENVIAR
+function enviarCliente(){
+  const campos=[
+    {id:'c-nombre',l:'Nombre'},{id:'c-cedula',l:'Cédula'},{id:'c-lugar',l:'Lugar expedición'},
+    {id:'c-dir',l:'Dirección'},{id:'c-email',l:'Correo'},{id:'c-cel',l:'Celular'},
+    {id:'c-proyecto',l:'Proyecto'},{id:'c-torre',l:'Torre'},{id:'c-apto',l:'Apartamento'},
+  ];
+  for(const c of campos){
+    if(!document.getElementById(c.id).value.trim()){notif('⚠️ Completa: '+c.l);document.getElementById(c.id).focus();return;}
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('c-email').value)){
+    notif('⚠️ Ingresa un correo válido');return;
+  }
+  const datos={
+    nombre:document.getElementById('c-nombre').value.trim().toUpperCase(),
+    cedula:document.getElementById('c-cedula').value.trim(),
+    lugar:document.getElementById('c-lugar').value.trim(),
+    dir:document.getElementById('c-dir').value.trim(),
+    email:document.getElementById('c-email').value.trim(),
+    cel:document.getElementById('c-cel').value.trim(),
+    proyecto:document.getElementById('c-proyecto').value.trim(),
+    torre:document.getElementById('c-torre').value.trim(),
+    apto:document.getElementById('c-apto').value.trim(),
+    ts:new Date().toLocaleString('es-CO',{timeZone:'America/Bogota'})
+  };
+  try{localStorage.setItem('visco_cliente_pendiente',JSON.stringify(datos));}catch(e){}
+
+  // Notificación por mailto
+  const asunto=encodeURIComponent(`VIS-CO: Datos de ${datos.nombre} listos para contrato`);
+  const cuerpo=encodeURIComponent(
+    `Nuevo cliente diligenció formulario VIS-CO:\n\n`+
+    `Nombre: ${datos.nombre}\nCédula: ${datos.cedula} — ${datos.lugar}\n`+
+    `Dirección: ${datos.dir}\nCorreo: ${datos.email}\nCelular: ${datos.cel}\n`+
+    `Proyecto: ${datos.proyecto}\nTorre: ${datos.torre}\nApto: ${datos.apto}\n`+
+    `Fecha: ${datos.ts}\n\nIngresa a VIS-CO para completar el contrato.`
+  );
+  const a=document.createElement('a');
+  a.href=`mailto:contacto@acabadosvis.com?subject=${asunto}&body=${cuerpo}`;
+  a.style.display='none'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+
+  document.getElementById('cl-form').style.display='none';
+  document.getElementById('cl-ok').style.display='block';
+  document.getElementById('cl-resumen').innerHTML=
+    [['Nombre',datos.nombre],['Cédula',datos.cedula+' — '+datos.lugar],
+     ['Dirección',datos.dir],['Correo',datos.email],['Celular',datos.cel],
+     ['Proyecto',datos.proyecto],['Torre/Apto',datos.torre+' Apto '+datos.apto]]
+    .map(([k,v])=>`<div style="display:flex;gap:8px;margin-bottom:4px;font-size:11px;"><span style="color:#AAA;min-width:68px;">${k}:</span><span>${v}</span></div>`).join('');
+}
+
+// ── PAGOS
+function renderPagos(){
+  const t=TIPOS[tipo];
+  let html='';
+  for(let i=0;i<t.pagos.length;i++){
+    html+=`<div class="pr">
+      <div class="pnum">${i+1}</div>
+      <div class="pd">${t.pagos[i]}<span>${t.desc[i]}</span></div>
+      <div class="ppct" id="pct${i+1}">—</div>
+      <input class="pi" id="pago${i+1}" placeholder="$0" oninput="updTotal()"/>
+    </div>`;
+  }
+  document.getElementById('pagos-rows').innerHTML=html;
+  const vt=parseV(document.getElementById('valor-total').value);
+  if(vt) calcPagos();
+}
+
+function calcPagos(){
+  const t=TIPOS[tipo];
+  const vt=parseV(document.getElementById('valor-total').value);
+  if(!vt) return;
+  let vals=[];
+  if(t.congelacion){
+    const cong=parseV(document.getElementById('valor-cong').value)||5000000;
+    const resto=vt-cong;
+    const p2=Math.round(resto*.50),p3=Math.round(resto*.20),p4=Math.round(resto*.20),p5=vt-cong-p2-p3-p4;
+    vals=[cong,p2,p3,p4,p5];
+  } else {
+    const p1=Math.round(vt*.50),p2=Math.round(vt*.20),p3=Math.round(vt*.20),p4=vt-p1-p2-p3;
+    vals=[p1,p2,p3,p4];
+  }
+  vals.forEach((v,i)=>{const el=document.getElementById('pago'+(i+1));if(el)el.value=fmtP(v);});
+  updPcts(vt,vals); updTotal();
+}
+
+function updTotal(){
+  const vt=parseV(document.getElementById('valor-total').value);
+  const rows=document.querySelectorAll('.pi');
+  const vals=Array.from(rows).map(r=>parseV(r.value));
+  document.getElementById('tot-pag').textContent=fmtP(vals.reduce((a,b)=>a+b,0));
+  if(vt) updPcts(vt,vals);
+}
+
+function updPcts(vt,vals){
+  vals.forEach((v,i)=>{const el=document.getElementById('pct'+(i+1));if(el)el.textContent=vt?Math.round((v/vt)*100)+'%':'—';});
+}
+
+// ── RESUMEN
+function buildResumen(){
+  const t=TIPOS[tipo];
+  const vt=parseV(document.getElementById('valor-total').value);
+  const rows=document.querySelectorAll('.pi');
+  const tagC=tipo==='gran_central'?'gran':tipo==='visualizza'?'vis':'acab';
+  document.getElementById('res-card').innerHTML=`
+    <span class="etag ${tagC}">${t.nombre}</span>
+    <h3>Resumen del contrato</h3>
+    <div class="rg">
+      <div class="ri"><div class="rl">Cliente</div><div class="rv">${g('nombre')}</div></div>
+      <div class="ri"><div class="rl">Cédula</div><div class="rv">${g('cedula')} — ${g('lugar-exp')}</div></div>
+      <div class="ri"><div class="rl">Proyecto</div><div class="rv">${g('proyecto')}</div></div>
+      <div class="ri"><div class="rl">Torre / Apto</div><div class="rv">${g('torre')} / ${g('apto')}</div></div>
+      <div class="ri"><div class="rl">Cotización</div><div class="rv">${g('cotizacion')}</div></div>
+      <div class="ri hl"><div class="rl">Valor total</div><div class="rv">${fmtP(vt)}</div></div>
+      ${Array.from(rows).map((r,i)=>`<div class="ri"><div class="rl">Pago ${i+1} — ${t.pagos[i]}</div><div class="rv">${r.value}</div></div>`).join('')}
+      <div class="ri"><div class="rl">Correo</div><div class="rv">${g('correo')}</div></div>
+    </div>`;
+  document.getElementById('hdr-num').textContent=g('cotizacion').replace('CO-','CON-');
+}
+
+// ── GENERAR via API Anthropic
+async function generarContrato(){
+  const btn=document.getElementById('btn-gen');
+  btn.disabled=true;
+  document.getElementById('overlay').classList.add('show');
+
+  try{
+    const vt=parseV(document.getElementById('valor-total').value);
+    const cong=TIPOS[tipo].congelacion?parseV(document.getElementById('valor-cong').value)||5000000:0;
+    const fs=document.getElementById('fecha-firma').value;
+    const f=fs?new Date(fs+'T12:00:00'):new Date();
+    const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+    const datos={
+      tipo,
+      nombre:g('nombre'), cedula:g('cedula'), lugar_exp:g('lugar-exp'),
+      direccion:g('direccion'), correo:g('correo'), celular:g('celular'),
+      proyecto:g('proyecto'), torre:g('torre'), apto:g('apto'),
+      cotizacion:g('cotizacion'),
+      valor_total:vt, congelacion:cong,
+      fecha_cong:g('fecha-cong')||'30 de junio de 2026',
+      dia:f.getDate().toString(), mes:meses[f.getMonth()],
+    };
+
+    // Generar directamente sin API externa
+    const campos = {
+      pct_cong: Math.round((cong/vt)*100),
+      pct_anticipo: tipo==='visualizza' ? 50 : Math.round(((vt-cong)*0.50/vt)*100),
+    };
+    await generarDocxFinal(datos, campos);
+
+    document.getElementById('overlay').classList.remove('show');
+    const carpeta = tipo==='gran_central'?'CLIENTES GRAN CENTRAL':tipo==='visualizza'?'Clientes Visualizza':'CLIENTES '+datos.proyecto.toUpperCase();
+    document.getElementById('msg-ok').textContent=`Contrato ${campos.numero_contrato||datos.cotizacion.replace('CO-','CON-')} de ${datos.nombre} generado.`;
+    document.getElementById('msg-ruta').innerHTML=`📂 Guarda en OneDrive:<br><strong>2-Comercial / 1. Clientes / ${carpeta} / ${datos.nombre} / CONTRATO /</strong>`;
+    try{localStorage.removeItem('visco_cliente_pendiente');}catch(e){}
+    setView(6);
+
+  }catch(e){
+    document.getElementById('overlay').classList.remove('show');
+    notif('❌ Error: '+e.message); console.error(e);
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg> Generar contrato Word';
+  }
+}
+
+async function generarDocxFinal(d, c){
+  // Construir el documento como texto limpio respetando la estructura de la minuta
+  const rows=document.querySelectorAll('.pi');
+  const pagosVals=Array.from(rows).map(r=>r.value);
+  const t=TIPOS[tipo];
+  const conNum=d.cotizacion.replace('CO-','CON-');
+  const cotNum=d.cotizacion;
+
+  let pagosTexto='';
+  if(tipo==='acabadosvis'){
+    pagosTexto=[
+      `Primer pago, como congelación, equivalente al ${c.pct_cong||Math.round((parseV(pagosVals[0])/d.valor_total)*100)} por ciento ${c.pct_cong||''}% del valor del contrato por un valor de ${numALetras(parseV(pagosVals[0]))} (${pagosVals[0]}), para separar tu remodelación y congelar el precio.`,
+      `Segundo pago, como anticipo para inicio de obra, equivalente al ${c.pct_anticipo||Math.round((parseV(pagosVals[1])/d.valor_total)*100)} por ciento ${c.pct_anticipo||''}% del valor del contrato por un valor de ${numALetras(parseV(pagosVals[1]))} (${pagosVals[1]}), para dar inicio a los trabajos.`,
+      `Tercer pago, equivale al veinte por ciento 20% del valor del contrato por valor de ${numALetras(parseV(pagosVals[2]))} (${pagosVals[2]}), pagaderos al avance de la obra civil: paredes en segunda mano de pintura, cargue de piso y techo.`,
+      `Cuarto pago equivale veinte por ciento 20% del valor del contrato por valor de ${numALetras(parseV(pagosVals[3]))} (${pagosVals[3]}), pagaderos al avance del 70% de la carpintería.`,
+      `Quinto pago equivale al diez por ciento 10% del valor del contrato por valor de ${numALetras(parseV(pagosVals[4]))} (${pagosVals[4]}), pagaderos 8 días antes de la fecha de terminación de la obra.`,
+    ].join('\n\n');
+  } else if(tipo==='visualizza'){
+    pagosTexto=[
+      `Primer pago, a título de anticipo para iniciar la obra, equivalente al 50% del valor del contrato por valor de ${numALetras(parseV(pagosVals[0]))} (${pagosVals[0]}). Este valor deberá ser pagado por el CONTRATANTE para dar inicio a los trabajos.`,
+      `Segundo pago equivale al veinte 20% del valor del contrato por valor de ${numALetras(parseV(pagosVals[1]))} (${pagosVals[1]}), pagaderos al avance de la obra civil: paredes en segunda mano de pintura, cargue de piso y techo.`,
+      `Tercer pago equivale veinte 20% del valor del contrato por valor de ${numALetras(parseV(pagosVals[2]))} (${pagosVals[2]}), pagaderos al avance del 70% de la carpintería.`,
+      `Cuarto pago equivale al diez 10% del valor del contrato por valor de ${numALetras(parseV(pagosVals[3]))} (${pagosVals[3]}) pagaderos 8 días antes de la fecha de terminación de la obra.`,
+    ].join('\n\n');
+  } else {
+    pagosTexto=[
+      `Primer pago, como congelación, equivalente al ${Math.round((parseV(pagosVals[0])/d.valor_total)*100)} por ciento ${Math.round((parseV(pagosVals[0])/d.valor_total)*100)}% del valor del contrato por un valor de ${numALetras(parseV(pagosVals[0]))} (${pagosVals[0]}), para separar tu remodelación y congelar el precio.`,
+      `Segundo pago, a título de anticipo para iniciar la obra, equivalente al ${Math.round((parseV(pagosVals[1])/d.valor_total)*100)} por ciento ${Math.round((parseV(pagosVals[1])/d.valor_total)*100)}% del valor del contrato por valor de ${numALetras(parseV(pagosVals[1]))} (${pagosVals[1]}). Este valor deberá ser pagado por el CONTRATANTE para dar inicio a los trabajos.`,
+      `Tercer pago equivale al ${Math.round((parseV(pagosVals[2])/d.valor_total)*100)} por ciento ${Math.round((parseV(pagosVals[2])/d.valor_total)*100)}% del valor del contrato por valor de ${numALetras(parseV(pagosVals[2]))} (${pagosVals[2]}), pagaderos al avance de la obra civil: paredes en segunda mano de pintura, cargue de piso y techo.`,
+      `Cuarto pago equivale ${Math.round((parseV(pagosVals[3])/d.valor_total)*100)} por ciento ${Math.round((parseV(pagosVals[3])/d.valor_total)*100)}% del valor del contrato por valor de ${numALetras(parseV(pagosVals[3]))} (${pagosVals[3]}), pagaderos al avance del 70% de la carpintería.`,
+      `Quinto pago equivale al ${Math.round((parseV(pagosVals[4])/d.valor_total)*100)} por ciento ${Math.round((parseV(pagosVals[4])/d.valor_total)*100)}% del valor del contrato por valor de ${numALetras(parseV(pagosVals[4]))} (${pagosVals[4]}) pagaderos 8 días antes de la fecha de terminación de la obra.`,
+    ].join('\n\n');
+  }
+
+  // Construir párrafos para el DOCX
+  const enc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  
+  // Encabezado A según tipo
+  const partB_vis = tipo==='visualizza'
+    ? `GRUPO VISUALIZZA S.A.S., sociedad domiciliada en la ciudad de Bogotá, constituida mediante Documento Privado de Asamblea de Accionistas del 20 de octubre de 2020, inscrita el 04 de Noviembre de 2020 bajo el número 02631617 del libro IX, con Matrícula Mercantil número 03305363 de la Cámara de Comercio de Bogotá y N.I.T. 901.426.973-9, representada legalmente por la señora CAROLINA CHACON VARGAS, mayor de edad, vecina de Bogotá, identificada con la cédula de ciudadanía No. 1.032.370.748 expedida en Bogotá, quien para todos los efectos del presente documento se le denominará EL CONTRATISTA; y`
+    : `GRUPO VISUALIZZA S.A.S., a través de su marca ACABADOSVIS.COM., sociedad domiciliada en la ciudad de Bogotá, constituida mediante Documento Privado de Asamblea de Accionistas del 20 de octubre de 2020, inscrita el 04 de Noviembre de 2020 bajo el número 02631617 del libro IX, con Matrícula Mercantil número 03305363 de la Cámara de Comercio de Bogotá y N.I.T. 901.426.973-9, representada legalmente por la señora CAROLINA CHACON VARGAS, mayor de edad, vecina de Bogotá, identificada con la cédula de ciudadanía No. 1.032.370.748 expedida en Bogotá, quien para todos los efectos del presente documento se le denominará EL CONTRATISTA; y`;
+
+  const diasVig = tipo==='acabadosvis'?'sesenta (60)':'sesenta y cinco (65)';
+  const cuentaBanco = tipo==='visualizza'||tipo==='gran_central'
+    ? 'cuenta de ahorros No. 075661991 del Banco de Bogotá, a nombre de GRUPO VISUALIZZA S.A.S con NIT 901.426.973-9'
+    : 'cuenta de ahorros No. 075661991 del Banco de Bogotá, a nombre de ACABADOSVIS.COM';
+  
+  const objetoDir = tipo==='gran_central'
+    ? `el Conjunto residencial Gran Central ${d.torre} Apartamento ${d.apto}`
+    : tipo==='visualizza'
+    ? `${d.proyecto} ${d.torre} Apartamento ${d.apto}`
+    : `${d.direccion} ${d.torre} Apartamento ${d.apto}`;
+
+  const lineasDoc = [
+    tipo==='acabadosvis'
+      ? `CONTRATO DE OBRA CIVIL No. ${conNum} PARA LA TERMINACIÓN DE CONSTRUCCIÓN DE INMUEBLE`
+      : `CONTRATO DE OBRA CIVIL No. ${conNum} PARA LA TERMINACIÓN DE CONSTRUCCIÓN DE INMUEBLE`,
+    ``,
+    `Entre los suscritos a saber, quienes conjuntamente se denominarán LAS PARTES, y de manera individual LA PARTE:`,
+    ``,
+    `${partB_vis}`,
+    ``,
+    `${d.nombre}, mayor de edad y vecino(a) de Bogotá, identificado(a) con la cédula de ciudadanía No. ${d.cedula} expedida en ${d.lugar_exp}, quien (es) en adelante se denominará(n) EL(LOS) CONTRATANTE(S).`,
+    ``,
+    `Hemos decidido celebrar el presente CONTRATO DE OBRA CIVIL PARA TERMINACIÓN DE CONSTRUCCIÓN DE INMUEBLE, que se regirá por las normas civiles y comerciales que regulan la materia, y por las cláusulas contenidas en este documento:`,
+    ``,
+    `CLÁUSULAS`,
+    ``,
+    `PRIMERA. - OBJETO: El CONTRATISTA se obliga para con EL(LOS) CONTRATANTE(S) a ejecutar la obra civil de terminación del inmueble ubicado en ${objetoDir} en Bogotá, y a su vez EL(LOS) CONTRATANTE(S), se obliga a pagar el precio por las actividades estipuladas en el ANEXO A, Cotización ${cotNum} y ANEXO B, Listado de especificaciones.`,
+    `Por su parte, EL(LOS) CONTRATANTE(S), se obliga a pagar a EL CONTRATISTA todas y cada una de las contraprestaciones acordadas y a ejecutar todas las obligaciones que se describen en el presente contrato y sus anexos.`,
+    ``,
+    `SEGUNDA – OBLIGACIONES DEL CONTRATISTA`,
+    `Ejecutar la obra civil de terminación del inmueble objeto de este CONTRATO de manera correcta y de acuerdo con el ANEXO A, Cotización ${cotNum} y ANEXO B, Listado de especificaciones.`,
+    `Poner a disposición de la obra personal profesional y técnico idóneo y con experiencia en las áreas propias de las distintas actividades que integran el objeto del presente CONTRATO.`,
+    `Sujetarse a todos los reglamentos y determinaciones en materia de construcción conforme el objeto del presente contrato.`,
+    `Atender con prontitud las observaciones o sugerencias formuladas por EL(LOS) CONTRATANTE(S).`,
+    `Iniciar los trabajos contratados una vez EL(LOS) CONTRATANTE(S) haya realizado el pago del anticipo en favor del EL CONTRATISTA.`,
+    tipo!=='acabadosvis'?`Retirar los escombros generados durante la obra y disponerlos adecuadamente.`:``,
+    tipo!=='acabadosvis'?`Trabajar dentro de los horarios establecidos por la administración del conjunto residencial y hacer buen uso de las zonas comunes.`:``,
+    tipo!=='acabadosvis'?`El personal se abstendrá de pedirle instrucciones directamente a EL CONTRATANTE.`:``,
+    ``,
+    `TERCERA – OBLIGACIONES DEL CONTRATANTE`,
+    `Seleccionar los productos en El ANEXO B. Listado de especificaciones, de manera oportuna.`,
+    `Pagar el valor del presente CONTRATO conforme lo estipulado en la cláusula quinta.`,
+    `Cumplir con el plan de pagos pactado en el ANEXO A y en el presente CONTRATO, con un plazo no mayor a cinco (5) días calendario.`,
+    `Remitir a la Constructora del proyecto las posventas a que haya lugar previo al inicio de los trabajos y durante la ejecución de los mismos, en caso de que sea necesario.`,
+    `Coordinar y garantizar el acceso del personal del CONTRATISTA al inmueble en las fechas acordadas, para el cabal cumplimiento de las obligaciones del mismo.`,
+    `Abstenerse de dar instrucciones directas al personal del CONTRATISTA.`,
+    tipo!=='acabadosvis'?`Aprobar en un transcurso de máximo 5 días luego de recibidos los esquemas o diseños del apartamento que se requieran para la ejecución de las obras contratadas.`:``,
+    ``,
+    `CUARTA. - VIGENCIA: La vigencia del presente CONTRATO se extenderá hasta la firma del acta de entrega de obra y liquidación del CONTRATO o ${diasVig} días calendario, lo que ocurra primero. Este término podrá prorrogarse, por acuerdo expreso entre LAS PARTES, el cual deberá constar por escrito y que a manera de Anexo formará parte integral del presente CONTRATO.`,
+    ``,
+    `QUINTA. - VALOR DEL CONTRATO: De acuerdo con el ANEXO A, Cotización ${cotNum}, el valor del presente contrato asciende a la suma de ${numALetras(d.valor_total)} ($${d.valor_total.toLocaleString('es-CO')}).`,
+    ``,
+    pagosTexto,
+    ``,
+    `PARÁGRAFO PRIMERO: Se establece como fecha para sostener el valor del presente contrato hasta el ${d.fecha_cong} y un mes más, a partir de esta fecha los valores contenidos dentro de la cotización aprobada por EL(LOS) CONTRATANTE(S), por lo tanto, cualquier incremento de material y obra de mano serán ajustadas previa autorización del EL(LOS) CONTRATANTE(S).`,
+    ``,
+    `SEXTA- FECHA DE ENTREGA: La ejecución y entrega de la obra civil de terminación del inmueble será de ${diasVig} días calendario, en donde la fecha estimada de inicio y entrega será pactada al recibo del apartamento y quedará consignada en el acta de Inicio de obra que suscribirán LAS PARTES.`,
+    ``,
+    `PARÁGRAFO SEGUNDO: EL CONTRATISTA elaborará un ACTA DE ENTREGA DE OBRA Y LIQUIDACIÓN DEL CONTRATO con el fin de entregar las obras civiles realizadas y liquidar el presente contrato, y EL(LOS) CONTRATANTE(S) recibirá de conformidad los trabajos ejecutados y recibirá el paz y salvo por concepto de pago total del valor del contrato.`,
+    ``,
+    `SÉPTIMA. - CONDICIONES DE PAGO: EL CONTRATISTA facturará a EL(LOS) CONTRATANTE(S) los valores señalados en la cláusula anterior en los tiempos y montos establecidos. EL(LOS) CONTRATANTE(S) tiene la obligación de pagar los montos establecidos en la cláusula quinta anterior en la ${cuentaBanco}.`,
+    ``,
+    `OCTAVA. - GARANTÍAS: EL CONTRATISTA otorgará a favor de EL(LOS) CONTRATANTE(S), la garantía sobre la obra civil de doce meses (12) contados a partir de la fecha del ACTA DE ENTREGA DE OBRA Y LIQUIDACIÓN DEL CONTRATO. EL(LOS) CONTRATANTE(S) entiende(n) que tiene(n) derecho a la garantía por los defectos o vicios de cualquier índole que puedan verificarse siempre que afecten la identidad, idoneidad o calidad entre lo ofrecido y lo entregado. La garantía implica que EL CONTRATISTA deberá prestar el servicio en las condiciones en que fue contratado y que las partes, insumos, accesorios o componentes adheridos al inmueble deban ser cambiados por otros de igual o mejor calidad.`,
+    ``,
+    `NOVENA. - LÍMITE DE RESPONSABILIDAD: LAS PARTES acuerdan expresamente que EL CONTRATISTA es únicamente responsable de las actividades descritas en el presente CONTRATO. EL CONTRATISTA no será responsable de la suspensión, demora, interrupciones o fallas que pudieran presentarse durante la ejecución de la obra derivadas u originadas por casos fortuitos o fuerza mayor, problemas de orden civil, paros, pandemias, robos o eventos atribuibles exclusivamente a responsabilidad de EL(LOS) CONTRATANTE(S) o a terceros.`,
+    ``,
+    `DÉCIMA - AMPLIACIÓN DEL PLAZO. - El CONTRATANTE podrá conceder ampliaciones del plazo inicialmente previsto para la entrega de las obras cuando se presenten circunstancias ajenas al CONTRATISTA, tales como no tener el ANEXO B "Listado de especificaciones" firmado, retrasos en la definición de diseños, entrega o aprobación de materiales, pagos extemporáneos, decisiones tardías del CONTRATANTE o situaciones de fuerza mayor o caso fortuito.`,
+    ``,
+    `DÉCIMA PRIMERA - TERMINACIÓN: El presente CONTRATO termina por las siguientes causas:\na)\tPor cumplimiento del objeto contractual y culminación del plazo de ejecución.\nb)\tPor imposibilidad legal sobreviniente para desarrollar el objeto del CONTRATO que no sea atribuible a ninguna de LAS PARTES.\nc)\tPor mutuo acuerdo entre LAS PARTES, siempre que de ello se deje constancia por escrito.\nd)\tPor incumplimiento de cualquiera de las obligaciones a cargo de LAS PARTES.\ne)\tPor caso fortuito o fuerza mayor en el cumplimiento de la totalidad del CONTRATO.\nf)\tLas demás previstas en la ley.`,
+    ``,
+    `DÉCIMA SEGUNDA. - INDEPENDENCIA DEL CONTRATISTA Y PERSONAL DE LA OBRA: EL CONTRATISTA actuará por su propia cuenta y riesgo, con absoluta autonomía y no estará sometido a subordinación laboral con EL(LOS) CONTRATANTE(S), por lo tanto, este CONTRATO no es de carácter laboral y no genera prestaciones laborales a favor de aquel.`,
+    ``,
+    `DÉCIMA TERCERA. - PENALIDADES: EL(LOS) CONTRATANTE(S) pagará(n) intereses a una tasa del 1.5% mensual, siempre que esta no sobrepase la máxima tasa de interés de usura sobre cualquier monto que EL(LOS) CONTRATANTE(S) no pague(n) dentro de los términos pactados en este CONTRATO. En caso de incumplimiento, LA PARTE INCUMPLIDA, deberá pagar a LA OTRA PARTE el equivalente al veinte por ciento (20%) del valor estimado del CONTRATO, a título de cláusula penal.`,
+    ``,
+    `DÉCIMA CUARTA. - NO CONTRATACIÓN DE PERSONAL: EL(LOS) CONTRATANTE(S), se compromete(n) a no ofrecer, ni contratar de manera directa o indirecta a los empleados de EL CONTRATISTA durante la vigencia de este CONTRATO y por un período de 36 meses con posterioridad.`,
+    ``,
+    `DÉCIMA QUINTA. - RESOLUCIÓN DE CONTROVERSIAS Y LEY APLICABLE: Este CONTRATO será regido e interpretado de conformidad con las leyes de la República de Colombia. Las controversias se someterán a arbitraje de derecho ante la Cámara de Comercio de Bogotá.`,
+    ``,
+    `DÉCIMA SEXTA. - PROTECCIÓN DE DATOS: LAS PARTES acuerdan que se acogerán a la Ley de Protección de Datos Personales establecida mediante Ley 1581 de 2012 y su Decreto Reglamentario 1377 de 2013.`,
+    ``,
+    `VIGÉSIMA PRIMERA - RELACIÓN: Para todos los efectos legales y contractuales, cualquier requerimiento, reclamación o garantía relacionada con la ejecución de los trabajos contratados en virtud del presente contrato deberá dirigirse única y exclusivamente a GRUPO VISUALIZZA S.A.S.`,
+    ``,
+    `VIGÉSIMA SEGUNDA – NOTIFICACIONES: Cualquier aviso o notificación que deba realizarse entre LAS PARTES deberá de dirigirse al domicilio o al correo electrónico señalado en este mismo CONTRATO con acuse, constancia o certificado de recibo.`,
+    `Las notificaciones entre LAS PARTES serán entregadas en los domicilios y correos electrónicos que a continuación se señalan:`,
+    `Por EL CONTRATISTA: Bogotá. Email: info@acabadosvis.com. Tel: 324 337 8250.`,
+    `Por EL(LOS) CONTRATANTE(S): Dirección: ${d.direccion}. Bogotá. Tel: ${d.celular}. Email: ${d.correo}.`,
+    ``,
+    `El presente documento se suscribe en la ciudad de Bogotá el día (${d.dia}) día del mes de ${d.mes} de dos mil veintiséis (2026) en dos (2) ejemplares de un mismo tenor para cada una de LAS PARTES, como prueba de aceptación de lo aquí consignado.`,
+    ``,``,
+    `EL CONTRATISTA                                                    EL(LOS) CONTRATANTE(S)`,
+    ``,``,
+    `_____________________________                              _________________________________`,
+    `GRUPO VISUALIZZA SAS${tipo==='acabadosvis'?' - ACABADOSVIS.COM':''}                     ${d.nombre}`,
+    `Nombre: CAROLINA CHACON VARGAS                             C.C. ${d.cedula} — ${d.lugar_exp}`,
+    `Cargo: Representante Legal                                      Email: ${d.correo}`,
+  ].filter(l=>l!==null&&l!==undefined);
+
+  const paras=lineasDoc.map(l=>{
+    const e=enc(l);
+    const isTit=l.includes('CONTRATO DE OBRA CIVIL No.')&&l.includes('PARA LA TERMINACIÓN');
+    const isCl=l==='CLÁUSULAS';
+    const isB=isTit||isCl||/^(PRIMERA|SEGUNDA|TERCERA|CUARTA|QUINTA|SEXTA|SÉPTIMA|OCTAVA|NOVENA|DÉCIMA|VIGÉSIMA|PARÁGRAFO|PARAGRAFO)/.test(l);
+    return `<w:p><w:pPr>${(isTit||isCl)?'<w:jc w:val="center"/>':''}<w:spacing w:after="140"/></w:pPr><w:r><w:rPr>${isB?'<w:b/>':''}<w:sz w:val="20"/><w:szCs w:val="20"/><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman"/></w:rPr><w:t xml:space="preserve">${e}</w:t></w:r></w:p>`;
+  }).join('\n');
+
+  const docXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${paras}<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr></w:body></w:document>`;
+
+  const files={
+    'word/document.xml':docXml,
+    '[Content_Types].xml':`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>`,
+    '_rels/.rels':`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`,
+    'word/_rels/document.xml.rels':`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
+  };
+  if(!window.JSZip) await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+  const zip=new window.JSZip();
+  for(const[p,ct]of Object.entries(files)) zip.file(p,ct);
+  const blob=await zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`${conNum}_${d.nombre.split(' ')[0]}.docx`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+function nuevo(){
+  document.querySelectorAll('input').forEach(i=>{if(i.id!=='correo-comercial')i.value='';});
+  document.getElementById('hdr-num').textContent='Nuevo';
+  try{localStorage.removeItem('visco_cliente_pendiente');}catch(e){}
+  selTipo('acabadosvis'); setView(1);
+}
+
+// ── HELPERS
+function parseV(s){return s?parseInt(s.toString().replace(/[^0-9]/g,''))||0:0;}
+function fmtP(n){return n?'$'+n.toLocaleString('es-CO'):'$0';}
+function g(id){return document.getElementById(id)?.value?.trim()||'—';}
+function numALetras(n){
+  if(!n) return 'CERO';
+  const u=['','UN','DOS','TRES','CUATRO','CINCO','SEIS','SIETE','OCHO','NUEVE','DIEZ','ONCE','DOCE','TRECE','CATORCE','QUINCE','DIECISÉIS','DIECISIETE','DIECIOCHO','DIECINUEVE'];
+  const d=['','DIEZ','VEINTE','TREINTA','CUARENTA','CINCUENTA','SESENTA','SETENTA','OCHENTA','NOVENTA'];
+  function m1000(x){
+    if(x===0) return '';
+    if(x<20) return u[x];
+    if(x<100){const [a,b]=[Math.floor(x/10),x%10];return d[a]+(b?' Y '+u[b]:'');}
+    if(x===100) return 'CIEN';
+    const [a,b]=[Math.floor(x/100),x%100];
+    return ['','CIENTO','DOSCIENTOS','TRESCIENTOS','CUATROCIENTOS','QUINIENTOS','SEISCIENTOS','SETECIENTOS','OCHOCIENTOS','NOVECIENTOS'][a]+(b?' '+m1000(b):'');
+  }
+  const mil=Math.floor(n/1000000),miles=Math.floor((n%1000000)/1000),uni=n%1000;
+  let r='';
+  if(mil) r+=(mil===1?'UN MILLÓN':m1000(mil)+' MILLONES')+' ';
+  if(miles) r+=(miles===1?'MIL':m1000(miles)+' MIL')+' ';
+  if(uni) r+=m1000(uni)+' ';
+  return r.trim()+' PESOS M/CTE';
+}
+function notif(msg){
+  const el=document.getElementById('notif');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3500);
+}
+(()=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';document.head.appendChild(s);})();
+</script>
+</body>
+</html>
+
