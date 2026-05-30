@@ -199,4 +199,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers: { 'Access-Control-Allow-Origin': '*' },
-      bod
+      body: JSON.stringify({ error: error.message }),
+    };
+  }
+};
