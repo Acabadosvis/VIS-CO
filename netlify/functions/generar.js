@@ -86,7 +86,8 @@ exports.handler = async (event) => {
     'visualizza': 'Contrato clientes visualizza.docx',
     'gran_central': 'CON - XXXX - 2026 NOMBRE CLIENTE Gran central.docx',
   };
-    const minutaPath = path.join(process.cwd(), minutaNames[tipo]);
+    // En Netlify, los archivos del repo están en /var/task/
+    const minutaPath = path.join('/var/task', minutaNames[tipo]);
     const docxBuffer = fs.readFileSync(minutaPath);
 
     const vt = valor_total;
@@ -198,7 +199,4 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ error: error.message }),
-    };
-  }
-};
+      bod
