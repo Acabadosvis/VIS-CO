@@ -1,7 +1,9 @@
 [build]
   functions = "netlify/functions"
 
-[[headers]]
-  for = "/*"
-  [headers.values]
-    Access-Control-Allow-Origin = "*"
+[functions]
+  included_files = [
+    "Minuta clientes Acabadosvis.docx",
+    "Contrato clientes visualizza.docx",
+    "CON - XXXX - 2026 NOMBRE CLIENTE Gran central.docx"
+  ]
