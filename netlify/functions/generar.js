@@ -108,7 +108,8 @@ exports.handler = async (event) => {
     }
  
     // En Netlify los archivos del repo están en /var/task/
-    const minutaPath = path.join('/var/task', minutaNames[tipo]);
+    // process.cwd() en Netlify Functions apunta a /var/task (raíz del bundle)
+    const minutaPath = path.join(process.cwd(), minutaNames[tipo]);
  
     if (!fs.existsSync(minutaPath)) {
       return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: `Minuta no encontrada en: ${minutaPath}` }) };
@@ -234,3 +235,4 @@ exports.handler = async (event) => {
     };
   }
 };
+ 
