@@ -637,7 +637,7 @@ async function generarContrato(){
     };
 
     // Llamar al servidor para generar con la minuta original
-    const resp = await fetch('/.netlify/functions/generar', {
+    const resp = await fetch('/./api/generar', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(datos)
