@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/generar.js": {
+      "includeFiles": "*.docx"
+    }
+  }
+}
