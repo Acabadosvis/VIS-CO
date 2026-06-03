@@ -213,7 +213,7 @@ module.exports = async (req, res) => {
 
     // ── Visualizza ────────────────────────────────────────────────────────────
     } else if (tipo === 'visualizza') {
-      // Misma estructura que AcabadosVIS: congelación + 50/20/20/10 del resto
+      // Congelación fija ($5M hardcodeada en la minuta) + 50/20/20/10 del resto
       const resto   = vt - cong;
       const p2      = Math.round(resto * 0.50);
       const p3      = Math.round(resto * 0.20);
@@ -223,32 +223,39 @@ module.exports = async (req, res) => {
       const pct2    = Math.round((p2   / vt) * 100);
 
       reps = {
-        'CON-XXXXX-26'                                                              : conNum,
-        'XXXXXXXXXXXXXXXXXXX'                                                       : nombre,
-        'XXXXXXXXXXX'                                                               : cedula,
-        'XXXXXXXXXX'                                                                : lugar_exp,
-        'XXXXXXXXXXXXXXXXXXXXXXX'                                                   : `${proyecto} ${torre} Apartamento ${apto}`,
-        'CO-XXXXXX-25'                                                              : cotizacion,
-        'CO-XXXXX-25'                                                               : cotizacion,
-        'CO-XXXXXXXX'                                                               : cotizacion,
-        "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS M/CTE ($XX'XXX.XXX)"                  : `${numLetras(vt)} (${fmtPesos(vt)})`,
-        // Porcentajes con número y letra
-        'XXXXXXXX por ciento XX%'                                                   : `${pctTxt(pct2)} por ciento ${pct2}%`,
-        'XXXXXX por ciento XX%'                                                     : `${pctTxt(pctCong)} por ciento ${pctCong}%`,
-        // Valores de pagos
-        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS ($XX,XXX,XXX)'                        : `${numLetras(cong)} (${fmtPesos(cong)})`,
-        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS ($XX,XXX,XXX)'            : `${numLetras(p2)} (${fmtPesos(p2)})`,
-        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS ($XX,XXX,XXX)'                  : `${numLetras(p3)} (${fmtPesos(p3)})`,
-        'XXXXXXXXXXXXXXXXXXXXXXXXXX PESOS ($X,XXX,XXX)'                            : `${numLetras(p4)} (${fmtPesos(p4)})`,
-        'MES DE XXXXXX DE 202X Y UN MES MAS'                                       : fecha_cong.toUpperCase() + ' Y UN MES MAS',
-        '(23) día del mes de julio'                                                 : `(${dia}) día del mes de ${mes}`,
-        'Dirección: xxxxxxxxxxxxxx'                                                 : `Dirección: ${direccion}`,
-        'Lugar: XXXXXXXXXX'                                                         : `Lugar: ${lugar_exp}`,
-        'Teléfono: 3XXXXXXXXXXXXX'                                                  : `Teléfono: ${celular}`,
-        'Email: XXXXXXXXXXXXXXXXXXXX'                                               : `Email: ${correo}`,
-        'Nombre: XXXXXXXXXXXXXXXXX'                                                 : `Nombre: ${nombre}`,
-        'Email: XXXXXXXXXXXXXXXXXXXXX'                                              : `Email: ${correo}`,
-        'XX día del mes de xxxxx'                                                   : `${dia} día del mes de ${mes}`,
+        // Número de contrato
+        'CON-XXXXX-26'                                                                       : conNum,
+        // Identificación cliente (19-X nombre, 11-X cédula, contexto para lugar_exp)
+        'XXXXXXXXXXXXXXXXXXX'                                                                : nombre,
+        'XXXXXXXXXXX'                                                                        : cedula,
+        'expedida en XXXXXXXXXX,'                                                            : `expedida en ${lugar_exp},`,
+        // Objeto PRIMERA (23-X proyecto+torre+apto)
+        'XXXXXXXXXXXXXXXXXXXXXXX'                                                            : `${proyecto} Torre ${torre} Apartamento ${apto}`,
+        // Cotización en cuerpo
+        'CO-XXXXXX-25'                                                                       : `CO-${cotizNum}-2026`,
+        'CO-XXXXX-25'                                                                        : `CO-${cotizNum}-2026`,
+        'CO-XXXXXXXX'                                                                        : `CO-${cotizNum}-2026`,
+        // Valor total (formato con apóstrofo en la minuta)
+        "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS M/CTE ($XX'XXX.XXX)"                           : `${numLetras(vt)} (${fmtPesos(vt)})`,
+        // Porcentajes pagos 1 y 2 (3/4/5 son estáticos en la minuta: 20/20/10)
+        'XXXXXX por ciento XX%'                                                              : `${pctTxt(pctCong)} por ciento ${pctCong}%`,
+        'XXXXXXXX por ciento XX%'                                                            : `${pctTxt(pct2)} por ciento ${pct2}%`,
+        // Valores pagos (el valor de congelación es estático $5M en la minuta)
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS M/CTE ($XX.XXX.XXX)'                         : `${numLetras(p2)} (${fmtPesos(p2)})`,
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS MCTE ($X.XXX.XXX)': `${numLetras(p3)} (${fmtPesos(p3)})`,
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS MCTE ($X.XXX.XXX)': `${numLetras(p4)} (${fmtPesos(p4)})`,
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS MCTE ($X.XXX.XXX)': `${numLetras(p5)} (${fmtPesos(p5)})`,
+        // Parágrafo primero (fecha vigencia valor)
+        'MES DE XXXXXX DE 202X Y UN MES MAS'                                                : fecha_cong.toUpperCase() + ' Y UN MES MAS',
+        // Notificaciones contratante (con contexto para evitar conflictos)
+        'Dirección: XXXXXXXXXXXXXXXX'                                                        : `Dirección: ${direccion}`,
+        'Lugar: XXXXXXX'                                                                     : `Lugar: ${lugar_exp}`,
+        'Teléfono: XXXXXXXXXX'                                                               : `Teléfono: ${celular}`,
+        'Email: XXXXXXXXXXXXXXX'                                                             : `Email: ${correo}`,
+        // Fecha suscripción y firma
+        '(23) día del mes de julio'                                                          : `(${dia}) día del mes de ${mes}`,
+        'Nombre: XXXXXXXXXXXXXXXXXXXX'                                                       : `Nombre: ${nombre}`,
+        'Email: XXXXXXXXXXXXXXXXXXXXX'                                                       : `Email: ${correo}`,
       };
 
     // ── Gran Central ──────────────────────────────────────────────────────────
