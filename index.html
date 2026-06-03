@@ -306,7 +306,7 @@ header{background:var(--n);padding:0 32px;height:56px;display:flex;align-items:c
         <input type="date" id="fecha-firma"/>
       </div>
       <div class="field">
-        <label>Fecha congelación precio</label>
+        <label>Fecha hasta la que se mantiene el valor</label>
         <input type="date" id="fecha-cong"/>
       </div>
     </div>
@@ -368,7 +368,7 @@ const TIPOS = {
     desc:['Congelar precio','Para dar inicio a trabajos','Paredes, piso y techo','Al 70% carpintería','8 días antes de entrega'],
   },
   visualizza: {
-    nombre:'Grupo Visualizza', dias:65, congelacion:false,
+    nombre:'Grupo Visualizza', dias:65, congelacion:true,
     info:'Vigencia 65 días. Sin congelación. Pagos: 50/20/20/10 sobre valor total. Cuenta Banco de Bogotá a nombre de GRUPO VISUALIZZA S.A.S.',
     pagos:['Anticipo inicio obra','Avance obra civil','Carpintería 70%','Pago final'],
     desc:['Para dar inicio a trabajos','Paredes, piso y techo','Al 70% carpintería','8 días antes de entrega'],
