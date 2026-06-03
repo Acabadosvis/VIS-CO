@@ -1,4 +1,3 @@
-/ api/generar.js  — Vercel Serverless Function
 'use strict';
  
 const fs    = require('fs');
