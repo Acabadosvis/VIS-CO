@@ -1,9 +1,9 @@
-// api/generar.js  — Vercel Serverless Function
+// netlify/functions/generar.js
 'use strict';
 
-const fs    = require('fs');
-const path  = require('path');
-const JSZip = require('jszip');
+const fs   = require('fs');
+const path = require('path');
+const JSZip = require('jszip'); // DEBE estar aquí arriba para que Netlify lo empaquete
 
 // ── Helpers de texto ──────────────────────────────────────────────────────────
 
@@ -61,8 +61,12 @@ function escapeXml(str) {
 }
 
 // ── Motor de reemplazo con merge de runs ──────────────────────────────────────
+// Word parte los placeholders largos en múltiples <w:r> con distinto rsid.
+// Solución: para cada <w:p> extraemos el texto completo, aplicamos los reemplazos
+// y ponemos todo el texto en el primer <w:t>, vaciando los demás.
 
 function extractParaText(paraXml) {
+  // Captura el contenido de TODOS los <w:t>...</w:t> del párrafo
   const matches = paraXml.match(/<w:t[^>]*>([^<]*)<\/w:t>/g) || [];
   return matches.map(m => m.replace(/<[^>]*>/g, '')).join('');
 }
@@ -70,7 +74,9 @@ function extractParaText(paraXml) {
 function applyReplacements(text, sortedReps) {
   let result = text;
   for (const [k, v] of sortedReps) {
-    if (result.includes(k)) result = result.split(k).join(String(v));
+    if (result.includes(k)) {
+      result = result.split(k).join(String(v));
+    }
   }
   return result;
 }
@@ -78,7 +84,10 @@ function applyReplacements(text, sortedReps) {
 function replaceParagraphText(paraXml, sortedReps) {
   const original = extractParaText(paraXml);
   const updated  = applyReplacements(original, sortedReps);
-  if (updated === original) return paraXml;
+
+  if (updated === original) return paraXml; // nada cambió
+
+  // Poner todo el texto en el PRIMER <w:t>, vaciar el resto
   let firstDone = false;
   return paraXml.replace(/<w:t([^>]*)>[^<]*<\/w:t>/g, (match, attrs) => {
     if (!firstDone) {
@@ -91,11 +100,19 @@ function replaceParagraphText(paraXml, sortedReps) {
 
 async function replaceInDocx(docxBuffer, replacements) {
   const zip = await JSZip.loadAsync(docxBuffer);
+
   const xmlFile = zip.file('word/document.xml');
   if (!xmlFile) throw new Error('word/document.xml no encontrado en el .docx');
+
   let xml = await xmlFile.async('string');
-  const sorted = Object.entries(replacements).sort((a, b) => b[0].length - a[0].length);
+
+  // Ordenar por longitud de clave descendente (claves largas primero = más específicas)
+  const sorted = Object.entries(replacements)
+    .sort((a, b) => b[0].length - a[0].length);
+
+  // Procesar párrafo a párrafo con merge de runs
   xml = xml.replace(/<w:p[ >][\s\S]*?<\/w:p>/g, para => replaceParagraphText(para, sorted));
+
   zip.file('word/document.xml', xml);
   return zip.generateAsync({
     type: 'nodebuffer',
@@ -103,19 +120,20 @@ async function replaceInDocx(docxBuffer, replacements) {
   });
 }
 
-// ── Handler Vercel ────────────────────────────────────────────────────────────
+// ── Handler principal ─────────────────────────────────────────────────────────
 
-module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+exports.handler = async (event) => {
+  const corsHeaders = {
+    'Access-Control-Allow-Origin' : '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  };
 
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST')   return res.status(405).end('Method not allowed');
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: corsHeaders, body: '' };
+  if (event.httpMethod !== 'POST')   return { statusCode: 405, headers: corsHeaders, body: 'Method not allowed' };
 
   try {
-    // Vercel parsea el body automáticamente si Content-Type es application/json
-    const datos = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const datos = JSON.parse(event.body);
 
     const {
       tipo,
@@ -124,11 +142,11 @@ module.exports = async (req, res) => {
       lugar_exp    = '',
       direccion    = '',
       correo       = '',
-      celular      = '',   // el form envía 'celular', no 'telefono'
+      telefono     = '',
       cotizacion   = '',
       valor_total,
       congelacion,
-      fecha_cong   = '',
+      fecha_cong   = '',   // Parágrafo 1: fecha vigencia cotización
       dia          = '',
       mes          = '',
       torre        = '',
@@ -136,11 +154,20 @@ module.exports = async (req, res) => {
       proyecto     = '',
     } = datos;
 
+    // Validación básica
     if (!tipo || !nombre || !valor_total) {
-      return res.status(400).json({ error: 'Faltan campos obligatorios: tipo, nombre, valor_total' });
+      return {
+        statusCode: 400,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: 'Faltan campos obligatorios: tipo, nombre, valor_total' }),
+      };
     }
     if (!fecha_cong) {
-      return res.status(400).json({ error: 'Falta la fecha de vigencia de la cotización (fecha_cong). Por favor ingrésala para continuar.' });
+      return {
+        statusCode: 400,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: 'Falta la fecha de vigencia de la cotización (fecha_cong). Por favor ingrésala para continuar.' }),
+      };
     }
 
     const minutaNames = {
@@ -150,32 +177,36 @@ module.exports = async (req, res) => {
     };
 
     if (!minutaNames[tipo]) {
-      return res.status(400).json({ error: `Tipo desconocido: ${tipo}` });
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: `Tipo desconocido: ${tipo}` }) };
     }
 
     const minutaPath = path.join(process.cwd(), minutaNames[tipo]);
     if (!fs.existsSync(minutaPath)) {
-      return res.status(500).json({ error: `Minuta no encontrada en: ${minutaPath}` });
+      return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: `Minuta no encontrada en: ${minutaPath}` }) };
     }
 
     const docxBuffer = fs.readFileSync(minutaPath);
 
-    // ── Cálculos ──────────────────────────────────────────────────────────────
+    // ── Cálculos de valores ────────────────────────────────────────────────────
     const vt   = Number(valor_total);
     const cong = Number(congelacion) || 5_000_000;
 
+    // Número limpio de cotización: "co-2502-2026" → "2502"
     const cotizNum = cotizacion
-      .replace(/^[Cc][Oo][-\s]*/, '')
-      .replace(/[-\s]*20\d\d$/, '')
-      .replace(/-/g, '')
+      .replace(/^[Cc][Oo][-\s]*/,  '')  // quita el prefijo CO-
+      .replace(/[-\s]*20\d\d$/,     '')  // quita el año al final
+      .replace(/-/g, '')                  // quita guiones internos
       .trim();
 
-    const conNum   = `CON-${cotizNum}-2026`;
-    const cotizFmt = `CO - ${cotizNum}`;  // el año ya está en la minuta, no duplicar
+    // Número de contrato: "CON-2502-2026"
+    const conNum = `CON-${cotizNum}-2026`;
+
+    // Cotización formateada para el cuerpo del contrato: "CO - 2502 - 2026"
+    const cotizFmt = `CO - ${cotizNum} - 2026`;
 
     let reps = {};
 
-    // ── AcabadosVIS ───────────────────────────────────────────────────────────
+    // ── AcabadosVIS ──────────────────────────────────────────────────────────
     if (tipo === 'acabadosvis') {
       const resto   = vt - cong;
       const p2      = Math.round(resto * 0.50);
@@ -186,79 +217,118 @@ module.exports = async (req, res) => {
       const pct2    = Math.round((p2   / vt) * 100);
 
       reps = {
-        'No. CON - XXXXX'                                                          : `No. CON - ${cotizNum}`,
-        'XXXXXXXXXXXXXXXXXXXX mayor de edad'                                        : `${nombre} mayor de edad`,
-        'ciudadanía No. XXXXXXXXXXXXX expedida'                                    : `ciudadanía No. ${cedula} expedida`,
-        'expedida en XXXXXXXXXX,'                                                  : `expedida en ${lugar_exp},`,
-        'ubicado en XXXXXXXXXXXXXXXXXXXX Torre'                                    : `ubicado en ${proyecto} Torre`,
-        'Torre XX Apartamento XXXX'                                                : `Torre ${torre} Apartamento ${apto}`,
-        'CO - XXXXXXX'                                                             : cotizFmt,
-        'CO – XXXXXX'                                                              : `CO – ${cotizNum}`,
-        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS M/CTE ($XX.XXX.XXX)'             : `${numLetras(vt)} (${fmtPesos(vt)})`,
-        'XXXXXXXX por ciento XX%'                                                  : `${pctTxt(pct2)} por ciento`,
-        'XXXXXX por ciento XX%'                                                    : `${pctTxt(pctCong)} por ciento`,
-        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS M/CTE ($XX.XXX.XXX)'               : `${numLetras(p2)} (${fmtPesos(p2)})`,
-        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS MCTE ($X.XXX.XXX)': `${numLetras(p3)} (${fmtPesos(p3)})`,
-        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS MCTE ($X.XXX.XXX)': `${numLetras(p4)} (${fmtPesos(p4)})`,
-        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS MCTE ($X.XXX.XXX)': `${numLetras(p5)} (${fmtPesos(p5)})`,
-        'hasta el XXXXXXXXX y'                                                     : `hasta el ${fecha_cong} y`,
-        'Dirección: xxxxxxxxxxxxxx'                                                : `Dirección: ${direccion}`,
-        'Lugar: XXXXXXXXXX'                                                        : `Lugar: ${lugar_exp}`,
-        'Teléfono: 3XXXXXXXXXXXXX'                                                 : `Teléfono: ${celular}`,
-        'Email: XXXXXXXXXXXXXXXXXXXX'                                              : `Email: ${correo}`,
-        'XX día del mes de xxxxx'                                                  : `${dia} día del mes de ${mes}`,
-        'Nombre: XXXXXXXXXXXXXXXXX'                                                : `Nombre: ${nombre}`,
-        'Email: XXXXXXXXXXXXXXXXXXXXX'                                             : `Email: ${correo}`,
+        // ── Número de contrato (título) ─────────────────────────────
+        // El 5-X aparece en "CON - XXXXX - 2026"
+        'No. CON - XXXXX': `No. CON - ${cotizNum}`,
+
+        // ── Identificación del cliente ──────────────────────────────
+        // 20-X CONTEXTO 1: nombre del cliente (párrafo identificación)
+        'XXXXXXXXXXXXXXXXXXXX mayor de edad': `${nombre} mayor de edad`,
+
+        // 13-X con contexto para NO chocar con Teléfono "3XXXXXXXXXXXXX"
+        'ciudadanía No. XXXXXXXXXXXXX expedida': `ciudadanía No. ${cedula} expedida`,
+
+        // 10-X lugar expedición
+        'expedida en XXXXXXXXXX,': `expedida en ${lugar_exp},`,
+
+        // ── Objeto del contrato (PRIMERA) ───────────────────────────
+        // 20-X CONTEXTO 2: ubicación del inmueble → proyecto, NO nombre cliente
+        'ubicado en XXXXXXXXXXXXXXXXXXXX Torre': `ubicado en ${proyecto} Torre`,
+
+        // Torre y Apartamento
+        'Torre XX Apartamento XXXX': `Torre ${torre} Apartamento ${apto}`,
+
+        // ── Referencias de cotización en cuerpo ─────────────────────
+        // 7-X → número cotización (en PRIMERA, SEGUNDA)
+        'CO - XXXXXXX': cotizFmt,
+
+        // 6-X → número cotización (en QUINTA con guión largo "CO – XXXXXX")
+        'CO – XXXXXX': `CO – ${cotizNum}`,  // – = U+2013
+
+        // ── Valor total (33-X intacto en un solo run) ───────────────
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS M/CTE ($XX.XXX.XXX)':
+          `${numLetras(vt)} (${fmtPesos(vt)})`,
+
+        // ── Pagos: porcentajes ──────────────────────────────────────
+        // 8-X pago 2 (DEBE ir antes que 6-X)
+        'XXXXXXXX por ciento XX%': `${pctTxt(pct2)} por ciento ${pct2}%`,
+
+        // 6-X pago 1
+        'XXXXXX por ciento XX%': `${pctTxt(pctCong)} por ciento ${pctCong}%`,
+
+        // ── Pagos: valores en letras y números ──────────────────────
+        // 31-X pago 2 (anticipo)
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS M/CTE ($XX.XXX.XXX)':
+          `${numLetras(p2)} (${fmtPesos(p2)})`,
+
+        // 59-X pago 3 (avance obra civil)
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS MCTE ($X.XXX.XXX)':
+          `${numLetras(p3)} (${fmtPesos(p3)})`,
+
+        // 62-X pago 4 (70% carpintería)
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS MCTE ($X.XXX.XXX)':
+          `${numLetras(p4)} (${fmtPesos(p4)})`,
+
+        // 61-X pago 5 (final)
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS MCTE ($X.XXX.XXX)':
+          `${numLetras(p5)} (${fmtPesos(p5)})`,
+
+        // ── Parágrafo primero: vigencia cotización ──────────────────
+        // 9-X → fecha de vigencia ingresada por el usuario en el form
+        'hasta el XXXXXXXXX y': `hasta el ${fecha_cong} y`,
+
+        // ── Datos del cliente (sección notificaciones) ──────────────
+        'Dirección: xxxxxxxxxxxxxx'   : `Dirección: ${direccion}`,
+        'Lugar: XXXXXXXXXX'           : `Lugar: ${lugar_exp}`,
+        'Teléfono: 3XXXXXXXXXXXXX'    : `Teléfono: ${telefono}`,
+
+        // 20-X CONTEXTO 3: email en sección notificaciones
+        'Email: XXXXXXXXXXXXXXXXXXXX' : `Email: ${correo}`,
+
+        // ── Fecha de suscripción ────────────────────────────────────
+        // 'día' usa la í literal (NO &#237;)
+        'XX día del mes de xxxxx': `${dia} día del mes de ${mes}`,
+
+        // ── Bloque de firmas ────────────────────────────────────────
+        // 17-X nombre en firma contratante
+        'Nombre: XXXXXXXXXXXXXXXXX'  : `Nombre: ${nombre}`,
+        // 21-X email en firma contratante
+        'Email: XXXXXXXXXXXXXXXXXXXXX': `Email: ${correo}`,
       };
 
-    // ── Visualizza ────────────────────────────────────────────────────────────
+    // ── Visualizza ───────────────────────────────────────────────────────────
     } else if (tipo === 'visualizza') {
-      // Congelación fija ($5M hardcodeada en la minuta) + 50/20/20/10 del resto
-      const resto   = vt - cong;
-      const p2      = Math.round(resto * 0.50);
-      const p3      = Math.round(resto * 0.20);
-      const p4      = Math.round(resto * 0.20);
-      const p5      = vt - cong - p2 - p3 - p4;
-      const pctCong = Math.round((cong / vt) * 100);
-      const pct2    = Math.round((p2   / vt) * 100);
+      const p1 = Math.round(vt * 0.50);
+      const p2 = Math.round(vt * 0.20);
+      const p3 = Math.round(vt * 0.20);
+      const p4 = vt - p1 - p2 - p3;
 
       reps = {
-        // Número de contrato
-        'CON-XXXXX-26'                                                                       : conNum,
-        // Identificación cliente (19-X nombre, 11-X cédula, contexto para lugar_exp)
-        'XXXXXXXXXXXXXXXXXXX'                                                                : nombre,
-        'XXXXXXXXXXX'                                                                        : cedula,
-        'expedida en XXXXXXXXXX,'                                                            : `expedida en ${lugar_exp},`,
-        // Objeto PRIMERA (23-X proyecto+torre+apto)
-        'XXXXXXXXXXXXXXXXXXXXXXX'                                                            : `${proyecto} Torre ${torre} Apartamento ${apto}`,
-        // Cotización en cuerpo
-        'CO-XXXXXX-25'                                                                       : `CO-${cotizNum}-2026`,
-        'CO-XXXXX-25'                                                                        : `CO-${cotizNum}-2026`,
-        'CO-XXXXXXXX'                                                                        : `CO-${cotizNum}-2026`,
-        // Valor total (formato con apóstrofo en la minuta)
-        "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS M/CTE ($XX'XXX.XXX)"                           : `${numLetras(vt)} (${fmtPesos(vt)})`,
-        // Porcentajes pagos 1 y 2 (3/4/5 son estáticos en la minuta: 20/20/10)
-        'XXXXXX por ciento XX%'                                                              : `${pctTxt(pctCong)} por ciento ${pctCong}%`,
-        'XXXXXXXX por ciento XX%'                                                            : `${pctTxt(pct2)} por ciento ${pct2}%`,
-        // Valores pagos (el valor de congelación es estático $5M en la minuta)
-        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS M/CTE ($XX.XXX.XXX)'                         : `${numLetras(p2)} (${fmtPesos(p2)})`,
-        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS MCTE ($X.XXX.XXX)': `${numLetras(p3)} (${fmtPesos(p3)})`,
-        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS MCTE ($X.XXX.XXX)': `${numLetras(p4)} (${fmtPesos(p4)})`,
-        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS MCTE ($X.XXX.XXX)': `${numLetras(p5)} (${fmtPesos(p5)})`,
-        // Parágrafo primero (fecha vigencia valor)
-        'MES DE XXXXXX DE 202X Y UN MES MAS'                                                : fecha_cong.toUpperCase() + ' Y UN MES MAS',
-        // Notificaciones contratante (con contexto para evitar conflictos)
-        'Dirección: XXXXXXXXXXXXXXXX'                                                        : `Dirección: ${direccion}`,
-        'Lugar: XXXXXXX'                                                                     : `Lugar: ${lugar_exp}`,
-        'Teléfono: XXXXXXXXXX'                                                               : `Teléfono: ${celular}`,
-        'Email: XXXXXXXXXXXXXXX'                                                             : `Email: ${correo}`,
-        // Fecha suscripción y firma
-        '(23) día del mes de julio'                                                          : `(${dia}) día del mes de ${mes}`,
-        'Nombre: XXXXXXXXXXXXXXXXXXXX'                                                       : `Nombre: ${nombre}`,
-        'Email: XXXXXXXXXXXXXXXXXXXXX'                                                       : `Email: ${correo}`,
+        'CON-XXXXX-26'                                                          : conNum,
+        'XXXXXXXXXXXXXXXXXXX'                                                   : nombre,
+        'XXXXXXXXXXX'                                                           : cedula,
+        'XXXXXXXXXX'                                                            : lugar_exp,
+        'XXXXXXXXXXXXXXXXXXXXXXX'                                               : `${proyecto} ${torre} Apartamento ${apto}`,
+        'CO-XXXXXX-25'                                                          : cotizacion,
+        'CO-XXXXX-25'                                                           : cotizacion,
+        'CO-XXXXXXXX'                                                           : cotizacion,
+        "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS M/CTE ($XX'XXX.XXX)"              : `${numLetras(vt)} (${fmtPesos(vt)})`,
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS ($XX,XXX,XXX)'                    : `${numLetras(p1)} (${fmtPesos(p1)})`,
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS ($XX,XXX,XXX)'        : `${numLetras(p2)} (${fmtPesos(p2)})`,
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS ($XX,XXX,XXX)'              : `${numLetras(p3)} (${fmtPesos(p3)})`,
+        'XXXXXXXXXXXXXXXXXXXXXXXXXX PESOS ($X,XXX,XXX)'                        : `${numLetras(p4)} (${fmtPesos(p4)})`,
+        'MES DE XXXXXX DE 202X Y UN MES MAS'                                   : fecha_cong.toUpperCase() + ' Y UN MES MAS',
+        '(23) día del mes de julio'                                             : `(${dia}) día del mes de ${mes}`,
+        'Dirección: xxxxxxxxxxxxxx'                                             : `Dirección: ${direccion}`,
+        'Lugar: XXXXXXXXXX'                                                     : `Lugar: ${lugar_exp}`,
+        'Teléfono: 3XXXXXXXXXXXXX'                                              : `Teléfono: ${telefono}`,
+        'Email: XXXXXXXXXXXXXXXXXXXX'                                            : `Email: ${correo}`,
+        'Nombre: XXXXXXXXXXXXXXXXX'                                             : `Nombre: ${nombre}`,
+        'Email: XXXXXXXXXXXXXXXXXXXXX'                                           : `Email: ${correo}`,
+        'XX día del mes de xxxxx'                                               : `${dia} día del mes de ${mes}`,
       };
 
-    // ── Gran Central ──────────────────────────────────────────────────────────
+    // ── Gran Central ─────────────────────────────────────────────────────────
     } else if (tipo === 'gran_central') {
       const resto   = vt - cong;
       const p2      = Math.round(resto * 0.50);
@@ -287,7 +357,7 @@ module.exports = async (req, res) => {
         '(27) día del mes de abril'                                                       : `(${dia}) día del mes de ${mes}`,
         'Dirección: xxxxxxxxxxxxxx'                                                       : `Dirección: ${direccion}`,
         'Lugar: XXXXXXXXXX'                                                               : `Lugar: ${lugar_exp}`,
-        'Teléfono: 3XXXXXXXXXXXXX'                                                        : `Teléfono: ${celular}`,
+        'Teléfono: 3XXXXXXXXXXXXX'                                                        : `Teléfono: ${telefono}`,
         'Email: XXXXXXXXXXXXXXXXXXXX'                                                      : `Email: ${correo}`,
         'Nombre: XXXXXXXXXXXXXXXXX'                                                        : `Nombre: ${nombre}`,
         'Email: XXXXXXXXXXXXXXXXXXXXX'                                                      : `Email: ${correo}`,
@@ -296,14 +366,25 @@ module.exports = async (req, res) => {
     }
 
     const resultBuffer = await replaceInDocx(docxBuffer, reps);
-    const conNumFinal  = `CON-${cotizNum}-2026`;
+    const base64 = resultBuffer.toString('base64');
 
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-    res.setHeader('Content-Disposition', `attachment; filename="${conNumFinal}.docx"`);
-    return res.send(resultBuffer);
+    return {
+      statusCode: 200,
+      headers: {
+        ...corsHeaders,
+        'Content-Type'       : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'Content-Disposition': `attachment; filename="${conNum}.docx"`,
+      },
+      body           : base64,
+      isBase64Encoded: true,
+    };
 
   } catch (error) {
     console.error('[generar.js] ERROR:', error);
-    return res.status(500).json({ error: error.message, stack: error.stack });
+    return {
+      statusCode: 500,
+      headers: { 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({ error: error.message, stack: error.stack }),
+    };
   }
 };
