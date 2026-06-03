@@ -255,7 +255,7 @@ module.exports = async (req, res) => {
     }
 
     var resultBuffer = await replaceInDocx(docxBuffer, reps);
-    var conNumFinal = 'CON-'+cotizNum+'-2026';
+    var conNumFinal = 'CON-'+cotizNum+'-2026 '+nombre.toUpperCase();
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
     res.setHeader('Content-Disposition', 'attachment; filename="'+conNumFinal+'.docx"');
     return res.send(resultBuffer);
