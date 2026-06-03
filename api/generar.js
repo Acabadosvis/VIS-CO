@@ -1,15 +1,16 @@
+// api/generar.js  — Vercel Serverless Function
 'use strict';
- 
+
 const fs    = require('fs');
 const path  = require('path');
 const JSZip = require('jszip');
- 
+
 // ── Helpers de texto ──────────────────────────────────────────────────────────
- 
+
 function fmtPesos(n) {
   return '$' + Number(n).toLocaleString('es-CO');
 }
- 
+
 function numLetras(n) {
   n = Math.round(Number(n));
   if (!n) return 'CERO';
@@ -20,7 +21,7 @@ function numLetras(n) {
              'SESENTA','SETENTA','OCHENTA','NOVENTA'];
   const c = ['','CIENTO','DOSCIENTOS','TRESCIENTOS','CUATROCIENTOS','QUINIENTOS',
              'SEISCIENTOS','SETECIENTOS','OCHOCIENTOS','NOVECIENTOS'];
- 
+
   function m1000(x) {
     if (x === 0)   return '';
     if (x < 20)    return u[x];
@@ -32,7 +33,7 @@ function numLetras(n) {
     const [a, b] = [Math.floor(x / 100), x % 100];
     return c[a] + (b ? ' ' + m1000(b) : '');
   }
- 
+
   const mil   = Math.floor(n / 1_000_000);
   const miles = Math.floor((n % 1_000_000) / 1_000);
   const uni   = n % 1_000;
@@ -42,7 +43,7 @@ function numLetras(n) {
   if (uni)   r += m1000(uni) + ' ';
   return r.trim() + ' PESOS M/CTE';
 }
- 
+
 function pctTxt(p) {
   const t = {
     5:'CINCO', 10:'DIEZ', 13:'TRECE', 14:'CATORCE', 15:'QUINCE',
@@ -51,21 +52,21 @@ function pctTxt(p) {
   };
   return t[p] || String(p);
 }
- 
+
 function escapeXml(str) {
   return String(str)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 }
- 
+
 // ── Motor de reemplazo con merge de runs ──────────────────────────────────────
- 
+
 function extractParaText(paraXml) {
   const matches = paraXml.match(/<w:t[^>]*>([^<]*)<\/w:t>/g) || [];
   return matches.map(m => m.replace(/<[^>]*>/g, '')).join('');
 }
- 
+
 function applyReplacements(text, sortedReps) {
   let result = text;
   for (const [k, v] of sortedReps) {
@@ -73,7 +74,7 @@ function applyReplacements(text, sortedReps) {
   }
   return result;
 }
- 
+
 function replaceParagraphText(paraXml, sortedReps) {
   const original = extractParaText(paraXml);
   const updated  = applyReplacements(original, sortedReps);
@@ -87,7 +88,7 @@ function replaceParagraphText(paraXml, sortedReps) {
     return `<w:t></w:t>`;
   });
 }
- 
+
 async function replaceInDocx(docxBuffer, replacements) {
   const zip = await JSZip.loadAsync(docxBuffer);
   const xmlFile = zip.file('word/document.xml');
@@ -101,21 +102,21 @@ async function replaceInDocx(docxBuffer, replacements) {
     mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   });
 }
- 
+
 // ── Handler Vercel ────────────────────────────────────────────────────────────
- 
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
- 
+
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST')   return res.status(405).end('Method not allowed');
- 
+
   try {
     // Vercel parsea el body automáticamente si Content-Type es application/json
     const datos = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
- 
+
     const {
       tipo,
       nombre       = '',
@@ -123,7 +124,7 @@ module.exports = async (req, res) => {
       lugar_exp    = '',
       direccion    = '',
       correo       = '',
-      telefono     = '',
+      celular      = '',   // el form envía 'celular', no 'telefono'
       cotizacion   = '',
       valor_total,
       congelacion,
@@ -134,46 +135,46 @@ module.exports = async (req, res) => {
       apto         = '',
       proyecto     = '',
     } = datos;
- 
+
     if (!tipo || !nombre || !valor_total) {
       return res.status(400).json({ error: 'Faltan campos obligatorios: tipo, nombre, valor_total' });
     }
     if (!fecha_cong) {
       return res.status(400).json({ error: 'Falta la fecha de vigencia de la cotización (fecha_cong). Por favor ingrésala para continuar.' });
     }
- 
+
     const minutaNames = {
       acabadosvis : 'Minuta clientes Acabadosvis.docx',
       visualizza  : 'Contrato clientes visualizza.docx',
       gran_central: 'CON - XXXX - 2026 NOMBRE CLIENTE Gran central.docx',
     };
- 
+
     if (!minutaNames[tipo]) {
       return res.status(400).json({ error: `Tipo desconocido: ${tipo}` });
     }
- 
+
     const minutaPath = path.join(process.cwd(), minutaNames[tipo]);
     if (!fs.existsSync(minutaPath)) {
       return res.status(500).json({ error: `Minuta no encontrada en: ${minutaPath}` });
     }
- 
+
     const docxBuffer = fs.readFileSync(minutaPath);
- 
+
     // ── Cálculos ──────────────────────────────────────────────────────────────
     const vt   = Number(valor_total);
     const cong = Number(congelacion) || 5_000_000;
- 
+
     const cotizNum = cotizacion
       .replace(/^[Cc][Oo][-\s]*/, '')
       .replace(/[-\s]*20\d\d$/, '')
       .replace(/-/g, '')
       .trim();
- 
+
     const conNum   = `CON-${cotizNum}-2026`;
-    const cotizFmt = `CO - ${cotizNum} - 2026`;
- 
+    const cotizFmt = `CO - ${cotizNum}`;  // el año ya está en la minuta, no duplicar
+
     let reps = {};
- 
+
     // ── AcabadosVIS ───────────────────────────────────────────────────────────
     if (tipo === 'acabadosvis') {
       const resto   = vt - cong;
@@ -183,7 +184,7 @@ module.exports = async (req, res) => {
       const p5      = vt - cong - p2 - p3 - p4;
       const pctCong = Math.round((cong / vt) * 100);
       const pct2    = Math.round((p2   / vt) * 100);
- 
+
       reps = {
         'No. CON - XXXXX'                                                          : `No. CON - ${cotizNum}`,
         'XXXXXXXXXXXXXXXXXXXX mayor de edad'                                        : `${nombre} mayor de edad`,
@@ -194,8 +195,8 @@ module.exports = async (req, res) => {
         'CO - XXXXXXX'                                                             : cotizFmt,
         'CO – XXXXXX'                                                              : `CO – ${cotizNum}`,
         'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS M/CTE ($XX.XXX.XXX)'             : `${numLetras(vt)} (${fmtPesos(vt)})`,
-        'XXXXXXXX por ciento XX%'                                                  : `${pctTxt(pct2)} por ciento ${pct2}%`,
-        'XXXXXX por ciento XX%'                                                    : `${pctTxt(pctCong)} por ciento ${pctCong}%`,
+        'XXXXXXXX por ciento XX%'                                                  : `${pctTxt(pct2)} por ciento`,
+        'XXXXXX por ciento XX%'                                                    : `${pctTxt(pctCong)} por ciento`,
         'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS M/CTE ($XX.XXX.XXX)'               : `${numLetras(p2)} (${fmtPesos(p2)})`,
         'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS MCTE ($X.XXX.XXX)': `${numLetras(p3)} (${fmtPesos(p3)})`,
         'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS MCTE ($X.XXX.XXX)': `${numLetras(p4)} (${fmtPesos(p4)})`,
@@ -203,20 +204,20 @@ module.exports = async (req, res) => {
         'hasta el XXXXXXXXX y'                                                     : `hasta el ${fecha_cong} y`,
         'Dirección: xxxxxxxxxxxxxx'                                                : `Dirección: ${direccion}`,
         'Lugar: XXXXXXXXXX'                                                        : `Lugar: ${lugar_exp}`,
-        'Teléfono: 3XXXXXXXXXXXXX'                                                 : `Teléfono: ${telefono}`,
+        'Teléfono: 3XXXXXXXXXXXXX'                                                 : `Teléfono: ${celular}`,
         'Email: XXXXXXXXXXXXXXXXXXXX'                                              : `Email: ${correo}`,
         'XX día del mes de xxxxx'                                                  : `${dia} día del mes de ${mes}`,
         'Nombre: XXXXXXXXXXXXXXXXX'                                                : `Nombre: ${nombre}`,
         'Email: XXXXXXXXXXXXXXXXXXXXX'                                             : `Email: ${correo}`,
       };
- 
+
     // ── Visualizza ────────────────────────────────────────────────────────────
     } else if (tipo === 'visualizza') {
       const p1 = Math.round(vt * 0.50);
       const p2 = Math.round(vt * 0.20);
       const p3 = Math.round(vt * 0.20);
       const p4 = vt - p1 - p2 - p3;
- 
+
       reps = {
         'CON-XXXXX-26'                                                              : conNum,
         'XXXXXXXXXXXXXXXXXXX'                                                       : nombre,
@@ -235,13 +236,13 @@ module.exports = async (req, res) => {
         '(23) día del mes de julio'                                                 : `(${dia}) día del mes de ${mes}`,
         'Dirección: xxxxxxxxxxxxxx'                                                 : `Dirección: ${direccion}`,
         'Lugar: XXXXXXXXXX'                                                         : `Lugar: ${lugar_exp}`,
-        'Teléfono: 3XXXXXXXXXXXXX'                                                  : `Teléfono: ${telefono}`,
+        'Teléfono: 3XXXXXXXXXXXXX'                                                  : `Teléfono: ${celular}`,
         'Email: XXXXXXXXXXXXXXXXXXXX'                                               : `Email: ${correo}`,
         'Nombre: XXXXXXXXXXXXXXXXX'                                                 : `Nombre: ${nombre}`,
         'Email: XXXXXXXXXXXXXXXXXXXXX'                                              : `Email: ${correo}`,
         'XX día del mes de xxxxx'                                                   : `${dia} día del mes de ${mes}`,
       };
- 
+
     // ── Gran Central ──────────────────────────────────────────────────────────
     } else if (tipo === 'gran_central') {
       const resto   = vt - cong;
@@ -251,7 +252,7 @@ module.exports = async (req, res) => {
       const p5      = vt - cong - p2 - p3 - p4;
       const pctCong = Math.round((cong / vt) * 100);
       const pct2    = Math.round((p2   / vt) * 100);
- 
+
       reps = {
         'CON-2702-2026'                                                                  : conNum,
         'XXXXXXXXXXXXXXXXXXXXXXXXX'                                                      : nombre,
@@ -271,21 +272,21 @@ module.exports = async (req, res) => {
         '(27) día del mes de abril'                                                       : `(${dia}) día del mes de ${mes}`,
         'Dirección: xxxxxxxxxxxxxx'                                                       : `Dirección: ${direccion}`,
         'Lugar: XXXXXXXXXX'                                                               : `Lugar: ${lugar_exp}`,
-        'Teléfono: 3XXXXXXXXXXXXX'                                                        : `Teléfono: ${telefono}`,
+        'Teléfono: 3XXXXXXXXXXXXX'                                                        : `Teléfono: ${celular}`,
         'Email: XXXXXXXXXXXXXXXXXXXX'                                                      : `Email: ${correo}`,
         'Nombre: XXXXXXXXXXXXXXXXX'                                                        : `Nombre: ${nombre}`,
         'Email: XXXXXXXXXXXXXXXXXXXXX'                                                      : `Email: ${correo}`,
         'XX día del mes de xxxxx'                                                          : `${dia} día del mes de ${mes}`,
       };
     }
- 
+
     const resultBuffer = await replaceInDocx(docxBuffer, reps);
     const conNumFinal  = `CON-${cotizNum}-2026`;
- 
+
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
     res.setHeader('Content-Disposition', `attachment; filename="${conNumFinal}.docx"`);
     return res.send(resultBuffer);
- 
+
   } catch (error) {
     console.error('[generar.js] ERROR:', error);
     return res.status(500).json({ error: error.message, stack: error.stack });
