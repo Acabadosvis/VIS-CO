@@ -213,10 +213,14 @@ module.exports = async (req, res) => {
 
     // ── Visualizza ────────────────────────────────────────────────────────────
     } else if (tipo === 'visualizza') {
-      const p1 = Math.round(vt * 0.50);
-      const p2 = Math.round(vt * 0.20);
-      const p3 = Math.round(vt * 0.20);
-      const p4 = vt - p1 - p2 - p3;
+      // Misma estructura que AcabadosVIS: congelación + 50/20/20/10 del resto
+      const resto   = vt - cong;
+      const p2      = Math.round(resto * 0.50);
+      const p3      = Math.round(resto * 0.20);
+      const p4      = Math.round(resto * 0.20);
+      const p5      = vt - cong - p2 - p3 - p4;
+      const pctCong = Math.round((cong / vt) * 100);
+      const pct2    = Math.round((p2   / vt) * 100);
 
       reps = {
         'CON-XXXXX-26'                                                              : conNum,
@@ -228,7 +232,11 @@ module.exports = async (req, res) => {
         'CO-XXXXX-25'                                                               : cotizacion,
         'CO-XXXXXXXX'                                                               : cotizacion,
         "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS M/CTE ($XX'XXX.XXX)"                  : `${numLetras(vt)} (${fmtPesos(vt)})`,
-        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS ($XX,XXX,XXX)'                        : `${numLetras(p1)} (${fmtPesos(p1)})`,
+        // Porcentajes con número y letra
+        'XXXXXXXX por ciento XX%'                                                   : `${pctTxt(pct2)} por ciento ${pct2}%`,
+        'XXXXXX por ciento XX%'                                                     : `${pctTxt(pctCong)} por ciento ${pctCong}%`,
+        // Valores de pagos
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS ($XX,XXX,XXX)'                        : `${numLetras(cong)} (${fmtPesos(cong)})`,
         'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS ($XX,XXX,XXX)'            : `${numLetras(p2)} (${fmtPesos(p2)})`,
         'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS ($XX,XXX,XXX)'                  : `${numLetras(p3)} (${fmtPesos(p3)})`,
         'XXXXXXXXXXXXXXXXXXXXXXXXXX PESOS ($X,XXX,XXX)'                            : `${numLetras(p4)} (${fmtPesos(p4)})`,
