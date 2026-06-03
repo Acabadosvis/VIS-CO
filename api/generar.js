@@ -183,13 +183,13 @@ module.exports = async (req, res) => {
         'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS MCTE ($X.XXX.XXX)': numLetras(p4)+' ('+fmtPesos(p4)+')',
         'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS MCTE ($X.XXX.XXX)': numLetras(p5)+' ('+fmtPesos(p5)+')',
         'hasta el XXXXXXXXX y'                                                     : 'hasta el '+fecha_cong+' y',
-        'el dia XX dia del mes de xxxxx'                                           : 'el ('+dia+') dia del mes de '+mes,
+        'el dia XX dia del mes de xxxxx'                                           : 'el ('+dia+') día del mes de '+mes,
         'Nombre: XXXXXXXXXXXXXXXXX'                                                : 'Nombre: '+nombre,
         'Email: XXXXXXXXXXXXXXXXXXXXX'                                             : 'Email: '+correo,
         'Email: XXXXXXXXXXXXXXXXXXXX'                                              : 'Email: '+correo,
-        'Telefono: 3XXXXXXXXXXXXX'                                                 : 'Telefono: '+celular,
+        'Telefono: 3XXXXXXXXXXXXX'                                                 : 'Teléfono: '+celular,
         'Lugar: XXXXXXXXXX'                                                        : 'Lugar: '+lugar_exp,
-        'Direccion: xxxxxxxxxxxxxx'                                                : 'Direccion: '+direccion
+        'Direccion: xxxxxxxxxxxxxx'                                                : 'Dirección: '+direccion
       };
 
     } else if (tipo === 'visualizza') {
@@ -217,10 +217,10 @@ module.exports = async (req, res) => {
         'Nombre: XXXXXXXXXXXXXXXXXXXX'                                                       : 'Nombre: '+nombre,
         'Email: XXXXXXXXXXXXXXXXXXXXX'                                                       : 'Email: '+correo,
         'Email: XXXXXXXXXXXXXXX'                                                             : 'Email: '+correo,
-        'Telefono: XXXXXXXXXX'                                                               : 'Telefono: '+celular,
+        'Teléfono: XXXXXXXXXX'                                                          : 'Teléfono: '+celular,
         'Lugar: XXXXXXX'                                                                     : 'Lugar: '+lugar_exp,
-        'Direccion: XXXXXXXXXXXXXXXX'                                                        : 'Direccion: '+direccion,
-        '(23) dia del mes de julio'                                                          : '('+dia+') dia del mes de '+mes
+        'Dirección: XXXXXXXXXXXXXXXX'                                                   : 'Dirección: '+direccion,
+        '(23) día del mes de julio'                                                     : '('+dia+') día del mes de '+mes
       };
 
     } else if (tipo === 'gran_central') {
@@ -246,10 +246,10 @@ module.exports = async (req, res) => {
         'Nombre: XXXXXXXXXXXXXXXXX'                                                      : 'Nombre: '+nombre,
         'Email: XXXXXXXXXXXXXXXXXXXXX'                                                   : 'Email: '+correo,
         'Email: XXXXXXXXXXXXXXXXXXXX'                                                    : 'Email: '+correo,
-        'Telefono: 3XXXXXXXXXXXXX'                                                       : 'Telefono: '+celular,
+        'Telefono: 3XXXXXXXXXXXXX'                                                       : 'Teléfono: '+celular,
         'Lugar: XXXXXXXXXX'                                                              : 'Lugar: '+lugar_exp,
-        'Direccion: xxxxxxxxxxxxxx'                                                      : 'Direccion: '+direccion,
-        '(27) dia del mes de abril'                                                      : '('+dia+') dia del mes de '+mes,
+        'Direccion: xxxxxxxxxxxxxx'                                                      : 'Dirección: '+direccion,
+        '(27) dia del mes de abril'                                                      : '('+dia+') día del mes de '+mes,
         'XX dia del mes de xxxxx'                                                        : dia+' dia del mes de '+mes
       };
     }
