@@ -403,19 +403,32 @@ function carpetaOD(tipo_,proyecto_){
   return 'CLIENTES '+proyecto_.trim().toUpperCase();
 }
 
-async function guardarOD(blob,filename,tipo_,proyecto_,cliente){
-  if(!_odHandle) return false;
+// Guardar con diálogo "Guardar como" nativo del navegador
+// Abre el explorador de Windows para que el usuario elija la carpeta exacta
+async function guardarOD(blob, filename){
+  if(!window.showSaveFilePicker) return {ok:false, path:null};
   try{
-    const p=await _odHandle.requestPermission({mode:'readwrite'});
-    if(p!=='granted') return false;
-    const d1=await _odHandle.getDirectoryHandle(carpetaOD(tipo_,proyecto_),{create:true});
-    const d2=await d1.getDirectoryHandle(cliente,{create:true});
-    const d3=await d2.getDirectoryHandle('CONTRATO',{create:true});
-    const fh=await d3.getFileHandle(filename,{create:true});
+    const fh = await window.showSaveFilePicker({
+      suggestedName: filename,
+      startIn: _odHandle || 'documents',
+      types:[{
+        description:'Contrato Word',
+        accept:{'application/vnd.openxmlformats-officedocument.wordprocessingml.document':['.docx']}
+      }]
+    });
+    // Guardar referencia de la carpeta para la próxima vez
+    try{
+      const parent = await fh.getParent ? await fh.getParent() : null;
+      if(parent){ _odHandle=parent; await dbPut('od',parent); setOD(true,parent.name); }
+    }catch(e){}
     const w=await fh.createWritable();
     await w.write(blob); await w.close();
-    return true;
-  }catch(e){console.error('OD:',e);return false;}
+    return {ok:true, path:fh.name};
+  }catch(e){
+    if(e.name==='AbortError') return {ok:null, path:null}; // usuario canceló
+    console.error('SavePicker:',e);
+    return {ok:false, path:null};
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -645,30 +658,37 @@ async function generarContrato(){
     const filename=conNum+' '+datos.nombre.toUpperCase()+'.docx';
 
     document.getElementById('overlay').classList.remove('show');
-
-    // Intentar guardar en OneDrive automáticamente
-    const savedOD = await guardarOD(blob,filename,tipo,datos.proyecto,datos.nombre);
-
-    // Siempre descargar también
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
-
-    // Mostrar resultado
-    const carpeta=carpetaOD(tipo,datos.proyecto);
-    _rutaOneDrive_='2026 › '+carpeta+' › '+datos.nombre+' › CONTRATO';
-    _rutaOD=_rutaOneDrive_;
     document.getElementById('sv-titulo').textContent='¡Contrato '+conNum+' generado!';
 
-    if(savedOD){
-      document.getElementById('sv-msg').textContent='✅ Guardado automáticamente en OneDrive y descargado en Descargas.';
-      document.getElementById('sv-ruta').innerHTML='<div class="rt">📁 Guardado en OneDrive:</div><div class="rp">'+_rutaOD+'</div>';
-    }else{
-      document.getElementById('sv-msg').textContent='Archivo descargado en tu carpeta Descargas: "'+filename+'"';
+    // Intentar "Guardar como" con diálogo nativo (Chrome/Edge)
+    const saved = await guardarOD(blob, filename);
+
+    if(saved.ok === true){
+      // Guardado exitosamente donde el usuario eligió
+      document.getElementById('sv-msg').textContent='✅ Archivo guardado correctamente: "'+saved.path+'"';
       document.getElementById('sv-ruta').innerHTML=
-        '<div class="rt">📁 '+(_odHandle?'⚠️ No se pudo guardar automáticamente. Muévelo a:':'💡 Conecta OneDrive arriba para guardar automático. Ruta manual:')+'</div>'+
-        '<div class="rp">'+_rutaOD+'</div>'+
-        '<div style="margin-top:6px;font-size:11px;color:#888;">Busca "'+filename+'" en Descargas y muévelo a esta carpeta.</div>';
+        '<div class="rt">✓ Guardado en la ubicación que elegiste</div>'+
+        '<div class="rp" style="font-size:12px;">La próxima vez el diálogo abrirá en la misma carpeta.</div>';
+    } else if(saved.ok === null){
+      // Usuario canceló el diálogo — descarga normal como respaldo
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
+      document.getElementById('sv-msg').textContent='Cancelado. Archivo descargado en Descargas: "'+filename+'"';
+      document.getElementById('sv-ruta').innerHTML=
+        '<div class="rt">📁 Mueve el archivo manualmente a OneDrive:</div>'+
+        '<div class="rp">2026 › CLIENTES {PROYECTO} › '+datos.nombre+' › CONTRATO</div>';
+    } else {
+      // showSaveFilePicker no disponible o error — descarga normal
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
+      document.getElementById('sv-msg').textContent='Descargado en Descargas: "'+filename+'"';
+      document.getElementById('sv-ruta').innerHTML=
+        '<div class="rt">📁 Guarda manualmente en OneDrive:</div>'+
+        '<div class="rp">2026 › CLIENTES {PROYECTO} › '+datos.nombre+' › CONTRATO</div>'+
+        '<div style="margin-top:6px;font-size:11px;color:#888;">Para guardar automático usa Chrome o Edge.</div>';
     }
+
+    _rutaOD = '2026 › CLIENTES {PROYECTO} › '+datos.nombre+' › CONTRATO';
     document.getElementById('sv-ruta').style.display='block';
     document.getElementById('btn-copiar-ruta').style.display='inline-flex';
 
