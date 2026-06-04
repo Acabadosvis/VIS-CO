@@ -1,4 +1,4 @@
-// api/generar.js — Vercel Serverless Function — v2.1
+// api/generar.js — Vercel Serverless Function — v2.2
 'use strict';
 
 const fs   = require('fs');
@@ -33,17 +33,19 @@ function numLetras(n) {
   if (mil)   r+=(mil===1?'UN MILLÓN':m1000(mil)+' MILLONES')+' ';
   if (miles) r+=(miles===1?'MIL':m1000(miles)+' MIL')+' ';
   if (uni)   r+=m1000(uni)+' ';
-  return r.trim()+' PESOS M/CTE';
+  // En español: "CINCO MILLONES DE PESOS" (DE cuando sólo hay millones exactos)
+  const soloPorMilOnesPuros = mil > 0 && miles === 0 && uni === 0;
+  return r.trim()+(soloPorMilOnesPuros?' DE':'')+' PESOS M/CTE';
 }
 
-// Devuelve "veinte por ciento (20%)" — minúsculas + paréntesis
+// Devuelve "veinte por ciento 20%" — minúsculas, sin paréntesis (igual que el docx hardcoded)
 function pctFmt(p) {
   const t = {
     5:'cinco',10:'diez',13:'trece',14:'catorce',15:'quince',
     17:'diecisiete',20:'veinte',25:'veinticinco',30:'treinta',
     40:'cuarenta',43:'cuarenta y tres',50:'cincuenta',
   };
-  return (t[p]||String(p))+' por ciento ('+p+'%)';
+  return (t[p]||String(p))+' por ciento '+p+'%';
 }
 
 function escapeXml(str) {
@@ -170,6 +172,9 @@ module.exports = async (req, res) => {
 
         // QUINTA — valor total (33 X + M/CTE)
         'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PESOS M/CTE ($XX.XXX.XXX)'         : `${numLetras(vt)} (${fmtPesos(vt)})`,
+
+        // PAGO 1: valor congelación — texto HARDCODEADO en el docx, se reemplaza dinámicamente
+        'CINCO MILLONES DE PESOS M/CTE ($5.000.000)'                          : `${numLetras(cong)} (${fmtPesos(cong)})`,
 
         // PAGOS 1 y 2: porcentajes (8 X primero, luego 6 X — por longitud)
         'XXXXXXXX por ciento XX%'                                              : pctFmt(pct2),
