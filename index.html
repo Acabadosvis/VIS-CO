@@ -6,167 +6,230 @@
 <title>VIS-CO · AcabadosVIS</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root{--r:#E04A26;--ro:#B33A1C;--rc:#2a0e06;--n:#111;--g:#888;--gc:#1a1a1a;--b:#0a0a0a;--brd:#222;--gold:#C9A84C;--wa:#25D366;}
+:root{
+  --r:#E04A26;--ro:#C03B1A;--n:#1A1A1A;--g:#666;
+  --b:#F8F7F5;--w:#FFFFFF;--brd:#E4E0D9;--brd2:#D0CAC0;
+  --gc:#F0EDE8;--gold:#B8860B;--wa:#25D366;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06);
+  --sh2:0 2px 8px rgba(0,0,0,.12);
+}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--b);color:#e8e8e8;min-height:100vh;}
-header{background:#000;border-bottom:1px solid #1a1a1a;padding:0 32px;height:56px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
-.logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;}.logo span{color:var(--r);}
-.hbadge{margin-left:auto;font-size:10px;color:#444;letter-spacing:.06em;text-transform:uppercase;}
-.hnum{font-size:11px;color:#555;margin-left:10px;background:#1a1a1a;padding:3px 10px;border-radius:20px;}
-.tabs{background:#111;border-bottom:1px solid var(--brd);display:flex;overflow-x:auto;}
-.tab{padding:14px 20px;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#444;border-bottom:3px solid transparent;display:flex;align-items:center;gap:7px;white-space:nowrap;}
+body{font-family:'DM Sans',sans-serif;background:var(--b);color:var(--n);min-height:100vh;}
+
+/* HEADER */
+header{background:var(--w);border-bottom:1px solid var(--brd);padding:0 28px;height:60px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:var(--sh);}
+.logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--n);letter-spacing:-.02em;}
+.logo span{color:var(--r);}
+.hbadge{margin-left:auto;font-size:10px;color:#999;letter-spacing:.07em;text-transform:uppercase;}
+.hnum{font-size:11px;color:var(--g);margin-left:10px;background:var(--gc);padding:3px 10px;border-radius:20px;border:1px solid var(--brd);}
+
+/* ALERTA CLIENTE PENDIENTE */
+.alerta-cliente{display:none;background:#FFF3ED;border-bottom:2px solid var(--r);padding:10px 28px;font-size:12px;color:#7A2000;align-items:center;gap:10px;}
+.alerta-cliente.show{display:flex;}
+.alerta-cliente strong{color:var(--r);}
+.alerta-cliente .btn-mini{margin-left:auto;padding:5px 14px;background:var(--r);color:#fff;border:none;border-radius:6px;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.05em;cursor:pointer;text-transform:uppercase;}
+
+/* TABS */
+.tabs{background:var(--w);border-bottom:1px solid var(--brd);display:flex;overflow-x:auto;}
+.tab{padding:14px 20px;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#AAA;border-bottom:3px solid transparent;display:flex;align-items:center;gap:7px;white-space:nowrap;cursor:default;}
 .tab.active{color:var(--r);border-bottom-color:var(--r);}
 .tab.done{color:#27AE60;border-bottom-color:#27AE60;}
-.tn{width:19px;height:19px;border-radius:50%;background:#1a1a1a;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;color:#555;}
-.tab.active .tn{background:var(--r);color:#fff;}
-.tab.done .tn{background:#27AE60;color:#fff;}
-.wrap{max-width:680px;margin:0 auto;padding:40px 18px;}
+.tn{width:19px;height:19px;border-radius:50%;background:var(--gc);font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;color:#AAA;border:1px solid var(--brd);}
+.tab.active .tn{background:var(--r);color:#fff;border-color:var(--r);}
+.tab.done .tn{background:#27AE60;color:#fff;border-color:#27AE60;}
+
+/* LAYOUT */
+.wrap{max-width:680px;margin:0 auto;padding:36px 18px;}
 .view{display:none;}.view.active{display:block;}
-.sh{margin-bottom:26px;}
-.sh h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:5px;color:#fff;}
+.sh{margin-bottom:24px;}
+.sh h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:5px;color:var(--n);}
 .sh p{color:var(--g);font-size:13px;line-height:1.7;}
+
+/* FORM */
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .fg .full{grid-column:1/-1;}
-.fg .third{grid-column:span 1;}
 .field{display:flex;flex-direction:column;gap:5px;}
-.field label{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;}
-.field input,.field select{padding:11px 13px;border:1.5px solid var(--brd);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:#e8e8e8;background:#111;outline:none;transition:border-color .15s;}
-.field input:focus,.field select:focus{border-color:var(--r);}
-.field input::placeholder{color:#333;}
-.fhint{font-size:10px;color:#444;margin-top:2px;}
+.field label{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--g);}
+.field input,.field select{padding:11px 13px;border:1.5px solid var(--brd);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--n);background:var(--w);outline:none;transition:border-color .15s,box-shadow .15s;}
+.field input:focus,.field select:focus{border-color:var(--r);box-shadow:0 0 0 3px rgba(224,74,38,.1);}
+.field input::placeholder{color:#CCC;}
+.fhint{font-size:10px;color:#AAA;margin-top:2px;}
+
+/* TIPO BUTTONS */
 .tipo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:22px;}
-.tipo-btn{padding:16px 10px;border:1.5px solid var(--brd);border-radius:12px;cursor:pointer;background:#141414;text-align:center;transition:all .15s;}
-.tipo-btn:hover{border-color:#444;background:#1a1a1a;}
-.tipo-btn.sel{border-color:var(--r);background:#1a0a06;}
+.tipo-btn{padding:16px 10px;border:1.5px solid var(--brd);border-radius:12px;cursor:pointer;background:var(--w);text-align:center;transition:all .15s;box-shadow:var(--sh);}
+.tipo-btn:hover{border-color:var(--brd2);box-shadow:var(--sh2);}
+.tipo-btn.sel{border-color:var(--r);background:#FFF3ED;}
 .tb-icon{font-size:24px;margin-bottom:6px;}
-.tb-n{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#e8e8e8;}
+.tb-n{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--n);}
 .tb-s{font-size:10px;color:var(--g);margin-top:3px;}
-.info-box{background:#0d1520;border:1.5px solid #1a2d40;border-radius:9px;padding:14px 16px;margin-bottom:18px;}
-.info-box .it{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#60a5fa;margin-bottom:4px;}
-.info-box .ib{font-size:12px;color:#93c5fd;line-height:1.6;}
-.wa-box{background:#0d1a0f;border:1.5px solid #1a3a1a;border-radius:9px;padding:16px;margin-bottom:18px;}
-.wa-box .wt{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#4ade80;margin-bottom:10px;}
-.wa-preview{background:#111;border-radius:8px;padding:12px 14px;font-size:12px;color:#ccc;line-height:1.6;margin-bottom:12px;border:1px solid #1a3a1a;white-space:pre-wrap;}
+
+/* INFO BOXES */
+.info-box{background:#FFF8F5;border:1.5px solid #FDDDD0;border-radius:9px;padding:14px 16px;margin-bottom:18px;}
+.info-box .it{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--r);margin-bottom:4px;}
+.info-box .ib{font-size:12px;color:#7A3A20;line-height:1.6;}
+.info-box-green{background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:9px;padding:14px 16px;margin-bottom:18px;}
+.info-box-green .it{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#15803D;margin-bottom:4px;}
+.info-box-green .ib{font-size:12px;color:#14532D;line-height:1.6;}
+
+/* WHATSAPP */
+.wa-box{background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:9px;padding:16px;margin-bottom:18px;}
+.wa-box .wt{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#15803D;margin-bottom:10px;}
+.wa-preview{background:var(--w);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--n);line-height:1.6;margin-bottom:12px;border:1px solid #86EFAC;white-space:pre-wrap;}
 .btn-wa{display:inline-flex;align-items:center;gap:8px;background:var(--wa);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:all .15s;text-transform:uppercase;}
 .btn-wa:hover{background:#1DB954;}
-.pcard{background:#141414;border:1.5px solid var(--brd);border-radius:12px;padding:20px;margin-bottom:14px;}
-.pcard h3{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;margin-bottom:3px;color:#e8e8e8;}
+
+/* PAGOS */
+.pcard{background:var(--w);border:1.5px solid var(--brd);border-radius:12px;padding:20px;margin-bottom:14px;box-shadow:var(--sh);}
+.pcard h3{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;margin-bottom:3px;color:var(--n);}
 .pcard .pss{font-size:11px;color:var(--g);margin-bottom:16px;}
-.pr{display:grid;grid-template-columns:22px 1fr 40px 110px;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #1a1a1a;}
+.pr{display:grid;grid-template-columns:22px 1fr 40px 110px;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--brd);}
 .pr:last-child{border-bottom:none;padding-bottom:0;}
-.pnum{width:20px;height:20px;background:#2a0e06;color:var(--r);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'Syne',sans-serif;font-weight:800;}
-.pd{font-size:11px;color:#e8e8e8;line-height:1.3;}
+.pnum{width:20px;height:20px;background:#FFF3ED;color:var(--r);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'Syne',sans-serif;font-weight:800;border:1px solid #FDDDD0;}
+.pd{font-size:11px;color:var(--n);line-height:1.3;}
 .pd span{display:block;font-size:10px;color:var(--g);margin-top:1px;}
 .ppct{font-size:10px;font-weight:700;color:var(--r);text-align:right;}
-.pi{width:100%;padding:6px 8px;border:1.5px solid var(--brd);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:11px;text-align:right;outline:none;transition:border-color .15s;background:#111;color:#e8e8e8;}
+.pi{width:100%;padding:6px 8px;border:1.5px solid var(--brd);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:11px;text-align:right;outline:none;transition:border-color .15s;background:var(--w);color:var(--n);}
 .pi:focus{border-color:var(--r);}
-.trow{display:flex;justify-content:space-between;align-items:center;padding:12px 0 0;margin-top:4px;border-top:2px solid #222;}
-.trow .tl{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#e8e8e8;}
+.trow{display:flex;justify-content:space-between;align-items:center;padding:12px 0 0;margin-top:4px;border-top:2px solid var(--brd);}
+.trow .tl{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--n);}
 .trow .tv{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--r);}
-.alerta{display:none;background:#1a1200;border:1.5px solid #3a2a00;border-radius:8px;padding:10px 13px;font-size:11px;color:#fbbf24;margin-bottom:12px;}
-.res-card{background:#141414;border:1px solid #222;border-radius:12px;padding:22px;margin-bottom:22px;}
-.res-card h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:16px;color:#fff;}
+.alerta-suma{display:none;background:#FFF5F5;border:1.5px solid #FCA5A5;border-radius:8px;padding:10px 13px;font-size:11px;color:#991B1B;margin-bottom:12px;}
+
+/* RESUMEN */
+.res-card{background:var(--w);border:1.5px solid var(--brd);border-radius:12px;padding:22px;margin-bottom:22px;box-shadow:var(--sh);}
+.res-card h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:16px;color:var(--n);}
 .rg{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
-.ri .rl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#444;margin-bottom:2px;}
-.ri .rv{font-size:12px;color:#ccc;}
-.ri.hl .rv{color:var(--gold);font-weight:700;font-size:13px;}
+.ri .rl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#AAA;margin-bottom:2px;}
+.ri .rv{font-size:12px;color:var(--n);}
+.ri.hl .rv{color:var(--r);font-weight:700;font-size:13px;}
 .etag{display:inline-block;font-family:'Syne',sans-serif;font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px;}
-.etag.acab{background:#2a0e06;color:var(--r);}
-.etag.vis{background:#0d1520;color:#60a5fa;}
-.etag.gran{background:#1a1200;color:#fbbf24;}
+.etag.acab{background:#FFF3ED;color:var(--r);border:1px solid #FDDDD0;}
+.etag.vis{background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;}
+.etag.gran{background:#FFFBEB;color:#92400E;border:1px solid #FDE68A;}
+
+/* BUTTONS */
 .actions{margin-top:22px;display:flex;gap:9px;justify-content:flex-end;}
 .btn{padding:10px 22px;border-radius:8px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.05em;cursor:pointer;border:none;transition:all .15s;text-transform:uppercase;}
-.btn-p{background:var(--r);color:#fff;}.btn-p:hover{background:var(--ro);transform:translateY(-1px);}
-.btn-s{background:#1a1a1a;color:#ccc;border:1.5px solid var(--brd);}.btn-s:hover{border-color:#444;color:#fff;}
-.btn-g{background:#e8e8e8;color:#000;display:flex;align-items:center;gap:7px;padding:12px 26px;font-size:12px;}
-.btn-g:hover{background:#fff;transform:translateY(-1px);}
+.btn-p{background:var(--r);color:#fff;box-shadow:0 2px 8px rgba(224,74,38,.3);}
+.btn-p:hover{background:var(--ro);transform:translateY(-1px);}
+.btn-s{background:var(--w);color:var(--g);border:1.5px solid var(--brd);}
+.btn-s:hover{border-color:var(--brd2);color:var(--n);}
+.btn-g{background:var(--n);color:#fff;display:flex;align-items:center;gap:7px;padding:12px 26px;font-size:12px;}
+.btn-g:hover{background:#333;transform:translateY(-1px);}
 .btn-g:disabled{opacity:.4;cursor:not-allowed;transform:none;}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;}
+
+/* OVERLAY */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;}
 .overlay.show{display:flex;}
-.ov-box{background:#1e1e1e;border:1px solid #333;border-radius:14px;padding:36px 40px;text-align:center;max-width:320px;width:90%;}
+.ov-box{background:var(--w);border:1px solid var(--brd);border-radius:14px;padding:36px 40px;text-align:center;max-width:320px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.2);}
 .ov-box .ob-ic{font-size:36px;margin-bottom:12px;}
-.ov-box h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;color:#fff;}
-.ov-box p{font-size:12px;color:#bbb;line-height:1.6;}
-.spinner{width:28px;height:28px;border:3px solid #2a0e06;border-top-color:var(--r);border-radius:50%;animation:spin .8s linear infinite;margin:12px auto 0;}
+.ov-box h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;color:var(--n);}
+.ov-box p{font-size:12px;color:var(--g);line-height:1.6;}
+.spinner{width:28px;height:28px;border:3px solid var(--gc);border-top-color:var(--r);border-radius:50%;animation:spin .8s linear infinite;margin:12px auto 0;}
 @keyframes spin{to{transform:rotate(360deg);}}
+
+/* SUCCESS VIEW */
 .sv{text-align:center;padding:52px 0;}
-.sv .si{width:64px;height:64px;background:var(--r);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:28px;color:#fff;}
-.sv h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:8px;color:#fff;}
-.sv p{color:#bbb;max-width:380px;margin:0 auto 6px;line-height:1.6;font-size:12px;}
-.sv .ruta{font-size:11px;color:#ccc;background:#1e1e1e;border:1px solid #333;border-radius:8px;padding:12px 16px;margin:14px auto 0;max-width:440px;text-align:left;line-height:1.8;}
-.sv .ruta strong{color:#fff;}
-.sv-acts{display:flex;gap:9px;justify-content:center;margin-top:22px;flex-wrap:wrap;}
-.notif{position:fixed;bottom:18px;right:18px;background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:11px 16px;border-radius:8px;font-size:12px;transform:translateY(60px);opacity:0;transition:all .3s;z-index:999;max-width:280px;}
+.sv .si{width:72px;height:72px;background:var(--r);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px;color:#fff;box-shadow:0 4px 20px rgba(224,74,38,.3);}
+.sv h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:8px;color:var(--n);}
+.sv p{color:var(--g);max-width:380px;margin:0 auto 6px;line-height:1.6;font-size:13px;}
+.sv .ruta{font-size:12px;color:var(--n);background:var(--w);border:1.5px solid var(--brd);border-radius:10px;padding:16px 18px;margin:18px auto 0;max-width:480px;text-align:left;line-height:1.8;box-shadow:var(--sh);}
+.sv .ruta .ruta-titulo{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--g);margin-bottom:8px;}
+.sv .ruta .ruta-path{color:var(--r);font-weight:600;font-size:13px;}
+.sv-acts{display:flex;gap:9px;justify-content:center;margin-top:24px;flex-wrap:wrap;}
+
+/* NOTIF */
+.notif{position:fixed;bottom:18px;right:18px;background:var(--n);border:1px solid #333;color:#fff;padding:11px 16px;border-radius:8px;font-size:12px;transform:translateY(60px);opacity:0;transition:all .3s;z-index:999;max-width:280px;box-shadow:var(--sh2);}
 .notif.show{transform:translateY(0);opacity:1;}
-.cl-header{background:#000;border-bottom:1px solid #1a1a1a;padding:0 24px;height:52px;display:flex;align-items:center;justify-content:center;}
+
+/* VISTA CLIENTE */
+.cl-header{background:var(--w);border-bottom:1px solid var(--brd);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh);}
 .cl-wrap{max-width:500px;margin:0 auto;padding:36px 16px;}
 .cl-top{text-align:center;margin-bottom:26px;}
-.cl-top h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:7px;color:#fff;}
+.cl-top h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:7px;color:var(--n);}
 .cl-top p{color:var(--g);font-size:13px;line-height:1.7;}
-.cl-card{background:#141414;border:1.5px solid var(--brd);border-radius:13px;padding:26px;}
-.cl-card h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--brd);color:#e8e8e8;}
-.btn-env{width:100%;margin-top:20px;padding:14px;background:var(--r);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:all .15s;}
+.cl-card{background:var(--w);border:1.5px solid var(--brd);border-radius:13px;padding:26px;box-shadow:var(--sh);}
+.cl-card h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--brd);color:var(--n);}
+.btn-env{width:100%;margin-top:20px;padding:14px;background:var(--r);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:all .15s;box-shadow:0 2px 8px rgba(224,74,38,.3);}
 .btn-env:hover{background:var(--ro);}
-.privacy{margin-top:12px;font-size:11px;color:#444;text-align:center;line-height:1.5;}
+.privacy{margin-top:12px;font-size:11px;color:#AAA;text-align:center;line-height:1.5;}
 .cl-ok{text-align:center;padding:52px 0;}
-.cl-ok .si{width:64px;height:64px;background:var(--r);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:28px;color:#fff;}
-.cl-ok h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px;color:#fff;}
+.cl-ok .si{width:64px;height:64px;background:var(--r);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:28px;color:#fff;box-shadow:0 4px 20px rgba(224,74,38,.3);}
+.cl-ok h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px;color:var(--n);}
 .cl-ok p{color:var(--g);font-size:13px;line-height:1.7;max-width:320px;margin:0 auto;}
-.res-env{margin-top:18px;background:#1a1a1a;border-radius:10px;padding:14px 16px;text-align:left;font-size:12px;}
+.res-env{margin-top:18px;background:var(--gc);border-radius:10px;padding:14px 16px;text-align:left;font-size:12px;border:1px solid var(--brd);}
 .res-env strong{display:block;margin-bottom:8px;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g);}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--brd);margin:20px 0;}
+
 @media(max-width:560px){
-  .fg{grid-template-columns:1fr;}.fg .full,.fg .third{grid-column:1;}
+  .fg{grid-template-columns:1fr;}.fg .full{grid-column:1;}
   .tipo-grid{grid-template-columns:1fr 1fr;}
   .tabs{overflow-x:auto;}.tab{padding:12px 13px;}
-  header{padding:0 14px;}.wrap{padding:28px 12px;}
+  header{padding:0 14px;}.wrap{padding:24px 12px;}
   .pr{grid-template-columns:20px 1fr;}.ppct,.pi{display:none;}
   .rg{grid-template-columns:1fr;}
 }
 </style>
 </head>
 <body>
+
+<!-- ── VISTA CLIENTE ──────────────────────────────────────────────────────── -->
 <div id="vista-cliente" style="display:none;">
   <div class="cl-header">
-    <div class="logo" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;">VIS<span style="color:var(--r);">-CO</span></div>
+    <img src="https://acabadosvis.com/wp-content/uploads/2026/05/cropped-Acabados-Vis-Logotype-favicom-e1742710969663-270x270.png" alt="" style="height:28px;border-radius:5px;margin-right:10px;" onerror="this.style.display='none'"/>
+    <div class="logo">VIS<span>-CO</span></div>
   </div>
   <div class="cl-wrap">
     <div id="cl-form">
       <div class="cl-top">
         <h1>Datos para tu contrato</h1>
-        <p>Diligencie sus datos personales para generar su contrato de obra. Solo toma 2 minutos y sus datos estan seguros.</p>
+        <p>Diligencie sus datos personales para generar su contrato de obra.<br>Solo toma 2 minutos y su información está segura.</p>
       </div>
       <div class="cl-card">
-        <h3>Informacion personal</h3>
+        <h3>Información personal</h3>
         <div class="fg" style="gap:13px;">
-          <div class="field full"><label>Nombre completo *</label><input id="c-nombre" type="text" placeholder="Como aparece en su cedula" autocomplete="name"/></div>
-          <div class="field"><label>Cedula de ciudadania *</label><input id="c-cedula" type="text" placeholder="Ej: 1.000.150.006"/></div>
-          <div class="field"><label>Ciudad donde fue expedida *</label><input id="c-lugar" type="text" placeholder="Ej: Bogota"/></div>
-          <div class="field full"><label>Direccion de domicilio *</label><input id="c-dir" type="text" placeholder="Direccion completa de su residencia" autocomplete="street-address"/></div>
-          <div class="field"><label>Correo electronico *</label><input id="c-email" type="email" placeholder="su@correo.com" autocomplete="email"/></div>
+          <div class="field full"><label>Nombre completo *</label><input id="c-nombre" type="text" placeholder="Como aparece en su cédula" autocomplete="name"/></div>
+          <div class="field"><label>Cédula de ciudadanía *</label><input id="c-cedula" type="text" placeholder="Ej: 1.000.150.006"/></div>
+          <div class="field"><label>Ciudad de expedición *</label><input id="c-lugar" type="text" placeholder="Ej: Bogotá"/></div>
+          <div class="field full"><label>Dirección de domicilio *</label><input id="c-dir" type="text" placeholder="Dirección completa de su residencia" autocomplete="street-address"/></div>
+          <div class="field"><label>Correo electrónico *</label><input id="c-email" type="email" placeholder="su@correo.com" autocomplete="email"/></div>
           <div class="field"><label>Celular *</label><input id="c-cel" type="tel" placeholder="Ej: 315 987 6543" autocomplete="tel"/></div>
           <div class="field"><label>Nombre del proyecto *</label><input id="c-proyecto" type="text" placeholder="Ej: Gran Central, Well..."/></div>
           <div class="field"><label>Torre *</label><input id="c-torre" type="text" placeholder="Ej: Torre 3"/></div>
           <div class="field"><label>Apartamento *</label><input id="c-apto" type="text" placeholder="Ej: 802"/></div>
         </div>
-        <button class="btn-env" onclick="enviarCliente()">Enviar mis datos</button>
-        <div class="privacy">Sus datos se usan unicamente para generar su contrato de obra.<br>AcabadosVIS.com NIT 901.426.973-9</div>
+        <button class="btn-env" onclick="enviarCliente()">Enviar mis datos →</button>
+        <div class="privacy">Sus datos se usan únicamente para generar su contrato de obra.<br>AcabadosVIS.com · NIT 901.426.973-9</div>
       </div>
     </div>
     <div id="cl-ok" class="cl-ok" style="display:none;">
-      <div class="si">OK</div>
-      <h2>Datos enviados!</h2>
-      <p>Su asesor comercial recibio su informacion y generara el contrato pronto.</p>
-      <div class="res-env"><strong>Resumen enviado:</strong><div id="cl-resumen"></div></div>
+      <div class="si">✓</div>
+      <h2>¡Datos enviados!</h2>
+      <p>Su asesor comercial recibió su información y generará el contrato pronto.</p>
+      <div class="res-env"><strong>Resumen enviado</strong><div id="cl-resumen"></div></div>
     </div>
   </div>
 </div>
+
+<!-- ── VISTA COMERCIAL ────────────────────────────────────────────────────── -->
 <div id="vista-comercial" style="display:none;">
+
+<!-- Alerta cliente pendiente -->
+<div class="alerta-cliente" id="alerta-cliente">
+  <span>📋 <strong>Cliente pendiente:</strong> <span id="alerta-nombre-cliente"></span> llenó el formulario. Sus datos están listos.</span>
+  <button class="btn-mini" onclick="irPaso3()">Ver datos →</button>
+</div>
+
 <header>
-  <img src="https://acabadosvis.com/wp-content/uploads/2026/05/cropped-Acabados-Vis-Logotype-favicom-e1742710969663-270x270.png" alt="" style="height:30px;width:30px;border-radius:6px;object-fit:contain;" onerror="this.style.display='none'"/>
+  <img src="https://acabadosvis.com/wp-content/uploads/2026/05/cropped-Acabados-Vis-Logotype-favicom-e1742710969663-270x270.png" alt="" style="height:32px;width:32px;border-radius:7px;object-fit:contain;" onerror="this.style.display='none'"/>
   <div class="logo">VIS<span>-CO</span></div>
-  <span class="hbadge">Modulo contratos Comercial</span>
+  <span class="hbadge">Módulo Contratos</span>
   <span class="hnum" id="hdr-num">Nuevo</span>
 </header>
+
 <div class="tabs">
   <div class="tab active" id="tab1"><div class="tn">1</div>Tipo</div>
   <div class="tab" id="tab2"><div class="tn">2</div>WhatsApp</div>
@@ -174,235 +237,299 @@ header{background:#000;border-bottom:1px solid #1a1a1a;padding:0 32px;height:56p
   <div class="tab" id="tab4"><div class="tn">4</div>Pagos</div>
   <div class="tab" id="tab5"><div class="tn">5</div>Generar</div>
 </div>
+
+<!-- PASO 1: TIPO -->
 <div class="wrap view active" id="view1">
-  <div class="sh"><h2>Tipo de contrato</h2><p>Selecciona la empresa. Esto define la minuta y condiciones que se usan.</p></div>
+  <div class="sh"><h2>Tipo de contrato</h2><p>Selecciona la empresa. Esto define la minuta y condiciones aplicables.</p></div>
   <div class="tipo-grid">
     <div class="tipo-btn sel" id="tipo-acab" onclick="selTipo('acabadosvis')">
-      <div class="tb-icon">&#127959;</div>
+      <div class="tb-icon">🏗️</div>
       <div class="tb-n">ACABADOSVIS</div>
-      <div class="tb-s">Minuta AcabadosVIS 60 dias</div>
+      <div class="tb-s">Minuta AcabadosVIS · 60 días</div>
     </div>
     <div class="tipo-btn" id="tipo-vis" onclick="selTipo('visualizza')">
-      <div class="tb-icon">&#127970;</div>
+      <div class="tb-icon">🏠</div>
       <div class="tb-n">VISUALIZZA</div>
-      <div class="tb-s">Minuta Visualizza 65 dias</div>
+      <div class="tb-s">Minuta Visualizza · 65 días</div>
     </div>
     <div class="tipo-btn" id="tipo-gran" onclick="selTipo('gran_central_sin_bono')">
-      <div class="tb-icon">&#127959;</div>
+      <div class="tb-icon">🏢</div>
       <div class="tb-n">GRAN CENTRAL</div>
-      <div class="tb-s">Sin bono 5 pagos 65 dias</div>
+      <div class="tb-s">Sin bono · 5 pagos · 65 días</div>
     </div>
     <div class="tipo-btn" id="tipo-gran-con" onclick="selTipo('gran_central_con_bono')">
-      <div class="tb-icon">&#127243;</div>
+      <div class="tb-icon">🎫</div>
       <div class="tb-n">GRAN CENTRAL BONO</div>
       <div class="tb-s">Bono constructora $40.2M</div>
     </div>
   </div>
-  <div class="field" style="margin-bottom:18px;">
-    <label>N de cotizacion (CO-XXXX-2026) *</label>
-    <input id="cotizacion" type="text" placeholder="Ej: CO-00456-2026"/>
-  </div>
-  <div class="field" style="margin-bottom:18px;">
-    <label>Tu correo comercial</label>
-    <input id="correo-comercial" type="email" value="contacto@acabadosvis.com"/>
+  <div class="fg" style="margin-bottom:18px;">
+    <div class="field">
+      <label>N° de cotización (CO-XXXX-2026) *</label>
+      <input id="cotizacion" type="text" placeholder="Ej: CO-00456-2026"/>
+    </div>
+    <div class="field">
+      <label>Tu correo comercial</label>
+      <input id="correo-comercial" type="email" value="contacto@acabadosvis.com"/>
+    </div>
+    <div class="field">
+      <label>Fecha de firma del contrato</label>
+      <input type="date" id="fecha-firma"/>
+    </div>
+    <div class="field">
+      <label>Vigencia de la cotización (hasta)</label>
+      <input type="date" id="fecha-cong"/>
+      <div class="fhint">Fecha hasta la que se mantiene el precio</div>
+    </div>
   </div>
   <div class="info-box" id="info-tipo">
     <div class="it" id="info-title">Minuta: AcabadosVIS</div>
-    <div class="ib" id="info-body">Vigencia 60 dias. Congelacion $5.000.000 fija + anticipo 50% del resto + 20/20/10. Cuenta Banco de Bogota a nombre de ACABADOSVIS.COM.</div>
+    <div class="ib" id="info-body">Vigencia 60 días. Congelación $5.000.000 fija + anticipo 50% del resto + 20/20/10. Cuenta Banco de Bogotá a nombre de ACABADOSVIS.COM.</div>
   </div>
-  <div class="actions"><button class="btn btn-p" onclick="irPaso2()">Generar link cliente</button></div>
+  <div class="actions"><button class="btn btn-p" onclick="irPaso2()">Generar link cliente →</button></div>
 </div>
+
+<!-- PASO 2: WHATSAPP -->
 <div class="wrap view" id="view2">
-  <div class="sh"><h2>Enviar link al cliente</h2><p>El cliente abre el link, llena sus datos y tu recibes notificacion por correo.</p></div>
+  <div class="sh"><h2>Enviar link al cliente</h2><p>El cliente abre el link, llena sus datos y recibes notificación por correo.</p></div>
   <div class="wa-box">
-    <div class="wt">Mensaje listo para WhatsApp</div>
+    <div class="wt">✅ Mensaje listo para WhatsApp</div>
     <div class="wa-preview" id="wa-preview"></div>
-    <button class="btn-wa" onclick="abrirWA()">Abrir WhatsApp</button>
+    <button class="btn-wa" onclick="abrirWA()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Abrir WhatsApp
+    </button>
   </div>
   <div class="info-box">
-    <div class="it">Notificacion automatica</div>
-    <div class="ib">Cuando el cliente envie sus datos, se abrira automaticamente un correo a <strong id="correo-display"></strong> con toda la informacion.</div>
+    <div class="it">Notificación automática</div>
+    <div class="ib">Cuando el cliente envíe sus datos, recibirás un correo en <strong id="correo-display"></strong> con toda la información para completar el contrato.</div>
   </div>
-  <div class="info-box" style="background:#F0FDF4;border-color:#86EFAC;">
-    <div class="it" style="color:#15803D;">Cliente ya diligenció?</div>
-    <div class="ib" style="color:#14532D;">Si el cliente ya envio sus datos, haz clic en Continuar para ver si estan cargados.</div>
+  <div class="info-box-green" id="info-datos-ok" style="display:none;">
+    <div class="it">✓ Cliente ya diligenció</div>
+    <div class="ib">Los datos están guardados. Haz clic en Continuar para cargarlos automáticamente.</div>
   </div>
   <div class="actions">
-    <button class="btn btn-s" onclick="irPaso1()">Volver</button>
-    <button class="btn btn-p" onclick="irPaso3()">Continuar</button>
+    <button class="btn btn-s" onclick="irPaso1()">← Volver</button>
+    <button class="btn btn-p" onclick="irPaso3()">Continuar →</button>
   </div>
 </div>
+
+<!-- PASO 3: CLIENTE -->
 <div class="wrap view" id="view3">
-  <div class="sh"><h2>Datos del cliente</h2><p>Precargados si el cliente diligencio el formulario. Revisa y completa.</p></div>
-  <div class="info-box" id="alerta-datos" style="display:none;background:#F0FDF4;border-color:#86EFAC;">
-    <div class="it" style="color:#15803D;">Datos del cliente cargados automaticamente</div>
-    <div class="ib" style="color:#14532D;">El cliente ya diligencio el formulario. Revisa que todo este correcto.</div>
+  <div class="sh"><h2>Datos del cliente</h2><p>Precargados si el cliente diligenció el formulario. Revisa y completa.</p></div>
+  <div class="info-box-green" id="alerta-datos" style="display:none;">
+    <div class="it">✓ Datos cargados automáticamente</div>
+    <div class="ib">El cliente ya diligenció el formulario. Revisa que todo esté correcto antes de continuar.</div>
   </div>
   <div class="fg">
-    <div class="field full"><label>Nombre completo *</label><input id="nombre" type="text" placeholder="Nombre completo"/></div>
-    <div class="field"><label>Cedula *</label><input id="cedula" type="text" placeholder="52.456.789.012"/></div>
-    <div class="field"><label>Lugar expedicion *</label><input id="lugar-exp" type="text" placeholder="Bogota"/></div>
-    <div class="field full"><label>Direccion domicilio *</label><input id="direccion" type="text" placeholder="Direccion completa"/></div>
+    <div class="field full"><label>Nombre completo *</label><input id="nombre" type="text" placeholder="Nombre completo como en la cédula"/></div>
+    <div class="field"><label>Cédula *</label><input id="cedula" type="text" placeholder="52.456.789.012"/></div>
+    <div class="field"><label>Lugar de expedición *</label><input id="lugar-exp" type="text" placeholder="Bogotá"/></div>
+    <div class="field full"><label>Dirección de domicilio *</label><input id="direccion" type="text" placeholder="Dirección completa"/></div>
     <div class="field"><label>Correo *</label><input id="correo" type="email" placeholder="correo@email.com"/></div>
     <div class="field"><label>Celular *</label><input id="celular" type="tel" placeholder="315 987 6543"/></div>
-    <div class="field full"><label>Nombre del proyecto *</label><input id="proyecto" type="text" placeholder="Ej: Gran Central, Well, Corner View..."/></div>
+    <div class="field full" id="campo-proyecto-wrap">
+      <label>Nombre del proyecto *</label>
+      <input id="proyecto" type="text" placeholder="Ej: Gran Central, Well, Corner View..."/>
+    </div>
     <div class="field"><label>Torre *</label><input id="torre" type="text" placeholder="Ej: Torre 3"/></div>
     <div class="field"><label>Apartamento *</label><input id="apto" type="text" placeholder="Ej: 802"/></div>
   </div>
   <div class="actions">
-    <button class="btn btn-s" onclick="irPaso2()">Volver</button>
-    <button class="btn btn-p" onclick="irPaso4()">Continuar a pagos</button>
+    <button class="btn btn-s" onclick="irPaso2()">← Volver</button>
+    <button class="btn btn-p" onclick="irPaso4()">Continuar a pagos →</button>
   </div>
 </div>
+
+<!-- PASO 4: PAGOS -->
 <div class="wrap view" id="view4">
-  <div class="sh"><h2>Plan de pagos</h2><p>Solo el equipo comercial ve y diligencia esta seccion.</p></div>
+  <div class="sh"><h2>Plan de pagos</h2><p>Solo el equipo comercial ve y diligenció esta sección.</p></div>
   <div class="pcard">
-    <h3>Valor y distribucion</h3>
-    <div class="pss" id="pss-desc">Ingresa el valor total y los pagos se calculan automaticamente.</div>
+    <h3>Valor y distribución</h3>
+    <div class="pss" id="pss-desc">Ingresa el valor total y los pagos se calculan automáticamente.</div>
     <div class="fg" style="margin-bottom:16px;">
       <div class="field">
         <label>Valor total del contrato *</label>
         <input type="number" id="valor-total" placeholder="Ej: 38000000" oninput="calcPagos()"/>
       </div>
       <div class="field" id="campo-cong-wrap">
-        <label>Valor congelacion *</label>
+        <label>Valor congelación *</label>
         <input type="number" id="valor-cong" placeholder="Ej: 5000000" value="5000000" oninput="calcPagos()"/>
         <div class="fhint">Se resta del anticipo de inicio de obra</div>
-      </div>
-      <div class="field">
-        <label>Fecha firma</label>
-        <input type="date" id="fecha-firma"/>
-      </div>
-      <div class="field">
-        <label>Fecha hasta la que se mantiene el valor</label>
-        <input type="date" id="fecha-cong"/>
       </div>
     </div>
     <div id="pagos-rows"></div>
     <div class="trow"><div class="tl">Total</div><div class="tv" id="tot-pag">$0</div></div>
   </div>
-  <div class="alerta" id="al-suma">La suma de los pagos no coincide con el valor total del contrato.</div>
+  <div class="alerta-suma" id="al-suma">⚠️ La suma de los pagos no coincide con el valor total del contrato.</div>
   <div class="actions">
-    <button class="btn btn-s" onclick="irPaso3()">Volver</button>
-    <button class="btn btn-p" onclick="irPaso5()">Revisar</button>
+    <button class="btn btn-s" onclick="irPaso3()">← Volver</button>
+    <button class="btn btn-p" onclick="irPaso5()">Revisar →</button>
   </div>
 </div>
+
+<!-- PASO 5: GENERAR -->
 <div class="wrap view" id="view5">
-  <div class="sh"><h2>Revisar y generar</h2><p>Se generara el Word sobre la minuta oficial sin modificar ninguna letra.</p></div>
+  <div class="sh"><h2>Revisar y generar</h2><p>Se generará el Word sobre la minuta oficial sin modificar ninguna letra.</p></div>
   <div class="res-card" id="res-card"></div>
   <div class="actions">
-    <button class="btn btn-s" onclick="irPaso4()">Editar</button>
+    <button class="btn btn-s" onclick="irPaso4()">← Editar</button>
     <button class="btn btn-g" id="btn-gen" onclick="generarContrato()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
       Generar contrato Word
     </button>
   </div>
 </div>
+
+<!-- PASO 6: ÉXITO -->
 <div class="wrap view" id="view6">
   <div class="sv">
-    <div class="si">OK</div>
-    <h2>Contrato generado!</h2>
+    <div class="si">✓</div>
+    <h2 id="msg-ok-titulo">¡Contrato generado!</h2>
     <p id="msg-ok">El contrato fue descargado correctamente.</p>
     <div class="ruta" id="msg-ruta"></div>
-    <div class="sv-acts"><button class="btn btn-p" onclick="nuevo()">Nuevo contrato</button></div>
+    <div class="sv-acts">
+      <button class="btn btn-s" onclick="nuevo()">Nuevo contrato</button>
+      <button class="btn btn-p" onclick="copiarRuta()">Copiar ruta OneDrive</button>
+    </div>
   </div>
 </div>
-</div>
+
+</div><!-- /vista-comercial -->
+
+<!-- OVERLAY -->
 <div class="overlay" id="overlay">
   <div class="ov-box">
-    <div class="ob-ic">doc</div>
+    <div class="ob-ic">📄</div>
     <h3>Generando contrato...</h3>
-    <p>Aplicando datos sobre la minuta oficial. Solo un momento.</p>
+    <p>Aplicando datos sobre la minuta oficial.<br>Solo un momento.</p>
     <div class="spinner"></div>
   </div>
 </div>
+
 <div class="notif" id="notif"></div>
+
 <script>
 let tipo = 'acabadosvis';
+let _rutaOneDrive = '';
+
 const TIPOS = {
   acabadosvis: {
     nombre:'AcabadosVIS', dias:60, congelacion:true,
-    info:'Vigencia 60 dias. Congelacion fija + anticipo 50% del resto + 20/20/10. Cuenta Banco de Bogota a nombre de ACABADOSVIS.COM.',
-    pagos:['Congelacion','Anticipo inicio obra','Avance obra civil','Carpinteria 70%','Pago final'],
-    desc:['Congelar precio','Para dar inicio a trabajos','Paredes, piso y techo','Al 70% carpinteria','8 dias antes de entrega'],
+    info:'Vigencia 60 días. Congelación fija + anticipo 50% del resto + 20/20/10. Cuenta Banco de Bogotá a nombre de ACABADOSVIS.COM.',
+    pagos:['Congelación','Anticipo inicio obra','Avance obra civil','Carpintería 70%','Pago final'],
+    desc:['Congelar precio','Para dar inicio a trabajos','Paredes, piso y techo','Al 70% carpintería','8 días antes de entrega'],
   },
   visualizza: {
     nombre:'Grupo Visualizza', dias:65, congelacion:true,
-    info:'Vigencia 65 dias. Congelacion fija + anticipo 50% del resto + 20/20/10. Cuenta Banco de Bogota a nombre de GRUPO VISUALIZZA S.A.S.',
-    pagos:['Congelacion','Anticipo inicio obra','Avance obra civil','Carpinteria 70%','Pago final'],
-    desc:['Congelar precio','Para dar inicio a trabajos','Paredes, piso y techo','Al 70% carpinteria','8 dias antes de entrega'],
+    info:'Vigencia 65 días. Congelación fija + anticipo 50% del resto + 20/20/10. Cuenta Banco de Bogotá a nombre de GRUPO VISUALIZZA S.A.S.',
+    pagos:['Congelación','Anticipo inicio obra','Avance obra civil','Carpintería 70%','Pago final'],
+    desc:['Congelar precio','Para dar inicio a trabajos','Paredes, piso y techo','Al 70% carpintería','8 días antes de entrega'],
   },
   gran_central_sin_bono: {
-    nombre:'Gran Central Sin Bono', dias:65, congelacion:true,
-    info:'Vigencia 65 dias. Congelacion + anticipo 50% del resto + 20/20/10. Cuenta Banco de Bogota a nombre de GRUPO VISUALIZZA S.A.S.',
-    pagos:['Congelacion','Anticipo inicio obra','Avance obra civil','Carpinteria 70%','Pago final'],
-    desc:['Congelar precio','Para dar inicio a trabajos','Paredes, piso y techo','Al 70% carpinteria','8 dias antes de entrega'],
+    nombre:'Gran Central', dias:65, congelacion:true,
+    info:'Vigencia 65 días. Congelación + anticipo 50% del resto + 20/20/10. Cuenta Banco de Bogotá a nombre de GRUPO VISUALIZZA S.A.S.',
+    pagos:['Congelación','Anticipo inicio obra','Avance obra civil','Carpintería 70%','Pago final'],
+    desc:['Congelar precio','Para dar inicio a trabajos','Paredes, piso y techo','Al 70% carpintería','8 días antes de entrega'],
   },
   gran_central_con_bono: {
-    nombre:'Gran Central Con Bono', dias:65, congelacion:false,
+    nombre:'Gran Central con Bono', dias:65, congelacion:false,
     info:'Bono constructora $40.247.135 (paga la constructora). El cliente solo paga el excedente como anticipo del 100%.',
     pagos:['Bono constructora','Anticipo 100% excedente'],
     desc:['Paga la constructora','Excedente a cargo del cliente'],
   },
 };
+
+// INIT
 (function(){
   const p = new URLSearchParams(window.location.search);
-  if(p.get('modo')==='cliente'){
+  if (p.get('modo')==='cliente') {
     document.getElementById('vista-cliente').style.display='block';
   } else {
     document.getElementById('vista-comercial').style.display='block';
-    cargarDatos();
+    // Fecha de firma por defecto: hoy
+    const hoy = new Date().toISOString().split('T')[0];
+    document.getElementById('fecha-firma').value = hoy;
+    verificarClientePendiente();
   }
 })();
-function selTipo(t){
-  tipo=t;
-  ['acab','vis','gran','gran-con'].forEach(k=>{const el=document.getElementById('tipo-'+k);if(el)el.classList.remove('sel');});
-  const map={acabadosvis:'acab',visualizza:'vis',gran_central_sin_bono:'gran',gran_central_con_bono:'gran-con'};
-  const el=document.getElementById('tipo-'+map[t]);if(el)el.classList.add('sel');
-  const info=TIPOS[t];
-  document.getElementById('info-title').textContent='Minuta: '+info.nombre;
-  document.getElementById('info-body').textContent=info.info;
+
+function verificarClientePendiente() {
+  try {
+    const d = JSON.parse(localStorage.getItem('visco_cliente_pendiente') || '{}');
+    if (d.nombre) {
+      document.getElementById('alerta-cliente').classList.add('show');
+      document.getElementById('alerta-nombre-cliente').textContent = d.nombre;
+      document.getElementById('info-datos-ok').style.display = 'block';
+    }
+  } catch(e) {}
 }
-function setView(n){
+
+function selTipo(t) {
+  tipo = t;
+  ['acab','vis','gran','gran-con'].forEach(k=>{
+    const el=document.getElementById('tipo-'+k); if(el) el.classList.remove('sel');
+  });
+  const map={acabadosvis:'acab',visualizza:'vis',gran_central_sin_bono:'gran',gran_central_con_bono:'gran-con'};
+  const el=document.getElementById('tipo-'+map[t]); if(el) el.classList.add('sel');
+  document.getElementById('info-title').textContent='Minuta: '+TIPOS[t].nombre;
+  document.getElementById('info-body').textContent=TIPOS[t].info;
+}
+
+function setView(n) {
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('active','done');});
   document.getElementById('view'+n).classList.add('active');
-  const tab=document.getElementById('tab'+n);
-  if(tab) tab.classList.add('active');
+  const tab=document.getElementById('tab'+n); if(tab) tab.classList.add('active');
   for(let i=1;i<n;i++){const t=document.getElementById('tab'+i);if(t){t.classList.remove('active');t.classList.add('done');}}
   window.scrollTo(0,0);
 }
+
 function irPaso1(){setView(1);}
+
 function irPaso2(){
-  if(!document.getElementById('cotizacion').value.trim()){notif('Ingresa el numero de cotizacion');return;}
+  if (!g('cotizacion')) {notif('Ingresa el número de cotización');return;}
+  if (!document.getElementById('fecha-cong').value) {notif('Ingresa la fecha de vigencia de la cotización');return;}
   const base=window.location.href.split('?')[0];
   const link=base+'?modo=cliente';
-  const cot=document.getElementById('cotizacion').value.trim();
-  const msg='Hola! Soy tu asesor de AcabadosVIS.com.\n\nPara continuar con tu proyecto (cotizacion '+cot+'), necesitamos que diligencies tus datos personales para el contrato de obra.\n\nEs muy rapido, solo toma 2 minutos:\n' + link + '\n\nCualquier duda estoy a tu disposicion.';
+  const cot=g('cotizacion');
+  const msg='Hola! Soy tu asesor de AcabadosVIS.com.\n\nPara continuar con tu proyecto (cotización '+cot+'), necesitamos que diligencies tus datos personales para el contrato de obra.\n\n⏱️ Es muy rápido, solo toma 2 minutos:\n'+link+'\n\nCualquier duda estoy a tu disposición.';
   document.getElementById('wa-preview').textContent=msg;
-  document.getElementById('correo-display').textContent=document.getElementById('correo-comercial').value;
+  document.getElementById('correo-display').textContent=g('correo-comercial');
   setView(2);
 }
+
 function abrirWA(){
-  const msg=document.getElementById('wa-preview').textContent;
-  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  window.open('https://wa.me/?text='+encodeURIComponent(document.getElementById('wa-preview').textContent),'_blank');
 }
+
 function irPaso3(){
   cargarDatos();
-  if(!document.getElementById('fecha-firma').value)
-    document.getElementById('fecha-firma').value=new Date().toISOString().split('T')[0];
+  // Para Gran Central Bono: ocultar campo proyecto y fijarlo
+  const esGranCentralBono = tipo === 'gran_central_con_bono';
+  const campoProy = document.getElementById('campo-proyecto-wrap');
+  if (esGranCentralBono) {
+    campoProy.style.display = 'none';
+    document.getElementById('proyecto').value = 'Gran Central';
+  } else {
+    campoProy.style.display = 'block';
+  }
   setView(3);
 }
+
 function irPaso4(){
-  const reqs=['nombre','cedula','lugar-exp','direccion','correo','celular','proyecto','torre','apto'];
+  const reqs=['nombre','cedula','lugar-exp','direccion','correo','celular','torre','apto'];
+  // Solo validar proyecto si no es Gran Central Bono
+  if (tipo !== 'gran_central_con_bono') reqs.push('proyecto');
   for(const id of reqs){
-    if(!document.getElementById(id).value.trim()){notif('Completa todos los campos del cliente');document.getElementById(id).focus();return;}
+    if(!document.getElementById(id).value.trim()){notif('Completa: '+id.replace('-',' '));document.getElementById(id).focus();return;}
   }
   const t=TIPOS[tipo];
-  document.getElementById('campo-cong-wrap').style.display=(t.congelacion&&tipo!=='gran_central_con_bono')?'block':'none';
+  document.getElementById('campo-cong-wrap').style.display=(t.congelacion)?'block':'none';
   renderPagos();
   setView(4);
 }
+
 function irPaso5(){
   const vt=parseV(document.getElementById('valor-total').value);
   if(!vt){notif('Ingresa el valor total');return;}
@@ -413,6 +540,7 @@ function irPaso5(){
   if(diff>1000){notif('La suma de pagos no cuadra con el total');return;}
   buildResumen(); setView(5);
 }
+
 function cargarDatos(){
   try{
     const d=JSON.parse(localStorage.getItem('visco_cliente_pendiente')||'{}');
@@ -423,21 +551,22 @@ function cargarDatos(){
       document.getElementById('direccion').value=d.dir||'';
       document.getElementById('correo').value=d.email||'';
       document.getElementById('celular').value=d.cel||'';
-      document.getElementById('proyecto').value=d.proyecto||'';
+      if(tipo!=='gran_central_con_bono') document.getElementById('proyecto').value=d.proyecto||'';
       document.getElementById('torre').value=d.torre||'';
       document.getElementById('apto').value=d.apto||'';
       document.getElementById('alerta-datos').style.display='block';
     }
   }catch(e){}
 }
+
 function enviarCliente(){
-  const campos=[{id:'c-nombre',l:'Nombre'},{id:'c-cedula',l:'Cedula'},{id:'c-lugar',l:'Lugar expedicion'},
-    {id:'c-dir',l:'Direccion'},{id:'c-email',l:'Correo'},{id:'c-cel',l:'Celular'},
+  const campos=[{id:'c-nombre',l:'Nombre'},{id:'c-cedula',l:'Cédula'},{id:'c-lugar',l:'Lugar expedición'},
+    {id:'c-dir',l:'Dirección'},{id:'c-email',l:'Correo'},{id:'c-cel',l:'Celular'},
     {id:'c-proyecto',l:'Proyecto'},{id:'c-torre',l:'Torre'},{id:'c-apto',l:'Apartamento'}];
   for(const c of campos){
     if(!document.getElementById(c.id).value.trim()){notif('Completa: '+c.l);document.getElementById(c.id).focus();return;}
   }
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('c-email').value)){notif('Ingresa un correo valido');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('c-email').value)){notif('Ingresa un correo válido');return;}
   const datos={
     nombre:document.getElementById('c-nombre').value.trim().toUpperCase(),
     cedula:document.getElementById('c-cedula').value.trim(),
@@ -452,12 +581,25 @@ function enviarCliente(){
   };
   try{localStorage.setItem('visco_cliente_pendiente',JSON.stringify(datos));}catch(e){}
   const asunto=encodeURIComponent('VIS-CO: Datos de '+datos.nombre+' listos para contrato');
-  const cuerpo=encodeURIComponent('Nuevo cliente diligencio formulario VIS-CO:\n\nNombre: '+datos.nombre+'\nCedula: '+datos.cedula+' - '+datos.lugar+'\nDireccion: '+datos.dir+'\nCorreo: '+datos.email+'\nCelular: '+datos.cel+'\nProyecto: '+datos.proyecto+'\nTorre: '+datos.torre+'\nApto: '+datos.apto+'\nFecha: '+datos.ts);
-  const a=document.createElement('a');a.href='mailto:contacto@acabadosvis.com?subject='+asunto+'&body='+cuerpo;a.style.display='none';document.body.appendChild(a);a.click();document.body.removeChild(a);
+  const cuerpo=encodeURIComponent(
+    '✅ Nuevo cliente diligenció formulario VIS-CO:\n\n'+
+    'Nombre: '+datos.nombre+'\nCédula: '+datos.cedula+' exp. '+datos.lugar+
+    '\nDirección: '+datos.dir+'\nCorreo: '+datos.email+'\nCelular: '+datos.cel+
+    '\nProyecto: '+datos.proyecto+'\nTorre: '+datos.torre+' Apto: '+datos.apto+
+    '\nFecha: '+datos.ts
+  );
+  const a=document.createElement('a');
+  a.href='mailto:contacto@acabadosvis.com?subject='+asunto+'&body='+cuerpo;
+  a.style.display='none';document.body.appendChild(a);a.click();document.body.removeChild(a);
   document.getElementById('cl-form').style.display='none';
   document.getElementById('cl-ok').style.display='block';
-  document.getElementById('cl-resumen').innerHTML=[['Nombre',datos.nombre],['Cedula',datos.cedula+' - '+datos.lugar],['Direccion',datos.dir],['Correo',datos.email],['Celular',datos.cel],['Proyecto',datos.proyecto],['Torre/Apto',datos.torre+' Apto '+datos.apto]].map(function(x){return '<div style="display:flex;gap:8px;margin-bottom:4px;font-size:11px;"><span style="color:#AAA;min-width:68px;">'+x[0]+':</span><span>'+x[1]+'</span></div>';}).join('');
+  document.getElementById('cl-resumen').innerHTML=[
+    ['Nombre',datos.nombre],['Cédula',datos.cedula+' · '+datos.lugar],
+    ['Dirección',datos.dir],['Correo',datos.email],['Celular',datos.cel],
+    ['Proyecto',datos.proyecto],['Torre / Apto',datos.torre+' Apto '+datos.apto]
+  ].map(x=>'<div style="display:flex;gap:8px;margin-bottom:4px;font-size:11px;"><span style="color:#999;min-width:72px;">'+x[0]+':</span><span style="color:#1a1a1a;">'+x[1]+'</span></div>').join('');
 }
+
 function renderPagos(){
   const t=TIPOS[tipo];
   let html='';
@@ -469,13 +611,14 @@ function renderPagos(){
   const vt=parseV(document.getElementById('valor-total').value);
   if(vt) calcPagos();
 }
+
 function calcPagos(){
   const t=TIPOS[tipo];
   const vt=parseV(document.getElementById('valor-total').value);
   if(!vt) return;
   let vals=[];
   if(tipo==='gran_central_con_bono'){
-    vals=[40247135,vt-40247135];
+    vals=[40247135,Math.max(0,vt-40247135)];
   } else if(t.congelacion){
     const cong=parseV(document.getElementById('valor-cong').value)||5000000;
     const resto=vt-cong;
@@ -488,26 +631,40 @@ function calcPagos(){
   vals.forEach(function(v,i){const el=document.getElementById('pago'+(i+1));if(el)el.value=fmtP(v);});
   updPcts(vt,vals); updTotal();
 }
+
 function updTotal(){
   const vt=parseV(document.getElementById('valor-total').value);
-  const rows=document.querySelectorAll('.pi');
-  const vals=Array.from(rows).map(function(r){return parseV(r.value);});
-  document.getElementById('tot-pag').textContent=fmtP(vals.reduce(function(a,b){return a+b;},0));
+  const vals=Array.from(document.querySelectorAll('.pi')).map(r=>parseV(r.value));
+  document.getElementById('tot-pag').textContent=fmtP(vals.reduce((a,b)=>a+b,0));
   if(vt) updPcts(vt,vals);
 }
+
 function updPcts(vt,vals){
   vals.forEach(function(v,i){const el=document.getElementById('pct'+(i+1));if(el)el.textContent=vt?Math.round((v/vt)*100)+'%':'-';});
 }
+
 function buildResumen(){
   const t=TIPOS[tipo];
   const vt=parseV(document.getElementById('valor-total').value);
   const rows=document.querySelectorAll('.pi');
   const tagC=(tipo==='gran_central_sin_bono'||tipo==='gran_central_con_bono')?'gran':tipo==='visualizza'?'vis':'acab';
   let pagosHtml='';
-  rows.forEach(function(r,i){pagosHtml+='<div class="ri"><div class="rl">Pago '+(i+1)+' - '+t.pagos[i]+'</div><div class="rv">'+r.value+'</div></div>';});
-  document.getElementById('res-card').innerHTML='<span class="etag '+tagC+'">'+t.nombre+'</span><h3>Resumen del contrato</h3><div class="rg"><div class="ri"><div class="rl">Cliente</div><div class="rv">'+g('nombre')+'</div></div><div class="ri"><div class="rl">Cedula</div><div class="rv">'+g('cedula')+' - '+g('lugar-exp')+'</div></div><div class="ri"><div class="rl">Proyecto</div><div class="rv">'+g('proyecto')+'</div></div><div class="ri"><div class="rl">Torre / Apto</div><div class="rv">'+g('torre')+' / '+g('apto')+'</div></div><div class="ri"><div class="rl">Cotizacion</div><div class="rv">'+g('cotizacion')+'</div></div><div class="ri hl"><div class="rl">Valor total</div><div class="rv">'+fmtP(vt)+'</div></div>'+pagosHtml+'<div class="ri"><div class="rl">Correo</div><div class="rv">'+g('correo')+'</div></div></div>';
+  rows.forEach(function(r,i){pagosHtml+='<div class="ri"><div class="rl">Pago '+(i+1)+' — '+t.pagos[i]+'</div><div class="rv">'+r.value+'</div></div>';});
+  document.getElementById('res-card').innerHTML=
+    '<span class="etag '+tagC+'">'+t.nombre+'</span><h3>Resumen del contrato</h3><div class="rg">'+
+    '<div class="ri"><div class="rl">Cliente</div><div class="rv">'+g('nombre')+'</div></div>'+
+    '<div class="ri"><div class="rl">Cédula</div><div class="rv">'+g('cedula')+' · '+g('lugar-exp')+'</div></div>'+
+    '<div class="ri"><div class="rl">Proyecto</div><div class="rv">'+g('proyecto')+'</div></div>'+
+    '<div class="ri"><div class="rl">Torre / Apto</div><div class="rv">'+g('torre')+' / '+g('apto')+'</div></div>'+
+    '<div class="ri"><div class="rl">Cotización</div><div class="rv">'+g('cotizacion')+'</div></div>'+
+    '<div class="ri hl"><div class="rl">Valor total</div><div class="rv">'+fmtP(vt)+'</div></div>'+
+    pagosHtml+
+    '<div class="ri"><div class="rl">Fecha firma</div><div class="rv">'+document.getElementById('fecha-firma').value+'</div></div>'+
+    '<div class="ri"><div class="rl">Vigencia hasta</div><div class="rv">'+document.getElementById('fecha-cong').value+'</div></div>'+
+    '</div>';
   document.getElementById('hdr-num').textContent=g('cotizacion').replace('CO-','CON-');
 }
+
 async function generarContrato(){
   const btn=document.getElementById('btn-gen');
   btn.disabled=true;
@@ -521,31 +678,69 @@ async function generarContrato(){
     const fcRaw=document.getElementById('fecha-cong').value;
     let fcTexto=fcRaw;
     if(fcRaw&&fcRaw.includes('-')){const parts=fcRaw.split('-');fcTexto=parseInt(parts[2])+' de '+meses[parseInt(parts[1])-1]+' de '+parts[0];}
-    const datos={tipo,nombre:g('nombre'),cedula:g('cedula'),lugar_exp:g('lugar-exp'),direccion:g('direccion'),correo:g('correo'),celular:g('celular'),proyecto:g('proyecto'),torre:g('torre'),apto:g('apto'),cotizacion:g('cotizacion'),valor_total:vt,congelacion:cong,fecha_cong:fcTexto||'30 de junio de 2026',dia:f.getDate().toString(),mes:meses[f.getMonth()]};
+
+    const datos={
+      tipo, nombre:g('nombre'), cedula:g('cedula'), lugar_exp:g('lugar-exp'),
+      direccion:g('direccion'), correo:g('correo'), telefono:g('celular'),
+      proyecto:tipo==='gran_central_con_bono'?'Gran Central':g('proyecto'),
+      torre:g('torre'), apto:g('apto'), cotizacion:g('cotizacion'),
+      valor_total:vt, congelacion:cong,
+      fecha_cong:fcTexto||'30 de junio de 2026',
+      dia:f.getDate().toString(), mes:meses[f.getMonth()]
+    };
+
     const resp=await fetch('/api/generar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)});
-    if(!resp.ok){const err=await resp.json().catch(function(){return {error:'Error del servidor'};});throw new Error(err.error||'Error generando contrato');}
+    if(!resp.ok){const err=await resp.json().catch(()=>({error:'Error del servidor'}));throw new Error(err.error||'Error generando contrato');}
+
     const blob=await resp.blob();
     const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=url;a.download=datos.cotizacion.replace('CO-','CON-')+'_'+datos.nombre.split(' ')[0]+'.docx';a.click();URL.revokeObjectURL(url);
+
+    // Nombre de archivo: "CON-0001-2026 JUAN CARLOS PÉREZ.docx"
+    const cotizNum=datos.cotizacion.replace(/^[Cc][Oo][-\s]*/,'').replace(/[-\s]*20\d\d$/,'').replace(/-/g,'').trim();
+    const conNum='CON-'+cotizNum+'-2026';
+    const filename=conNum+' '+datos.nombre.toUpperCase()+'.docx';
+
+    const a=document.createElement('a');a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
+
     document.getElementById('overlay').classList.remove('show');
+
     const carpeta=(tipo==='gran_central_sin_bono'||tipo==='gran_central_con_bono')?'CLIENTES GRAN CENTRAL':tipo==='visualizza'?'Clientes Visualizza':'CLIENTES '+datos.proyecto.toUpperCase();
-    document.getElementById('msg-ok').textContent='Contrato '+datos.cotizacion.replace('CO-','CON-')+' de '+datos.nombre+' generado.';
-    document.getElementById('msg-ruta').innerHTML='Guarda en OneDrive:<br><strong>2-Comercial / 1. Clientes / '+carpeta+' / '+datos.nombre+' / CONTRATO /</strong>';
+    _rutaOneDrive='OneDrive > 2-Comercial > 1. Clientes > '+carpeta+' > '+datos.nombre+' > CONTRATO';
+
+    document.getElementById('msg-ok-titulo').textContent='¡Contrato '+conNum+' generado!';
+    document.getElementById('msg-ok').textContent='El archivo "'+filename+'" se descargó en tu carpeta de Descargas.';
+    document.getElementById('msg-ruta').innerHTML=
+      '<div class="ruta-titulo">📁 Guarda el archivo en OneDrive:</div>'+
+      '<div class="ruta-path">'+_rutaOneDrive+'</div>'+
+      '<div style="margin-top:8px;font-size:11px;color:#666;">1. Ve a Descargas y busca "'+filename+'"<br>2. Muévelo a la carpeta indicada en OneDrive</div>';
+
     try{localStorage.removeItem('visco_cliente_pendiente');}catch(e){}
+    document.getElementById('alerta-cliente').classList.remove('show');
     setView(6);
-  }catch(e){document.getElementById('overlay').classList.remove('show');notif('Error: '+e.message);console.error(e);}
-  finally{btn.disabled=false;}
+  }catch(e){
+    document.getElementById('overlay').classList.remove('show');
+    notif('Error: '+e.message);
+    console.error(e);
+  }finally{btn.disabled=false;}
 }
+
+function copiarRuta(){
+  if(!_rutaOneDrive) return;
+  navigator.clipboard.writeText(_rutaOneDrive).then(()=>notif('Ruta copiada al portapapeles')).catch(()=>notif('No se pudo copiar'));
+}
+
 function nuevo(){
   document.querySelectorAll('input').forEach(function(i){if(i.id!=='correo-comercial')i.value='';});
   document.getElementById('hdr-num').textContent='Nuevo';
+  document.getElementById('fecha-firma').value=new Date().toISOString().split('T')[0];
   try{localStorage.removeItem('visco_cliente_pendiente');}catch(e){}
   selTipo('acabadosvis');setView(1);
 }
+
 function parseV(s){return s?parseInt(s.toString().replace(/[^0-9]/g,''))||0:0;}
 function fmtP(n){return n?'$'+n.toLocaleString('es-CO'):'$0';}
-function g(id){const el=document.getElementById(id);return el?el.value.trim():'--';}
-function notif(msg){const el=document.getElementById('notif');el.textContent=msg;el.classList.add('show');setTimeout(function(){el.classList.remove('show');},3500);}
+function g(id){const el=document.getElementById(id);return el?el.value.trim():'';}
+function notif(msg){const el=document.getElementById('notif');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3500);}
 </script>
 </body>
 </html>
