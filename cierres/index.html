@@ -227,6 +227,29 @@ header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;displa
   .card-amounts{width:100%;}
 }
 
+/* ── KPI MONTH ── */
+.k-mes::before{background:#0891B2;}
+.k-mes .ktag{background:#ECFEFF;color:#0891B2;border-color:#A5F3FC;}
+.k-mes .kamt{color:#0891B2;}
+
+/* ── HISTORIAL ── */
+.hist-filters{display:flex;gap:10px;padding:16px 20px 8px;flex-wrap:wrap;align-items:center;}
+.hist-filters select,.hist-filters input{border:1.5px solid var(--brd);border-radius:8px;padding:7px 10px;font-family:'DM Sans',sans-serif;font-size:12px;background:var(--w);color:var(--n);outline:none;}
+.hist-filters select:focus,.hist-filters input:focus{border-color:var(--r);}
+.hist-resumen{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 20px 14px;}
+.hist-box{background:var(--w);border:1.5px solid var(--brd);border-radius:10px;padding:12px 14px;box-shadow:var(--sh);}
+.hist-box-num{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;}
+.hist-box-lbl{font-size:10px;color:var(--g);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
+.hist-table-wrap{padding:0 20px 30px;overflow-x:auto;}
+.hist-table{width:100%;border-collapse:collapse;font-size:12px;}
+.hist-table th{background:var(--gc);font-family:'Syne',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:9px 12px;text-align:left;border-bottom:2px solid var(--brd);white-space:nowrap;}
+.hist-table td{padding:10px 12px;border-bottom:1px solid var(--brd);vertical-align:middle;}
+.hist-table tr:hover td{background:#F8F7F5;}
+.hist-etapa{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--sem-bg);color:var(--sem);border:1px solid var(--sem-brd);}
+.hist-monto{font-family:'Syne',sans-serif;font-weight:800;color:var(--ok);}
+.hist-banco{font-size:11px;color:var(--g);}
+.hist-obs{font-size:11px;color:var(--n);font-style:italic;max-width:180px;}
+
 /* ── M2 SYNC ── */
 .m2-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px;}
 .m2-table th{background:var(--gc);font-family:'Syne',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;text-align:left;border-bottom:2px solid var(--brd);}
@@ -309,10 +332,15 @@ header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;displa
       <div class="kamt" id="kpiTotal">$0</div>
       <div class="ksub" id="kpiTotalSub">— clientes activos</div>
     </div>
-    <div class="kpi k2" onclick="filterByKpi('sin_facturar')">
-      <div class="ktag">Sin Facturar</div>
-      <div class="kamt" id="kpiSinFac">$0</div>
-      <div class="ksub" id="kpiSinFacSub">— clientes</div>
+    <div class="kpi k-mes" onclick="showTab('historial')">
+      <div class="ktag">Recibido este mes</div>
+      <div class="kamt" id="kpiMes">$0</div>
+      <div class="ksub" id="kpiMesSub">0 pagos confirmados</div>
+    </div>
+    <div class="kpi k2" onclick="showTab('contabilidad')">
+      <div class="ktag">Listo Contabilidad</div>
+      <div class="kamt" id="kpiFacturar">0</div>
+      <div class="ksub">clientes para facturar</div>
     </div>
     <div class="kpi k3" onclick="filterByKpi('ejecucion')">
       <div class="ktag">En Ejecución</div>
@@ -324,18 +352,14 @@ header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;displa
       <div class="kamt" id="kpiRecibir">0</div>
       <div class="ksub" id="kpiRecibirSub">obra terminada</div>
     </div>
-    <div class="kpi k5" onclick="showTab('contabilidad')">
-      <div class="ktag">Vista Contabilidad</div>
-      <div class="kamt" id="kpiFacturar">0</div>
-      <div class="ksub">lista para facturar</div>
-    </div>
   </div>
 
   <!-- Toolbar -->
   <div class="toolbar">
     <div class="tabs">
-      <div class="tab active" id="tabCartera" onclick="showTab('cartera')">Cartera</div>
-      <div class="tab" id="tabContabilidad" onclick="showTab('contabilidad')">Contabilidad</div>
+      <div class="tab active" id="tabCartera"       onclick="showTab('cartera')">Cartera</div>
+      <div class="tab"        id="tabContabilidad"  onclick="showTab('contabilidad')">Contabilidad</div>
+      <div class="tab"        id="tabHistorial"     onclick="showTab('historial')">Historial</div>
     </div>
     <select class="filter-sel" id="filterEstado" onchange="renderList()">
       <option value="">Todos los estados</option>
@@ -361,6 +385,11 @@ header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;displa
   <!-- Contabilidad Tab -->
   <div class="accounting-view" id="contabilidadView">
     <div id="accContent"></div>
+  </div>
+
+  <!-- Historial Tab -->
+  <div class="accounting-view" id="historialView">
+    <div id="histContent"></div>
   </div>
 
 </div>
@@ -767,7 +796,9 @@ function processWorkbook(buf) {
     allData.push(r);
   }
   // Load IDB overrides
-  loadIDBOverrides().then(() => {
+  loadIDBOverrides().then(async () => {
+    // Auto-sync M2 confirmed payments (silently)
+    await autoSyncM2();
     // Populate project filter
     populateFilters();
     // Show dashboard
@@ -848,11 +879,18 @@ function filterByKpi(filter) {
 }
 function showTab(tab) {
   currentTab = tab;
-  document.getElementById('tabCartera').classList.toggle('active', tab === 'cartera');
-  document.getElementById('tabContabilidad').classList.toggle('active', tab === 'contabilidad');
-  document.getElementById('carteraView').style.display = tab === 'cartera' ? 'block' : 'none';
+  ['cartera','contabilidad','historial'].forEach(t => {
+    const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  document.getElementById('carteraView').style.display        = tab === 'cartera'        ? 'block' : 'none';
   document.getElementById('contabilidadView').classList.toggle('show', tab === 'contabilidad');
+  document.getElementById('historialView').classList.toggle('show',    tab === 'historial');
+  // hide toolbar filters for historial
+  const toolbarFilters = document.getElementById('filterEstado');
+  if (toolbarFilters) toolbarFilters.parentElement.style.display = tab === 'historial' ? 'none' : '';
   if (tab === 'contabilidad') renderAccounting();
+  if (tab === 'historial')    renderHistorial();
 }
 
 // =====================================================================
@@ -864,25 +902,31 @@ function renderKPIs() {
     return e !== 'ENTREGADO' && e !== 'CAIDO';
   });
   const total = activos.reduce((s,r) => s + (+r._row[C.x_recaudar]||0), 0);
-  const sinFac = activos.filter(r => (r._row[C.facturacion]||'').trim() === 'SIN FACTURAR');
-  const ejec = activos.filter(r => estadoKey((r._row[C.estado]||'').trim()) === 'ejecucion');
+  const ejec    = activos.filter(r => estadoKey((r._row[C.estado]||'').trim()) === 'ejecucion');
   const recibir = activos.filter(r => estadoKey((r._row[C.estado]||'').trim()) === 'recibir');
-  // "listo para facturar" = has real payments but sin facturar or partial
   const paraFac = activos.filter(r => {
-    const fac = (r._row[C.facturacion]||'').trim();
+    const fac  = (r._row[C.facturacion]||'').trim();
     const antR = +getVal(r, C.ant_r_monto)||0;
     const p1R  = +getVal(r, C.p1_r_monto)||0;
     return (antR > 0 || p1R > 0) && fac !== 'FACTURADO TOTAL';
   });
-  document.getElementById('kpiTotal').textContent = fmtShort(total);
+  // Ingresos del mes desde M2 (visco_sop2)
+  const mesActual = new Date().toISOString().slice(0, 7); // YYYY-MM
+  const sops = JSON.parse(localStorage.getItem('visco_sop2') || '{}');
+  const pagosEstesMes = Object.values(sops).filter(v =>
+    v.estado === 'entro' && v.fecha_entro && v.fecha_entro.startsWith(mesActual)
+  );
+  const totalMes = pagosEstesMes.reduce((s, v) => s + (v.monto || 0), 0);
+
+  document.getElementById('kpiTotal').textContent    = fmtShort(total);
   document.getElementById('kpiTotalSub').textContent = `${activos.length} clientes activos`;
-  document.getElementById('kpiSinFac').textContent = fmtShort(sinFac.reduce((s,r)=>s+(+r._row[C.x_recaudar]||0),0));
-  document.getElementById('kpiSinFacSub').textContent = `${sinFac.length} clientes`;
-  document.getElementById('kpiEjec').textContent = ejec.length;
-  document.getElementById('kpiEjecSub').textContent = `proyectos activos`;
-  document.getElementById('kpiRecibir').textContent = recibir.length;
-  document.getElementById('kpiRecibirSub').textContent = `obra terminada`;
+  document.getElementById('kpiMes').textContent      = fmtShort(totalMes);
+  document.getElementById('kpiMesSub').textContent   = `${pagosEstesMes.length} pago${pagosEstesMes.length!==1?'s':''} confirmados`;
   document.getElementById('kpiFacturar').textContent = paraFac.length;
+  document.getElementById('kpiEjec').textContent     = ejec.length;
+  document.getElementById('kpiEjecSub').textContent  = `proyectos activos`;
+  document.getElementById('kpiRecibir').textContent  = recibir.length;
+  document.getElementById('kpiRecibirSub').textContent = `obra terminada`;
 }
 
 // =====================================================================
@@ -1156,6 +1200,123 @@ function exportExcel() {
 }
 
 // =====================================================================
+// HISTORIAL DE PAGOS — desde M2 (visco_sop2)
+// =====================================================================
+function renderHistorial() {
+  const sops = JSON.parse(localStorage.getItem('visco_sop2') || '{}');
+  const ETAPA_LABELS = {SEP:'Separación',ANT:'Anticipo',P1:'Obra Blanca',P2:'Carpintería',P3:'Entrega',P4:'Pago 4',P5:'Adicionales',P6:'Pago 6',ADIC:'Adicional'};
+  const todos = Object.entries(sops)
+    .filter(([k, v]) => v.estado === 'entro')
+    .map(([key, v]) => {
+      const lastUnd = key.lastIndexOf('_');
+      const cid   = key.slice(0, lastUnd);
+      const etapa = key.slice(lastUnd + 1);
+      const row   = allData.find(r => String(r._row[C.c]) === cid);
+      return {
+        fecha_entro:   v.fecha_entro   || '',
+        cliente:       row ? row._row[C.cliente]  : (v.cli   || cid),
+        proyecto:      row ? row._row[C.proyecto] : (v.proy  || '—'),
+        torre:         row ? row._row[C.torre]    : (v.torre || '—'),
+        apto:          row ? row._row[C.apto]     : (v.apto  || '—'),
+        etapa, monto:  v.monto        || 0,
+        banco:         v.banco        || '',
+        referencia:    v.referencia   || '',
+        obs_contab:    v.obs_contab   || '',
+        filename:      v.filename     || '',
+        fecha_soporte: v.fecha_soporte|| '',
+      };
+    })
+    .sort((a, b) => b.fecha_entro.localeCompare(a.fecha_entro));
+
+  const filtroMes  = document.getElementById('histFiltroMes')  ? document.getElementById('histFiltroMes').value  : '';
+  const filtroProy = document.getElementById('histFiltroProy') ? document.getElementById('histFiltroProy').value : '';
+  const filtrados  = todos.filter(p =>
+    (!filtroMes  || p.fecha_entro.startsWith(filtroMes)) &&
+    (!filtroProy || p.proyecto === filtroProy)
+  );
+
+  const totalFiltrado = filtrados.reduce((s, p) => s + p.monto, 0);
+  const porProy = {};
+  filtrados.forEach(p => { porProy[p.proyecto] = (porProy[p.proyecto]||0) + p.monto; });
+  const proyTop = Object.entries(porProy).sort((a,b)=>b[1]-a[1]).slice(0,2);
+
+  const meses    = [...new Set(todos.map(p => p.fecha_entro.slice(0,7)).filter(Boolean))].sort().reverse();
+  const proyList = [...new Set(todos.map(p => p.proyecto).filter(Boolean))].sort();
+  const mesOpts  = meses.map(m   => '<option value="'+m+'"'+(filtroMes===m?' selected':'')+'>'+m+'</option>').join('');
+  const proyOpts = proyList.map(p => '<option value="'+p+'"'+(filtroProy===p?' selected':'')+'>'+p+'</option>').join('');
+
+  let tableRows = '';
+  filtrados.forEach(function(p) {
+    tableRows += '<tr>';
+    tableRows += '<td style="font-size:11px;font-weight:600">'+(p.fecha_entro||'—')+'</td>';
+    tableRows += '<td style="font-weight:500">'+p.cliente+'</td>';
+    tableRows += '<td style="font-size:11px;color:var(--g)">'+p.proyecto+' T'+p.torre+'/A'+p.apto+'</td>';
+    tableRows += '<td><span class="hist-etapa">'+(ETAPA_LABELS[p.etapa]||p.etapa)+'</span></td>';
+    tableRows += '<td class="hist-monto">'+fmt(p.monto)+'</td>';
+    tableRows += '<td class="hist-banco">'+(p.banco||'—')+(p.referencia?'<br><span style="color:var(--n)">'+p.referencia+'</span>':'')+'</td>';
+    tableRows += '<td>'+(p.filename?'<span style="font-size:10px">📎 '+p.filename+'</span><br><span style="font-size:10px;color:var(--g)">'+p.fecha_soporte+'</span>':'—')+'</td>';
+    tableRows += '<td class="hist-obs">'+(p.obs_contab||'')+'</td>';
+    tableRows += '</tr>';
+  });
+
+  let resumenBoxes = '';
+  resumenBoxes += '<div class="hist-box"><div class="hist-box-num" style="color:var(--ok)">'+fmt(totalFiltrado)+'</div><div class="hist-box-lbl">Total recibido</div></div>';
+  resumenBoxes += '<div class="hist-box"><div class="hist-box-num">'+filtrados.length+'</div><div class="hist-box-lbl">Pagos confirmados</div></div>';
+  proyTop.forEach(function(kv) {
+    resumenBoxes += '<div class="hist-box"><div class="hist-box-num" style="font-size:14px;color:var(--sem)">'+fmt(kv[1])+'</div><div class="hist-box-lbl">'+kv[0]+'</div></div>';
+  });
+
+  let tableHTML = '';
+  if (filtrados.length === 0) {
+    tableHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">Sin pagos confirmados'+(filtroMes?' en este mes':'')+'</div></div>';
+  } else {
+    tableHTML = '<table class="hist-table"><thead><tr>';
+    tableHTML += '<th>Fecha confirmación</th><th>Cliente</th><th>Proyecto · Apto</th>';
+    tableHTML += '<th>Etapa</th><th>Monto</th><th>Banco / Ref</th><th>Soporte</th><th>Obs. Contabilidad</th>';
+    tableHTML += '</tr></thead><tbody>'+tableRows+'</tbody></table>';
+  }
+
+  document.getElementById('histContent').innerHTML =
+    '<div class="hist-filters">' +
+      '<select id="histFiltroMes" onchange="renderHistorial()"><option value="">Todos los meses</option>'+mesOpts+'</select>' +
+      '<select id="histFiltroProy" onchange="renderHistorial()"><option value="">Todos los proyectos</option>'+proyOpts+'</select>' +
+      '<span style="font-size:12px;color:var(--g);margin-left:4px">'+filtrados.length+' pago'+(filtrados.length!==1?'s':'')+'</span>' +
+      '<div style="margin-left:auto"><button class="hbtn" onclick="exportHistorialCSV()" style="font-size:10px">↓ Exportar CSV</button></div>' +
+    '</div>' +
+    '<div class="hist-resumen">'+resumenBoxes+'</div>' +
+    '<div class="hist-table-wrap">'+tableHTML+'</div>';
+}
+
+function exportHistorialCSV() {
+  const sops = JSON.parse(localStorage.getItem('visco_sop2') || '{}');
+  const ETAPA_LABELS = {SEP:'Separación',ANT:'Anticipo',P1:'Obra Blanca',P2:'Carpintería',P3:'Entrega',P4:'Pago 4',P5:'Adicionales',P6:'Pago 6',ADIC:'Adicional'};
+  const cols = ['Fecha Confirmación','Cliente','Proyecto','Torre','Apto','Etapa','Monto','Banco','Referencia','Observación','Soporte','Fecha Soporte'];
+  const rows = Object.entries(sops)
+    .filter(function(kv) { return kv[1].estado === 'entro'; })
+    .map(function(kv) {
+      var key = kv[0], v = kv[1];
+      var cid   = key.slice(0, key.lastIndexOf('_'));
+      var etapa = key.slice(key.lastIndexOf('_')+1);
+      var row   = allData.find(function(r) { return String(r._row[C.c]) === cid; });
+      return [
+        v.fecha_entro||'', row?row._row[C.cliente]:v.cli||cid,
+        row?row._row[C.proyecto]:v.proy||'', row?row._row[C.torre]:v.torre||'', row?row._row[C.apto]:v.apto||'',
+        ETAPA_LABELS[etapa]||etapa, v.monto||0, v.banco||'', v.referencia||'', v.obs_contab||'', v.filename||'', v.fecha_soporte||''
+      ];
+    })
+    .sort(function(a,b){ return b[0].localeCompare(a[0]); });
+  var BOM = '﻿';
+  var csv = BOM + [cols].concat(rows).map(function(r){
+    return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(',');
+  }).join('\n');
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'historial-pagos-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  toast('📥 Historial exportado ✓');
+}
+
+// =====================================================================
 // M2 SYNC — Lee pagos confirmados de Cartera (visco_sop2)
 // =====================================================================
 const ETAPA_M2 = {SEP:'sep',ANT:'ant',P1:'p1',P2:'p2',P3:'p3',P4:'p4',P5:'p5',P6:'p6'};
@@ -1181,54 +1342,65 @@ function abrirModalM2() {
   }
   const ETAPA_LABELS = {SEP:'Separación',ANT:'Anticipo',P1:'Obra Blanca',P2:'Carpintería',P3:'Entrega',P4:'Pago 4',P5:'Adicionales',P6:'Pago 6'};
   let nuevos = 0, existen = 0, sinFila = 0;
-  const rowsHTML = confirmados.map(sop => {
+  let rowsHTML = '';
+  confirmados.forEach(function(sop) {
     const pagoKey = ETAPA_M2[sop.etapa];
-    if (!pagoKey) { sinFila++; return ''; }
+    if (!pagoKey) { sinFila++; return; }
     const pagoDef = PAGOS_DEF.find(p => p.key === pagoKey);
-    if (!pagoDef) { sinFila++; return ''; }
+    if (!pagoDef) { sinFila++; return; }
     const row = allData.find(r => String(r._row[C.c]) === sop.cid);
     if (!row) {
       sinFila++;
-      return `<tr>
-        <td style="color:var(--g)">${sop.cli||sop.cid}</td>
-        <td style="font-size:11px;color:var(--g)">${sop.proy||'—'}</td>
-        <td>${ETAPA_LABELS[sop.etapa]||sop.etapa}</td>
-        <td class="acc-monto">${fmt(sop.monto||0)}</td>
-        <td style="font-size:11px">${sop.fecha_entro||'—'}</td>
-        <td><span class="m2-badge-skip">Sin fila en Excel</span></td>
-      </tr>`;
+      rowsHTML += '<tr><td style="color:var(--g)">'+(sop.cli||sop.cid)+'</td><td style="font-size:11px;color:var(--g)">'+(sop.proy||'—')+'</td><td>'+(ETAPA_LABELS[sop.etapa]||sop.etapa)+'</td><td class="acc-monto">'+fmt(sop.monto||0)+'</td><td style="font-size:11px">'+(sop.fecha_entro||'—')+'</td><td><span class="m2-badge-skip">Sin fila en Excel</span></td></tr>';
+      return;
     }
     const existingMonto = +getVal(row, pagoDef.rMonto) || 0;
     const yaExiste = existingMonto > 0;
     if (yaExiste) existen++; else nuevos++;
     const badge = yaExiste
-      ? `<span class="m2-badge-existe">Ya registrado (${fmt(existingMonto)})</span>`
-      : `<span class="m2-badge-nuevo">✓ Nuevo — se sincronizará</span>`;
-    return `<tr>
-      <td style="font-weight:500">${row._row[C.cliente]||sop.cli||'—'}</td>
-      <td style="font-size:11px;color:var(--g)">${row._row[C.proyecto]||sop.proy||'—'} · A${row._row[C.apto]||'—'}</td>
-      <td><strong>${ETAPA_LABELS[sop.etapa]||sop.etapa}</strong></td>
-      <td class="acc-monto" style="color:var(--ok)">${fmt(sop.monto||0)}</td>
-      <td style="font-size:11px">${sop.fecha_entro||'—'}</td>
-      <td>${badge}</td>
-    </tr>`;
-  }).join('');
+      ? '<span class="m2-badge-existe">Ya registrado ('+fmt(existingMonto)+')</span>'
+      : '<span class="m2-badge-nuevo">✓ Nuevo — se sincronizará</span>';
+    rowsHTML += '<tr><td style="font-weight:500">'+(row._row[C.cliente]||sop.cli||'—')+'</td><td style="font-size:11px;color:var(--g)">'+(row._row[C.proyecto]||sop.proy||'—')+' · A'+(row._row[C.apto]||'—')+'</td><td><strong>'+(ETAPA_LABELS[sop.etapa]||sop.etapa)+'</strong></td><td class="acc-monto" style="color:var(--ok)">'+fmt(sop.monto||0)+'</td><td style="font-size:11px">'+(sop.fecha_entro||'—')+'</td><td>'+badge+'</td></tr>';
+  });
   const syncBtn = document.getElementById('btnSyncConfirm');
   syncBtn.disabled = nuevos === 0;
-  syncBtn.textContent = nuevos === 0 ? 'Sin pagos nuevos' : `Sincronizar ${nuevos} pago${nuevos!==1?'s':''}`;
-  document.getElementById('m2PreviewContent').innerHTML = `
-    <div class="m2-summary">
-      <div class="m2-sum-box"><div class="m2-sum-num" style="color:var(--ok)">${nuevos}</div><div class="m2-sum-lbl">Pagos nuevos</div></div>
-      <div class="m2-sum-box"><div class="m2-sum-num" style="color:var(--g)">${existen}</div><div class="m2-sum-lbl">Ya registrados</div></div>
-      <div class="m2-sum-box"><div class="m2-sum-num" style="color:var(--mora)">${sinFila}</div><div class="m2-sum-lbl">Sin fila en Excel</div></div>
-    </div>
-    <table class="m2-table">
-      <thead><tr><th>Cliente</th><th>Proyecto · Apto</th><th>Etapa</th><th>Monto</th><th>Fecha confirmación</th><th>Estado</th></tr></thead>
-      <tbody>${rowsHTML||'<tr><td colspan="6" style="color:var(--g);text-align:center;padding:20px">Sin datos</td></tr>'}</tbody>
-    </table>`;
+  syncBtn.textContent = nuevos === 0 ? 'Sin pagos nuevos' : 'Sincronizar '+nuevos+' pago'+(nuevos!==1?'s':'');
+  document.getElementById('m2PreviewContent').innerHTML =
+    '<div class="m2-summary">' +
+      '<div class="m2-sum-box"><div class="m2-sum-num" style="color:var(--ok)">'+nuevos+'</div><div class="m2-sum-lbl">Pagos nuevos</div></div>' +
+      '<div class="m2-sum-box"><div class="m2-sum-num" style="color:var(--g)">'+existen+'</div><div class="m2-sum-lbl">Ya registrados</div></div>' +
+      '<div class="m2-sum-box"><div class="m2-sum-num" style="color:var(--mora)">'+sinFila+'</div><div class="m2-sum-lbl">Sin fila en Excel</div></div>' +
+    '</div>' +
+    '<table class="m2-table"><thead><tr><th>Cliente</th><th>Proyecto · Apto</th><th>Etapa</th><th>Monto</th><th>Fecha confirmación</th><th>Estado</th></tr></thead>' +
+    '<tbody>'+(rowsHTML||'<tr><td colspan="6" style="color:var(--g);text-align:center;padding:20px">Sin datos</td></tr>')+'</tbody></table>';
   document.getElementById('m2ModalSub').textContent =
-    `${confirmados.length} confirmados · ${nuevos} nuevos · ${msalAccount?'Se escribirán en OneDrive ✓':'Solo local — conecta OneDrive para sincronizar'}`;
+    confirmados.length+' confirmados · '+nuevos+' nuevos · '+(msalAccount?'Se escribirán en OneDrive ✓':'Solo local — conecta OneDrive para sincronizar');
   document.getElementById('modalM2').classList.add('show');
+}
+
+async function autoSyncM2() {
+  const confirmados = leerPagosM2();
+  for (const sop of confirmados) {
+    const pagoKey = ETAPA_M2[sop.etapa];
+    if (!pagoKey) continue;
+    const pagoDef = PAGOS_DEF.find(p => p.key === pagoKey);
+    if (!pagoDef) continue;
+    const row = allData.find(r => String(r._row[C.c]) === sop.cid);
+    if (!row) continue;
+    const existingMonto = +getVal(row, pagoDef.rMonto) || 0;
+    if (existingMonto > 0) continue;
+    const monto  = sop.monto || 0;
+    const fecha  = sop.fecha_entro || new Date().toISOString().slice(0, 10);
+    const total  = +row._row[C.total] || 1;
+    const pct    = monto / total;
+    const codigo = row._row[C.codigo];
+    await idbPut({ id: codigo+'_col'+pagoDef.rMonto, value: monto });
+    await idbPut({ id: codigo+'_col'+pagoDef.rFecha, value: fecha });
+    await idbPut({ id: codigo+'_col'+pagoDef.rPct,   value: pct  });
+    VC4[codigo+'_col'+pagoDef.rMonto] = { value: monto };
+    VC4[codigo+'_col'+pagoDef.rFecha] = { value: fecha };
+    VC4[codigo+'_col'+pagoDef.rPct]   = { value: pct  };
+  }
 }
 
 async function sincronizarM2() {
@@ -1249,18 +1421,18 @@ async function sincronizarM2() {
       if (!row) continue;
       const existingMonto = +getVal(row, pagoDef.rMonto) || 0;
       if (existingMonto > 0) continue;
-      const monto  = sop.monto  || 0;
+      const monto  = sop.monto || 0;
       const fecha  = sop.fecha_entro || new Date().toISOString().slice(0, 10);
       const total  = +row._row[C.total] || 1;
       const pct    = monto / total;
       const codigo = row._row[C.codigo];
       const excelRow = row._excelRow;
-      await idbPut({ id: `${codigo}_col${pagoDef.rMonto}`, value: monto });
-      await idbPut({ id: `${codigo}_col${pagoDef.rFecha}`, value: fecha });
-      await idbPut({ id: `${codigo}_col${pagoDef.rPct}`,   value: pct  });
-      VC4[`${codigo}_col${pagoDef.rMonto}`] = { value: monto };
-      VC4[`${codigo}_col${pagoDef.rFecha}`] = { value: fecha };
-      VC4[`${codigo}_col${pagoDef.rPct}`]   = { value: pct  };
+      await idbPut({ id: codigo+'_col'+pagoDef.rMonto, value: monto });
+      await idbPut({ id: codigo+'_col'+pagoDef.rFecha, value: fecha });
+      await idbPut({ id: codigo+'_col'+pagoDef.rPct,   value: pct  });
+      VC4[codigo+'_col'+pagoDef.rMonto] = { value: monto };
+      VC4[codigo+'_col'+pagoDef.rFecha] = { value: fecha };
+      VC4[codigo+'_col'+pagoDef.rPct]   = { value: pct  };
       if (msalAccount) {
         await updateExcelCells(excelRow, [
           { col: pagoDef.rMonto, value: monto },
@@ -1274,11 +1446,10 @@ async function sincronizarM2() {
     renderKPIs();
     renderList();
     if (currentTab === 'contabilidad') renderAccounting();
-    if (actualizados > 0) {
-      toast(`✅ ${actualizados} pago${actualizados!==1?'s':''} sincronizado${actualizados!==1?'s':''} desde Cartera${msalAccount?' · Excel actualizado en OneDrive':' · exporta Excel para guardar'}`);
-    } else {
-      toast('Sin pagos nuevos para sincronizar');
-    }
+    if (currentTab === 'historial')    renderHistorial();
+    toast(actualizados > 0
+      ? actualizados+' pago'+(actualizados!==1?'s':'')+' sincronizado'+(actualizados!==1?'s':'')+' desde Cartera'+(msalAccount?' · Excel actualizado en OneDrive':' · exporta Excel para guardar')
+      : 'Sin pagos nuevos para sincronizar');
   } catch(e) {
     toast('Error en sincronización: ' + e.message, 'err');
     console.error(e);
