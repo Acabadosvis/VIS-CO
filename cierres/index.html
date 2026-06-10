@@ -226,6 +226,19 @@ header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;displa
   .card-top{flex-wrap:wrap;}
   .card-amounts{width:100%;}
 }
+
+/* ── M2 SYNC ── */
+.m2-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px;}
+.m2-table th{background:var(--gc);font-family:'Syne',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;text-align:left;border-bottom:2px solid var(--brd);}
+.m2-table td{padding:9px 10px;border-bottom:1px solid var(--brd);vertical-align:middle;}
+.m2-table tr:hover td{background:#F8F7F5;}
+.m2-badge-nuevo{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;padding:2px 7px;border-radius:10px;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-brd);}
+.m2-badge-existe{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;padding:2px 7px;border-radius:10px;background:var(--gc);color:var(--g);border:1px solid var(--brd);}
+.m2-badge-skip{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;padding:2px 7px;border-radius:10px;background:#FEF2F2;color:#DC2626;border:1px solid #FECACA;}
+.m2-summary{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+.m2-sum-box{flex:1;min-width:130px;background:var(--gc);border:1.5px solid var(--brd);border-radius:10px;padding:10px 14px;}
+.m2-sum-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--n);}
+.m2-sum-lbl{font-size:10px;color:var(--g);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
 </style>
 </head>
 <body>
@@ -239,6 +252,7 @@ header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;displa
     <div class="sync-status off" id="syncStatus" onclick="toggleSetup()">OneDrive: no conectado</div>
     <button class="hbtn" onclick="toggleSetup()">⚙ Configurar</button>
     <button class="hbtn" style="display:none" id="btnExportExcel" onclick="exportExcel()">↓ Exportar Excel</button>
+    <button class="hbtn" style="display:none;background:#EFF6FF;border-color:#BFDBFE;color:#1D4ED8" id="btnSyncM2" onclick="abrirModalM2()">↓ Sync Cartera M2</button>
     <button class="hbtn" style="position:relative">
       📂 Cargar Excel
       <input type="file" accept=".xlsx,.xls" onchange="loadFile(this)">
@@ -409,6 +423,24 @@ header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;displa
         </select>
       </div>
       <button class="btn-save" onclick="guardarFac()">Guardar estado</button>
+    </div>
+  </div>
+</div>
+
+<!-- M2 Sync Modal -->
+<div class="modal-bg" id="modalM2">
+  <div class="modal" style="max-width:720px;max-height:90vh;display:flex;flex-direction:column">
+    <div class="modal-header" style="flex-shrink:0">
+      <div>
+        <div class="modal-title">↓ Sincronizar pagos desde Cartera (M2)</div>
+        <div class="modal-sub" id="m2ModalSub">Pagos confirmados por contabilidad en el módulo de Cartera</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modalM2')">✕</button>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:16px 24px" id="m2PreviewContent"></div>
+    <div style="padding:16px 24px;border-top:1px solid var(--brd);display:flex;gap:10px;justify-content:flex-end;flex-shrink:0">
+      <button class="btn-save" style="background:var(--ok);min-width:0;padding:10px 20px;font-size:12px" id="btnSyncConfirm" onclick="sincronizarM2()">✅ Sincronizar nuevos pagos</button>
+      <button class="btn-save" style="background:var(--g);min-width:0;padding:10px 20px;font-size:12px" onclick="closeModal('modalM2')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -743,6 +775,7 @@ function processWorkbook(buf) {
     document.getElementById('dash').classList.add('show');
     document.getElementById('btnExportExcel').style.display = 'inline-flex';
     document.getElementById('btnExportExcel2').style.display = 'inline-flex';
+    document.getElementById('btnSyncM2').style.display = 'inline-flex';
     renderKPIs();
     renderList();
   });
@@ -1069,7 +1102,6 @@ function openFacModal(rowIdx) {
   document.getElementById('modalFacSub').textContent = `${row[C.proyecto]||''} · Apto ${row[C.apto]||''}`;
   const fac = (row[C.facturacion]||'SIN FACTURAR').trim();
   document.getElementById('facSelect').value = fac;
-  // Build summary
   let html = `<strong>Pagos recibidos:</strong><br>`;
   PAGOS_DEF.forEach(p => {
     const rMonto = +getVal(selectedRow, p.rMonto) || 0;
@@ -1085,11 +1117,9 @@ async function guardarFac() {
   const nuevoEstado = document.getElementById('facSelect').value;
   const excelRow = selectedRow._excelRow;
   const codigo   = selectedRow._row[C.codigo];
-  // Save locally
   await idbPut({ id: `${codigo}_col${C.facturacion}`, value: nuevoEstado });
   VC4[`${codigo}_col${C.facturacion}`] = { value: nuevoEstado };
-  selectedRow._row[C.facturacion] = nuevoEstado; // update in-memory row
-  // Sync to OneDrive
+  selectedRow._row[C.facturacion] = nuevoEstado;
   if (msalAccount) {
     await updateExcelCells(excelRow, [{ col: C.facturacion, value: nuevoEstado }]);
     toast('Facturación actualizada en OneDrive ✓');
@@ -1107,9 +1137,7 @@ async function guardarFac() {
 // =====================================================================
 function exportExcel() {
   if (!workbook) { toast('Carga primero el Excel', 'err'); return; }
-  // Apply all IDB overrides to the workbook sheet
   const ws = workbook.Sheets[CFG.SHEET];
-  const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null, raw: true });
   Object.keys(VC4).forEach(key => {
     const match = key.match(/_col(\d+)$/);
     if (!match) return;
@@ -1117,7 +1145,7 @@ function exportExcel() {
     const codigo = key.replace(/_col\d+$/, '');
     const rowObj = allData.find(r => r._row[C.codigo] === codigo);
     if (!rowObj) return;
-    const excelRowIdx = rowObj._excelRow - 1; // 0-indexed
+    const excelRowIdx = rowObj._excelRow - 1;
     const cellAddr = XLSX.utils.encode_cell({ r: excelRowIdx, c: col });
     if (!ws[cellAddr]) ws[cellAddr] = {};
     ws[cellAddr].v = VC4[key].value;
@@ -1125,6 +1153,140 @@ function exportExcel() {
   });
   XLSX.writeFile(workbook, '202511 REPORTE DE VENTAS VISUALIZZA - ACTUALIZADO.xlsx');
   toast('Excel exportado con los pagos registrados ✓');
+}
+
+// =====================================================================
+// M2 SYNC — Lee pagos confirmados de Cartera (visco_sop2)
+// =====================================================================
+const ETAPA_M2 = {SEP:'sep',ANT:'ant',P1:'p1',P2:'p2',P3:'p3',P4:'p4',P5:'p5',P6:'p6'};
+
+function leerPagosM2() {
+  const sops = JSON.parse(localStorage.getItem('visco_sop2') || '{}');
+  return Object.entries(sops)
+    .filter(([k, v]) => v.estado === 'entro')
+    .map(([key, v]) => {
+      const lastUnd = key.lastIndexOf('_');
+      const cid   = key.slice(0, lastUnd);
+      const etapa = key.slice(lastUnd + 1);
+      return { key, cid, etapa, ...v };
+    });
+}
+
+function abrirModalM2() {
+  if (!allData.length) { toast('Carga el Excel primero', 'err'); return; }
+  const confirmados = leerPagosM2();
+  if (!confirmados.length) {
+    toast('No hay pagos confirmados en Cartera (M2). Ve a M2 → Cola de pagos.', 'err');
+    return;
+  }
+  const ETAPA_LABELS = {SEP:'Separación',ANT:'Anticipo',P1:'Obra Blanca',P2:'Carpintería',P3:'Entrega',P4:'Pago 4',P5:'Adicionales',P6:'Pago 6'};
+  let nuevos = 0, existen = 0, sinFila = 0;
+  const rowsHTML = confirmados.map(sop => {
+    const pagoKey = ETAPA_M2[sop.etapa];
+    if (!pagoKey) { sinFila++; return ''; }
+    const pagoDef = PAGOS_DEF.find(p => p.key === pagoKey);
+    if (!pagoDef) { sinFila++; return ''; }
+    const row = allData.find(r => String(r._row[C.c]) === sop.cid);
+    if (!row) {
+      sinFila++;
+      return `<tr>
+        <td style="color:var(--g)">${sop.cli||sop.cid}</td>
+        <td style="font-size:11px;color:var(--g)">${sop.proy||'—'}</td>
+        <td>${ETAPA_LABELS[sop.etapa]||sop.etapa}</td>
+        <td class="acc-monto">${fmt(sop.monto||0)}</td>
+        <td style="font-size:11px">${sop.fecha_entro||'—'}</td>
+        <td><span class="m2-badge-skip">Sin fila en Excel</span></td>
+      </tr>`;
+    }
+    const existingMonto = +getVal(row, pagoDef.rMonto) || 0;
+    const yaExiste = existingMonto > 0;
+    if (yaExiste) existen++; else nuevos++;
+    const badge = yaExiste
+      ? `<span class="m2-badge-existe">Ya registrado (${fmt(existingMonto)})</span>`
+      : `<span class="m2-badge-nuevo">✓ Nuevo — se sincronizará</span>`;
+    return `<tr>
+      <td style="font-weight:500">${row._row[C.cliente]||sop.cli||'—'}</td>
+      <td style="font-size:11px;color:var(--g)">${row._row[C.proyecto]||sop.proy||'—'} · A${row._row[C.apto]||'—'}</td>
+      <td><strong>${ETAPA_LABELS[sop.etapa]||sop.etapa}</strong></td>
+      <td class="acc-monto" style="color:var(--ok)">${fmt(sop.monto||0)}</td>
+      <td style="font-size:11px">${sop.fecha_entro||'—'}</td>
+      <td>${badge}</td>
+    </tr>`;
+  }).join('');
+  const syncBtn = document.getElementById('btnSyncConfirm');
+  syncBtn.disabled = nuevos === 0;
+  syncBtn.textContent = nuevos === 0 ? 'Sin pagos nuevos' : `Sincronizar ${nuevos} pago${nuevos!==1?'s':''}`;
+  document.getElementById('m2PreviewContent').innerHTML = `
+    <div class="m2-summary">
+      <div class="m2-sum-box"><div class="m2-sum-num" style="color:var(--ok)">${nuevos}</div><div class="m2-sum-lbl">Pagos nuevos</div></div>
+      <div class="m2-sum-box"><div class="m2-sum-num" style="color:var(--g)">${existen}</div><div class="m2-sum-lbl">Ya registrados</div></div>
+      <div class="m2-sum-box"><div class="m2-sum-num" style="color:var(--mora)">${sinFila}</div><div class="m2-sum-lbl">Sin fila en Excel</div></div>
+    </div>
+    <table class="m2-table">
+      <thead><tr><th>Cliente</th><th>Proyecto · Apto</th><th>Etapa</th><th>Monto</th><th>Fecha confirmación</th><th>Estado</th></tr></thead>
+      <tbody>${rowsHTML||'<tr><td colspan="6" style="color:var(--g);text-align:center;padding:20px">Sin datos</td></tr>'}</tbody>
+    </table>`;
+  document.getElementById('m2ModalSub').textContent =
+    `${confirmados.length} confirmados · ${nuevos} nuevos · ${msalAccount?'Se escribirán en OneDrive ✓':'Solo local — conecta OneDrive para sincronizar'}`;
+  document.getElementById('modalM2').classList.add('show');
+}
+
+async function sincronizarM2() {
+  if (!allData.length) { toast('Carga el Excel primero', 'err'); return; }
+  const confirmados = leerPagosM2();
+  let actualizados = 0;
+  loading(true);
+  const btn = document.getElementById('btnSyncConfirm');
+  btn.disabled = true;
+  btn.textContent = 'Sincronizando…';
+  try {
+    for (const sop of confirmados) {
+      const pagoKey = ETAPA_M2[sop.etapa];
+      if (!pagoKey) continue;
+      const pagoDef = PAGOS_DEF.find(p => p.key === pagoKey);
+      if (!pagoDef) continue;
+      const row = allData.find(r => String(r._row[C.c]) === sop.cid);
+      if (!row) continue;
+      const existingMonto = +getVal(row, pagoDef.rMonto) || 0;
+      if (existingMonto > 0) continue;
+      const monto  = sop.monto  || 0;
+      const fecha  = sop.fecha_entro || new Date().toISOString().slice(0, 10);
+      const total  = +row._row[C.total] || 1;
+      const pct    = monto / total;
+      const codigo = row._row[C.codigo];
+      const excelRow = row._excelRow;
+      await idbPut({ id: `${codigo}_col${pagoDef.rMonto}`, value: monto });
+      await idbPut({ id: `${codigo}_col${pagoDef.rFecha}`, value: fecha });
+      await idbPut({ id: `${codigo}_col${pagoDef.rPct}`,   value: pct  });
+      VC4[`${codigo}_col${pagoDef.rMonto}`] = { value: monto };
+      VC4[`${codigo}_col${pagoDef.rFecha}`] = { value: fecha };
+      VC4[`${codigo}_col${pagoDef.rPct}`]   = { value: pct  };
+      if (msalAccount) {
+        await updateExcelCells(excelRow, [
+          { col: pagoDef.rMonto, value: monto },
+          { col: pagoDef.rFecha, value: new Date(fecha + 'T12:00:00') },
+          { col: pagoDef.rPct,   value: pct   }
+        ]);
+      }
+      actualizados++;
+    }
+    closeModal('modalM2');
+    renderKPIs();
+    renderList();
+    if (currentTab === 'contabilidad') renderAccounting();
+    if (actualizados > 0) {
+      toast(`✅ ${actualizados} pago${actualizados!==1?'s':''} sincronizado${actualizados!==1?'s':''} desde Cartera${msalAccount?' · Excel actualizado en OneDrive':' · exporta Excel para guardar'}`);
+    } else {
+      toast('Sin pagos nuevos para sincronizar');
+    }
+  } catch(e) {
+    toast('Error en sincronización: ' + e.message, 'err');
+    console.error(e);
+  } finally {
+    loading(false);
+    btn.disabled = false;
+    btn.textContent = 'Sincronizar';
+  }
 }
 
 // =====================================================================
@@ -1142,11 +1304,10 @@ document.querySelectorAll('.modal-bg').forEach(m => {
 // =====================================================================
 (async function init() {
   await openIDB();
-  // Restore cfg
+  sessionStorage.removeItem('msal.interaction.status');
   document.getElementById('cfgClientId').value = CFG.CLIENT_ID;
   document.getElementById('cfgTenant').value = CFG.TENANT;
   document.getElementById('redirectUri').textContent = window.location.origin + window.location.pathname;
-  // Try silent MSAL if client configured
   if (CFG.CLIENT_ID) {
     try {
       msalApp = initMsal();
@@ -1155,9 +1316,13 @@ document.querySelectorAll('.modal-bg').forEach(m => {
       if (accounts.length > 0) {
         msalAccount = accounts[0];
         updateSyncStatus(true);
-        await loadFromOneDrive();
+        toast('OneDrive reconectado automáticamente ✓');
       }
-    } catch(e) { console.warn('Silent auth failed:', e); }
+    } catch(e) {
+      Object.keys(localStorage).filter(k => k.startsWith('msal.')).forEach(k => localStorage.removeItem(k));
+      sessionStorage.clear();
+      console.warn('MSAL init reset:', e);
+    }
   }
 })();
 </script>
