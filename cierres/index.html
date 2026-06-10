@@ -419,8 +419,10 @@ header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;displa
 // =====================================================================
 // CONFIG
 // =====================================================================
+const _GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const _storedId = localStorage.getItem('visco_m4_clientId');
 const CFG = {
-  CLIENT_ID: localStorage.getItem('visco_m4_clientId') || 'a3289496-21d5-4f4e-b033-7fb7339e2aa8',
+  CLIENT_ID: (_storedId && _GUID.test(_storedId)) ? _storedId : 'a3289496-21d5-4f4e-b033-7fb7339e2aa8',
   TENANT:    localStorage.getItem('visco_m4_tenant')   || '79cd3b5a-a384-4785-a983-74eace5f688d',
   DRIVE_ID:  'b!D251vSxdK0-WPxaL8adTxn6fr9AE5qVIiVLnRNP5r6fFtdHyi3bpTagdzJcffXBJ',
   FILE_ID:   '01HE3BNJIL2QQJEDPZXZBLWAVZVMNTAUL3',
