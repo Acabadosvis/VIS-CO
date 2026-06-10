@@ -596,13 +596,14 @@ function toggleSetup() {
 // =====================================================================
 // MSAL / GRAPH
 // =====================================================================
+const REDIRECT_URI = 'https://vis-co-blond.vercel.app/cierres/index.html';
 function initMsal() {
   if (!CFG.CLIENT_ID) return null;
   return new msal.PublicClientApplication({
     auth: {
       clientId: CFG.CLIENT_ID,
       authority: `https://login.microsoftonline.com/${CFG.TENANT}`,
-      redirectUri: window.location.origin + window.location.pathname
+      redirectUri: REDIRECT_URI
     },
     cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false }
   });
@@ -613,7 +614,6 @@ async function connectOneDrive() {
     toast('Configura primero el Azure AD Client ID', 'err');
     return;
   }
-  // Validate format (must be a GUID)
   if (!CFG.CLIENT_ID.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
     toast('El Client ID debe ser un GUID tipo xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx (no un correo)', 'err');
     return;
@@ -626,7 +626,8 @@ async function connectOneDrive() {
     loading(true);
     msalApp = initMsal();
     const result = await msalApp.loginPopup({
-      scopes: ['Files.ReadWrite','User.Read','offline_access']
+      scopes: ['Files.ReadWrite','User.Read','offline_access'],
+      redirectUri: REDIRECT_URI
     });
     msalAccount = result.account;
     graphToken = result.accessToken;
@@ -646,13 +647,15 @@ async function getToken() {
   try {
     const result = await msalApp.acquireTokenSilent({
       scopes: ['Files.ReadWrite'],
-      account: msalAccount
+      account: msalAccount,
+      redirectUri: REDIRECT_URI
     });
     return result.accessToken;
   } catch {
     const result = await msalApp.acquireTokenPopup({
       scopes: ['Files.ReadWrite'],
-      account: msalAccount
+      account: msalAccount,
+      redirectUri: REDIRECT_URI
     });
     return result.accessToken;
   }
