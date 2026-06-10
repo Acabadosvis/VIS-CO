@@ -11,7 +11,9 @@
       redirectUri: 'https://vis-co-blond.vercel.app/cierres/auth.html'
     }
   });
-  app.handleRedirectPromise().catch(console.error);
+  app.handleRedirectPromise()
+    .then(() => window.close())
+    .catch(() => window.close());
 </script>
 </body>
 </html>
