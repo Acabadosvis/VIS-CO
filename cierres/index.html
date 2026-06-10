@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIS-CO · M4 · Cierres y Pagos</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
+<style>
+:root{
+  --r:#E04A26;--ro:#C03B1A;--n:#1A1A1A;--g:#666;--b:#F8F7F5;
+  --w:#fff;--brd:#E4E0D9;--brd2:#D0CAC0;--gc:#F0EDE8;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06);
+  --mora:#E04A26;--mora-bg:#FFF3ED;--mora-brd:#FDDDD0;
+  --venc:#C2410C;--venc-bg:#FFF7ED;--venc-brd:#FED7AA;
+  --sem:#1D4ED8;--sem-bg:#EFF6FF;--sem-brd:#BFDBFE;
+  --ok:#15803D;--ok-bg:#F0FDF4;--ok-brd:#86EFAC;
+  --pur:#6D28D9;--pur-bg:#F5F3FF;--pur-brd:#DDD6FE;
+  --yel:#92400E;--yel-bg:#FFFBEB;--yel-brd:#FDE68A;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--b);color:var(--n);min-height:100vh;}
+
+/* ── HEADER ── */
+header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;display:flex;align-items:center;padding:0 20px;gap:10px;position:sticky;top:0;z-index:100;box-shadow:var(--sh);}
+.logo{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;}
+.logo span{color:var(--r);}
+.hbadge{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.07em;}
+.hright{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.sync-status{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:5px;cursor:pointer;}
+.sync-status.off{background:#F3F4F6;color:#9CA3AF;border:1px solid #E5E7EB;}
+.sync-status.on{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-brd);}
+.sync-status.on::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok);display:inline-block;}
+.sync-status.off::before{content:'';width:6px;height:6px;border-radius:50%;background:#D1D5DB;display:inline-block;}
+.hbtn{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:6px 13px;border-radius:8px;border:1.5px solid var(--brd);background:var(--w);color:var(--g);cursor:pointer;transition:.15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;position:relative;}
+.hbtn:hover{border-color:var(--r);color:var(--r);}
+.hbtn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.hbtn.primary{background:var(--r);color:#fff;border-color:var(--r);}
+.hbtn.primary:hover{background:var(--ro);}
+
+/* ── SETUP PANEL ── */
+.setup-panel{background:#FFFBEB;border-bottom:1px solid var(--yel-brd);padding:12px 20px;display:none;}
+.setup-panel.show{display:block;}
+.setup-inner{max-width:700px;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;}
+.setup-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--yel);text-transform:uppercase;letter-spacing:.05em;width:100%;margin-bottom:4px;}
+.setup-field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:200px;}
+.setup-field label{font-size:10px;font-weight:600;color:var(--g);text-transform:uppercase;letter-spacing:.05em;}
+.setup-field input{border:1.5px solid var(--brd);border-radius:8px;padding:7px 10px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--w);color:var(--n);outline:none;}
+.setup-field input:focus{border-color:var(--r);}
+.setup-btn{padding:8px 16px;border-radius:8px;border:none;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;transition:.15s;}
+.setup-btn.connect{background:var(--r);color:#fff;}
+.setup-btn.connect:hover{background:var(--ro);}
+.setup-help{font-size:11px;color:var(--g);line-height:1.5;width:100%;}
+.setup-help a{color:var(--r);text-decoration:none;}
+
+/* ── FIRST SCREEN ── */
+.first-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 56px);padding:40px 20px;text-align:center;}
+.fs-icon{font-size:52px;margin-bottom:16px;}
+.fs-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:8px;}
+.fs-sub{color:var(--g);font-size:14px;line-height:1.7;margin-bottom:32px;max-width:400px;}
+.fs-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+.fs-btn{position:relative;display:inline-flex;align-items:center;gap:10px;padding:14px 28px;background:var(--r);color:#fff;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:.04em;cursor:pointer;box-shadow:0 4px 16px rgba(224,74,38,.3);transition:.15s;}
+.fs-btn:hover{background:var(--ro);}
+.fs-btn.outline{background:var(--w);color:var(--n);border:2px solid var(--brd);box-shadow:none;}
+.fs-btn.outline:hover{border-color:var(--r);color:var(--r);}
+.fs-btn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+
+/* ── DASH ── */
+.dash{display:none;}
+.dash.show{display:block;}
+
+/* ── KPI STRIP ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:16px 20px 0;}
+.kpi{background:var(--w);border:1.5px solid var(--brd);border-radius:12px;padding:14px 16px;box-shadow:var(--sh);cursor:pointer;transition:.15s;position:relative;overflow:hidden;}
+.kpi:hover{transform:translateY(-2px);}
+.kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.k1::before{background:var(--mora);}
+.k2::before{background:var(--venc);}
+.k3::before{background:var(--sem);}
+.k4::before{background:var(--ok);}
+.k5::before{background:var(--pur);}
+.ktag{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:20px;border:1px solid;display:inline-block;margin-bottom:7px;}
+.k1 .ktag{background:var(--mora-bg);color:var(--mora);border-color:var(--mora-brd);}
+.k2 .ktag{background:var(--venc-bg);color:var(--venc);border-color:var(--venc-brd);}
+.k3 .ktag{background:var(--sem-bg);color:var(--sem);border-color:var(--sem-brd);}
+.k4 .ktag{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-brd);}
+.k5 .ktag{background:var(--pur-bg);color:var(--pur);border-color:var(--pur-brd);}
+.kamt{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;line-height:1;margin-bottom:3px;}
+.k1 .kamt{color:var(--mora);}
+.k2 .kamt{color:var(--venc);}
+.k3 .kamt{color:var(--sem);}
+.k4 .kamt{color:var(--ok);}
+.k5 .kamt{color:var(--pur);}
+.ksub{font-size:11px;color:var(--g);}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:10px;padding:14px 20px;flex-wrap:wrap;}
+.tabs{display:flex;background:var(--gc);border-radius:10px;padding:3px;border:1.5px solid var(--brd);}
+.tab{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:6px 14px;border-radius:7px;cursor:pointer;transition:.15s;color:var(--g);}
+.tab.active{background:var(--w);color:var(--n);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+.filter-sel{border:1.5px solid var(--brd);border-radius:8px;padding:7px 10px;font-family:'DM Sans',sans-serif;font-size:12px;background:var(--w);color:var(--n);outline:none;cursor:pointer;}
+.filter-sel:focus{border-color:var(--r);}
+.search-box{border:1.5px solid var(--brd);border-radius:8px;padding:7px 12px;font-family:'DM Sans',sans-serif;font-size:12px;background:var(--w);color:var(--n);outline:none;width:200px;}
+.search-box:focus{border-color:var(--r);}
+.tright{margin-left:auto;display:flex;gap:8px;}
+
+/* ── CLIENT LIST ── */
+.list-wrap{padding:0 20px 20px;}
+.list-count{font-size:11px;color:var(--g);margin-bottom:10px;font-weight:600;}
+
+/* ── CLIENT CARD ── */
+.card{background:var(--w);border:1.5px solid var(--brd);border-radius:14px;padding:16px 18px;margin-bottom:10px;box-shadow:var(--sh);transition:.15s;}
+.card:hover{border-color:var(--brd2);}
+.card-top{display:flex;align-items:flex-start;gap:12px;}
+.card-badge{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;flex-shrink:0;}
+.estado-ejecucion .card-badge{background:var(--sem-bg);color:var(--sem);}
+.estado-recibir .card-badge{background:var(--ok-bg);color:var(--ok);}
+.estado-caido .card-badge{background:#F3F4F6;color:#9CA3AF;}
+.card-info{flex:1;}
+.card-cliente{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;line-height:1.2;}
+.card-proyecto{font-size:11px;color:var(--g);margin-top:2px;}
+.card-meta{display:flex;align-items:center;gap:6px;margin-top:5px;flex-wrap:wrap;}
+.chip{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;border:1px solid;}
+.chip-estado-ejecucion{background:var(--sem-bg);color:var(--sem);border-color:var(--sem-brd);}
+.chip-estado-recibir{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-brd);}
+.chip-estado-caido{background:#F3F4F6;color:#9CA3AF;border-color:#E5E7EB;}
+.chip-fac{background:var(--pur-bg);color:var(--pur);border-color:var(--pur-brd);}
+.card-amounts{text-align:right;flex-shrink:0;}
+.card-total{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--n);}
+.card-recaudado{font-size:11px;color:var(--ok);font-weight:600;}
+.card-pendiente{font-size:11px;color:var(--mora);font-weight:600;}
+
+/* ── PROGRESS BAR ── */
+.progress-bar{height:5px;background:#F3F4F6;border-radius:3px;margin:12px 0 10px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--ok) 0%,#22C55E 100%);transition:width .4s ease;}
+
+/* ── PAYMENT TIMELINE ── */
+.pagos-line{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.pago-chip{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;border:1.5px solid;cursor:pointer;transition:.15s;position:relative;}
+.pago-chip:hover{transform:translateY(-1px);}
+.pago-chip.pagado{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-brd);}
+.pago-chip.parcial{background:var(--yel-bg);color:var(--yel);border-color:var(--yel-brd);}
+.pago-chip.pendiente{background:#F3F4F6;color:#6B7280;border-color:#E5E7EB;}
+.pago-chip.sin-contrato{display:none;}
+.pago-chip .pago-monto{font-size:9px;font-weight:400;display:block;margin-top:1px;opacity:.8;}
+
+/* ── CARD FOOTER ── */
+.card-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.btn-registrar{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:8px 16px;border-radius:8px;border:1.5px solid var(--r);background:var(--r);color:#fff;cursor:pointer;transition:.15s;}
+.btn-registrar:hover{background:var(--ro);}
+.btn-fac{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:8px 16px;border-radius:8px;border:1.5px solid var(--pur-brd);background:var(--pur-bg);color:var(--pur);cursor:pointer;transition:.15s;}
+.btn-fac:hover{border-color:var(--pur);background:var(--pur);color:#fff;}
+.card-vd{font-size:10px;color:#BBB;font-weight:600;}
+
+/* ── ACCOUNTING TAB ── */
+.accounting-view{display:none;padding:0 20px 20px;}
+.accounting-view.show{display:block;}
+.acc-group{margin-bottom:20px;}
+.acc-group-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.acc-group-title .count{background:var(--gc);color:var(--g);padding:1px 7px;border-radius:20px;font-size:10px;}
+.acc-table{width:100%;border-collapse:collapse;background:var(--w);border:1.5px solid var(--brd);border-radius:12px;overflow:hidden;box-shadow:var(--sh);}
+.acc-table th{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--g);padding:9px 14px;text-align:left;background:var(--gc);border-bottom:1px solid var(--brd);}
+.acc-table td{font-size:12px;padding:9px 14px;border-bottom:1px solid #F5F3F0;}
+.acc-table tr:last-child td{border-bottom:none;}
+.acc-table tr:hover td{background:#FAFAF9;}
+.acc-monto{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;}
+.btn-fac-sm{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;border:1.5px solid var(--brd);background:var(--w);color:var(--g);cursor:pointer;font-family:'Syne',sans-serif;transition:.15s;text-transform:uppercase;letter-spacing:.04em;}
+.btn-fac-sm:hover{border-color:var(--pur);color:var(--pur);}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-bg.show{display:flex;}
+.modal{background:var(--w);border-radius:18px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.modal-header{padding:20px 22px 16px;border-bottom:1px solid var(--brd);display:flex;justify-content:space-between;align-items:flex-start;}
+.modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;}
+.modal-sub{font-size:11px;color:var(--g);margin-top:3px;}
+.modal-close{width:28px;height:28px;border-radius:8px;border:none;background:var(--gc);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--g);flex-shrink:0;}
+.modal-body{padding:20px 22px;}
+.pago-list{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;}
+.pago-row{border:1.5px solid var(--brd);border-radius:10px;padding:12px 14px;cursor:pointer;transition:.15s;position:relative;}
+.pago-row:hover{border-color:var(--r);}
+.pago-row.selected{border-color:var(--r);background:#FFF8F6;}
+.pago-row.done{border-color:var(--ok-brd);background:var(--ok-bg);}
+.pago-row.no-contrato{opacity:.4;cursor:not-allowed;}
+.pago-row-top{display:flex;justify-content:space-between;align-items:center;}
+.pago-row-name{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;}
+.pago-row-cont{font-size:11px;color:var(--g);}
+.pago-row-real{font-size:11px;font-weight:600;}
+.pago-row-real.done{color:var(--ok);}
+.pago-row-real.pending{color:var(--g);}
+.pago-form{margin-top:14px;padding-top:14px;border-top:1px dashed var(--brd);display:none;}
+.pago-form.show{display:block;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.form-field{display:flex;flex-direction:column;gap:5px;}
+.form-field label{font-size:10px;font-weight:600;color:var(--g);text-transform:uppercase;letter-spacing:.05em;}
+.form-field input{border:1.5px solid var(--brd);border-radius:8px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--n);outline:none;}
+.form-field input:focus{border-color:var(--r);}
+.btn-save{width:100%;padding:12px;border:none;border-radius:10px;background:var(--r);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:.15s;}
+.btn-save:hover{background:var(--ro);}
+.btn-save:disabled{opacity:.5;cursor:not-allowed;}
+
+/* ── FAC MODAL ── */
+.fac-select{width:100%;border:1.5px solid var(--brd);border-radius:8px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--n);outline:none;margin-bottom:16px;}
+.fac-select:focus{border-color:var(--r);}
+.fac-summary{background:var(--gc);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;line-height:1.7;}
+.fac-summary strong{font-weight:700;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;z-index:500;background:var(--n);color:#fff;padding:12px 18px;border-radius:10px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.3);transform:translateY(80px);opacity:0;transition:.3s;max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{background:var(--ok);}
+.toast.err{background:var(--mora);}
+
+/* ── LOADING ── */
+.loading-bar{height:3px;background:linear-gradient(90deg,var(--r),#FF8C6B);position:fixed;top:0;left:0;z-index:999;transition:width .3s;width:0;}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:60px 20px;color:var(--g);}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+.empty-text{font-size:14px;}
+
+@media(max-width:768px){
+  .kpi-strip{grid-template-columns:repeat(2,1fr);}
+  .form-row{grid-template-columns:1fr;}
+  .card-top{flex-wrap:wrap;}
+  .card-amounts{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<div class="loading-bar" id="loadingBar"></div>
+
+<header>
+  <div class="logo">VIS<span>·</span>CO</div>
+  <div class="hbadge">M4 · Cierres y Pagos</div>
+  <div class="hright">
+    <div class="sync-status off" id="syncStatus" onclick="toggleSetup()">OneDrive: no conectado</div>
+    <button class="hbtn" onclick="toggleSetup()">⚙ Configurar</button>
+    <button class="hbtn" style="display:none" id="btnExportExcel" onclick="exportExcel()">↓ Exportar Excel</button>
+    <button class="hbtn" style="position:relative">
+      📂 Cargar Excel
+      <input type="file" accept=".xlsx,.xls" onchange="loadFile(this)">
+    </button>
+  </div>
+</header>
+
+<!-- Setup Panel -->
+<div class="setup-panel" id="setupPanel">
+  <div class="setup-inner">
+    <div class="setup-title">🔗 Conexión OneDrive (Microsoft Graph API)</div>
+    <div class="setup-field">
+      <label>Azure AD Client ID</label>
+      <input type="text" id="cfgClientId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" oninput="saveCfg()">
+    </div>
+    <div class="setup-field" style="max-width:160px">
+      <label>Tenant</label>
+      <input type="text" id="cfgTenant" value="acabadosvis.onmicrosoft.com" oninput="saveCfg()">
+    </div>
+    <div style="display:flex;align-items:flex-end;gap:8px">
+      <button class="setup-btn connect" onclick="connectOneDrive()">Conectar cuenta</button>
+    </div>
+    <div class="setup-help">
+      ⚠️ El <strong>Client ID</strong> es un código tipo <code>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</code> (no es un correo).<br>
+      <strong>Cómo obtenerlo (5 min):</strong>
+      1. Ve a <a href="https://portal.azure.com" target="_blank">portal.azure.com</a> → Azure Active Directory → Registros de aplicaciones → Nueva registro<br>
+      2. Nombre: VIS-CO · Tipo: SPA · URI de redireccionamiento: <code id="redirectUri"></code><br>
+      3. Permisos API: Files.ReadWrite (delegado) · Copiar el <strong>Application (client) ID</strong> arriba.
+    </div>
+  </div>
+</div>
+
+<!-- First Screen -->
+<div class="first-screen" id="firstScreen">
+  <div class="fs-icon">💳</div>
+  <div class="fs-title">Cierres y Pagos</div>
+  <div class="fs-sub">Registra pagos en segundos y actualiza el reporte automáticamente. Contabilidad ve en tiempo real qué se puede facturar.</div>
+  <div class="fs-btns">
+    <button class="fs-btn">
+      📂 Cargar Excel de ventas
+      <input type="file" accept=".xlsx,.xls" onchange="loadFile(this)">
+    </button>
+    <button class="fs-btn outline" onclick="connectOneDrive()">🔗 Conectar OneDrive</button>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div class="dash" id="dash">
+
+  <!-- KPI Strip -->
+  <div class="kpi-strip">
+    <div class="kpi k1" onclick="filterByKpi('todos')">
+      <div class="ktag">Total × Cobrar</div>
+      <div class="kamt" id="kpiTotal">$0</div>
+      <div class="ksub" id="kpiTotalSub">— clientes activos</div>
+    </div>
+    <div class="kpi k2" onclick="filterByKpi('sin_facturar')">
+      <div class="ktag">Sin Facturar</div>
+      <div class="kamt" id="kpiSinFac">$0</div>
+      <div class="ksub" id="kpiSinFacSub">— clientes</div>
+    </div>
+    <div class="kpi k3" onclick="filterByKpi('ejecucion')">
+      <div class="ktag">En Ejecución</div>
+      <div class="kamt" id="kpiEjec">0</div>
+      <div class="ksub" id="kpiEjecSub">proyectos activos</div>
+    </div>
+    <div class="kpi k4" onclick="filterByKpi('recibir')">
+      <div class="ktag">× Recibir</div>
+      <div class="kamt" id="kpiRecibir">0</div>
+      <div class="ksub" id="kpiRecibirSub">obra terminada</div>
+    </div>
+    <div class="kpi k5" onclick="showTab('contabilidad')">
+      <div class="ktag">Vista Contabilidad</div>
+      <div class="kamt" id="kpiFacturar">0</div>
+      <div class="ksub">lista para facturar</div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="tabs">
+      <div class="tab active" id="tabCartera" onclick="showTab('cartera')">Cartera</div>
+      <div class="tab" id="tabContabilidad" onclick="showTab('contabilidad')">Contabilidad</div>
+    </div>
+    <select class="filter-sel" id="filterEstado" onchange="renderList()">
+      <option value="">Todos los estados</option>
+      <option value="EN EJECUCIÓN">En Ejecución</option>
+      <option value="X RECIBIR">× Recibir</option>
+      <option value="CAIDO">Caído</option>
+    </select>
+    <select class="filter-sel" id="filterProyecto" onchange="renderList()">
+      <option value="">Todos los proyectos</option>
+    </select>
+    <input class="search-box" id="searchBox" placeholder="🔍 Buscar cliente…" oninput="renderList()">
+    <div class="tright">
+      <button class="hbtn" id="btnExportExcel2" onclick="exportExcel()" style="display:none">↓ Excel</button>
+    </div>
+  </div>
+
+  <!-- Cartera Tab -->
+  <div class="list-wrap" id="carteraView">
+    <div class="list-count" id="listCount"></div>
+    <div id="clientList"></div>
+  </div>
+
+  <!-- Contabilidad Tab -->
+  <div class="accounting-view" id="contabilidadView">
+    <div id="accContent"></div>
+  </div>
+
+</div>
+
+<!-- Payment Modal -->
+<div class="modal-bg" id="modalPago">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalPagoTitle">Registrar Pago</div>
+        <div class="modal-sub" id="modalPagoSub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modalPago')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="pago-list" id="pagoList"></div>
+      <div class="pago-form" id="pagoForm">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Monto recibido ($)</label>
+            <input type="number" id="inputMonto" placeholder="0" min="0" step="1000">
+          </div>
+          <div class="form-field">
+            <label>Fecha de pago</label>
+            <input type="date" id="inputFecha">
+          </div>
+        </div>
+        <button class="btn-save" id="btnGuardarPago" onclick="guardarPago()" disabled>Guardar pago</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Facturación Modal -->
+<div class="modal-bg" id="modalFac">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalFacTitle">Actualizar Facturación</div>
+        <div class="modal-sub" id="modalFacSub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modalFac')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fac-summary" id="facSummary"></div>
+      <div class="form-field" style="margin-bottom:16px">
+        <label>Estado de facturación</label>
+        <select class="fac-select" id="facSelect">
+          <option>SIN FACTURAR</option>
+          <option>FACTURADO ANTICIPO</option>
+          <option>FACTURADO ANTICIPO Y OBRA BLANCA</option>
+          <option>FACTURADO ANTICIPO Y SEGUNDO PAGO</option>
+          <option>FACTURADO 50%</option>
+          <option>FACTURADO 90%</option>
+          <option>FACTURADO CONGELACIÓN</option>
+          <option>FACTURADO CONGELACIÓN-ANTICIPOS</option>
+          <option>FACTURADO OBRA BLANCA</option>
+          <option>FACTURADO TOTAL</option>
+          <option>FACTURADO TOTAL-FALTAN ADICIONALES</option>
+        </select>
+      </div>
+      <button class="btn-save" onclick="guardarFac()">Guardar estado</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// =====================================================================
+// CONFIG
+// =====================================================================
+const CFG = {
+  CLIENT_ID: localStorage.getItem('visco_m4_clientId') || 'a3289496-21d5-4f4e-b033-7fb7339e2aa8',
+  TENANT:    localStorage.getItem('visco_m4_tenant')   || '79cd3b5a-a384-4785-a983-74eace5f688d',
+  DRIVE_ID:  'b!D251vSxdK0-WPxaL8adTxn6fr9AE5qVIiVLnRNP5r6fFtdHyi3bpTagdzJcffXBJ',
+  FILE_ID:   '01HE3BNJIL2QQJEDPZXZBLWAVZVMNTAUL3',
+  SHEET:     'REPORTE VENTAS',
+  DATA_START: 4 // Excel row (1-indexed) where data begins
+};
+
+// =====================================================================
+// COLUMN MAP (0-indexed)
+// =====================================================================
+const C = {
+  c:0, codigo:1, vd:2, mes:3, ano:4, cons:5,
+  cliente:6, estado:7, proyecto:8, torre:9, apto:10,
+  total:18, contrato:19, specs:20,
+  sep_pct:21,  sep_monto:22,  sep_fecha:23,
+  ant_c1:24, ant_c2:25, ant_c_monto:26, ant_c_fecha:27,
+  ant_r_pct:28, ant_r_monto:29, ant_r_fecha:30,
+  p1_c_pct:31, p1_c_monto:32, p1_c_fecha:33,
+  p1_r_pct:34, p1_r_monto:35, p1_r_fecha:36,
+  p2_c_pct:37, p2_c_monto:38, p2_c_fecha:39,
+  p2_r_pct:40, p2_r_monto:41, p2_r_fecha:42,
+  p3_c_pct:43, p3_c_monto:44, p3_c_fecha:45,
+  p3_r_pct:46, p3_r_monto:47, p3_r_fecha:48,
+  p4_c_pct:49, p4_c_monto:50, p4_c_fecha:51,
+  p4_r_pct:52, p4_r_monto:53, p4_r_fecha:54,
+  p5_c_pct:55, p5_c_monto:56, p5_c_fecha:57,
+  p5_r_pct:58, p5_r_monto:59, p5_r_fecha:60,
+  p6_c_pct:61, p6_c_monto:62, p6_c_fecha:63,
+  p6_r_pct:64, p6_r_monto:65, p6_r_fecha:66,
+  recaudado:67, x_recaudar:68, facturacion:73
+};
+
+// Payment definitions
+const PAGOS_DEF = [
+  { key:'sep', label:'Separación',  cMonto:22, cFecha:23, rMonto:22, rFecha:23, rPct:21,  tipo:'sep' },
+  { key:'ant', label:'Anticipo',    cMonto:26, cFecha:27, rMonto:29, rFecha:30, rPct:28,  tipo:'real' },
+  { key:'p1',  label:'Obra Blanca', cMonto:32, cFecha:33, rMonto:35, rFecha:36, rPct:34,  tipo:'real' },
+  { key:'p2',  label:'Carpintería', cMonto:38, cFecha:39, rMonto:41, rFecha:42, rPct:40,  tipo:'real' },
+  { key:'p3',  label:'Entrega',     cMonto:44, cFecha:45, rMonto:47, rFecha:48, rPct:46,  tipo:'real' },
+  { key:'p4',  label:'Pago 4',      cMonto:50, cFecha:51, rMonto:53, rFecha:54, rPct:52,  tipo:'real' },
+  { key:'p5',  label:'Adicionales', cMonto:56, cFecha:57, rMonto:59, rFecha:60, rPct:58,  tipo:'real' },
+  { key:'p6',  label:'Pago 6',      cMonto:62, cFecha:63, rMonto:65, rFecha:66, rPct:64,  tipo:'real' },
+];
+
+// =====================================================================
+// STATE
+// =====================================================================
+let allData     = [];  // parsed rows from Excel
+let workbook    = null; // SheetJS workbook (for export)
+let msalApp     = null;
+let msalAccount = null;
+let graphToken  = null;
+let selectedRow = null;
+let selectedPago= null;
+let currentTab  = 'cartera';
+let kpiFilter   = '';
+const VC4 = {}; // in-memory overrides (payments registered this session)
+
+// =====================================================================
+// IDB
+// =====================================================================
+let idb = null;
+function openIDB() {
+  return new Promise(r => {
+    const req = indexedDB.open('VISCO_M4', 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore('pagos', {keyPath:'id'});
+    req.onsuccess = e => { idb = e.target.result; r(); };
+    req.onerror = () => r();
+  });
+}
+async function idbGet(id) {
+  if (!idb) return null;
+  return new Promise(r => {
+    const tx = idb.transaction('pagos','readonly');
+    tx.objectStore('pagos').get(id).onsuccess = e => r(e.target.result);
+  });
+}
+async function idbPut(obj) {
+  if (!idb) return;
+  return new Promise(r => {
+    const tx = idb.transaction('pagos','readwrite');
+    tx.objectStore('pagos').put(obj).onsuccess = () => r();
+  });
+}
+async function idbGetAll() {
+  if (!idb) return [];
+  return new Promise(r => {
+    const tx = idb.transaction('pagos','readonly');
+    tx.objectStore('pagos').getAll().onsuccess = e => r(e.target.result);
+  });
+}
+
+// =====================================================================
+// UTILS
+// =====================================================================
+function fmt(n) {
+  if (!n && n !== 0) return '—';
+  return '$' + Math.round(n).toLocaleString('es-CO');
+}
+function fmtShort(n) {
+  if (!n) return '—';
+  if (Math.abs(n) >= 1e9) return '$' + (n/1e9).toFixed(1) + 'B';
+  if (Math.abs(n) >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
+  if (Math.abs(n) >= 1e3) return '$' + (n/1e3).toFixed(0) + 'K';
+  return '$' + n;
+}
+function fmtDate(v) {
+  if (!v) return null;
+  if (typeof v === 'string' && v.match(/\d{2}\/\d{2}\/\d{4}/)) {
+    const [m,d,y] = v.split('/');
+    return `${y}-${m}-${d}`;
+  }
+  if (v instanceof Date) return v.toISOString().slice(0,10);
+  if (typeof v === 'number') {
+    // Excel serial date
+    const d = new Date((v - 25569) * 86400 * 1000);
+    return d.toISOString().slice(0,10);
+  }
+  return null;
+}
+function colLetter(idx) { // 0-indexed → Excel letter
+  const n = idx + 1;
+  if (n <= 26) return String.fromCharCode(64 + n);
+  const hi = Math.floor((n-1)/26);
+  const lo = ((n-1)%26)+1;
+  return String.fromCharCode(64+hi) + String.fromCharCode(64+lo);
+}
+function loading(on) {
+  document.getElementById('loadingBar').style.width = on ? '70%' : '0';
+}
+function toast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  t.textContent = (type==='ok'?'✓ ':'✗ ') + msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+function estadoKey(e) {
+  if (!e) return 'caido';
+  if (e.includes('EJECUCIÓN') || e.includes('EJECUCION')) return 'ejecucion';
+  if (e.includes('RECIBIR')) return 'recibir';
+  return 'caido';
+}
+function estadoLabel(e) {
+  if (!e) return 'Sin estado';
+  if (e.includes('EJECUCIÓN') || e.includes('EJECUCION')) return 'En Ejecución';
+  if (e.includes('RECIBIR')) return '× Recibir';
+  if (e.includes('CAIDO')) return 'Caído';
+  if (e.includes('ENTREGADO')) return 'Entregado';
+  return e;
+}
+function initials(nombre) {
+  if (!nombre) return '?';
+  return nombre.trim().split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+}
+
+// =====================================================================
+// CONFIG / SETUP
+// =====================================================================
+function saveCfg() {
+  CFG.CLIENT_ID = document.getElementById('cfgClientId').value.trim();
+  CFG.TENANT = document.getElementById('cfgTenant').value.trim();
+  localStorage.setItem('visco_m4_clientId', CFG.CLIENT_ID);
+  localStorage.setItem('visco_m4_tenant', CFG.TENANT);
+}
+function toggleSetup() {
+  const p = document.getElementById('setupPanel');
+  p.classList.toggle('show');
+  document.getElementById('redirectUri').textContent = window.location.origin + window.location.pathname;
+}
+
+// =====================================================================
+// MSAL / GRAPH
+// =====================================================================
+function initMsal() {
+  if (!CFG.CLIENT_ID) return null;
+  return new msal.PublicClientApplication({
+    auth: {
+      clientId: CFG.CLIENT_ID,
+      authority: `https://login.microsoftonline.com/${CFG.TENANT}`,
+      redirectUri: window.location.origin + window.location.pathname
+    },
+    cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false }
+  });
+}
+async function connectOneDrive() {
+  if (!CFG.CLIENT_ID) {
+    document.getElementById('setupPanel').classList.add('show');
+    toast('Configura primero el Azure AD Client ID', 'err');
+    return;
+  }
+  // Validate format (must be a GUID)
+  if (!CFG.CLIENT_ID.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+    toast('El Client ID debe ser un GUID tipo xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx (no un correo)', 'err');
+    return;
+  }
+  if (typeof msal === 'undefined') {
+    toast('La librería MSAL no cargó. Verifica tu conexión a internet.', 'err');
+    return;
+  }
+  try {
+    loading(true);
+    msalApp = initMsal();
+    const result = await msalApp.loginPopup({
+      scopes: ['Files.ReadWrite','User.Read','offline_access']
+    });
+    msalAccount = result.account;
+    graphToken = result.accessToken;
+    updateSyncStatus(true);
+    toast('OneDrive conectado ✓');
+    // If no data loaded yet, load from OneDrive
+    if (allData.length === 0) await loadFromOneDrive();
+  } catch(e) {
+    toast('Error al conectar: ' + e.message, 'err');
+    console.error(e);
+  } finally {
+    loading(false);
+  }
+}
+async function getToken() {
+  if (!msalApp || !msalAccount) throw new Error('No autenticado');
+  try {
+    const result = await msalApp.acquireTokenSilent({
+      scopes: ['Files.ReadWrite'],
+      account: msalAccount
+    });
+    return result.accessToken;
+  } catch {
+    const result = await msalApp.acquireTokenPopup({
+      scopes: ['Files.ReadWrite'],
+      account: msalAccount
+    });
+    return result.accessToken;
+  }
+}
+async function loadFromOneDrive() {
+  try {
+    loading(true);
+    const token = await getToken();
+    const url = `https://graph.microsoft.com/v1.0/drives/${CFG.DRIVE_ID}/items/${CFG.FILE_ID}/content`;
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` }});
+    if (!res.ok) throw new Error('Error descargando archivo');
+    const blob = await res.blob();
+    const buf = await blob.arrayBuffer();
+    processWorkbook(buf);
+    toast('Excel cargado desde OneDrive ✓');
+  } catch(e) {
+    toast('Error cargando desde OneDrive: ' + e.message, 'err');
+  } finally {
+    loading(false);
+  }
+}
+async function updateExcelCells(excelRow, updates) {
+  // updates = [{col (0-indexed), value}]
+  if (!msalAccount) return; // silent skip if not connected
+  try {
+    const token = await getToken();
+    for (const u of updates) {
+      const addr = `${colLetter(u.col)}${excelRow}`;
+      const url = `https://graph.microsoft.com/v1.0/drives/${CFG.DRIVE_ID}/items/${CFG.FILE_ID}/workbook/worksheets/${encodeURIComponent(CFG.SHEET)}/range(address='${addr}')`;
+      const val = u.value instanceof Date
+        ? u.value.toLocaleDateString('en-US') // MM/DD/YYYY
+        : u.value;
+      await fetch(url, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ values: [[val]] })
+      });
+    }
+  } catch(e) {
+    console.warn('Graph API update failed:', e);
+    toast('Pago guardado localmente. Reconecta OneDrive para sincronizar.', 'err');
+  }
+}
+function updateSyncStatus(on) {
+  const el = document.getElementById('syncStatus');
+  el.className = 'sync-status ' + (on ? 'on' : 'off');
+  el.textContent = on ? 'OneDrive: conectado' : 'OneDrive: no conectado';
+}
+
+// =====================================================================
+// EXCEL PARSING
+// =====================================================================
+function loadFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  loading(true);
+  const reader = new FileReader();
+  reader.onload = e => {
+    processWorkbook(e.target.result);
+    loading(false);
+  };
+  reader.readAsArrayBuffer(file);
+}
+function processWorkbook(buf) {
+  workbook = XLSX.read(new Uint8Array(buf), { type: 'array', cellDates: true });
+  const ws = workbook.Sheets[CFG.SHEET];
+  if (!ws) { toast('No se encontró la hoja "REPORTE VENTAS"', 'err'); return; }
+  const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null, raw: false, dateNF: 'MM/DD/YYYY' });
+  // Parse rows starting at DATA_START (0-indexed = DATA_START - 1)
+  allData = [];
+  for (let i = CFG.DATA_START - 1; i < raw.length; i++) {
+    const row = raw[i];
+    if (!row || !row[C.cliente]) continue;
+    const r = { _row: row, _excelRow: i + 1, _idx: allData.length };
+    allData.push(r);
+  }
+  // Load IDB overrides
+  loadIDBOverrides().then(() => {
+    // Populate project filter
+    populateFilters();
+    // Show dashboard
+    document.getElementById('firstScreen').style.display = 'none';
+    document.getElementById('dash').classList.add('show');
+    document.getElementById('btnExportExcel').style.display = 'inline-flex';
+    document.getElementById('btnExportExcel2').style.display = 'inline-flex';
+    renderKPIs();
+    renderList();
+  });
+}
+async function loadIDBOverrides() {
+  const all = await idbGetAll();
+  all.forEach(item => { VC4[item.id] = item; });
+}
+function getVal(r, col) {
+  // Check IDB override first
+  const key = `${r._row[C.codigo]}_col${col}`;
+  if (VC4[key]) return VC4[key].value;
+  return r._row[col];
+}
+function getRecaudado(r) {
+  // Sum all real montos that have been paid
+  let sum = 0;
+  // Separación (no real column, use contrato monto if set)
+  const sep = +getVal(r, C.sep_monto) || 0;
+  sum += sep;
+  // Anticipo real
+  sum += +getVal(r, C.ant_r_monto) || 0;
+  sum += +getVal(r, C.p1_r_monto) || 0;
+  sum += +getVal(r, C.p2_r_monto) || 0;
+  sum += +getVal(r, C.p3_r_monto) || 0;
+  sum += +getVal(r, C.p4_r_monto) || 0;
+  sum += +getVal(r, C.p5_r_monto) || 0;
+  sum += +getVal(r, C.p6_r_monto) || 0;
+  return sum;
+}
+
+// =====================================================================
+// FILTERS & RENDERING
+// =====================================================================
+function populateFilters() {
+  const proyectos = [...new Set(allData.map(r => r._row[C.proyecto]).filter(Boolean))].sort();
+  const sel = document.getElementById('filterProyecto');
+  sel.innerHTML = '<option value="">Todos los proyectos</option>';
+  proyectos.forEach(p => sel.innerHTML += `<option value="${p}">${p}</option>`);
+}
+function getFiltered() {
+  const estado = document.getElementById('filterEstado').value;
+  const proyecto = document.getElementById('filterProyecto').value;
+  const search = document.getElementById('searchBox').value.toLowerCase();
+  return allData.filter(r => {
+    const e = (r._row[C.estado] || '').trim();
+    if (e === 'ENTREGADO') return false; // solo activos
+    if (kpiFilter === 'sin_facturar') {
+      const fac = (r._row[C.facturacion] || '').trim();
+      if (fac !== 'SIN FACTURAR') return false;
+    } else if (kpiFilter === 'ejecucion') {
+      if (estadoKey(e) !== 'ejecucion') return false;
+    } else if (kpiFilter === 'recibir') {
+      if (estadoKey(e) !== 'recibir') return false;
+    }
+    if (estado && e !== estado) return false;
+    if (proyecto && (r._row[C.proyecto] || '') !== proyecto) return false;
+    if (search) {
+      const haystack = `${r._row[C.cliente]} ${r._row[C.proyecto]} ${r._row[C.codigo]}`.toLowerCase();
+      if (!haystack.includes(search)) return false;
+    }
+    return true;
+  });
+}
+function filterByKpi(filter) {
+  kpiFilter = filter;
+  document.getElementById('filterEstado').value = '';
+  showTab('cartera');
+  renderList();
+}
+function showTab(tab) {
+  currentTab = tab;
+  document.getElementById('tabCartera').classList.toggle('active', tab === 'cartera');
+  document.getElementById('tabContabilidad').classList.toggle('active', tab === 'contabilidad');
+  document.getElementById('carteraView').style.display = tab === 'cartera' ? 'block' : 'none';
+  document.getElementById('contabilidadView').classList.toggle('show', tab === 'contabilidad');
+  if (tab === 'contabilidad') renderAccounting();
+}
+
+// =====================================================================
+// KPI
+// =====================================================================
+function renderKPIs() {
+  const activos = allData.filter(r => {
+    const e = (r._row[C.estado] || '').trim();
+    return e !== 'ENTREGADO' && e !== 'CAIDO';
+  });
+  const total = activos.reduce((s,r) => s + (+r._row[C.x_recaudar]||0), 0);
+  const sinFac = activos.filter(r => (r._row[C.facturacion]||'').trim() === 'SIN FACTURAR');
+  const ejec = activos.filter(r => estadoKey((r._row[C.estado]||'').trim()) === 'ejecucion');
+  const recibir = activos.filter(r => estadoKey((r._row[C.estado]||'').trim()) === 'recibir');
+  // "listo para facturar" = has real payments but sin facturar or partial
+  const paraFac = activos.filter(r => {
+    const fac = (r._row[C.facturacion]||'').trim();
+    const antR = +getVal(r, C.ant_r_monto)||0;
+    const p1R  = +getVal(r, C.p1_r_monto)||0;
+    return (antR > 0 || p1R > 0) && fac !== 'FACTURADO TOTAL';
+  });
+  document.getElementById('kpiTotal').textContent = fmtShort(total);
+  document.getElementById('kpiTotalSub').textContent = `${activos.length} clientes activos`;
+  document.getElementById('kpiSinFac').textContent = fmtShort(sinFac.reduce((s,r)=>s+(+r._row[C.x_recaudar]||0),0));
+  document.getElementById('kpiSinFacSub').textContent = `${sinFac.length} clientes`;
+  document.getElementById('kpiEjec').textContent = ejec.length;
+  document.getElementById('kpiEjecSub').textContent = `proyectos activos`;
+  document.getElementById('kpiRecibir').textContent = recibir.length;
+  document.getElementById('kpiRecibirSub').textContent = `obra terminada`;
+  document.getElementById('kpiFacturar').textContent = paraFac.length;
+}
+
+// =====================================================================
+// CLIENT LIST
+// =====================================================================
+function renderList() {
+  const rows = getFiltered();
+  document.getElementById('listCount').textContent = `${rows.length} cliente${rows.length!==1?'s':''}`;
+  if (rows.length === 0) {
+    document.getElementById('clientList').innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Sin resultados</div></div>';
+    return;
+  }
+  document.getElementById('clientList').innerHTML = rows.map(r => cardHTML(r)).join('');
+}
+function cardHTML(r) {
+  const row = r._row;
+  const estado = (row[C.estado]||'').trim();
+  const eKey = estadoKey(estado);
+  const total = +row[C.total] || 0;
+  const xRec = +row[C.x_recaudar] || 0;
+  const recaudado = total - xRec;
+  const pct = total > 0 ? Math.round((recaudado/total)*100) : 0;
+  const fac = (row[C.facturacion]||'').trim() || 'SIN FACTURAR';
+  const pagosHTML = PAGOS_DEF.map(p => {
+    const cMonto = +getVal(r, p.cMonto) || 0;
+    if (!cMonto) return ''; // no payment planned
+    const rMonto = +getVal(r, p.rMonto) || 0;
+    const rFecha = getVal(r, p.rFecha);
+    let cls = 'pendiente', montoTxt = fmt(cMonto);
+    if (rMonto >= cMonto * 0.98) cls = 'pagado';
+    else if (rMonto > 0) cls = 'parcial';
+    const fechaTxt = rFecha ? ` · ${fmtDate(rFecha)}` : '';
+    return `<div class="pago-chip ${cls}" onclick="event.stopPropagation(); openModal(${r._idx}, '${p.key}')" title="${p.label}: Contrato ${fmt(cMonto)} | Real ${fmt(rMonto)}${fechaTxt}">
+      ${p.label}
+      <span class="pago-monto">${cls==='pagado' ? '✓ '+fmtShort(rMonto) : fmtShort(cMonto)}</span>
+    </div>`;
+  }).join('');
+  return `<div class="card estado-${eKey}">
+    <div class="card-top">
+      <div class="card-badge">${initials(row[C.cliente])}</div>
+      <div class="card-info">
+        <div class="card-cliente">${row[C.cliente]||'—'}</div>
+        <div class="card-proyecto">${row[C.proyecto]||''} · Torre ${row[C.torre]||'—'} · Apto ${row[C.apto]||'—'}</div>
+        <div class="card-meta">
+          <span class="chip chip-estado-${eKey}">${estadoLabel(estado)}</span>
+          <span class="chip chip-fac">${fac}</span>
+        </div>
+      </div>
+      <div class="card-amounts">
+        <div class="card-total">${fmt(total)}</div>
+        <div class="card-recaudado">✓ Recibido: ${fmt(recaudado)}</div>
+        <div class="card-pendiente">⏳ Pendiente: ${fmt(xRec)}</div>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="pagos-line">${pagosHTML||'<span style="font-size:11px;color:#bbb">Sin pagos programados</span>'}</div>
+    <div class="card-footer">
+      <span class="card-vd">VD: ${row[C.vd]||'—'}</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn-fac" onclick="openFacModal(${r._idx})">📋 Facturación</button>
+        <button class="btn-registrar" onclick="openModal(${r._idx}, null)">+ Registrar Pago</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// =====================================================================
+// ACCOUNTING VIEW
+// =====================================================================
+function renderAccounting() {
+  const activos = allData.filter(r => {
+    const e = (r._row[C.estado]||'').trim();
+    return e !== 'ENTREGADO' && e !== 'CAIDO';
+  });
+  const groups = {};
+  activos.forEach(r => {
+    const fac = (r._row[C.facturacion]||'SIN FACTURAR').trim();
+    if (!groups[fac]) groups[fac] = [];
+    groups[fac].push(r);
+  });
+  const order = ['SIN FACTURAR','FACTURADO ANTICIPO','FACTURADO ANTICIPO Y OBRA BLANCA','FACTURADO 50%','FACTURADO 90%','FACTURADO CONGELACIÓN','FACTURADO CONGELACIÓN-ANTICIPOS','FACTURADO TOTAL'];
+  const keys = [...new Set([...order, ...Object.keys(groups)])].filter(k => groups[k]);
+  let html = '';
+  keys.forEach(fac => {
+    const rows = groups[fac] || [];
+    if (!rows.length) return;
+    const totalPend = rows.reduce((s,r) => s + (+r._row[C.x_recaudar]||0), 0);
+    html += `<div class="acc-group">
+      <div class="acc-group-title">${fac}<span class="count">${rows.length}</span> <span style="margin-left:auto;font-size:12px;color:var(--n);font-weight:700">${fmt(totalPend)} pendiente</span></div>
+      <table class="acc-table">
+        <thead><tr>
+          <th>Cliente</th><th>Proyecto · Apto</th><th>Total contrato</th>
+          <th>Recibido</th><th>× Recaudar</th><th>Asesor</th><th>Acción</th>
+        </tr></thead>
+        <tbody>
+          ${rows.map(r => `<tr>
+            <td><strong>${r._row[C.cliente]||'—'}</strong></td>
+            <td style="font-size:11px;color:var(--g)">${r._row[C.proyecto]||''} T${r._row[C.torre]||''}/A${r._row[C.apto]||''}</td>
+            <td class="acc-monto">${fmt(+r._row[C.total]||0)}</td>
+            <td class="acc-monto" style="color:var(--ok)">${fmt((+r._row[C.total]||0)-(+r._row[C.x_recaudar]||0))}</td>
+            <td class="acc-monto" style="color:var(--mora)">${fmt(+r._row[C.x_recaudar]||0)}</td>
+            <td style="font-size:11px">${r._row[C.vd]||'—'}</td>
+            <td><button class="btn-fac-sm" onclick="openFacModal(${r._idx})">Actualizar</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  });
+  document.getElementById('accContent').innerHTML = html || '<div class="empty"><div class="empty-icon">📊</div><div class="empty-text">No hay datos</div></div>';
+}
+
+// =====================================================================
+// PAYMENT MODAL
+// =====================================================================
+function openModal(rowIdx, pagoKey) {
+  selectedRow = allData[rowIdx];
+  selectedPago = null;
+  const row = selectedRow._row;
+  document.getElementById('modalPagoTitle').textContent = row[C.cliente]||'—';
+  document.getElementById('modalPagoSub').textContent = `${row[C.proyecto]||''} · Torre ${row[C.torre]||''} · Apto ${row[C.apto]||''} · Total: ${fmt(+row[C.total]||0)}`;
+  document.getElementById('pagoForm').classList.remove('show');
+  document.getElementById('btnGuardarPago').disabled = true;
+  // Default date = today
+  document.getElementById('inputFecha').value = new Date().toISOString().slice(0,10);
+  document.getElementById('inputMonto').value = '';
+  // Render payment rows
+  document.getElementById('pagoList').innerHTML = PAGOS_DEF.map(p => {
+    const cMonto = +getVal(selectedRow, p.cMonto) || 0;
+    if (!cMonto) return '';
+    const rMonto = +getVal(selectedRow, p.rMonto) || 0;
+    const rFecha = getVal(selectedRow, p.rFecha);
+    const done = rMonto >= cMonto * 0.98;
+    return `<div class="pago-row ${done?'done':''}" id="pr_${p.key}" onclick="${done?'':` selectPago('${p.key}')`}">
+      <div class="pago-row-top">
+        <div>
+          <div class="pago-row-name">${p.label}</div>
+          <div class="pago-row-cont">Contrato: ${fmt(cMonto)}</div>
+        </div>
+        <div class="pago-row-real ${done?'done':'pending'}">
+          ${done ? `✓ Recibido: ${fmt(rMonto)}<br><small style="font-weight:400">${fmtDate(rFecha)||''}</small>` : `Pendiente: ${fmt(cMonto - rMonto)}`}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('modalPago').classList.add('show');
+  // Auto-select if key provided
+  if (pagoKey) selectPago(pagoKey);
+}
+function selectPago(key) {
+  selectedPago = PAGOS_DEF.find(p => p.key === key);
+  if (!selectedPago) return;
+  // Highlight selected
+  document.querySelectorAll('.pago-row').forEach(el => el.classList.remove('selected'));
+  const el = document.getElementById(`pr_${key}`);
+  if (el) el.classList.add('selected');
+  // Pre-fill amount = remaining
+  const cMonto = +getVal(selectedRow, selectedPago.cMonto) || 0;
+  const rMonto = +getVal(selectedRow, selectedPago.rMonto) || 0;
+  document.getElementById('inputMonto').value = Math.max(0, cMonto - rMonto);
+  document.getElementById('pagoForm').classList.add('show');
+  document.getElementById('btnGuardarPago').disabled = false;
+}
+async function guardarPago() {
+  if (!selectedRow || !selectedPago) return;
+  const monto = parseFloat(document.getElementById('inputMonto').value);
+  const fecha = document.getElementById('inputFecha').value;
+  if (!monto || !fecha) { toast('Completa monto y fecha', 'err'); return; }
+  loading(true);
+  const btn = document.getElementById('btnGuardarPago');
+  btn.disabled = true;
+  btn.textContent = 'Guardando…';
+  try {
+    const total = +selectedRow._row[C.total] || 1;
+    const pct   = monto / total;
+    const excelRow = selectedRow._excelRow;
+    const codigo   = selectedRow._row[C.codigo];
+    // Save to IDB
+    const fechaVal = new Date(fecha);
+    await idbPut({ id: `${codigo}_col${selectedPago.rMonto}`, value: monto });
+    await idbPut({ id: `${codigo}_col${selectedPago.rFecha}`, value: fecha });
+    await idbPut({ id: `${codigo}_col${selectedPago.rPct}`,   value: pct  });
+    // Update in-memory
+    VC4[`${codigo}_col${selectedPago.rMonto}`] = { value: monto };
+    VC4[`${codigo}_col${selectedPago.rFecha}`] = { value: fecha };
+    VC4[`${codigo}_col${selectedPago.rPct}`]   = { value: pct };
+    // Update Excel via Graph API
+    if (msalAccount) {
+      await updateExcelCells(excelRow, [
+        { col: selectedPago.rMonto, value: monto },
+        { col: selectedPago.rFecha, value: fechaVal },
+        { col: selectedPago.rPct,   value: pct }
+      ]);
+      toast(`Pago registrado y sincronizado en OneDrive ✓`);
+    } else {
+      toast(`Pago guardado localmente. Conecta OneDrive para sincronizar.`);
+    }
+    closeModal('modalPago');
+    renderKPIs();
+    renderList();
+    if (currentTab === 'contabilidad') renderAccounting();
+  } catch(e) {
+    toast('Error: ' + e.message, 'err');
+  } finally {
+    loading(false);
+    btn.disabled = false;
+    btn.textContent = 'Guardar pago';
+  }
+}
+
+// =====================================================================
+// FACTURACIÓN MODAL
+// =====================================================================
+function openFacModal(rowIdx) {
+  selectedRow = allData[rowIdx];
+  const row = selectedRow._row;
+  document.getElementById('modalFacTitle').textContent = row[C.cliente]||'—';
+  document.getElementById('modalFacSub').textContent = `${row[C.proyecto]||''} · Apto ${row[C.apto]||''}`;
+  const fac = (row[C.facturacion]||'SIN FACTURAR').trim();
+  document.getElementById('facSelect').value = fac;
+  // Build summary
+  let html = `<strong>Pagos recibidos:</strong><br>`;
+  PAGOS_DEF.forEach(p => {
+    const rMonto = +getVal(selectedRow, p.rMonto) || 0;
+    const rFecha = getVal(selectedRow, p.rFecha);
+    if (rMonto > 0) html += `${p.label}: <strong>${fmt(rMonto)}</strong> · ${fmtDate(rFecha)||'sin fecha'}<br>`;
+  });
+  html += `<br><strong>Facturación actual:</strong> ${fac}`;
+  document.getElementById('facSummary').innerHTML = html;
+  document.getElementById('modalFac').classList.add('show');
+}
+async function guardarFac() {
+  if (!selectedRow) return;
+  const nuevoEstado = document.getElementById('facSelect').value;
+  const excelRow = selectedRow._excelRow;
+  const codigo   = selectedRow._row[C.codigo];
+  // Save locally
+  await idbPut({ id: `${codigo}_col${C.facturacion}`, value: nuevoEstado });
+  VC4[`${codigo}_col${C.facturacion}`] = { value: nuevoEstado };
+  selectedRow._row[C.facturacion] = nuevoEstado; // update in-memory row
+  // Sync to OneDrive
+  if (msalAccount) {
+    await updateExcelCells(excelRow, [{ col: C.facturacion, value: nuevoEstado }]);
+    toast('Facturación actualizada en OneDrive ✓');
+  } else {
+    toast('Facturación guardada localmente');
+  }
+  closeModal('modalFac');
+  renderKPIs();
+  renderList();
+  if (currentTab === 'contabilidad') renderAccounting();
+}
+
+// =====================================================================
+// EXPORT EXCEL
+// =====================================================================
+function exportExcel() {
+  if (!workbook) { toast('Carga primero el Excel', 'err'); return; }
+  // Apply all IDB overrides to the workbook sheet
+  const ws = workbook.Sheets[CFG.SHEET];
+  const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null, raw: true });
+  Object.keys(VC4).forEach(key => {
+    const match = key.match(/_col(\d+)$/);
+    if (!match) return;
+    const col = parseInt(match[1]);
+    const codigo = key.replace(/_col\d+$/, '');
+    const rowObj = allData.find(r => r._row[C.codigo] === codigo);
+    if (!rowObj) return;
+    const excelRowIdx = rowObj._excelRow - 1; // 0-indexed
+    const cellAddr = XLSX.utils.encode_cell({ r: excelRowIdx, c: col });
+    if (!ws[cellAddr]) ws[cellAddr] = {};
+    ws[cellAddr].v = VC4[key].value;
+    ws[cellAddr].t = typeof VC4[key].value === 'number' ? 'n' : 's';
+  });
+  XLSX.writeFile(workbook, '202511 REPORTE DE VENTAS VISUALIZZA - ACTUALIZADO.xlsx');
+  toast('Excel exportado con los pagos registrados ✓');
+}
+
+// =====================================================================
+// MODAL HELPERS
+// =====================================================================
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+document.querySelectorAll('.modal-bg').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
+});
+
+// =====================================================================
+// INIT
+// =====================================================================
+(async function init() {
+  await openIDB();
+  // Restore cfg
+  document.getElementById('cfgClientId').value = CFG.CLIENT_ID;
+  document.getElementById('cfgTenant').value = CFG.TENANT;
+  document.getElementById('redirectUri').textContent = window.location.origin + window.location.pathname;
+  // Try silent MSAL if client configured
+  if (CFG.CLIENT_ID) {
+    try {
+      msalApp = initMsal();
+      await msalApp.handleRedirectPromise();
+      const accounts = msalApp.getAllAccounts();
+      if (accounts.length > 0) {
+        msalAccount = accounts[0];
+        updateSyncStatus(true);
+        await loadFromOneDrive();
+      }
+    } catch(e) { console.warn('Silent auth failed:', e); }
+  }
+})();
+</script>
+</body>
+</html>
