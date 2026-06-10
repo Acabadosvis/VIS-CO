@@ -624,11 +624,9 @@ async function connectOneDrive() {
   }
   try {
     loading(true);
-    // Clear any stale MSAL interaction state
-    Object.keys(sessionStorage).filter(k => k.startsWith('msal.')).forEach(k => sessionStorage.removeItem(k));
-    Object.keys(localStorage).filter(k => k.startsWith('msal.')).forEach(k => localStorage.removeItem(k));
+    // Solo borra el flag de interacción en progreso, no el estado completo
+    sessionStorage.removeItem('msal.interaction.status');
     msalApp = initMsal();
-    await msalApp.initialize();
     const result = await msalApp.loginPopup({
       scopes: ['Files.ReadWrite','User.Read','offline_access'],
       redirectUri: REDIRECT_URI
