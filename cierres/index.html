@@ -657,7 +657,7 @@ function toggleSetup() {
 // =====================================================================
 // MSAL / GRAPH
 // =====================================================================
-const REDIRECT_URI = 'https://vis-co-blond.vercel.app/cierres/auth.html';
+const REDIRECT_URI = 'https://vis-co-blond.vercel.app/cierres/';
 function initMsal() {
   if (!CFG.CLIENT_ID) return null;
   return new msal.PublicClientApplication({
@@ -690,7 +690,7 @@ async function connectOneDrive() {
     // Flujo redirect: Microsoft redirige a auth.html, que vuelve a index.html
     await msalApp.loginRedirect({
       scopes: ['Files.ReadWrite','User.Read','offline_access'],
-      redirectUri: 'https://vis-co-blond.vercel.app/cierres/auth.html'
+      redirectUri: 'https://vis-co-blond.vercel.app/cierres/'
     });
     // La página navega a Microsoft — el código de abajo no se ejecuta
   } catch(e) {
