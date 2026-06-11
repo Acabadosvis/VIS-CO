@@ -1348,7 +1348,7 @@ function abrirModalM2() {
       rowsHTML += '<tr><td style="color:var(--g)">'+(sop.cli||sop.cid)+'</td><td style="font-size:11px;color:var(--g)">'+(sop.proy||'—')+'</td><td>'+(ETAPA_LABELS[sop.etapa]||sop.etapa)+'</td><td class="acc-monto">'+fmt(sop.monto||0)+'</td><td style="font-size:11px">'+(sop.fecha_entro||'—')+'</td><td><span class="m2-badge-skip">Sin fila en Excel</span></td></tr>';
       return;
     }
-    const existingMonto = +getVal(row, pagoDef.rMonto) || 0;
+    const existingMonto = +row._row[pagoDef.rMonto] || 0; // Excel real, no caché local
     const yaExiste = existingMonto > 0;
     if (yaExiste) existen++; else nuevos++;
     const badge = yaExiste
@@ -1381,19 +1381,30 @@ async function autoSyncM2() {
     if (!pagoDef) continue;
     const row = allData.find(r => String(r._row[C.c]) === sop.cid);
     if (!row) continue;
-    const existingMonto = +getVal(row, pagoDef.rMonto) || 0;
+    const existingMonto = +row._row[pagoDef.rMonto] || 0; // Excel real
     if (existingMonto > 0) continue;
     const monto  = sop.monto || 0;
     const fecha  = sop.fecha_entro || new Date().toISOString().slice(0, 10);
     const total  = +row._row[C.total] || 1;
     const pct    = monto / total;
     const codigo = row._row[C.codigo];
+    const excelRow = row._excelRow;
     await idbPut({ id: codigo+'_col'+pagoDef.rMonto, value: monto });
     await idbPut({ id: codigo+'_col'+pagoDef.rFecha, value: fecha });
     await idbPut({ id: codigo+'_col'+pagoDef.rPct,   value: pct  });
     VC4[codigo+'_col'+pagoDef.rMonto] = { value: monto };
     VC4[codigo+'_col'+pagoDef.rFecha] = { value: fecha };
     VC4[codigo+'_col'+pagoDef.rPct]   = { value: pct  };
+    // Escribir en OneDrive si hay sesión activa
+    if (msalAccount) {
+      try {
+        await updateExcelCells(excelRow, [
+          { col: pagoDef.rMonto, value: monto },
+          { col: pagoDef.rFecha, value: new Date(fecha + 'T12:00:00') },
+          { col: pagoDef.rPct,   value: pct   }
+        ]);
+      } catch(e) { console.warn('autoSync OneDrive error:', e); }
+    }
   }
 }
 
@@ -1413,7 +1424,7 @@ async function sincronizarM2() {
       if (!pagoDef) continue;
       const row = allData.find(r => String(r._row[C.c]) === sop.cid);
       if (!row) continue;
-      const existingMonto = +getVal(row, pagoDef.rMonto) || 0;
+      const existingMonto = +row._row[pagoDef.rMonto] || 0; // Excel real
       if (existingMonto > 0) continue;
       const monto  = sop.monto || 0;
       const fecha  = sop.fecha_entro || new Date().toISOString().slice(0, 10);
