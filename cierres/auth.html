@@ -4,16 +4,27 @@
 <meta charset="UTF-8"><title>VIS-CO Auth</title>
 <style>
   body{font-family:sans-serif;background:#F8F7F5;display:flex;align-items:center;
-  justify-content:center;min-height:100vh;margin:0;}
+  justify-content:center;min-height:100vh;margin:0;color:#666;font-size:14px;}
 </style>
 </head>
 <body>
-<div style="text-align:center;color:#15803D">
-  <div style="font-size:36px;margin-bottom:8px">✓</div>
-  <div style="font-size:14px;font-weight:600">Autenticado — cerrando ventana...</div>
-</div>
+<div id="msg">Conectando con Microsoft...</div>
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
 <script>
+  // ¿Hay código de auth en la URL? (segunda carga, después de Microsoft)
+  const hasCode = window.location.hash.includes('code=')
+               || window.location.search.includes('code=')
+               || window.location.hash.includes('error=')
+               || window.location.search.includes('error=');
+
+  if (hasCode) {
+    document.getElementById('msg').innerHTML =
+      '<div style="text-align:center;color:#15803D">' +
+      '<div style="font-size:36px;margin-bottom:8px">&#10003;</div>' +
+      '<div style="font-weight:600">Autenticado &#8212; cerrando...</div>' +
+      '</div>';
+  }
+
   const app = new msal.PublicClientApplication({
     auth: {
       clientId: 'a3289496-21d5-4f4e-b033-7fb7339e2aa8',
@@ -22,9 +33,13 @@
     },
     cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false }
   });
+
   app.handleRedirectPromise()
     .catch(console.error)
-    .finally(() => setTimeout(() => window.close(), 1500));
+    .finally(() => {
+      // Solo cerrar cuando hay respuesta de auth (segunda carga)
+      if (hasCode) setTimeout(() => window.close(), 600);
+    });
 </script>
 </body>
 </html>
