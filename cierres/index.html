@@ -666,7 +666,7 @@ function initMsal() {
       authority: `https://login.microsoftonline.com/${CFG.TENANT}`,
       redirectUri: REDIRECT_URI
     },
-    cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false }
+    cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: true }
   });
 }
 async function connectOneDrive() {
