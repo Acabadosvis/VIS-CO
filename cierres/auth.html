@@ -22,7 +22,7 @@
       authority: 'https://login.microsoftonline.com/79cd3b5a-a384-4785-a983-74eace5f688d',
       redirectUri: BASE + 'auth.html'
     },
-    cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false }
+    cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: true }
   });
 
   app.handleRedirectPromise()
