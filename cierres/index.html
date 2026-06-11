@@ -721,7 +721,7 @@ async function loadFromOneDrive() {
   try {
     loading(true);
     const token = await getToken();
-    const url = `https://graph.microsoft.com/v1.0/drives/${CFG.DRIVE_ID}/items/${CFG.FILE_ID}/content`;
+    const url = `https://graph.microsoft.com/v1.0/me/drive/items/${CFG.FILE_ID}/content`;
     const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` }});
     if (!res.ok) throw new Error('Error descargando archivo');
     const blob = await res.blob();
@@ -740,7 +740,7 @@ async function updateExcelCells(excelRow, updates) {
   const token = await getToken();
   for (const u of updates) {
     const addr = `${colLetter(u.col)}${excelRow}`;
-    const sheetUrl = `https://graph.microsoft.com/v1.0/drives/${CFG.DRIVE_ID}/items/${CFG.FILE_ID}/workbook/worksheets/${encodeURIComponent(CFG.SHEET)}/range(address='${addr}')`;
+    const sheetUrl = `https://graph.microsoft.com/v1.0/me/drive/items/${CFG.FILE_ID}/workbook/worksheets/${encodeURIComponent(CFG.SHEET)}/range(address='${addr}')`;
     const val = u.value instanceof Date
       ? u.value.toLocaleDateString('en-US')
       : u.value;
