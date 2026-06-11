@@ -685,23 +685,17 @@ async function connectOneDrive() {
   }
   try {
     loading(true);
-    // Solo borra el flag de interacción en progreso, no el estado completo
     sessionStorage.removeItem('msal.interaction.status');
     msalApp = initMsal();
-    const result = await msalApp.loginPopup({
+    // Flujo redirect: Microsoft redirige a auth.html, que vuelve a index.html
+    await msalApp.loginRedirect({
       scopes: ['Files.ReadWrite','User.Read','offline_access'],
-      redirectUri: REDIRECT_URI
+      redirectUri: 'https://vis-co-blond.vercel.app/cierres/auth.html'
     });
-    msalAccount = result.account;
-    graphToken = result.accessToken;
-    updateSyncStatus(true);
-    toast('OneDrive conectado ✓');
-    // If no data loaded yet, load from OneDrive
-    if (allData.length === 0) await loadFromOneDrive();
+    // La página navega a Microsoft — el código de abajo no se ejecuta
   } catch(e) {
     toast('Error al conectar: ' + e.message, 'err');
     console.error(e);
-  } finally {
     loading(false);
   }
 }
@@ -1479,6 +1473,10 @@ document.querySelectorAll('.modal-bg').forEach(m => {
   document.getElementById('cfgClientId').value = CFG.CLIENT_ID;
   document.getElementById('cfgTenant').value = CFG.TENANT;
   document.getElementById('redirectUri').textContent = window.location.origin + window.location.pathname;
+  // Check URL for auth error from redirect flow
+  const _authErr = new URLSearchParams(window.location.search).get('auth_error');
+  if (_authErr) toast('Error al conectar: ' + _authErr, 'err');
+
   if (CFG.CLIENT_ID) {
     try {
       msalApp = initMsal();
@@ -1487,7 +1485,14 @@ document.querySelectorAll('.modal-bg').forEach(m => {
       if (accounts.length > 0) {
         msalAccount = accounts[0];
         updateSyncStatus(true);
-        toast('OneDrive reconectado automáticamente ✓');
+        const justConnected = localStorage.getItem('visco_auth_just_connected');
+        if (justConnected) {
+          localStorage.removeItem('visco_auth_just_connected');
+          toast('OneDrive conectado ✓');
+          await loadFromOneDrive();
+        } else {
+          toast('OneDrive reconectado automáticamente ✓');
+        }
       }
     } catch(e) {
       Object.keys(localStorage).filter(k => k.startsWith('msal.')).forEach(k => localStorage.removeItem(k));
