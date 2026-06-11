@@ -4,41 +4,38 @@
 <meta charset="UTF-8"><title>VIS-CO Auth</title>
 <style>
   body{font-family:sans-serif;background:#F8F7F5;display:flex;align-items:center;
-  justify-content:center;min-height:100vh;margin:0;color:#666;font-size:14px;}
+  justify-content:center;min-height:100vh;margin:0;text-align:center;color:#666;}
 </style>
 </head>
 <body>
-<div id="msg">Conectando con Microsoft...</div>
+<div>
+  <div style="font-size:28px;margin-bottom:10px">⏳</div>
+  <div style="font-size:14px">Procesando autenticación...</div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
 <script>
-  // ¿Hay código de auth en la URL? (segunda carga, después de Microsoft)
-  const hasCode = window.location.hash.includes('code=')
-               || window.location.search.includes('code=')
-               || window.location.hash.includes('error=')
-               || window.location.search.includes('error=');
-
-  if (hasCode) {
-    document.getElementById('msg').innerHTML =
-      '<div style="text-align:center;color:#15803D">' +
-      '<div style="font-size:36px;margin-bottom:8px">&#10003;</div>' +
-      '<div style="font-weight:600">Autenticado &#8212; cerrando...</div>' +
-      '</div>';
-  }
+  const BASE = 'https://vis-co-blond.vercel.app/cierres/';
 
   const app = new msal.PublicClientApplication({
     auth: {
       clientId: 'a3289496-21d5-4f4e-b033-7fb7339e2aa8',
       authority: 'https://login.microsoftonline.com/79cd3b5a-a384-4785-a983-74eace5f688d',
-      redirectUri: 'https://vis-co-blond.vercel.app/cierres/auth.html'
+      redirectUri: BASE + 'auth.html'
     },
     cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false }
   });
 
   app.handleRedirectPromise()
-    .catch(console.error)
-    .finally(() => {
-      // Solo cerrar cuando hay respuesta de auth (segunda carga)
-      if (hasCode) setTimeout(() => window.close(), 600);
+    .then(function(result) {
+      if (result && result.account) {
+        // Token obtenido — marcar y volver al módulo
+        localStorage.setItem('visco_auth_just_connected', '1');
+      }
+      window.location.replace(BASE);
+    })
+    .catch(function(err) {
+      console.error(err);
+      window.location.replace(BASE + '?auth_error=' + encodeURIComponent(err.message));
     });
 </script>
 </body>
