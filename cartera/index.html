@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIS-CO · Cartera</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --r:#E04A26;--ro:#C03B1A;--n:#1A1A1A;--g:#666;--b:#F8F7F5;
+  --w:#fff;--brd:#E4E0D9;--brd2:#D0CAC0;--gc:#F0EDE8;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06);
+  --mora:#E04A26;     --mora-bg:#FFF3ED;   --mora-brd:#FDDDD0;
+  --venc:#C2410C;     --venc-bg:#FFF7ED;   --venc-brd:#FED7AA;
+  --sem:#1D4ED8;      --sem-bg:#EFF6FF;    --sem-brd:#BFDBFE;
+  --rec:#6D28D9;      --rec-bg:#F5F3FF;    --rec-brd:#DDD6FE;
+  --ok:#15803D;       --ok-bg:#F0FDF4;     --ok-brd:#86EFAC;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--b);color:var(--n);min-height:100vh;}
+
+/* ── HEADER ──────────────────────────────────────────────────── */
+header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;display:flex;align-items:center;padding:0 20px;gap:10px;position:sticky;top:0;z-index:100;box-shadow:var(--sh);}
+.logo{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;}
+.logo span{color:var(--r);}
+.hbadge{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.07em;}
+.hright{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.week-pill{display:flex;align-items:center;gap:5px;background:var(--gc);border:1.5px solid var(--brd);border-radius:8px;padding:4px 10px;}
+.week-pill span{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#AAA;}
+.week-pill input{border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--n);outline:none;width:90px;cursor:pointer;}
+.week-pill input:focus{color:var(--r);}
+.week-pill .sep{color:#CCC;font-size:11px;}
+.week-btns button{background:var(--w);border:1.5px solid var(--brd);border-radius:5px;width:22px;height:22px;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;justify-content:center;color:var(--g);transition:.1s;}
+.week-btns button:hover{border-color:var(--r);color:var(--r);}
+.file-pill{display:none;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px;background:var(--ok-bg);border:1px solid var(--ok-brd);color:var(--ok);white-space:nowrap;cursor:pointer;transition:.1s;}
+.file-pill:hover{opacity:.8;}
+.hbtn{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:6px 13px;border-radius:8px;border:1.5px solid var(--brd);background:var(--w);color:var(--g);cursor:pointer;transition:.15s;white-space:nowrap;position:relative;display:inline-flex;align-items:center;gap:5px;}
+.hbtn:hover{border-color:var(--r);color:var(--r);}
+.hbtn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.hbtn.danger{border-color:var(--mora-brd);color:var(--mora);}
+.hbtn.danger:hover{background:var(--mora-bg);}
+
+/* ── FIRST-TIME SCREEN ───────────────────────────────────────── */
+.first-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 56px);padding:40px 20px;text-align:center;}
+.fs-icon{font-size:52px;margin-bottom:16px;}
+.fs-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:8px;}
+.fs-sub{color:var(--g);font-size:14px;line-height:1.7;margin-bottom:32px;max-width:380px;}
+.fs-btn{position:relative;display:inline-flex;align-items:center;gap:10px;padding:14px 32px;background:var(--r);color:#fff;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:.04em;cursor:pointer;box-shadow:0 4px 16px rgba(224,74,38,.3);transition:.15s;}
+.fs-btn:hover{background:var(--ro);}
+.fs-btn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.fs-note{margin-top:16px;font-size:11px;color:#BBB;}
+.fs-saved{display:none;margin-top:20px;align-items:center;gap:8px;background:var(--ok-bg);border:1.5px solid var(--ok-brd);border-radius:10px;padding:11px 16px;max-width:400px;}
+.fs-saved.show{display:flex;}
+
+/* ── DASHBOARD ───────────────────────────────────────────────── */
+.dash{display:none;}
+.dash.show{display:block;}
+
+/* ── KPI STRIP ───────────────────────────────────────────────── */
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:16px 20px 0;}
+.kpi{background:var(--w);border:1.5px solid var(--brd);border-radius:12px;padding:14px 16px;box-shadow:var(--sh);cursor:pointer;transition:.15s;position:relative;overflow:hidden;}
+.kpi:hover{transform:translateY(-2px);}
+.kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.k1::before{background:var(--mora);}
+.k2::before{background:var(--venc);}
+.k3::before{background:var(--sem);}
+.k4::before{background:var(--rec);}
+.k5::before{background:var(--ok);}
+.ktag{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:20px;border:1px solid;display:inline-block;margin-bottom:7px;}
+.k1 .ktag{background:var(--mora-bg);color:var(--mora);border-color:var(--mora-brd);}
+.k2 .ktag{background:var(--venc-bg);color:var(--venc);border-color:var(--venc-brd);}
+.k3 .ktag{background:var(--sem-bg);color:var(--sem);border-color:var(--sem-brd);}
+.k4 .ktag{background:var(--rec-bg);color:var(--rec);border-color:var(--rec-brd);}
+.k5 .ktag{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-brd);}
+.kamt{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;line-height:1;margin-bottom:3px;}
+.k1 .kamt{color:var(--mora);} .k2 .kamt{color:var(--venc);}
+.k3 .kamt{color:var(--sem);} .k4 .kamt{color:var(--rec);}
+.k5 .kamt{color:var(--ok);}
+.ksub{font-size:11px;color:var(--g);}
+
+/* ── FILTER BAR ──────────────────────────────────────────────── */
+.fbar{display:flex;align-items:center;gap:8px;padding:14px 20px;flex-wrap:wrap;}
+.fg{display:flex;align-items:center;gap:5px;}
+.fl{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#AAA;}
+.fbar select,.fbar input[type=text]{padding:6px 10px;border:1.5px solid var(--brd);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--n);background:var(--w);outline:none;cursor:pointer;transition:.15s;}
+.fbar select:focus,.fbar input[type=text]:focus{border-color:var(--r);}
+.fbar select{min-width:110px;}
+.fbar input[type=text]{min-width:160px;}
+.bsm{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:6px 12px;border-radius:8px;border:1.5px solid var(--brd);background:var(--w);color:var(--g);cursor:pointer;transition:.15s;}
+.bsm:hover{border-color:var(--r);color:var(--r);}
+.fcnt{margin-left:auto;font-size:12px;color:var(--g);}
+.fcnt strong{color:var(--n);}
+
+/* ── TABS ────────────────────────────────────────────────────── */
+.tabs-wrap{padding:0 20px;}
+.tabs{background:var(--w);border-bottom:1px solid var(--brd);display:flex;overflow-x:auto;}
+.tab{padding:11px 16px;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#AAA;border-bottom:3px solid transparent;display:flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer;transition:.15s;}
+.tab:hover{color:var(--n);}
+.tab.a1{color:var(--mora);border-bottom-color:var(--mora);}
+.tab.a2{color:var(--venc);border-bottom-color:var(--venc);}
+.tab.a3{color:var(--sem);border-bottom-color:var(--sem);}
+.tab.a4{color:var(--rec);border-bottom-color:var(--rec);}
+.tab.a5{color:var(--ok);border-bottom-color:var(--ok);}
+.tn{width:17px;height:17px;border-radius:50%;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;}
+.tab.a1 .tn{background:var(--mora-bg);color:var(--mora);}
+.tab.a2 .tn{background:var(--venc-bg);color:var(--venc);}
+.tab.a3 .tn{background:var(--sem-bg);color:var(--sem);}
+.tab.a4 .tn{background:var(--rec-bg);color:var(--rec);}
+.tab.a5 .tn{background:var(--ok-bg);color:var(--ok);}
+
+/* ── TABLE PANEL ─────────────────────────────────────────────── */
+.tpanel{background:var(--w);border:1.5px solid var(--brd);border-top:none;border-radius:0 0 10px 10px;margin:0 20px 20px;box-shadow:var(--sh);overflow:hidden;}
+.tphdr{padding:10px 16px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px;background:var(--gc);}
+.tptitle{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
+.tphint{font-size:11px;color:var(--g);margin-left:auto;}
+.tscroll{overflow-x:auto;max-height:500px;overflow-y:auto;}
+table{width:100%;border-collapse:collapse;}
+thead th{background:var(--gc);padding:8px 12px;font-family:'Syne',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g);text-align:left;white-space:nowrap;position:sticky;top:0;z-index:5;border-bottom:1px solid var(--brd);cursor:pointer;user-select:none;}
+thead th:hover{color:var(--n);}
+thead th.sorted{color:var(--r);}
+tbody tr{border-bottom:1px solid var(--brd);cursor:pointer;transition:.1s;}
+tbody tr:hover{background:#FFF8F5;}
+tbody td{padding:8px 12px;font-size:12px;white-space:nowrap;}
+/* Row tints */
+.r1{background:#FFFAF8;} .r2{background:#FFFDF8;} .r3{background:#F8FAFE;}
+.r4{background:#FAF8FF;} .r5{background:#F8FDF9;}
+
+/* ── BADGES ──────────────────────────────────────────────────── */
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-family:'Syne',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;border:1px solid;}
+.bm{background:var(--mora-bg);color:var(--mora);border-color:var(--mora-brd);}
+.bv{background:var(--venc-bg);color:var(--venc);border-color:var(--venc-brd);}
+.bs{background:var(--sem-bg);color:var(--sem);border-color:var(--sem-brd);}
+.br{background:var(--rec-bg);color:var(--rec);border-color:var(--rec-brd);}
+.bok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-brd);}
+.bn{background:var(--gc);color:var(--g);border-color:var(--brd);}
+.bproy{background:var(--mora-bg);color:var(--mora);border-color:var(--mora-brd);padding:2px 7px;border-radius:20px;font-family:'Syne',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;border:1px solid;}
+
+/* ── REASON SELECT ───────────────────────────────────────────── */
+.reason-sel{font-family:'DM Sans',sans-serif;font-size:11px;padding:3px 7px;border:1.5px solid var(--venc-brd);border-radius:7px;background:var(--venc-bg);color:var(--venc);cursor:pointer;outline:none;transition:.15s;min-width:110px;}
+.reason-sel:focus{border-color:var(--venc);}
+.reason-sel.set{background:var(--venc-bg);font-weight:600;}
+
+/* ── DAYS MORA ───────────────────────────────────────────────── */
+.dias-mora{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;}
+.dias-mora.red{background:var(--mora-bg);color:var(--mora);}
+.dias-mora.orange{background:var(--venc-bg);color:var(--venc);}
+.dias-mora.blue{background:var(--sem-bg);color:var(--sem);}
+
+/* ── MONEY ───────────────────────────────────────────────────── */
+.m{font-variant-numeric:tabular-nums;}
+.mm{color:var(--mora);font-weight:600;}
+.mv{color:var(--venc);font-weight:600;}
+.ms{color:var(--sem);font-weight:600;}
+.mr2{color:var(--rec);font-weight:600;}
+.mok{color:var(--ok);font-weight:600;}
+
+/* ── PROGRESS BAR ────────────────────────────────────────────── */
+.pbar{display:flex;align-items:center;gap:7px;}
+.pbar-out{flex:1;height:5px;background:rgba(0,0,0,.08);border-radius:3px;overflow:hidden;min-width:50px;}
+.pbar-in{height:100%;border-radius:3px;}
+.pbar-val{font-size:11px;font-weight:600;min-width:35px;}
+
+/* ── MODAL ───────────────────────────────────────────────────── */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:center;justify-content:center;padding:16px;}
+.ov.open{display:flex;}
+.modal{background:var(--w);border:1px solid var(--brd);border-radius:16px;width:100%;max-width:600px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.mhdr{padding:16px 20px;border-bottom:1px solid var(--brd);display:flex;align-items:flex-start;justify-content:space-between;}
+.mtitle{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;}
+.msub{font-size:12px;color:var(--g);margin-top:2px;}
+.mcls{background:var(--gc);border:1px solid var(--brd);color:var(--g);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:.15s;}
+.mcls:hover{background:var(--brd2);}
+.mbody{padding:18px 20px;overflow-y:auto;flex:1;}
+.mftr{padding:11px 20px;border-top:1px solid var(--brd);display:flex;gap:8px;justify-content:flex-end;background:var(--gc);}
+
+/* Modal info grid */
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px;}
+.ii{background:var(--gc);border-radius:8px;padding:9px 11px;border:1px solid var(--brd);}
+.ii.wide{grid-column:1/-1;}
+.iil{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#AAA;margin-bottom:3px;}
+.iiv{font-size:13px;font-weight:500;}
+
+/* Blocks table in modal */
+.btable{width:100%;border-collapse:collapse;font-size:12px;}
+.btable th{background:var(--gc);padding:7px 10px;font-family:'Syne',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--g);text-align:left;border-bottom:1px solid var(--brd);}
+.btable td{padding:7px 10px;border-bottom:1px solid var(--brd);}
+.btable tr:last-child td{border-bottom:none;}
+.btable tr.bv-row{background:var(--venc-bg);}
+.btable tr.bs-row{background:var(--sem-bg);}
+.btable tr.bok-row{background:var(--ok-bg);}
+.bstatus{display:inline-block;padding:2px 7px;border-radius:10px;font-family:'Syne',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;}
+
+.bpri{background:var(--r);border:none;border-radius:8px;padding:8px 18px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;color:#fff;cursor:pointer;transition:.15s;}
+.bpri:hover{background:var(--ro);}
+.bsec{background:var(--w);border:1.5px solid var(--brd);border-radius:8px;padding:8px 15px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--g);cursor:pointer;transition:.15s;}
+.bsec:hover{border-color:var(--brd2);}
+
+/* ── OBS textarea ─────────────────────────────────────────────── */
+.fg2{margin-bottom:12px;}
+.fl2{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#AAA;margin-bottom:5px;display:block;}
+.fi{width:100%;padding:8px 11px;border:1.5px solid var(--brd);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--n);background:var(--w);outline:none;transition:.15s;}
+.fi:focus{border-color:var(--r);}
+textarea.fi{resize:vertical;min-height:64px;}
+.fi2r{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.sep{height:1px;background:var(--brd);margin:12px 0;}
+.mst{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#AAA;margin-bottom:9px;padding-bottom:5px;border-bottom:1px solid var(--brd);}
+
+/* ── TOAST ───────────────────────────────────────────────────── */
+.toast{position:fixed;bottom:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:6px;}
+.tmsg{background:var(--n);color:#fff;border-radius:10px;padding:9px 14px;font-size:12px;display:flex;align-items:center;gap:7px;animation:sli .25s ease;max-width:280px;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+.tmsg.ok{background:#15803D;} .tmsg.err{background:#B91C1C;} .tmsg.warn{background:#D97706;}
+@keyframes sli{from{transform:translateX(20px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+.lbar{height:2px;background:var(--r);position:fixed;top:56px;left:0;z-index:200;transition:width .4s;width:0;}
+
+/* ── EMPTY ───────────────────────────────────────────────────── */
+.empty{text-align:center;padding:50px 20px;color:var(--g);}
+.empty-ico{font-size:32px;margin-bottom:8px;}
+.empty-txt{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:3px;}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:var(--gc);}
+::-webkit-scrollbar-thumb{background:var(--brd2);border-radius:2px;}
+
+@media(max-width:1200px){.kpi-strip{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:800px){.kpi-strip{grid-template-columns:repeat(2,1fr)};.fbar{padding:10px;}}
+.pago-sel{font-size:10px;padding:2px 6px;border-radius:5px;border:1px solid var(--brd);background:var(--gc);color:var(--g);cursor:pointer;font-family:inherit;}
+.pago-sel.soporte{background:#EFF6FF;border-color:#BFDBFE;color:#1D4ED8;}
+.pago-sel.pendiente{background:#FFFBEB;border-color:#FDE68A;color:#D97706;}
+.pago-sel.entro{background:var(--ok-bg);border-color:var(--ok-brd);color:var(--ok);font-weight:700;}
+.pago-badge{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;padding:1px 5px;border-radius:3px;letter-spacing:.03em;margin-left:4px;vertical-align:middle;}
+.pago-badge.soporte{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE;}
+.pago-badge.pendiente{background:#FFFBEB;color:#D97706;border:1px solid #FDE68A;}
+.pago-badge.entro{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-brd);}
+.pago-badge.red{background:#FEF2F2;color:#DC2626;border:1px solid #FECACA;}
+.fbtn.rechazar{background:#FEF2F2;border-color:#FECACA;color:#DC2626;}
+.fbtn.rechazar:hover{background:#FEE2E2;}
+/* cartera mode toggle */
+.cmodo-wrap{display:flex;align-items:center;background:var(--gc);border:1.5px solid var(--brd);border-radius:8px;padding:3px;gap:2px;}
+.cmodo-btn{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:5px 12px;border-radius:6px;border:none;background:transparent;color:var(--g);cursor:pointer;transition:.15s;white-space:nowrap;}
+.cmodo-btn:hover{color:var(--n);}
+.cmodo-btn.active{background:var(--w);color:var(--r);box-shadow:0 1px 4px rgba(0,0,0,.12);}
+.cmodo-btn.active.conv{color:#6D28D9;}
+.dash-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:10px 0 6px;color:var(--g);}
+.dash-title span{color:var(--r);}
+.dash-title span.conv{color:#6D28D9;}
+/* adicionales */
+.adic-kpi{background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:10px;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;}
+.adic-kpi-left{display:flex;align-items:center;gap:10px;}
+.adic-kpi-ico{font-size:20px;}
+.adic-kpi-label{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#92400E;}
+.adic-kpi-amt{font-size:20px;font-weight:700;color:#D97706;font-variant-numeric:tabular-nums;}
+.adic-kpi-sub{font-size:11px;color:#A16207;margin-top:1px;}
+.adic-col{color:#D97706;font-weight:600;}
+/* ── ADICIONALES TAB ────────────────────────────────────────── */
+.k6{background:#ECFDF5;border:1.5px solid #A7F3D0;border-radius:10px;padding:11px 16px;cursor:pointer;transition:.1s;}
+.k6:hover{border-color:#6EE7B7;}
+.k6 .ktag{color:#065F46;}
+.k6 .kamt{color:#059669;}
+.a6{background:#ECFDF5;border-color:#A7F3D0;color:#065F46;}
+.k7{background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:10px;padding:11px 16px;cursor:pointer;transition:.1s;}
+.k7:hover{border-color:#F59E0B;}
+.k7 .ktag{color:#92400E;}
+.k7 .kamt{color:#D97706;}
+.a7{background:#FFFBEB;border-color:#FDE68A;color:#92400E;}
+/* soporte upload */
+.flujo-bar{display:flex;align-items:center;gap:0;margin:14px 0 10px;}
+.flujo-step{flex:1;text-align:center;position:relative;}
+.flujo-step::after{content:'';position:absolute;top:13px;right:-50%;width:100%;height:2px;background:var(--brd);z-index:0;}
+.flujo-step:last-child::after{display:none;}
+.fstep-dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--brd);background:var(--w);display:inline-flex;align-items:center;justify-content:center;font-size:13px;position:relative;z-index:1;}
+.fstep-dot.done{border-color:#059669;background:#ECFDF5;}
+.fstep-dot.active{border-color:#D97706;background:#FFFBEB;box-shadow:0 0 0 3px rgba(217,119,6,.15);}
+.fstep-lbl{font-size:9px;color:var(--g);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+.flujo-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.fbtn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid;font-family:inherit;transition:.15s;position:relative;}
+.fbtn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.fbtn.upload{background:#EFF6FF;border-color:#BFDBFE;color:#1D4ED8;}
+.fbtn.upload:hover{background:#DBEAFE;}
+.fbtn.revision{background:#FFFBEB;border-color:#FDE68A;color:#D97706;}
+.fbtn.revision:hover{background:#FEF3C7;}
+.fbtn.entro{background:#ECFDF5;border-color:#A7F3D0;color:#059669;}
+.fbtn.entro:hover{background:#D1FAE5;}
+.fbtn.reset{background:var(--gc);border-color:var(--brd);color:var(--g);font-size:11px;padding:5px 10px;}
+.soporte-info{font-size:11px;background:var(--gc);border-radius:7px;padding:7px 10px;margin-top:8px;display:flex;align-items:center;gap:7px;color:var(--g);}
+.soporte-info strong{color:var(--n);}
+/* mini overlay confirmación */
+.ov2{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:600;align-items:center;justify-content:center;padding:20px;}
+.ov2-card{background:var(--w);border:1px solid var(--brd);border-radius:16px;width:100%;max-width:420px;padding:24px;box-shadow:0 8px 32px rgba(0,0,0,.18);}
+</style>
+</head>
+<body>
+<div class="lbar" id="lbar"></div>
+
+<header>
+  <img src="https://acabadosvis.com/wp-content/uploads/2026/05/cropped-Acabados-Vis-Logotype-favicom-e1742710969663-270x270.png"
+       alt="" style="height:26px;border-radius:5px;" onerror="this.style.display='none'">
+  <div class="logo">VIS<span>-CO</span></div>
+  <span class="hbadge">Cartera · M2</span>
+  <div class="hright">
+    <!-- Selector semana -->
+    <div class="week-pill">
+      <span>Semana</span>
+      <input type="date" id="ws" onchange="weekChanged()">
+      <span class="sep">→</span>
+      <input type="date" id="we" onchange="weekChanged()">
+      <div class="week-btns">
+        <button onclick="shiftWeek(-1)" title="Semana anterior">‹</button>
+        <button onclick="shiftWeek(1)"  title="Semana siguiente">›</button>
+        <button onclick="goToday()" style="font-size:9px;font-family:'Syne',sans-serif;font-weight:700;width:auto;padding:0 5px;">HOY</button>
+      </div>
+    </div>
+    <!-- Archivo activo -->
+    <div class="cmodo-wrap" id="cmodo-wrap" style="display:none">
+      <button class="cmodo-btn active" data-mode="principal" onclick="switchCartera('principal')">VIS-CO</button>
+      <button class="cmodo-btn conv" data-mode="convenios" onclick="switchCartera('convenios')">Convenios</button>
+    </div>
+    <div class="file-pill" id="file-pill" onclick="recargar()" title="Haz clic para recargar">
+      📊 <span id="file-name">—</span> · Recargar
+    </div>
+    <!-- Cambiar archivo -->
+    <label class="hbtn">
+      📂 Cambiar archivo
+      <input type="file" accept=".xlsx,.xls" onchange="onFileInput(this)">
+    </label>
+    <button class="hbtn" id="btn-csv" onclick="exportCSV()" style="display:none">⬇ CSV</button>
+  </div>
+</header>
+
+<!-- ── PRIMERA VEZ ───────────────────────────────────────────── -->
+<div class="first-screen" id="first-screen">
+  <div class="fs-icon">📊</div>
+  <div class="fs-title">Cartera Semanal</div>
+  <div class="fs-sub">
+    Selecciona el archivo <strong>Reporte de Ventas</strong>.<br>
+    El sistema lo recordará y lo leerá automáticamente cada vez que lo abras.
+  </div>
+  <label class="fs-btn">
+    📂 Seleccionar Reporte de Ventas
+    <input type="file" accept=".xlsx,.xls" onchange="onFileInput(this)">
+  </label>
+  <div class="fs-note">202511 REPORTE DE VENTAS VISUALIZZA.xlsx</div>
+
+  <!-- Si tiene handle guardado -->
+  <div class="fs-saved" id="fs-saved">
+    <span>💾</span>
+    <div style="flex:1;">
+      <div style="font-size:12px;font-weight:600" id="fs-saved-name">—</div>
+      <div style="font-size:11px;color:var(--g)">Último archivo guardado</div>
+    </div>
+    <button class="bsm" onclick="loadFromHandle()" style="border-color:var(--ok-brd);color:var(--ok);">
+      Abrir →
+    </button>
+  </div>
+</div>
+
+<!-- ── DASHBOARD ─────────────────────────────────────────────── -->
+<div class="dash" id="dash">
+  <div class="dash-title" id="dash-title"><span>Cartera VIS-CO</span></div>
+  <div class="kpi-strip" id="kpis"></div>
+  <div class="adic-kpi" id="adic-kpi" style="display:none">
+    <div class="adic-kpi-left">
+      <div class="adic-kpi-ico">🔧</div>
+      <div>
+        <div class="adic-kpi-label">Adicionales pendientes de cobro</div>
+        <div class="adic-kpi-sub" id="adic-kpi-sub">—</div>
+      </div>
+    </div>
+    <div class="adic-kpi-amt" id="adic-kpi-amt">—</div>
+  </div>
+  <div class="fbar">
+    <div class="fg"><span class="fl">Proyecto</span><select id="fp"><option value="">Todos</option></select></div>
+    <div class="fg"><span class="fl">Estado</span>
+      <select id="fe">
+        <option value="">Todos</option>
+        <option value="EN EJECUCIÓN">En Ejecución</option>
+        <option value="X RECIBIR">Por Recibir</option>
+        <option value="ENTREGADO">Entregado</option>
+      </select>
+    </div>
+    <div class="fg"><span class="fl">Buscar</span>
+      <input type="text" id="fs2" placeholder="Cliente, apto…">
+    </div>
+    <button class="bsm" onclick="clearFilters()">✕</button>
+    <span class="fcnt" id="fcnt"></span>
+  </div>
+  <div class="tabs-wrap">
+    <div class="tabs" id="tabs"></div>
+  </div>
+  <div class="tpanel">
+    <div class="tphdr">
+      <span class="tptitle" id="ptitle">—</span>
+      <span class="tphint" id="phint"></span>
+    </div>
+    <div class="tscroll">
+      <table><thead id="thead"></thead><tbody id="tbody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL DETALLE ─────────────────────────────────────────── -->
+<div class="ov" id="ov" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="mhdr">
+      <div><div class="mtitle" id="mtitle">—</div><div class="msub" id="msub"></div></div>
+      <button class="mcls" onclick="closeModal()">✕</button>
+    </div>
+    <div class="mbody" id="mbody"></div>
+    <div class="mftr" id="mftr"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<!-- Mini overlay contabilidad -->
+<div class="ov2" id="ov2" onclick="if(event.target===this)this.style.display='none'">
+  <div class="ov2-card" id="ov2-body"></div>
+</div>
+
+<script>
+// ── CONSTANTES ────────────────────────────────────────────────
+const LS_NOTES = 'visco_notes';   // observaciones por cliente
+const LS_REASONS = 'visco_rsns';  // razones de vencimiento
+const LS_PAGOS   = 'visco_pagos';  // estado flujo de pago por bloque (soporte/pendiente/entro)
+
+// ── FLUJO PAGOS ───────────────────────────────────────────────
+const PAGO_ESTADOS = {
+  '':          {lbl:'—',           cls:''},
+  'soporte':   {lbl:'📤 Soporte',  cls:'soporte'},
+  'pendiente': {lbl:'⏳ Pendiente',cls:'pendiente'},
+  'entro':     {lbl:'✅ Entró',    cls:'entro'},
+};
+function getPagos()  { try { return JSON.parse(localStorage.getItem(LS_PAGOS)||'{}'); } catch{return{};} }
+function savePago(key, val) {
+  const p = getPagos();
+  if (val) p[key]=val; else delete p[key];
+  localStorage.setItem(LS_PAGOS, JSON.stringify(p));
+  render();
+}
+function pagoKey(cid, etapa) { return cid+'_'+etapa; }
+
+// ── ADICIONALES STORAGE ───────────────────────────────────────
+const LS_ADICS = 'visco_adics';
+function getAdics()  { try{return JSON.parse(localStorage.getItem(LS_ADICS)||'{}');}catch{return{};} }
+function saveAdic(cid,data){ const a=getAdics(); if(data)a[cid]=data; else delete a[cid]; localStorage.setItem(LS_ADICS,JSON.stringify(a)); }
+
+// ── SOPORTES STORAGE ──────────────────────────────────────────
+// key = cid_ETAPA  (ej: "365_P3")
+// estados: '' → 'pendiente' (soporte subido, espera contabilidad) → 'entro' (confirmado)
+const LS_SOPORTES = 'visco_sop2';
+const API_SOPORTES = '/api/soportes';
+const SOP_ESTADOS = {
+  '':           {ico:'—',  lbl:'Sin registrar',         cls:'',         order:0},
+  'pendiente':  {ico:'📤', lbl:'Soporte / Pend. contab',cls:'soporte',  order:1},
+  'entro':      {ico:'✅', lbl:'Confirmado — Entró',    cls:'entro',    order:2},
+  'rechazado':  {ico:'❌', lbl:'Rechazado',             cls:'red',      order:3},
+};
+// ── In-memory cache — fuente autoritativa en runtime ─────────
+let VC_SOPS = (()=>{ try{return JSON.parse(localStorage.getItem(LS_SOPORTES)||'{}');}catch{return{};} })();
+function getSoportes(){ return VC_SOPS; }
+function _saveSop(data){
+  VC_SOPS = data;
+  try{ localStorage.setItem(LS_SOPORTES,JSON.stringify(data)); }catch(e){}
+  // Sincronizar con API (fire-and-forget)
+  fetch(API_SOPORTES,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+    .catch(e=>console.warn('VIS-CO: API sync failed',e));
+}
+// Carga inicial desde API (autoritativa sobre localStorage)
+async function loadSoportesFromAPI(){
+  try{
+    const r=await fetch(API_SOPORTES);
+    if(r.ok){
+      const data=await r.json();
+      if(data && typeof data==='object'){
+        VC_SOPS=data;
+        try{ localStorage.setItem(LS_SOPORTES,JSON.stringify(data)); }catch(e){}
+      }
+    }
+  }catch(e){ console.warn('VIS-CO: No se pudo cargar desde API, usando localStorage',e); }
+}
+function saveSoporte(key,data){
+  const s=getSoportes();
+  if(data) s[key]=data; else delete s[key];
+  _saveSop(s); render();
+}
+function setSoporteEstado(key,estado){
+  const s=getSoportes(); const cur=s[key]||{};
+  const upd={...cur,estado,updated:new Date().toISOString().slice(0,10)};
+  if(estado==='entro') upd.fecha_entro=new Date().toISOString().slice(0,10);
+  if(estado==='') { delete upd.fecha_entro; }
+  const s2=getSoportes(); s2[key]=upd; _saveSop(s2); render();
+}
+function onSoporteFile(key,input){
+  const f=input.files[0]; if(!f) return;
+  const s=getSoportes(); const cur=s[key]||{};
+  const upd={...cur,estado:'pendiente',filename:f.name,size:f.size,
+    fecha_soporte:new Date().toISOString().slice(0,10),
+    semana:WEEK.ss};
+  s[key]=upd; _saveSop(s); render();
+  toast('📤 Soporte registrado — pendiente de confirmación','ok');
+}
+// Helpers para reporte semanal
+function getSoportesSemana(ss){
+  const s=getSoportes();
+  return Object.entries(s).filter(([k,v])=>v.semana===ss||v.fecha_entro===ss||
+    (v.fecha_soporte&&v.fecha_soporte>=ss&&v.fecha_soporte<=ss.replace(/$/,'')));
+}
+function getSumSoportesBySemana(ss,estado){
+  // Returns total monto of soportes in that week+estado
+  // We store monto when registering
+  const s=getSoportes();
+  return Object.values(s).filter(v=>v.estado===estado&&(estado==='entro'?v.fecha_entro?.startsWith(ss.slice(0,7)):v.semana===ss))
+    .reduce((a,v)=>a+(v.monto||0),0);
+}
+const DB_NAME = 'visco_cartera';
+const DB_STORE = 'handles';
+
+// Columnas (0-indexed)
+const BLOCKS = [
+  {n:'SEP', mc:22, fc:23, mr:null, fr:null},
+  {n:'ANT', mc:26, fc:27, mr:29,   fr:30},
+  {n:'P1',  mc:32, fc:33, mr:35,   fr:36},
+  {n:'P2',  mc:38, fc:39, mr:41,   fr:42},
+  {n:'P3',  mc:44, fc:45, mr:47,   fr:48},
+  {n:'P4',  mc:50, fc:51, mr:53,   fr:54},
+  {n:'P5',  mc:56, fc:57, mr:59,   fr:60},
+  {n:'P6',  mc:62, fc:63, mr:65,   fr:66},
+];
+const ETAPA_LABELS = {SEP:'Separación',ANT:'Anticipo',P1:'Obra Blanca',P2:'Carpintería',P3:'Entrega',P4:'Pago 4',P5:'Pago 5',P6:'Pago 6'};
+const VALID_ESTADOS = new Set(['EN EJECUCIÓN','EN EJECUCION','ENTREGADO','X RECIBIR']);
+const CONVENIO_PROYECTOS = new Set(['WELL','KLIK CONVENIO','GRAN CENTRAL - CONVENIO']);
+
+// ── RUNTIME ───────────────────────────────────────────────────
+let DATA = [];           // parsed clients
+let fileHandle = null;   // FileSystemFileHandle
+let fileName = '';
+const TODAY = new Date(); TODAY.setHours(12,0,0,0);
+let WEEK = calcWeek(TODAY);
+let curTab = 'mora';
+let sortK = 'x_recaudar', sortD = -1;
+let carteraMode = 'principal'; // 'principal' | 'convenios'
+const MODO_CONTAB = new URLSearchParams(location.search).get('modo')==='contabilidad';
+
+// ── FECHA ─────────────────────────────────────────────────────
+function calcWeek(ref) {
+  const d = new Date(ref); d.setHours(12,0,0,0);
+  const wd = d.getDay(); // 0=Sun,6=Sat
+  const dsSat = (wd - 6 + 7) % 7;
+  const ws = new Date(d); ws.setDate(ws.getDate() - dsSat); ws.setHours(0,0,0,0);
+  const we = new Date(ws); we.setDate(we.getDate() + 7); we.setHours(23,59,59,0);
+  return {start:ws, end:we, ss:ws.toISOString().slice(0,10), es:we.toISOString().slice(0,10)};
+}
+function setWeekInputs() {
+  document.getElementById('ws').value = WEEK.ss;
+  document.getElementById('we').value = WEEK.es;
+}
+function weekChanged() {
+  const s = document.getElementById('ws').value;
+  const e = document.getElementById('we').value;
+  if (!s||!e) return;
+  WEEK = {start:new Date(s+'T00:00:00'),end:new Date(e+'T23:59:59'),ss:s,es:e};
+  parseAndRender(null);
+}
+function shiftWeek(d) {
+  const ref = new Date(WEEK.start); ref.setDate(ref.getDate()+d*7);
+  WEEK = calcWeek(ref);
+  setWeekInputs(); parseAndRender(null);
+}
+function goToday() { WEEK=calcWeek(TODAY); setWeekInputs(); parseAndRender(null); }
+
+// ── FORMAT ────────────────────────────────────────────────────
+const fmtM = v => {
+  if (!v||v===0) return '—';
+  if (v>=1e9) return '$'+(v/1e9).toFixed(2)+'B';
+  if (v>=1e6) return '$'+(v/1e6).toFixed(1)+'M';
+  if (v>=1e3) return '$'+(v/1e3).toFixed(0)+'K';
+  return '$'+Math.round(v).toLocaleString('es-CO');
+};
+const fmtMF = v => v ? '$'+Math.round(v).toLocaleString('es-CO') : '$0';
+const fmtD = s => {
+  if (!s) return '—';
+  const d = new Date(s+'T12:00:00');
+  return d.toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'2-digit'});
+};
+const daysDiff = s => s ? Math.round((new Date(s+'T12:00:00')-TODAY)/86400000) : null;
+
+// ── IndexedDB FILE HANDLE ─────────────────────────────────────
+function openDB() {
+  return new Promise((res,rej)=>{
+    const r = indexedDB.open(DB_NAME,1);
+    r.onupgradeneeded = e => e.target.result.createObjectStore(DB_STORE);
+    r.onsuccess = e => res(e.target.result);
+    r.onerror = e => rej(e.target.error);
+  });
+}
+async function saveHandle(h) {
+  if (!h) return;
+  try {
+    const db = await openDB();
+    const tx = db.transaction(DB_STORE,'readwrite');
+    tx.objectStore(DB_STORE).put(h,'source');
+    await new Promise((res,rej)=>{tx.oncomplete=res;tx.onerror=rej;});
+  } catch(e) {}
+}
+async function loadHandle() {
+  try {
+    const db = await openDB();
+    return new Promise((res,rej)=>{
+      const r = db.transaction(DB_STORE,'readonly').objectStore(DB_STORE).get('source');
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+  } catch(e) { return null; }
+}
+async function clearHandle() {
+  try {
+    const db = await openDB();
+    db.transaction(DB_STORE,'readwrite').objectStore(DB_STORE).delete('source');
+  } catch(e) {}
+}
+
+// ── EXCEL DATE ────────────────────────────────────────────────
+function xlDate(v) {
+  if (!v) return null;
+  if (typeof v === 'number') {
+    // Use UTC components to avoid timezone day-shift (Colombia UTC-5)
+    const d = new Date((v - 25569) * 86400000);
+    const y = d.getUTCFullYear();
+    const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const dd = String(d.getUTCDate()).padStart(2, '0');
+    return y + '-' + m + '-' + dd;
+  }
+  if (v instanceof Date) {
+    const y = v.getUTCFullYear();
+    const m = String(v.getUTCMonth() + 1).padStart(2, '0');
+    const dd = String(v.getUTCDate()).padStart(2, '0');
+    return y + '-' + m + '-' + dd;
+  }
+  return null;
+}
+const xlM = v => { try { return v ? Math.round(parseFloat(v))||0 : 0; } catch {return 0;} };
+
+// ── PARSE EXCEL BUFFER ────────────────────────────────────────
+function parseBuffer(buf) {
+  const wb = XLSX.read(buf,{type:'array',cellDates:false,dense:false});
+  const ws = wb.Sheets['REPORTE VENTAS'];
+  if (!ws) throw new Error('Hoja "REPORTE VENTAS" no encontrada');
+  const rows = XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:true});
+
+  const wStart = WEEK.start, wEnd = WEEK.end;
+  const result = [];
+
+  for (let i=3; i<rows.length; i++) {
+    const r = rows[i];
+    if (!r||!r[0]||!r[6]) continue;
+    let ep = String(r[7]||'').trim().toUpperCase();
+    if (ep==='EN EJECUCION') ep='EN EJECUCIÓN';
+    if (!VALID_ESTADOS.has(ep)) continue;
+
+    const xrec = xlM(r[68]);
+    if (xrec < 100) continue; // pagado/cerrado
+
+    const total = xlM(r[18]);
+    const recaudado = xlM(r[67]);
+    const adic = xlM(r[14]);
+    const cid = String(r[0]);
+    const cli = String(r[6]||'').trim();
+    const proy = String(r[8]||'').trim();
+    const asesor = String(r[2]||'').trim();
+
+    // Parse blocks — usa recaudado total como fuente autoritativa
+    // y lo redistribuye en orden SEP→ANT→P1…para capturar pagos lump-sum
+    // y anticipos que el Excel no asigna al bloque correcto.
+    let vencAmt=0, semAmt=0, proxAmt=0, oldestVenc=null;
+    const blocks = [];
+    let remPagado = recaudado; // dinero disponible para cubrir bloques en orden
+    // Soportes confirmados por contabilidad cuentan como pago adicional
+    const _sops = JSON.parse(localStorage.getItem('visco_sop2')||'{}');
+
+    for (const b of BLOCKS) {
+      const mc = xlM(r[b.mc]);
+      if (mc <= 0) continue;
+      const fc = xlDate(r[b.fc]);
+      const mr = b.mr!==null ? xlM(r[b.mr]) : 0; // original Excel (para mostrar en detalle)
+      const fr = b.fr!==null ? xlDate(r[b.fr]) : null;
+      // Cuánto del recaudado total cubre este bloque
+      const applied = Math.min(mc, Math.max(0, remPagado));
+      remPagado = Math.max(0, remPagado - mc);
+      const saldo = Math.max(0, mc - applied);
+      if (saldo < 1) continue; // cubierto por recaudado
+      // Si contabilidad confirmó este bloque como 'entró', tratarlo como pagado
+      const _pk = cid+'_'+b.n;
+      if (_sops[_pk]?.estado === 'entro') continue;
+
+      let bst = 'proximo';
+      if (fc) {
+        const fd = new Date(fc+'T12:00:00');
+        if (fd < wStart) {
+          bst = 'vencido';
+          vencAmt += saldo;
+          if (!oldestVenc || fc < oldestVenc) oldestVenc = fc;
+        } else if (fd <= wEnd) {
+          bst = 'semana';
+          semAmt += saldo;
+        } else {
+          proxAmt += saldo;
+        }
+      }
+      // mr_display: el mayor entre lo que el Excel registra y lo que se aplicó
+      const mr_display = Math.max(mr, applied);
+      blocks.push({etapa:b.n,label:ETAPA_LABELS[b.n],mc,mr:mr_display,saldo,fc,fr,bst});
+    }
+
+    // Determine días en mora (from oldest overdue block)
+    const diasMora = oldestVenc ? Math.abs(daysDiff(oldestVenc)) : 0;
+
+    // Category
+    let cat;
+    if (ep==='ENTREGADO') {
+      cat = 'mora';
+    } else if (ep==='EN EJECUCIÓN') {
+      if (vencAmt > 0)      cat = 'vencido';
+      else if (semAmt > 0)  cat = 'semana';
+      else                  cat = 'aldia';
+    } else { // X RECIBIR — siempre en 'recibir', nunca en semana
+      cat = 'recibir';
+    }
+
+    result.push({
+      cid, cli, ep, proy, asesor,
+      torre: String(r[9]||'').trim(),
+      apto: String(r[10]||'').trim(),
+      total, recaudado, xrec, adic,
+      vencAmt, semAmt, proxAmt, diasMora, oldestVenc,
+      pct: total>0 ? recaudado/total : 0,
+      cat, blocks
+    });
+  }
+  return result;
+}
+
+// ── CLASSIFY / FILTER ─────────────────────────────────────────
+function applyFilters(arr) {
+  const p=document.getElementById('fp')?.value||'';
+  const e=document.getElementById('fe')?.value||'';
+  const s=document.getElementById('fs2')?.value.toLowerCase().trim()||'';
+  return arr.filter(c=>{
+    if(p && c.proy!==p) return false;
+    if(e && c.ep!==e) return false;
+    if(s){const h=(c.cli+c.proy+c.asesor+c.apto+c.torre).toLowerCase();if(!h.includes(s))return false;}
+    return true;
+  });
+}
+function clearFilters(){['fp','fe','fs2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});render();}
+function populateFilters(){
+  const fP=document.getElementById('fp');
+  fP.innerHTML='<option value="">Todos</option>';
+  // Solo proyectos del modo activo
+  [...new Set(getActiveData().map(c=>c.proy).filter(Boolean))].sort().forEach(p=>{
+    const o=document.createElement('option');o.value=p;o.textContent=p;fP.appendChild(o);
+  });
+}
+
+// ── TABS & KPIs ───────────────────────────────────────────────
+const CATS = ['mora','vencido','semana','recibir','aldia','adicionales','cola'];
+const CAT_CFG = {
+  mora:    {label:'🔴 En Mora',          tag:'mora',    cls:'k1 a1',  hint:'ENTREGADO con saldo pendiente — pago exigible'},
+  vencido: {label:'🟠 Vencido Ejecución',tag:'vencido', cls:'k2 a2',  hint:'EN EJECUCIÓN con pagos vencidos — marcar razón del atraso'},
+  semana:  {label:'🔵 Esta Semana',      tag:'semana',  cls:'k3 a3',  hint:'Pagos con fecha en la semana seleccionada'},
+  recibir: {label:'🟣 Por Recibir',      tag:'recibir', cls:'k4 a4',  hint:'X RECIBIR — apartamentos comprados sin iniciar ejecución'},
+  aldia:   {label:'✅ Al Día',           tag:'al día',  cls:'k5 a5',  hint:'EN EJECUCIÓN sin vencimientos ni pagos esta semana'},
+  adicionales:{label:'🔧 Adicionales',   tag:'adic',    cls:'k6 a6',  hint:'Cobros adicionales fuera del contrato principal'},
+  cola:       {label:'💳 Cola de Pagos',  tag:'cola',    cls:'k7 a7',  hint:'Soportes enviados y confirmaciones pendientes de contabilidad'},
+};
+
+function renderKPIs() {
+  const af = arr=>applyFilters(arr);
+  const grp = cat => af(getActiveData().filter(c=>c.cat===cat));
+  const sum = (arr,key) => arr.reduce((a,c)=>a+(c[key]||0),0);
+  const clts = arr => new Set(arr.map(c=>c.cid)).size;
+  const html = [
+    {c:'mora',   val:sum(grp('mora'),'xrec'),      cnt:clts(grp('mora')),   tag:'k1'},
+    {c:'vencido',val:sum(grp('vencido'),'vencAmt'),cnt:clts(grp('vencido')),tag:'k2'},
+    {c:'semana', val:sum(grp('semana'),'semAmt'),  cnt:clts(grp('semana')), tag:'k3'},
+    {c:'recibir',val:sum(grp('recibir'),'xrec'),   cnt:clts(grp('recibir')),tag:'k4'},
+    {c:'aldia',  val:sum(grp('aldia'),'xrec'),     cnt:clts(grp('aldia')),  tag:'k5'},
+    // adicionales: clients with adic>0 in active view
+    {c:'adicionales', val:getActiveData().filter(c=>c.adic>0).reduce((s,c)=>s+c.adic,0),
+     cnt:getActiveData().filter(c=>c.adic>0).length, tag:'k6'},
+    // cola: pending soportes
+    {c:'cola', val:Object.values(getSoportes()).filter(v=>v.estado==='pendiente').reduce((a,v)=>a+(v.monto||0),0),
+     cnt:Object.values(getSoportes()).filter(v=>v.estado==='pendiente').length, tag:'k7'},
+  ].map(({c,val,cnt,tag})=>`
+    <div class="kpi ${tag}" onclick="switchTab('${c}')">
+      <span class="ktag">${CAT_CFG[c].tag}</span>
+      <div class="kamt">${fmtM(val)}</div>
+      <div class="ksub">${cnt} clientes</div>
+    </div>`).join('');
+  document.getElementById('kpis').innerHTML = html;
+  // Adicionales KPI
+  const adArr = getActiveData().filter(c=>c.adic>0);
+  const adTotal = adArr.reduce((s,c)=>s+c.adic,0);
+  const adKpi = document.getElementById('adic-kpi');
+  if(adKpi){
+    if(adTotal>0){
+      adKpi.style.display='flex';
+      document.getElementById('adic-kpi-amt').textContent = fmtMF(adTotal);
+      document.getElementById('adic-kpi-sub').textContent = adArr.length+' cliente'+(adArr.length!==1?'s':'')+' con adicionales sin cobrar';
+    } else {
+      adKpi.style.display='none';
+    }
+  }
+}
+
+function renderTabs() {
+  const af = arr=>applyFilters(arr);
+  document.getElementById('tabs').innerHTML = CATS.map(c=>{
+    const cnt = c==='adicionales'
+      ? af(getActiveData().filter(x=>x.adic>0)).length
+      : c==='cola'
+      ? Object.values(getSoportes()).filter(v=>v.estado==='pendiente').length
+      : af(getActiveData().filter(x=>x.cat===c)).length;
+    const cfg = CAT_CFG[c];
+    const actCls = curTab===c ? cfg.cls.split(' ')[1] : '';
+    return `<div class="tab ${actCls}" onclick="switchTab('${c}')">
+      ${cfg.label} <div class="tn">${cnt}</div>
+    </div>`;
+  }).join('');
+}
+function switchTab(t){curTab=t;render();}
+function switchCartera(mode){
+  carteraMode=mode;
+  curTab='mora';
+  document.querySelectorAll('.cmodo-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
+  populateFilters();
+  // Reset project filter when switching
+  const fp=document.getElementById('fp'); if(fp) fp.value='';
+  render();
+}
+function getActiveData(){
+  return DATA.filter(c=>carteraMode==='convenios'
+    ? CONVENIO_PROYECTOS.has(c.proy)
+    : !CONVENIO_PROYECTOS.has(c.proy));
+}
+
+// ── MAIN RENDER ───────────────────────────────────────────────
+function render() {
+  renderKPIs(); renderTabs();
+  // Update cartera title
+  const titleEl = document.getElementById('dash-title');
+  if (titleEl) {
+    const isConv = carteraMode==='convenios';
+    titleEl.innerHTML = isConv
+      ? '<span class="conv">Cartera Convenios</span> <span style="font-size:10px;color:#9CA3AF;font-weight:400">— WELL · KLIK · Gran Central Conv.</span>'
+      : '<span>Cartera VIS-CO</span> <span style="font-size:10px;color:#9CA3AF;font-weight:400">— Proyectos propios</span>';
+  }
+  const cfg = CAT_CFG[curTab];
+  document.getElementById('ptitle').textContent = cfg.label;
+  document.getElementById('phint').textContent = cfg.hint;
+
+  if (curTab === 'adicionales') { renderAdicionales(); return; }
+  if (curTab === 'cola') { renderCola(); return; }
+  let items = applyFilters(getActiveData().filter(c=>c.cat===curTab));
+  // Sort
+  items.sort((a,b)=>{
+    let va=a[sortK]||0, vb=b[sortK]||0;
+    if(typeof va==='string'){va=va.toLowerCase();vb=vb.toLowerCase();}
+    if(va<vb)return sortD; if(va>vb)return -sortD; return 0;
+  });
+
+  document.getElementById('fcnt').innerHTML=`<strong>${items.length}</strong> clientes`;
+
+  const notes = JSON.parse(localStorage.getItem(LS_NOTES)||'{}');
+  const reasons = JSON.parse(localStorage.getItem(LS_REASONS)||'{}');
+
+  // HEADERS
+  const showVencAmt  = curTab==='vencido';
+  const showSemAmt   = curTab==='semana';
+  const showDias     = curTab==='mora'||curTab==='vencido';
+  const showReason   = curTab==='vencido';
+  const showPagoBtn  = curTab==='vencido'||curTab==='semana'||curTab==='mora'||curTab==='recibir';
+
+  document.getElementById('thead').innerHTML = `<tr>
+    <th onclick="doSort('ep')">Estado</th>
+    <th onclick="doSort('cli')">Cliente / Apto</th>
+    <th onclick="doSort('proy')">Proyecto</th>
+    <th onclick="doSort('total')" style="text-align:right">Total Contrato</th>
+    <th onclick="doSort('recaudado')" style="text-align:right">Recaudado</th>
+    <th onclick="doSort('xrec')" style="text-align:right">X Recaudar</th>
+    <th onclick="doSort('adic')" style="text-align:right">Adicionales</th>
+    ${showVencAmt?'<th style="text-align:right">Vencido</th>':''}
+    ${showSemAmt?'<th style="text-align:right">Esta Semana</th>':''}
+    <th>Recaudo %</th>
+    ${showDias?'<th>Fecha pago</th>':''}
+    ${showReason?'<th>Razón atraso</th>':''}
+    ${showPagoBtn?'<th>Pago</th>':''}
+    <th>Obs.</th>
+  </tr>`;
+
+  if (!items.length) {
+    document.getElementById('tbody').innerHTML=`<tr><td colspan="12"><div class="empty">
+      <div class="empty-ico">${curTab==='mora'?'✅':'💼'}</div>
+      <div class="empty-txt">Sin registros</div>
+    </div></td></tr>`;
+    return;
+  }
+
+  const rowCls={mora:'r1',vencido:'r2',semana:'r3',recibir:'r4',aldia:'r5'};
+  const epBadge = ep => ep==='ENTREGADO'?'<span class="badge bm">Entregado</span>':
+    ep==='X RECIBIR'?'<span class="badge br">Por Recibir</span>':
+    '<span class="badge bs">En Ejec.</span>';
+
+  // Progress bar color
+    function barCol(pct){return pct>=0.9?'var(--ok)':pct>=0.5?'#D97706':'var(--mora)';}
+
+  document.getElementById('tbody').innerHTML = items.map(c=>{
+    const dias = c.diasMora;
+    const fechaPagoHtml = c.oldestVenc
+      ? `<span class="dias-mora ${dias>60?'red':dias>30?'orange':'blue'}">${fmtD(c.oldestVenc)}</span>`
+      : '—';
+    const reasonKey = c.cid;
+    const savedReason = reasons[reasonKey] || '';
+    const obs = notes[c.cid] ? '📝' : '';
+    // Soporte flow badge
+    const sopsRow = getSoportes();
+    const clientSops = (c.blocks||[]).map(b=>(sopsRow[pagoKey(c.cid,b.etapa)]||{}).estado||'').filter(Boolean);
+    const hasRevision = clientSops.includes('revision');
+    const hasSoporte  = clientSops.includes('soporte');
+    const allEntro    = clientSops.length>0 && clientSops.every(v=>v==='entro');
+    const pagoBadge   = hasRevision ? '<span class="pago-badge pendiente">🔍 Revisión</span>'
+                      : hasSoporte  ? '<span class="pago-badge soporte">📤 Soporte</span>'
+                      : allEntro    ? '<span class="pago-badge entro">✅ Entró</span>' : '';
+    const pct = c.pct;
+    const pctBar = `<div class="pbar">
+      <div class="pbar-out"><div class="pbar-in" style="width:${Math.min(100,Math.round(pct*100))}%;background:${barCol(pct)}"></div></div>
+      <span class="pbar-val" style="color:${barCol(pct)}">${Math.round(pct*100)}%</span>
+    </div>`;
+
+    const reasonSel = showReason ? `<td onclick="event.stopPropagation()">
+      <select class="reason-sel ${savedReason?'set':''}" onchange="saveReason('${c.cid}',this.value)">
+        <option value="" ${!savedReason?'selected':''}>Sin clasificar</option>
+        <option value="cliente" ${savedReason==='cliente'?'selected':''}>Cliente</option>
+        <option value="obra"    ${savedReason==='obra'?'selected':''}>Atraso de Obra</option>
+        <option value="adic"    ${savedReason==='adic'?'selected':''}>Adicionales</option>
+        <option value="otro"    ${savedReason==='otro'?'selected':''}>Otro</option>
+      </select>
+    </td>` : '';
+
+    const xRecClass = curTab==='mora'?'mm':curTab==='vencido'?'mv':curTab==='semana'?'ms':curTab==='recibir'?'mr2':'mok';
+
+    return `<tr class="${rowCls[curTab]}" onclick="openModal('${c.cid}')">
+      <td>${epBadge(c.ep)}</td>
+      <td style="max-width:180px;font-weight:500" title="${c.cli}">${c.cli}<br><span style="font-size:10px;color:var(--g);font-weight:400">${c.proy} · T${c.torre||'—'} A${c.apto||'—'}</span>${pagoBadge}</td>
+      <td><span class="bproy">${c.proy}</span></td>
+      <td style="font-size:11px;color:var(--g)">${c.torre||'—'} · ${c.apto||'—'}</td>
+      <td class="m" style="text-align:right">${fmtMF(c.total)}</td>
+      <td class="m mok" style="text-align:right">${fmtMF(c.recaudado)}</td>
+      <td class="m ${xRecClass}" style="text-align:right">${fmtMF(c.xrec)}</td>
+      <td class="m adic-col" style="text-align:right">${c.adic>0?fmtMF(c.adic):'—'}</td>
+      ${showVencAmt?`<td class="m mv" style="text-align:right">${fmtMF(c.vencAmt)}</td>`:''}
+      ${showSemAmt?`<td class="m ms" style="text-align:right">${fmtMF(c.semAmt)}</td>`:''}
+      <td>${pctBar}</td>
+      ${showDias?`<td>${fechaPagoHtml}</td>`:''}
+      ${reasonSel}
+      ${showPagoBtn?`<td onclick="event.stopPropagation()">${renderPagoCellRow(c)}</td>`:''}
+      <td onclick="event.stopPropagation()" style="text-align:center;cursor:pointer" onclick="openObs('${c.cid}')">${obs}</td>
+    </tr>`;
+  }).join('');
+}
+
+function doSort(k){if(sortK===k)sortD*=-1;else{sortK=k;sortD=-1;}render();}
+
+function saveReason(cid,val){
+  const r=JSON.parse(localStorage.getItem(LS_REASONS)||'{}');
+  if(val)r[cid]=val;else delete r[cid];
+  localStorage.setItem(LS_REASONS,JSON.stringify(r));
+}
+
+// ── MODAL DETALLE ─────────────────────────────────────────────
+function openModal(cid) {
+  const c = DATA.find(x=>x.cid===cid); if(!c) return;
+  const notes = JSON.parse(localStorage.getItem(LS_NOTES)||'{}');
+  const reasons = JSON.parse(localStorage.getItem(LS_REASONS)||'{}');
+
+  document.getElementById('mtitle').textContent = c.cli;
+  document.getElementById('msub').textContent = `${c.proy} · T${c.torre||'—'} · A${c.apto||'—'} · ${c.asesor}`;
+
+  const pct = Math.round(c.pct*100);
+  const diasMora = c.diasMora;
+
+  let blocksHtml = `<div class="mst">📋 DETALLE DE PAGOS</div>
+  <table class="btable">
+    <thead><tr><th>Etapa</th><th>Monto Contrato</th><th>Pagado</th><th>Saldo</th><th>Fecha</th><th>Estado</th><th>Flujo pago</th></tr></thead>
+    <tbody>`;
+
+  for (const b of c.blocks) {
+    const rowCls = b.bst==='vencido'?'bv-row':b.bst==='semana'?'bs-row':'';
+    const stBadge = b.bst==='vencido'?`<span class="bstatus bv" style="background:var(--venc-bg);color:var(--venc)">Vencido</span>`:
+      b.bst==='semana'?`<span class="bstatus bs" style="background:var(--sem-bg);color:var(--sem)">Esta semana</span>`:
+      `<span class="bstatus bn" style="background:var(--gc);color:var(--g)">Próximo</span>`;
+    const dias = b.fc ? daysDiff(b.fc) : null;
+    const fechaLabel = b.fc ? (dias<0?`⚠ ${fmtD(b.fc)} (${Math.abs(dias)}d)`:fmtD(b.fc)) : '—';
+    // Flujo de pago con soporte upload
+    const pk = pagoKey(cid, b.etapa);
+    const sops_all = getSoportes();
+    const sopB = sops_all[pk]||{};
+    const sopEst = sopB.estado||'';
+    const sopCfgB = SOP_ESTADOS[sopEst]||SOP_ESTADOS[''];
+    const flujoHtml = sopEst===''
+      ? `<label class="fbtn upload" style="padding:3px 9px;font-size:10px" onclick="event.stopPropagation()">📤 Cargar<input type="file" accept="image/*,.pdf" onchange="onSoporteFile('${pk}',this)"></label>`
+      : sopEst==='pendiente'
+        ? `<span class="pago-badge soporte" style="cursor:pointer" title="${sopB.filename||''}">📤 Pend. contab.</span>
+           <button class="fbtn entro" style="padding:2px 7px;font-size:9px;margin-left:4px" onclick="event.stopPropagation();setSoporteEstado('${pk}','entro');openModal('${cid}')">✅ Entró</button>`
+        : `<span class="pago-badge entro" title="${sopB.fecha_entro||''}">✅ Entró ${sopB.fecha_entro||''}</span>
+           <button class="fbtn reset" style="padding:2px 6px;font-size:9px;margin-left:4px" onclick="event.stopPropagation();setSoporteEstado('${pk}','');openModal('${cid}')">↩</button>`;
+    blocksHtml += `<tr class="${rowCls}">
+      <td><strong>${b.label}</strong></td>
+      <td class="m">${fmtMF(b.mc)}</td>
+      <td class="m mok">${fmtMF(b.mr)}</td>
+      <td class="m ${b.bst==='vencido'?'mv':b.bst==='semana'?'ms':''}">${fmtMF(b.saldo)}</td>
+      <td style="font-size:11px;${dias&&dias<0?'color:var(--venc);font-weight:700':''}">${fechaLabel}</td>
+      <td>${stBadge}</td>
+      <td>${flujoHtml}</td>
+    </tr>`;
+  }
+  blocksHtml += '</tbody></table>';
+
+  // Soporte block details for modal
+  const sops_modal = getSoportes();
+  const pendingSops = c.blocks.filter(b=>{ const s=sops_modal[pagoKey(cid,b.etapa)]; return s&&s.estado&&s.estado!=='entro'; });
+  const sopSummaryHtml = pendingSops.length>0 ? `
+  <div class="sep"></div>
+  <div class="mst">💳 SOPORTES EN PROCESO</div>
+  ${pendingSops.map(b=>{
+    const pk2=pagoKey(cid,b.etapa);
+    const sopB2=sops_modal[pk2]||{};
+    const sopCfg2=SOP_ESTADOS[sopB2.estado||'']||SOP_ESTADOS[''];
+    return `<div class="soporte-info" style="margin-bottom:6px;justify-content:space-between">
+      <span><strong>${b.label}</strong> — ${sopCfg2.ico} ${sopCfg2.lbl}</span>
+      <span style="display:flex;gap:5px">
+        ${sopB2.estado==='soporte'?`<button class="fbtn revision" style="padding:3px 9px;font-size:10px" onclick="setSoporteEstado('${pk2}','revision');openModal('${cid}')">🔍 Revisión</button>`:''}
+        ${sopB2.estado==='revision'?`<button class="fbtn entro" style="padding:3px 9px;font-size:10px" onclick="setSoporteEstado('${pk2}','entro');openModal('${cid}')">✅ Entró</button>`:''}
+        <button class="fbtn reset" onclick="setSoporteEstado('${pk2}','');openModal('${cid}')">↩</button>
+      </span>
+    </div>`;
+  }).join('')}` : '';
+
+  const reasonSaved = reasons[cid]||'';
+  const reasonHtml = c.cat==='vencido' ? `
+  <div class="sep"></div>
+  <div class="mst">⚠ RAZÓN DEL ATRASO</div>
+  <select class="fi" onchange="saveReason('${cid}',this.value)" style="max-width:240px">
+    <option value="" ${!reasonSaved?'selected':''}>Sin clasificar</option>
+    <option value="cliente" ${reasonSaved==='cliente'?'selected':''}>Por el cliente</option>
+    <option value="obra"    ${reasonSaved==='obra'?'selected':''}>Atraso de obra</option>
+    <option value="adic"    ${reasonSaved==='adic'?'selected':''}>Adicionales pendientes</option>
+    <option value="otro"    ${reasonSaved==='otro'?'selected':''}>Otro motivo</option>
+  </select>` : '';
+
+  const noteSaved = notes[cid]||'';
+
+  document.getElementById('mbody').innerHTML = `
+  <div class="ig">
+    <div class="ii"><div class="iil">Estado</div><div class="iiv">${c.ep}</div></div>
+    <div class="ii"><div class="iil">Asesor / VD</div><div class="iiv">${c.asesor||'—'}</div></div>
+    <div class="ii"><div class="iil">Total Contrato</div><div class="iiv">${fmtMF(c.total)}</div></div>
+    <div class="ii"><div class="iil">Recaudado</div><div class="iiv mok">${fmtMF(c.recaudado)} (${pct}%)</div></div>
+    <div class="ii"><div class="iil">X Recaudar Total</div><div class="iiv mm">${fmtMF(c.xrec)}</div></div>
+    <div class="ii"><div class="iil">Fecha pago</div><div class="iiv ${diasMora>0?'mm':''}">${c.oldestVenc?fmtD(c.oldestVenc)+' ('+(diasMora)+'d)':'—'}</div></div>
+    ${c.adic>0?`<div class="ii"><div class="iil">Adicionales</div><div class="iiv mv">${fmtMF(c.adic)}</div></div><div class="ii"></div>`:''}
+  </div>
+  ${blocksHtml}
+  ${sopSummaryHtml}
+  ${reasonHtml}
+  <div class="sep"></div>
+  <div class="mst">📝 OBSERVACIONES</div>
+  <textarea class="fi" id="obs-ta" rows="3" placeholder="Escribe observaciones de seguimiento...">${noteSaved}</textarea>`;
+
+  document.getElementById('mftr').innerHTML = `
+    <button class="bsec" onclick="closeModal()">Cerrar</button>
+    <button class="bpri" onclick="saveObs('${cid}')">💾 Guardar observación</button>`;
+
+  document.getElementById('ov').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function saveObs(cid) {
+  const val = document.getElementById('obs-ta')?.value.trim();
+  const n = JSON.parse(localStorage.getItem(LS_NOTES)||'{}');
+  if(val) n[cid]=val; else delete n[cid];
+  localStorage.setItem(LS_NOTES,JSON.stringify(n));
+  closeModal(); render(); toast('Observación guardada','ok');
+}
+function closeModal(){document.getElementById('ov').classList.remove('open');document.body.style.overflow='';}
+
+// ── RENDER ADICIONALES TAB ───────────────────────────────────
+function renderAdicionales() {
+  const adics_meta = getAdics();
+  const sops = getSoportes();
+  const items = applyFilters(getActiveData().filter(c=>c.adic>0));
+  document.getElementById('ptitle').textContent = '🔧 Adicionales';
+  document.getElementById('phint').textContent  = 'Cobros adicionales fuera del contrato principal';
+  document.getElementById('fcnt').innerHTML = `<strong>${items.length}</strong> clientes`;
+
+  document.getElementById('thead').innerHTML = `<tr>
+    <th>Estado</th><th>Cliente</th><th>Proyecto</th><th>Torre/Apto</th>
+    <th style="text-align:right">Valor Adicional</th>
+    <th>Descripción</th><th>Fecha cobro</th><th>Soporte / Flujo</th>
+  </tr>`;
+
+  if(!items.length){
+    document.getElementById('tbody').innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-ico">🔧</div><div class="empty-txt">Sin adicionales pendientes</div></div></td></tr>`;
+    return;
+  }
+  const epBadge=ep=>ep==='ENTREGADO'?'<span class="badge bm">Entregado</span>':ep==='X RECIBIR'?'<span class="badge br">Por Recibir</span>':'<span class="badge bs">En Ejec.</span>';
+
+  document.getElementById('tbody').innerHTML = items.map(c=>{
+    const meta = adics_meta[c.cid]||{};
+    const sopKey = c.cid+'_ADIC';
+    const sop = sops[sopKey]||{};
+    const est = sop.estado||'';
+    const sopCfg = SOP_ESTADOS[est]||SOP_ESTADOS[''];
+    const fechaCobro = meta.fecha_cobro||'';
+    const badgeCls = est==='entro'?'pago-badge entro':est==='soporte'?'pago-badge soporte':est==='revision'?'pago-badge pendiente':'';
+    const badgeTxt = est?`<span class="${badgeCls}">${sopCfg.ico} ${sopCfg.lbl}</span>`:'';
+    return `<tr onclick="openAdicModal('${c.cid}')" style="cursor:pointer">
+      <td>${epBadge(c.ep)}</td>
+      <td style="font-weight:500;max-width:160px" title="${c.cli}">${c.cli}<br><span style="font-size:10px;color:var(--g);font-weight:400">T${c.torre||'—'} A${c.apto||'—'}</span></td>
+      <td><span class="bproy">${c.proy}</span></td>
+      <td style="font-size:11px;color:var(--g)">${c.torre||'—'} · ${c.apto||'—'}</td>
+      <td class="m adic-col" style="text-align:right;font-size:13px;font-weight:700">${fmtMF(c.adic)}</td>
+      <td style="font-size:11px;color:var(--g)">Adicionales/Ajustes</td>
+      <td style="font-size:11px">${fechaCobro?fmtD(fechaCobro):'<span style="color:#CCC">Sin fecha</span>'}</td>
+      <td>${badgeTxt||'<span style="color:#CCC;font-size:11px">Sin gestión</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function openAdicModal(cid){
+  const c=DATA.find(x=>x.cid===cid); if(!c||!c.adic) return;
+  const adics_meta=getAdics(); const meta=adics_meta[cid]||{};
+  const sops=getSoportes(); const sop=sops[cid+'_ADIC']||{};
+  const est=sop.estado||'';
+  document.getElementById('mtitle').textContent=c.cli;
+  document.getElementById('msub').textContent=`Adicionales — ${c.proy} · T${c.torre||'—'} · A${c.apto||'—'}`;
+  const steps=[
+    {key:'soporte', ico:'📤', lbl:'Soporte cargado'},
+    {key:'revision',ico:'🔍', lbl:'En revisión'},
+    {key:'entro',   ico:'✅', lbl:'Entró'},
+  ];
+  const order=['soporte','revision','entro'];
+  const currentIdx=order.indexOf(est);
+  const stepsHtml=`<div class="flujo-bar">
+    ${steps.map((s,i)=>{
+      const done=currentIdx>i, active=currentIdx===i;
+      return `<div class="flujo-step">
+        <div class="fstep-dot ${done?'done':active?'active':''}">${done?'✓':s.ico}</div>
+        <div class="fstep-lbl">${s.lbl}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+  const sopInfo=sop.filename?`<div class="soporte-info">📎 <strong>${sop.filename}</strong> · ${sop.uploaded||''}</div>`:'';
+  const btnsHtml=`<div class="flujo-btns">
+    ${est===''?`<label class="fbtn upload">📤 Cargar soporte<input type="file" accept="image/*,.pdf" onchange="onSoporteAdicFile('${cid}',this)"></label>`:''}
+    ${est==='soporte'?`<button class="fbtn revision" onclick="setSopAdicEstado('${cid}','revision')">🔍 Marcar en revisión</button>`:''}
+    ${est==='revision'?`<button class="fbtn entro" onclick="setSopAdicEstado('${cid}','entro')">✅ Confirmar que entró</button>`:''}
+    ${est!==''?`<button class="fbtn reset" onclick="setSopAdicEstado('${cid}','')">↩ Reiniciar</button>`:''}
+  </div>`;
+  const fechaCobro=meta.fecha_cobro||'';
+  document.getElementById('mbody').innerHTML=`
+    <div class="ig">
+      <div class="ii"><div class="iil">Estado proyecto</div><div class="iiv">${c.ep}</div></div>
+      <div class="ii"><div class="iil">Valor adicional</div><div class="iiv adic-col" style="font-size:16px">${fmtMF(c.adic)}</div></div>
+      <div class="ii wide"><div class="iil">Descripción</div><div class="iiv">Adicionales / Ajustes</div></div>
+    </div>
+    <div class="sep"></div>
+    <div class="mst">📅 FECHA DE COBRO</div>
+    <input type="date" class="fi" style="max-width:200px" value="${fechaCobro}"
+      onchange="saveAdicFecha('${cid}',this.value)">
+    <div class="sep"></div>
+    <div class="mst">💳 FLUJO DE PAGO</div>
+    ${stepsHtml}${sopInfo}${btnsHtml}
+    <div class="sep"></div>
+    <div class="mst">📝 OBSERVACIONES</div>
+    <textarea class="fi" id="obs-ta" rows="2" placeholder="Notas de seguimiento...">${meta.nota||''}</textarea>`;
+  document.getElementById('mftr').innerHTML=`
+    <button class="bsec" onclick="closeModal()">Cerrar</button>
+    <button class="bpri" onclick="saveAdicObs('${cid}')">💾 Guardar</button>`;
+  document.getElementById('ov').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function onSoporteAdicFile(cid,input){
+  const f=input.files[0]; if(!f) return;
+  const sops=getSoportes();
+  saveSoporte(cid+'_ADIC',{estado:'soporte',filename:f.name,size:f.size,uploaded:new Date().toISOString().slice(0,10)});
+  toast('📤 '+f.name+' cargado','ok');
+  openAdicModal(cid);
+}
+function setSopAdicEstado(cid,estado){
+  setSoporteEstado(cid+'_ADIC',estado);
+  if(estado==='entro') toast('✅ Adicional confirmado como entrado','ok');
+  openAdicModal(cid);
+}
+function saveAdicFecha(cid,val){
+  const adics_meta=getAdics(); const cur=adics_meta[cid]||{};
+  saveAdic(cid,{...cur,fecha_cobro:val});
+}
+function saveAdicObs(cid){
+  const val=document.getElementById('obs-ta')?.value.trim();
+  const adics_meta=getAdics(); const cur=adics_meta[cid]||{};
+  saveAdic(cid,{...cur,nota:val||''});
+  closeModal(); render(); toast('Guardado','ok');
+}
+
+// ── PAGO CELL (inline en tabla) ──────────────────────────────
+function renderPagoCellRow(c) {
+  const sops = getSoportes();
+  // Mora/X RECIBIR: cualquier bloque con saldo. Otros: vencido o semana.
+  const activeBlocks = (c.blocks||[]).filter(b=>b.saldo>0&&(
+    (c.ep==='ENTREGADO'||c.ep==='X RECIBIR') ? true : (b.bst==='vencido'||b.bst==='semana')
+  ));
+  if(!activeBlocks.length) return '<span style="color:#CCC;font-size:10px">—</span>';
+  // Check any soporte registered for this client
+  const anyPend = activeBlocks.some(b=>{ const s=sops[pagoKey(c.cid,b.etapa)]; return s&&s.estado==='pendiente'; });
+  const anyEntro= activeBlocks.some(b=>{ const s=sops[pagoKey(c.cid,b.etapa)]; return s&&s.estado==='entro'; });
+  if(anyPend) return `<span class="pago-badge pendiente" onclick="openModal('${c.cid}')" style="cursor:pointer">📤 Pend. contab.</span>`;
+  if(anyEntro)return `<span class="pago-badge entro" onclick="openModal('${c.cid}')" style="cursor:pointer">✅ Entró</span>`;
+  return `<label class="fbtn upload" style="padding:3px 9px;font-size:10px;display:inline-flex" title="Registrar pago">
+    📤 Soporte<input type="file" accept="image/*,.pdf" onchange="onSoporteRapido('${c.cid}',this)">
+  </label>`;
+}
+function onSoporteRapido(cid,input){
+  const f=input.files[0]; if(!f) return;
+  const c=DATA.find(x=>x.cid===cid); if(!c) return;
+  // Register soporte for ALL vencido/semana blocks of this client
+  const activeBlocks=(c.blocks||[]).filter(b=>b.saldo>0&&(
+    (c.ep==='ENTREGADO'||c.ep==='X RECIBIR') ? true : (b.bst==='vencido'||b.bst==='semana')
+  ));
+  const s=getSoportes();
+  activeBlocks.forEach(b=>{
+    const pk=pagoKey(cid,b.etapa);
+    if(!s[pk]||s[pk].estado==='') {
+      s[pk]={estado:'pendiente',filename:f.name,size:f.size,
+        monto:b.saldo,etapa:b.etapa,etapa_label:b.label,
+        cli:c.cli,proy:c.proy,torre:c.torre,apto:c.apto,
+        fecha_soporte:new Date().toISOString().slice(0,10),
+        semana:WEEK.ss};
+    }
+  });
+  _saveSop(s); render();
+  toast('📤 Soporte registrado para '+c.cli+' — pendiente de confirmación','ok');
+}
+
+// ── COLA DE SOPORTES ──────────────────────────────────────────
+function renderCola(){
+  const sops=getSoportes();
+  const all=Object.entries(sops).filter(([k,v])=>v.estado&&v.estado!=='');
+  const pending   =all.filter(([k,v])=>v.estado==='pendiente');
+  const entrado   =all.filter(([k,v])=>v.estado==='entro');
+  const rechazados=all.filter(([k,v])=>v.estado==='rechazado');
+  // Filter to active week for entrados, all pending shown
+  const pendMonto=pending.reduce((a,[k,v])=>a+(v.monto||0),0);
+  const entroMonto=entrado.filter(([k,v])=>v.fecha_entro&&v.fecha_entro>=WEEK.ss&&v.fecha_entro<=WEEK.es)
+    .reduce((a,[k,v])=>a+(v.monto||0),0);
+
+  document.getElementById('ptitle').textContent='💳 Cola de Pagos';
+  document.getElementById('phint').textContent='Soportes enviados + confirmaciones de contabilidad';
+  document.getElementById('fcnt').innerHTML=`<strong>${pending.length}</strong> pendientes · <strong>${entrado.length}</strong> confirmados
+    <button onclick="limpiarSoportes()" style="margin-left:12px;font-size:10px;padding:3px 9px;border-radius:6px;border:1px solid var(--brd);background:var(--gc);color:var(--g);cursor:pointer;font-family:inherit">🗑 Limpiar todo</button>`;
+
+  const mkTbl=(rows,title,color,btnFn)=>{
+    if(!rows.length) return `<div style="padding:20px;color:var(--g);font-size:12px;text-align:center">Sin registros</div>`;
+    return `<table><thead><tr style="background:${color}10">
+      <th>Cliente</th><th>Proyecto/Apto</th><th>Etapa</th>
+      <th style="text-align:right">Monto</th><th>Archivo</th><th>Fecha soporte</th><th>Acción</th>
+    </tr></thead><tbody>
+    ${rows.map(([k,v])=>`<tr>
+      <td style="font-weight:500">${v.cli||'—'}</td>
+      <td style="font-size:11px;color:var(--g)">${v.proy||'—'} · T${v.torre||'—'} A${v.apto||'—'}</td>
+      <td><span class="betapa">${v.etapa_label||v.etapa||'—'}</span></td>
+      <td class="m" style="text-align:right;font-weight:700;color:${color}">${fmtMF(v.monto||0)}</td>
+      <td style="font-size:11px">📎 ${v.filename||'—'}</td>
+      <td style="font-size:11px">${v.fecha_soporte||'—'}</td>
+      <td>${btnFn(k,v)}</td>
+    </tr>`).join('')}
+    </tbody></table>`;
+  };
+
+  const pendBtns=(k,v)=>`<div style="display:flex;gap:5px;flex-wrap:wrap">
+    <button class="fbtn entro"   style="padding:3px 10px;font-size:10px" onclick="confirmarEntro('${k}')">✅ Entró</button>
+    <button class="fbtn rechazar" style="padding:3px 10px;font-size:10px" onclick="rechazarPago('${k}')">❌ Rechazar</button>
+    <button class="fbtn reset"   style="padding:3px 8px;font-size:10px"  onclick="reversarPago('${k}')">↩</button>
+  </div>`;
+  const rechBtns=(k,v)=>`<div style="font-size:11px">
+    <span style="color:#DC2626;font-weight:700">${v.fecha_rechazo||'Rechazado'}</span>
+    ${v.obs_contab?`<div style="color:var(--g);font-style:italic">"${v.obs_contab}"</div>`:''}
+    <button class="fbtn upload" style="padding:2px 8px;font-size:9px;margin-top:4px" onclick="reversarPago('${k}')">↩ Volver a pendiente</button>
+  </div>`;
+  const entroBtns=(k,v)=>`<div style="font-size:11px">
+    <span style="color:var(--ok);font-weight:700">${v.fecha_entro||''}</span>
+    ${v.banco?`<div style="color:var(--g);margin-top:2px">🏦 ${v.banco}</div>`:''}
+    ${v.referencia?`<div style="color:var(--g)">🔖 ${v.referencia}</div>`:''}
+    ${v.obs_contab?`<div style="color:var(--n);font-style:italic;margin-top:2px">"${v.obs_contab}"</div>`:''}
+    <button class="fbtn reset" style="padding:2px 8px;font-size:9px;margin-top:5px" onclick="reversarPago('${k}')">↩ Reversar</button>
+  </div>`;
+
+  document.getElementById('thead').innerHTML='';
+  document.getElementById('tbody').innerHTML=`
+    <tr><td colspan="20" style="padding:0">
+      <!-- RESUMEN SEMANA -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 16px;background:var(--gc);border-bottom:1px solid var(--brd)">
+        <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:10px;padding:12px 16px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#92400E;margin-bottom:4px">📤 Soporte enviado · Pendiente contabilidad</div>
+          <div style="font-size:22px;font-weight:800;color:#D97706">${fmtMF(pendMonto)}</div>
+          <div style="font-size:11px;color:#A16207;margin-bottom:10px">${pending.length} pago${pending.length!==1?'s':''} por confirmar</div>
+          <button onclick="exportPendientes()" style="font-size:10px;padding:4px 11px;border-radius:6px;border:1.5px solid #FDE68A;background:#fff;color:#D97706;cursor:pointer;font-family:inherit;font-weight:700">📥 Exportar pendientes</button>
+        </div>
+        <div style="background:#ECFDF5;border:1.5px solid #A7F3D0;border-radius:10px;padding:12px 16px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#065F46;margin-bottom:4px">✅ Confirmado — Entró esta semana</div>
+          <div style="font-size:22px;font-weight:800;color:#059669">${fmtMF(entroMonto)}</div>
+          <div style="font-size:11px;color:#047857;margin-bottom:10px">${entrado.filter(([k,v])=>v.fecha_entro&&v.fecha_entro>=WEEK.ss&&v.fecha_entro<=WEEK.es).length} confirmados esta semana</div>
+          <button onclick="exportConfirmaciones()" style="font-size:10px;padding:4px 11px;border-radius:6px;border:1.5px solid #A7F3D0;background:#fff;color:#059669;cursor:pointer;font-family:inherit;font-weight:700">📥 Exportar confirmados</button>
+        </div>
+      </div>
+      <!-- PENDING TABLE -->
+      <div style="padding:14px 16px 4px">
+        <div class="mst" style="margin-bottom:8px">📤 PENDIENTES DE CONFIRMAR (${pending.length})</div>
+        ${mkTbl(pending,'',  '#D97706',pendBtns)}
+      </div>
+      <!-- CONFIRMED TABLE -->
+      <div style="padding:14px 16px">
+        <div class="mst" style="margin-bottom:8px">✅ CONFIRMADOS — ENTRÓ (${entrado.length})</div>
+        ${mkTbl(entrado,'','#059669',entroBtns)}
+      </div>
+      <!-- RECHAZADOS TABLE -->
+      ${rechazados.length>0?`<div style="padding:0 16px 14px">
+        <div class="mst" style="margin-bottom:8px;color:#DC2626">❌ RECHAZADOS (${rechazados.length})</div>
+        ${mkTbl(rechazados,'','#DC2626',rechBtns)}
+      </div>`:''}
+    </td></tr>`;
+}
+// Mini-modal contabilidad para confirmar con obs
+function confirmarEntro(key){
+  const s=getSoportes(); const cur=s[key]||{};
+  // Render mini-form in a confirm overlay
+  const ov=document.getElementById('ov2');
+  document.getElementById('ov2-body').innerHTML=`
+    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:4px">✅ Confirmar pago</div>
+    <div style="font-size:12px;color:var(--g);margin-bottom:16px">${cur.cli||''} · ${cur.etapa_label||cur.etapa||''} · <strong>${fmtMF(cur.monto||0)}</strong></div>
+    <div class="fg2"><label class="fl2">Banco / Cuenta donde entró</label>
+      <input class="fi" id="cv-banco" placeholder="Ej: Bancolombia cta 123-456..." value="${cur.banco||''}"></div>
+    <div class="fg2"><label class="fl2">Número de referencia / transacción</label>
+      <input class="fi" id="cv-ref" placeholder="Ej: 2026060512345" value="${cur.referencia||''}"></div>
+    <div class="fg2"><label class="fl2">Observación</label>
+      <textarea class="fi" id="cv-obs" rows="2" placeholder="Notas adicionales...">${cur.obs_contab||''}</textarea></div>
+    <div style="display:flex;gap:9px;justify-content:flex-end;margin-top:16px">
+      <button class="bsec" onclick="document.getElementById('ov2').style.display='none'">Cancelar</button>
+      <button class="bpri" onclick="guardarConfirmacion('${key}')">✅ Confirmar que entró</button>
+    </div>`;
+  ov.style.display='flex';
+}
+function limpiarSoportes(){
+  if(!confirm('¿Borrar todos los registros de soportes? Esta acción no se puede deshacer.')) return;
+  localStorage.removeItem(LS_SOPORTES);
+  parseAndRender(null); // recalculate saldos
+  toast('🗑 Soportes eliminados','ok');
+}
+function rechazarPago(key){
+  const s=getSoportes(); const cur=s[key]||{};
+  s[key]={...cur,estado:'rechazado',fecha_rechazo:new Date().toISOString().slice(0,10)};
+  _saveSop(s); parseAndRender(null);
+  toast('❌ Pago marcado como rechazado','ok');
+}
+function reversarPago(key){
+  if(!confirm('¿Reversar este pago? Volverá a aparecer en la cartera pendiente.')) return;
+  const s=getSoportes(); delete s[key];
+  _saveSop(s); parseAndRender(null);
+  toast('↩ Pago reversado — vuelve a cartera','ok');
+}
+function guardarConfirmacion(key){
+  const banco=document.getElementById('cv-banco')?.value.trim()||'';
+  const ref  =document.getElementById('cv-ref')?.value.trim()||'';
+  const obs  =document.getElementById('cv-obs')?.value.trim()||'';
+  const s=getSoportes(); const cur=s[key]||{};
+  s[key]={...cur,estado:'entro',banco,referencia:ref,obs_contab:obs,
+    fecha_entro:new Date().toISOString().slice(0,10),
+    updated:new Date().toISOString().slice(0,10)};
+  _saveSop(s);
+  document.getElementById('ov2').style.display='none';
+  parseAndRender(null); // recalculate so block disappears from cartera
+  toast('✅ Pago confirmado y registrado','ok');
+}
+
+// ── EXPORT CONFIRMACIONES ────────────────────────────────────
+function exportConfirmaciones(){
+  const sops = getSoportes();
+  const all  = Object.values(sops).filter(v=>v.estado==='entro');
+  if(!all.length){ toast('Sin confirmaciones para exportar','warn'); return; }
+
+  const BOM = '\ufeff'; // UTF-8 BOM para que Excel abra bien tildes
+  const cols = [
+    'Fecha Confirmación','Semana','Cliente','Proyecto','Torre','Apto',
+    'Etapa','Monto','Fecha Soporte','Banco / Cuenta','Referencia','Observación Contabilidad'
+  ];
+  const rows = all
+    .sort((a,b)=>(a.fecha_entro||'').localeCompare(b.fecha_entro||''))
+    .map(v=>[
+      v.fecha_entro||'',
+      v.semana||'',
+      v.cli||'',
+      v.proy||'',
+      v.torre||'',
+      v.apto||'',
+      v.etapa_label||v.etapa||'',
+      v.monto||0,
+      v.fecha_soporte||'',
+      v.banco||'',
+      v.referencia||'',
+      v.obs_contab||''
+    ].map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(','));
+
+  const csv = BOM + [cols.join(','), ...rows].join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'confirmaciones-cartera-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  toast('📥 CSV descargado — '+all.length+' confirmaciones','ok');
+}
+
+function exportPendientes(){
+  const sops = getSoportes();
+  const all  = Object.values(sops).filter(v=>v.estado==='pendiente');
+  if(!all.length){ toast('Sin pendientes para exportar','warn'); return; }
+
+  const BOM = '\ufeff';
+  const cols = ['Fecha Soporte','Semana','Cliente','Proyecto','Torre','Apto','Etapa','Monto','Archivo Soporte'];
+  const rows = all
+    .sort((a,b)=>(a.fecha_soporte||'').localeCompare(b.fecha_soporte||''))
+    .map(v=>[
+      v.fecha_soporte||'',
+      v.semana||'',
+      v.cli||'',
+      v.proy||'',
+      v.torre||'',
+      v.apto||'',
+      v.etapa_label||v.etapa||'',
+      v.monto||0,
+      v.filename||''
+    ].map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(','));
+
+  const csv = BOM + [cols.join(','), ...rows].join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'soportes-pendientes-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  toast('📥 CSV pendientes descargado','ok');
+}
+
+// ── EXPORT CSV ────────────────────────────────────────────────
+function exportCSV(){
+  const reasons=JSON.parse(localStorage.getItem(LS_REASONS)||'{}');
+  const notes=JSON.parse(localStorage.getItem(LS_NOTES)||'{}');
+  const h=['Categoría','Estado','Cliente','Proyecto','Torre','Apto','Asesor','Total Contrato','Recaudado','X Recaudar','Vencido','Esta Semana','%Recaudo','Días Mora','Razón Atraso','Observaciones'];
+  const rows=DATA.map(c=>[
+    c.cat,c.ep,c.cli,c.proy,c.torre,c.apto,c.asesor,
+    c.total,c.recaudado,c.xrec,c.vencAmt,c.semAmt,
+    Math.round(c.pct*100)+'%',c.diasMora,
+    reasons[c.cid]||'',notes[c.cid]||''
+  ].map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(','));
+  const csv=[h.join(','),...rows].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='cartera-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click(); toast('CSV exportado','ok');
+}
+
+// ── FILE LOADING ──────────────────────────────────────────────
+function setLBar(on){
+  const lb=document.getElementById('lbar');
+  lb.style.width=on?'70%':'100%';
+  if(!on) setTimeout(()=>lb.style.width='0',400);
+}
+
+function parseAndRender(buf) {
+  if (MODO_CONTAB && !buf) { renderCola(); return; }
+  if (buf) {
+    try { DATA = parseBuffer(buf); }
+    catch(e) { toast('Error: '+e.message,'err'); setLBar(false); return; }
+  } else {
+    // Re-classify with new week
+    // Re-parse not possible without buffer — just re-render with existing data
+    // Reclassify based on new week
+    for (const c of DATA) {
+      let vencAmt=0, semAmt=0, proxAmt=0, oldestVenc=null;
+      const _sops2 = JSON.parse(localStorage.getItem('visco_sop2')||'{}');
+      for (const b of c.blocks) {
+        // Si contabilidad confirmó este bloque, excluirlo del cálculo
+        if (_sops2[pagoKey(c.cid,b.etapa)]?.estado === 'entro') {
+          b.bst='pagado'; continue;
+        }
+        const fd = b.fc ? new Date(b.fc+'T12:00:00') : null;
+        if (!fd) { b.bst='proximo'; continue; }
+        if (fd < WEEK.start) {
+          b.bst='vencido'; vencAmt+=b.saldo;
+          if(!oldestVenc||b.fc<oldestVenc)oldestVenc=b.fc;
+        } else if (fd<=WEEK.end) {
+          b.bst='semana'; semAmt+=b.saldo;
+        } else {
+          b.bst='proximo'; proxAmt+=b.saldo;
+        }
+      }
+      c.vencAmt=vencAmt; c.semAmt=semAmt; c.proxAmt=proxAmt;
+      c.oldestVenc=oldestVenc;
+      c.diasMora=oldestVenc?Math.abs(daysDiff(oldestVenc)):0;
+      if(c.ep==='ENTREGADO') c.cat='mora';
+      else if(c.ep==='EN EJECUCIÓN'){
+        if(vencAmt>0)c.cat='vencido';
+        else if(semAmt>0)c.cat='semana';
+        else c.cat='aldia';
+      } else { // X RECIBIR — siempre recibir
+        c.cat='recibir';
+      }
+    }
+  }
+  populateFilters();
+  showDash();
+  render();
+  setLBar(false);
+}
+
+function showDash(){
+  document.getElementById('first-screen').style.display='none';
+  document.getElementById('dash').classList.add('show');
+  document.getElementById('file-pill').style.display='flex';
+  document.getElementById('btn-csv').style.display='flex';
+  document.getElementById('cmodo-wrap').style.display='flex';
+}
+
+async function onFileInput(input){
+  const file=input.files[0]; if(!file) return;
+  setLBar(true);
+  // Try to save File System handle
+  if(input.files[0] && window.FileSystemFileHandle===undefined){
+    // Fallback: read as ArrayBuffer
+  }
+  // Save to IndexedDB if possible (modern Chrome/Edge)
+  // We can't get FileSystemFileHandle from <input type=file>, only from showOpenFilePicker
+  // So for <input>, just read and cache filename
+  fileName = file.name;
+  document.getElementById('file-name').textContent = fileName;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    parseAndRender(new Uint8Array(e.target.result));
+    toast('✅ '+fileName+' cargado','ok');
+  };
+  reader.readAsArrayBuffer(file);
+  input.value='';
+}
+
+async function recargar(){
+  if(fileHandle){
+    await loadFromHandle();
+  } else {
+    toast('Selecciona el archivo con el botón "Cambiar archivo"','warn');
+  }
+}
+
+// File System Access API — auto-open
+async function tryAutoOpen(){
+  if(!window.showOpenFilePicker){
+    // Browser doesn't support FSA
+    checkCachedName();
+    return;
+  }
+  const h = await loadHandle();
+  if(!h){ checkCachedName(); return; }
+  fileHandle = h;
+  const savedName = await h.name.catch?.(()=>null) || h.name;
+  if(savedName){
+    document.getElementById('fs-saved-name').textContent = savedName;
+    document.getElementById('fs-saved').classList.add('show');
+  }
+}
+
+async function loadFromHandle(){
+  if(!fileHandle) return;
+  setLBar(true);
+  try{
+    const perm = await fileHandle.queryPermission({mode:'read'});
+    const final = perm==='granted' ? 'granted' : await fileHandle.requestPermission({mode:'read'});
+    if(final!=='granted'){ toast('Permiso denegado','err'); setLBar(false); return; }
+    const file = await fileHandle.getFile();
+    fileName = file.name;
+    document.getElementById('file-name').textContent = fileName;
+    const buf = await file.arrayBuffer();
+    parseAndRender(new Uint8Array(buf));
+    toast('✅ '+fileName+' cargado','ok');
+  }catch(e){ toast('Error al leer el archivo: '+e.message,'err'); setLBar(false); }
+}
+
+async function openWithFSA(){
+  if(!window.showOpenFilePicker){ toast('Tu navegador no soporta esta función. Usa Chrome o Edge.','warn'); return; }
+  try{
+    const [h] = await window.showOpenFilePicker({
+      types:[{description:'Excel',accept:{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':['.xlsx','.xls']}}]
+    });
+    fileHandle = h;
+    await saveHandle(h);
+    await loadFromHandle();
+  }catch(e){ if(e.name!=='AbortError') toast('Error: '+e.message,'err'); }
+}
+
+function checkCachedName(){
+  // No FSA support — just show the normal screen
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function toast(msg,type,dur=3200){
+  const el=document.createElement('div');
+  el.className='tmsg '+(type==='ok'?'ok':type==='err'?'err':type==='warn'?'warn':'');
+  el.textContent=msg;
+  document.getElementById('toast').appendChild(el);
+  setTimeout(()=>el.remove(),dur);
+}
+
+// ── UTILS ─────────────────────────────────────────────────────
+function getCSSVar(name){return getComputedStyle(document.documentElement).getPropertyValue(name);}
+
+// ── KEYBOARD ─────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+['fa','fp','fe'].forEach(id=>document.addEventListener('change',e=>{if(e.target.id===id)render();}));
+document.getElementById('fs2')?.addEventListener('input',()=>render());
+
+// ── MODO CONTABILIDAD ─────────────────────────────────
+function initContabMode(){
+  document.getElementById('first-screen').style.display='none';
+  document.getElementById('dash').classList.add('show');
+  document.querySelectorAll('.hbtn,#file-pill,#cmodo-wrap,#btn-csv').forEach(function(el){el.style.display='none';});
+  document.querySelector('.week-pill').style.display='none';
+  document.getElementById('kpis').style.display='none';
+  document.getElementById('adic-kpi').style.display='none';
+  document.querySelector('.fbar').style.display='none';
+  document.querySelector('.tabs-wrap').style.display='none';
+  document.querySelector('.hbadge').textContent='Contabilidad';
+  var badge=document.createElement('span');
+  badge.style.cssText='background:#ECFDF5;border:1.5px solid #A7F3D0;color:#065F46;border-radius:20px;padding:3px 12px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-right:8px;';
+  badge.textContent='🔒 Contabilidad';
+  document.querySelector('.hright').prepend(badge);
+  var btnBack=document.createElement('button');
+  btnBack.textContent='← Cartera completa';
+  btnBack.style.cssText='font-size:10px;font-weight:700;padding:6px 13px;border-radius:8px;border:1.5px solid var(--brd);background:var(--w);color:var(--g);cursor:pointer;';
+  btnBack.onclick=function(){ window.location.href=location.pathname; };
+  document.querySelector('.hright').appendChild(btnBack);
+  var dt=document.getElementById('dash-title');
+  if(dt) dt.innerHTML='<span>Cola de pagos &mdash; Contabilidad</span>';
+  curTab='cola';
+  renderCola();
+}
+
+// ── INIT ──────────────────────────────────────────────
+setWeekInputs();
+loadSoportesFromAPI().then(function(){
+  if (MODO_CONTAB) { initContabMode(); } else { tryAutoOpen(); }
+});
+</script>
+</body>
+</html>
