@@ -830,7 +830,14 @@ function renderTabs() {
     </div>`;
   }).join('');
 }
-function switchTab(t){curTab=t;render();}
+function switchTab(t){
+  curTab=t;
+  if(t==='cola'){
+    loadSoportesFromAPI().then(function(){render();});
+  } else {
+    render();
+  }
+}
 function switchCartera(mode){
   carteraMode=mode;
   curTab='mora';
