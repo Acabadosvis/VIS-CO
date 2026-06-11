@@ -490,12 +490,17 @@ function setSoporteEstado(key,estado){
 }
 function onSoporteFile(key,input){
   const f=input.files[0]; if(!f) return;
-  const s=getSoportes(); const cur=s[key]||{};
-  const upd={...cur,estado:'pendiente',filename:f.name,size:f.size,
-    fecha_soporte:new Date().toISOString().slice(0,10),
-    semana:WEEK.ss};
-  s[key]=upd; _saveSop(s); render();
-  toast('📤 Soporte registrado — pendiente de confirmación','ok');
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const s=getSoportes(); const cur=s[key]||{};
+    const upd={...cur,estado:'pendiente',filename:f.name,size:f.size,
+      dataUrl:e.target.result,
+      fecha_soporte:new Date().toISOString().slice(0,10),
+      semana:WEEK.ss};
+    s[key]=upd; _saveSop(s); render();
+    toast('📤 Soporte registrado — pendiente de confirmación','ok');
+  };
+  reader.readAsDataURL(f);
 }
 // Helpers para reporte semanal
 function getSoportesSemana(ss){
@@ -1230,23 +1235,46 @@ function renderPagoCellRow(c) {
 function onSoporteRapido(cid,input){
   const f=input.files[0]; if(!f) return;
   const c=DATA.find(x=>x.cid===cid); if(!c) return;
-  // Register soporte for ALL vencido/semana blocks of this client
-  const activeBlocks=(c.blocks||[]).filter(b=>b.saldo>0&&(
+  // Solo el PRIMER bloque pendiente en orden (no se salta etapas sin pagar)
+  const candidatos=(c.blocks||[]).filter(b=>b.saldo>0&&(
     (c.ep==='ENTREGADO'||c.ep==='X RECIBIR') ? true : (b.bst==='vencido'||b.bst==='semana')
   ));
-  const s=getSoportes();
-  activeBlocks.forEach(b=>{
-    const pk=pagoKey(cid,b.etapa);
-    if(!s[pk]||s[pk].estado==='') {
-      s[pk]={estado:'pendiente',filename:f.name,size:f.size,
-        monto:b.saldo,etapa:b.etapa,etapa_label:b.label,
-        cli:c.cli,proy:c.proy,torre:c.torre,apto:c.apto,
-        fecha_soporte:new Date().toISOString().slice(0,10),
-        semana:WEEK.ss};
-    }
+  const sActual=getSoportes();
+  const primerBloque=candidatos.find(b=>{
+    const est=sActual[pagoKey(cid,b.etapa)]?.estado||'';
+    return est===''||est==='rechazado';
   });
-  _saveSop(s); render();
-  toast('📤 Soporte registrado para '+c.cli+' — pendiente de confirmación','ok');
+  if(!primerBloque){ toast('No hay etapas pendientes para '+c.cli,'warn'); return; }
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const s=getSoportes();
+    const pk=pagoKey(cid,primerBloque.etapa);
+    s[pk]={estado:'pendiente',filename:f.name,size:f.size,
+      dataUrl:e.target.result,
+      monto:primerBloque.saldo,etapa:primerBloque.etapa,etapa_label:primerBloque.label,
+      cli:c.cli,proy:c.proy,torre:c.torre,apto:c.apto,
+      fecha_soporte:new Date().toISOString().slice(0,10),
+      semana:WEEK.ss};
+    _saveSop(s); render();
+    toast('📤 Soporte '+primerBloque.label+' registrado para '+c.cli,'ok');
+  };
+  reader.readAsDataURL(f);
+}
+
+// ── VER SOPORTE ───────────────────────────────────────────────
+function verSoporte(key){
+  const s=getSoportes(); const v=s[key];
+  if(!v||!v.dataUrl){ toast('Sin archivo adjunto','warn'); return; }
+  const w=window.open('','_blank');
+  const isImg=v.dataUrl.startsWith('data:image');
+  w.document.write('<html><head><title>Soporte — '+( v.cli||'')+'</title>'
+    +'<style>body{margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;}'
+    +'h3{color:#fff;font-family:sans-serif;margin-bottom:12px;}img,iframe{max-width:98vw;max-height:90vh;border-radius:8px;}</style></head><body>'
+    +'<h3>'+( v.cli||'')+(v.etapa_label?' · '+v.etapa_label:'')+'</h3>'
+    +(isImg?'<img src="'+v.dataUrl+'">'
+      :'<iframe src="'+v.dataUrl+'" width="900" height="700"></iframe>')
+    +'</body></html>');
+  w.document.close();
 }
 
 // ── COLA DE SOPORTES ──────────────────────────────────────────
@@ -1277,7 +1305,9 @@ function renderCola(){
       <td style="font-size:11px;color:var(--g)">${v.proy||'—'} · T${v.torre||'—'} A${v.apto||'—'}</td>
       <td><span class="betapa">${v.etapa_label||v.etapa||'—'}</span></td>
       <td class="m" style="text-align:right;font-weight:700;color:${color}">${fmtMF(v.monto||0)}</td>
-      <td style="font-size:11px">📎 ${v.filename||'—'}</td>
+      <td style="font-size:11px">${v.dataUrl
+        ? `<button onclick="verSoporte('${k}')" style="padding:2px 9px;border-radius:6px;border:1.5px solid #BFDBFE;background:#EFF6FF;color:#1D4ED8;cursor:pointer;font-size:10px;font-weight:700">🔍 Ver soporte</button><div style="color:var(--g);margin-top:2px">${v.filename||''}</div>`
+        : `📎 ${v.filename||'—'}`}</td>
       <td style="font-size:11px">${v.fecha_soporte||'—'}</td>
       <td>${btnFn(k,v)}</td>
     </tr>`).join('')}
