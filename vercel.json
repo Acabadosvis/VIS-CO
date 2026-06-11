@@ -3,12 +3,6 @@
     "api/generar.js": {
       "includeFiles": "*.docx"
     },
-    "api/cartera-estados.js": {
-      "maxDuration": 15
-    },
-    "api/cartera-datos.js": {
-      "maxDuration": 15
-    },
     "api/soportes.js": {
       "maxDuration": 10
     }
