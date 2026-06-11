@@ -1491,17 +1491,19 @@ document.querySelectorAll('.modal-bg').forEach(m => {
   if (CFG.CLIENT_ID) {
     try {
       msalApp = initMsal();
-      await msalApp.handleRedirectPromise();
-      const accounts = msalApp.getAllAccounts();
-      if (accounts.length > 0) {
-        msalAccount = accounts[0];
+      const redirectResult = await msalApp.handleRedirectPromise();
+      if (redirectResult && redirectResult.account) {
+        // Llegamos de un loginRedirect exitoso
+        msalAccount = redirectResult.account;
         updateSyncStatus(true);
-        const justConnected = localStorage.getItem('visco_auth_just_connected');
-        if (justConnected) {
-          localStorage.removeItem('visco_auth_just_connected');
-          toast('OneDrive conectado ✓');
-          await loadFromOneDrive();
-        } else {
+        toast('OneDrive conectado ✓');
+        await loadFromOneDrive();
+      } else {
+        // Sesión previa en caché
+        const accounts = msalApp.getAllAccounts();
+        if (accounts.length > 0) {
+          msalAccount = accounts[0];
+          updateSyncStatus(true);
           toast('OneDrive reconectado automáticamente ✓');
         }
       }
