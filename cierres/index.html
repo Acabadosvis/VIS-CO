@@ -689,7 +689,7 @@ async function connectOneDrive() {
     msalApp = initMsal();
     // Flujo redirect: Microsoft redirige a auth.html, que vuelve a index.html
     await msalApp.loginRedirect({
-      scopes: ['Files.ReadWrite.All','User.Read','offline_access'],
+      scopes: ['Files.ReadWrite','User.Read','offline_access'],
       redirectUri: 'https://vis-co-blond.vercel.app/cierres/auth.html'
     });
     // La página navega a Microsoft — el código de abajo no se ejecuta
@@ -703,14 +703,14 @@ async function getToken() {
   if (!msalApp || !msalAccount) throw new Error('No autenticado');
   try {
     const result = await msalApp.acquireTokenSilent({
-      scopes: ['Files.ReadWrite.All'],
+      scopes: ['Files.ReadWrite'],
       account: msalAccount,
       redirectUri: REDIRECT_URI
     });
     return result.accessToken;
   } catch {
     const result = await msalApp.acquireTokenPopup({
-      scopes: ['Files.ReadWrite.All'],
+      scopes: ['Files.ReadWrite'],
       account: msalAccount,
       redirectUri: REDIRECT_URI
     });
