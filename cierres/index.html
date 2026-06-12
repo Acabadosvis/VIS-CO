@@ -596,6 +596,7 @@ function processWorkbook(buf) {
   }
   console.log('[M4] Registros leídos:', allData.length);
   loadAllIDB().then(async () => {
+    await loadSopsFromAPI();   // ← carga cloud antes de renderizar
     await autoSyncM2();
     populateFilters();
     document.getElementById('firstScreen').style.display = 'none';
@@ -623,8 +624,25 @@ function populateFilters() {
 }
 
 // =====================================================================
-// M2 DATA — leer visco_sop2
+// M2 DATA — leer visco_sop2 (local + cloud API)
 // =====================================================================
+const API_SOPORTES = '/api/soportes';
+async function loadSopsFromAPI() {
+  try {
+    const r = await fetch(API_SOPORTES, { signal: AbortSignal.timeout(5000) });
+    if (!r.ok) return;
+    const data = await r.json();
+    if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+      // Merge: cloud tiene prioridad sobre localStorage
+      const local = JSON.parse(localStorage.getItem('visco_sop2') || '{}');
+      const merged = { ...local, ...data };
+      localStorage.setItem('visco_sop2', JSON.stringify(merged));
+      console.log('[M4] visco_sop2 cargado desde cloud:', Object.keys(data).length, 'registros');
+    }
+  } catch(e) {
+    console.warn('[M4] API soportes no disponible, usando localStorage:', e.message);
+  }
+}
 function getSops() {
   return JSON.parse(localStorage.getItem('visco_sop2') || '{}');
 }
