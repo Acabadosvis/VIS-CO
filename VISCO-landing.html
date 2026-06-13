@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIS-CO · AcabadosVIS</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --or:#E04A26;--or2:#FF6940;--ord:#C03B1A;
+  --or-bg:#FFF4F0;--or-br:#FCDDD4;
+  --bg:#F6F5F3;--w:#FFFFFF;
+  --n:#18181B;--g:#71717A;--g2:#A1A1AA;
+  --brd:#E4E4E7;--brd2:#D4D4D8;
+  --gr:#16A34A;--gr-bg:#F0FDF4;--gr-br:#BBF7D0;
+  --am:#D97706;--am-bg:#FFFBEB;--am-br:#FDE68A;
+  --sh:0 1px 3px rgba(0,0,0,.04),0 4px 12px rgba(0,0,0,.05);
+  --sh2:0 8px 28px rgba(0,0,0,.09),0 2px 6px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--n);min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+
+/* NAV */
+nav{
+  background:var(--w);border-bottom:1px solid var(--brd);
+  padding:0 36px;height:52px;
+  display:flex;align-items:center;gap:12px;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 1px 6px rgba(0,0,0,.05);
+}
+.logo{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;letter-spacing:-.03em;}
+.logo span{color:var(--or);}
+.n-pipe{width:1px;height:18px;background:var(--brd);}
+.n-sub{font-size:10px;color:var(--g2);text-transform:uppercase;letter-spacing:.1em;}
+.n-r{margin-left:auto;display:flex;align-items:center;gap:7px;}
+.nb{
+  font-size:11px;font-weight:500;padding:5px 11px;
+  border-radius:7px;border:1px solid var(--brd);
+  background:var(--w);color:var(--g);transition:all .13s;white-space:nowrap;
+}
+.nb:hover{border-color:var(--brd2);color:var(--n);}
+.nb.p{background:var(--or);color:#fff;border-color:var(--or);}
+.nb.p:hover{background:var(--ord);}
+.nlive{
+  display:flex;align-items:center;gap:5px;
+  font-size:10px;font-weight:600;
+  color:var(--gr);background:var(--gr-bg);border:1px solid var(--gr-br);
+  padding:4px 10px;border-radius:20px;
+}
+.nlive i{width:6px;height:6px;border-radius:50%;background:var(--gr);animation:p 1.4s infinite;display:block;}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.15}}
+
+/* QUICK BAR */
+.qbar{
+  background:var(--w);border-bottom:1px solid var(--brd);
+  padding:0 36px;display:flex;overflow-x:auto;scrollbar-width:none;
+}
+.qbar::-webkit-scrollbar{display:none;}
+.qb{
+  display:flex;align-items:center;gap:6px;padding:9px 13px;
+  font-size:11px;font-weight:500;color:var(--g2);
+  border-bottom:2px solid transparent;white-space:nowrap;
+  transition:all .13s;cursor:pointer;
+}
+.qb:hover{color:var(--n);border-bottom-color:var(--brd2);}
+.qb.on{color:var(--or);font-weight:600;border-bottom-color:var(--or);}
+
+/* HERO — solo descripción, sin pills repetitivas */
+.hero{
+  background:var(--w);border-bottom:1px solid var(--brd);
+  padding:28px 36px 24px;
+}
+.hero-inner{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:32px;flex-wrap:wrap;}
+.hero-text{}
+.hero-title{
+  font-family:'Syne',sans-serif;font-size:32px;font-weight:800;
+  letter-spacing:-.04em;line-height:1;margin-bottom:4px;color:var(--n);
+}
+.hero-title em{color:var(--or);font-style:normal;}
+.hero-subtitle{
+  font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--or);margin-bottom:12px;
+}
+.hero-desc{font-size:12.5px;color:var(--g);line-height:1.72;max-width:520px;}
+
+/* PAGE */
+.page{max-width:980px;margin:0 auto;padding:28px 20px 60px;}
+
+/* SECTION HEADER con mini-progreso integrado */
+.sec-row{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;gap:16px;
+}
+.sec{
+  font-size:9.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--g2);
+  white-space:nowrap;
+}
+.sec-line{flex:1;height:1px;background:var(--brd);}
+
+/* Mini gantt inline */
+.mini-gantt{
+  display:flex;align-items:center;gap:8px;flex-shrink:0;
+}
+.mg-item{display:flex;align-items:center;gap:4px;font-size:10px;}
+.mg-bar{width:36px;height:5px;background:var(--brd);border-radius:3px;overflow:hidden;}
+.mg-fill{height:100%;border-radius:3px;}
+.mgf-ok{background:var(--gr);}
+.mgf-live{background:linear-gradient(90deg,var(--or),var(--or2));animation:gsh 2.5s ease infinite;}
+@keyframes gsh{0%,100%{opacity:1}50%{opacity:.5}}
+.mgf-am{background:var(--am);}
+.mgf-off{background:var(--brd2);}
+.mg-pct{font-size:9.5px;font-weight:600;color:var(--g2);min-width:26px;}
+
+/* MÓDULOS */
+.mods{
+  background:var(--w);border:1px solid var(--brd);
+  border-radius:14px;overflow:hidden;
+  box-shadow:var(--sh);margin-bottom:28px;
+}
+.mod{
+  display:grid;
+  grid-template-columns:34px 1fr auto auto;
+  align-items:center;gap:14px;
+  padding:12px 18px;
+  border-bottom:1px solid var(--brd);
+  transition:background .13s;
+  position:relative;
+}
+.mod:last-child{border-bottom:none;}
+.mod.live:hover{background:var(--or-bg);cursor:pointer;}
+.mod::before{
+  content:'';position:absolute;left:0;top:10px;bottom:10px;
+  width:3px;border-radius:0 2px 2px 0;
+}
+.mod.live::before{background:var(--or);}
+.mod.pnd::before{background:var(--am);}
+.mod.off::before{background:var(--brd2);}
+
+.mod-ico{
+  width:34px;height:34px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;
+}
+.live .mod-ico{background:var(--or-bg);}
+.pnd  .mod-ico{background:var(--am-bg);}
+.off  .mod-ico{background:var(--bg);}
+
+.mod-name{font-size:13px;font-weight:600;margin-bottom:1px;}
+.mod-desc{font-size:10.5px;color:var(--g2);line-height:1.4;}
+
+.mod-badge{
+  font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  padding:3px 9px;border-radius:20px;border:1px solid;white-space:nowrap;flex-shrink:0;
+}
+.b-ok{background:var(--gr-bg);color:var(--gr);border-color:var(--gr-br);}
+.b-am{background:var(--am-bg);color:var(--am);border-color:var(--am-br);}
+.b-off{background:var(--bg);color:var(--g2);border-color:var(--brd);}
+
+.mod-btn{
+  font-size:11px;font-weight:600;padding:6px 13px;
+  border-radius:8px;border:1.5px solid;transition:all .13s;
+  flex-shrink:0;white-space:nowrap;
+}
+.btn-go{background:var(--or);color:#fff;border-color:var(--or);}
+.btn-go:hover{background:var(--ord);}
+.btn-wait{background:var(--bg);color:var(--g2);border-color:var(--brd);pointer-events:none;}
+
+/* CALCULADORAS */
+.sec-row2{display:flex;align-items:center;gap:16px;margin-bottom:12px;}
+
+.calc{background:var(--w);border:1px solid var(--brd);border-radius:14px;overflow:hidden;margin-bottom:28px;box-shadow:var(--sh);}
+.calc-hd{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 18px;border-bottom:1px solid var(--brd);
+  background:var(--bg);
+}
+.calc-hd-t{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;}
+.calc-hd-s{font-size:10.5px;color:var(--g2);margin-top:1px;}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);}
+.cc{padding:13px 15px;border-right:1px solid var(--brd);}
+.cc:last-child{border-right:none;}
+.cc-n{font-size:11px;font-weight:600;margin-bottom:9px;}
+.cc-btns{display:flex;flex-direction:column;gap:5px;}
+.ca{
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  font-size:10px;font-weight:600;padding:7px 8px;border-radius:7px;
+  background:var(--or);color:#fff;transition:all .13s;
+}
+.ca:hover{background:var(--ord);}
+.cb{
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  font-size:10px;font-weight:500;padding:7px 8px;border-radius:7px;
+  background:var(--w);color:var(--g);border:1px solid var(--brd);transition:all .13s;
+}
+.cb:hover{border-color:var(--brd2);color:var(--n);}
+
+/* TOOLS */
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:28px;}
+.tc{
+  background:var(--w);border:1px solid var(--brd);border-radius:11px;
+  padding:13px;display:flex;flex-direction:column;gap:8px;transition:all .13s;
+}
+.tc:hover{border-color:var(--or-br);transform:translateY(-1px);box-shadow:var(--sh);}
+.tc:hover .ti{background:var(--or-bg);}
+.ti{width:30px;height:30px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:14px;transition:background .13s;}
+.tn{font-size:11px;font-weight:600;}
+.td{font-size:9.5px;color:var(--g2);line-height:1.5;}
+
+/* FOOTER */
+footer{
+  border-top:1px solid var(--brd);background:var(--w);
+  padding:15px 36px;display:flex;align-items:center;
+  justify-content:space-between;flex-wrap:wrap;gap:8px;
+  font-size:10.5px;color:var(--g2);
+}
+footer .fl{display:flex;align-items:center;gap:6px;}
+footer strong{color:var(--or);font-family:'Syne',sans-serif;font-weight:800;}
+footer a:hover{color:var(--n);}
+
+/* RESPONSIVE */
+@media(max-width:720px){
+  nav,footer,.hero{padding-left:16px;padding-right:16px;}
+  .qbar{padding:0 16px;}
+  .page{padding:20px 14px 52px;}
+  .n-sub,.nb:not(.p){display:none;}
+  .mod{grid-template-columns:32px 1fr auto;}
+  .mod-btn{display:none;}
+  .g-row{grid-template-columns:110px 1fr 44px;}
+  .calc-grid{grid-template-columns:1fr 1fr;}
+  .cc{border-bottom:1px solid var(--brd);border-right:none;}
+  .cc:nth-child(odd){border-right:1px solid var(--brd);}
+  .mini-gantt{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">VIS<span>-CO</span></div>
+  <div class="n-pipe"></div>
+  <span class="n-sub">Plataforma Comercial · AcabadosVIS</span>
+  <div class="n-r">
+    <div class="nlive"><i></i>2 activos</div>
+    <a class="nb" href="https://intranetacabadosvis.bitrix24.site/" target="_blank">🏢 Intranet</a>
+    <a class="nb" href="https://acabadosvis.bitrix24.co/" target="_blank">📈 CRM</a>
+    <a class="nb p" href="https://acabadosvis.bitrix24.co/bi/dashboard/detail/12/" target="_blank">📊 Métricas</a>
+  </div>
+</nav>
+
+<!-- QUICK BAR -->
+<div class="qbar">
+  <a class="qb on" href="https://vis-co-blond.vercel.app/" target="_blank">📝 Contratos</a>
+  <a class="qb on" href="https://vis-co-blond.vercel.app/cartera/index.html" target="_blank">💰 Cartera</a>
+  <a class="qb on" href="https://vis-co-blond.vercel.app/cierres/" target="_blank">💳 Cierres y Pagos</a>
+  <a class="qb" href="https://vis-co-blond.vercel.app/cartera/index.html?modo=contabilidad" target="_blank" style="color:#1D4ED8;border-color:#BFDBFE;background:#EFF6FF;">🏦 Contabilidad</a>
+  <a class="qb" href="https://acabadosvis.bitrix24.co/" target="_blank">📈 CRM</a>
+  <a class="qb" href="https://acabadosvis.bitrix24.co/bi/dashboard/detail/12/" target="_blank">📊 Métricas BI</a>
+  <a class="qb" href="https://formulario.acabadosvis.com/crear_negociacion/" target="_blank">➕ Crear negociación</a>
+  <a class="qb" href="https://tidycal.com/team/acabadosvis/programa-tu-cita-virtual" target="_blank">📅 Agendar reunión</a>
+  <a class="qb" href="https://acabadosvis.bubbleapps.io/" target="_blank">📱 App</a>
+  <a class="qb" href="https://acabadosvis.com/" target="_blank">🌐 Web</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-title"><em>VIS</em>-CO</div>
+      <div class="hero-subtitle">VIS Comercial Operativa</div>
+      <div class="hero-desc">Contratos, cartera, reportes y especificaciones — todo en un solo lugar para el equipo AcabadosVIS. Una plataforma diseñada para reducir el tiempo dedicado a tareas administrativas repetitivas y aumentar la productividad del área comercial.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- MÓDULOS con progreso integrado al lado del título -->
+  <div class="sec-row">
+    <span class="sec">Módulos VIS-CO</span>
+    <div class="sec-line"></div>
+    <!-- Mini gantt compacto -->
+    <div class="mini-gantt">
+      <div class="mg-item">
+        <div class="mg-bar"><div class="mg-fill mgf-ok" style="width:100%"></div></div>
+        <span class="mg-pct" style="color:var(--gr)">M1</span>
+      </div>
+      <div class="mg-item">
+        <div class="mg-bar"><div class="mg-fill mgf-ok" style="width:90%"></div></div>
+        <span class="mg-pct" style="color:var(--gr)">M2</span>
+      </div>
+      <div class="mg-item">
+        <div class="mg-bar"><div class="mg-fill mgf-ok" style="width:90%"></div></div>
+        <span class="mg-pct" style="color:var(--gr)">M3</span>
+      </div>
+      <div class="mg-item">
+        <div class="mg-bar"><div class="mg-fill mgf-ok" style="width:85%"></div></div>
+        <span class="mg-pct" style="color:var(--gr)">M4</span>
+      </div>
+      <div class="mg-item">
+        <div class="mg-bar"><div class="mg-fill mgf-off" style="width:5%"></div></div>
+        <span class="mg-pct">M5</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mods">
+    <a class="mod live" href="https://vis-co-blond.vercel.app/" target="_blank">
+      <div class="mod-ico">📝</div>
+      <div>
+        <div class="mod-name">Contratos Inteligentes</div>
+        <div class="mod-desc">Genera contratos para Visualizza, Gran Central y AcabadosVIS en segundos.</div>
+      </div>
+      <span class="mod-badge b-ok">✓ Activo</span>
+      <span class="mod-btn btn-go">Abrir →</span>
+    </a>
+
+    <div class="mod live" style="cursor:default;">
+      <div class="mod-ico">💰</div>
+      <div style="flex:1">
+        <div class="mod-name">Cartera Semanal</div>
+        <div class="mod-desc">Clasificación automática de cartera por estado. Carga el Excel y listo.</div>
+      </div>
+      <span class="mod-badge b-ok">✓ Activo</span>
+      <div style="display:flex;gap:7px;flex-shrink:0;">
+        <a class="mod-btn btn-go" href="https://vis-co-blond.vercel.app/cartera/index.html" target="_blank" style="text-decoration:none">Cartera →</a>
+        <a class="mod-btn" href="https://vis-co-blond.vercel.app/cartera/index.html?modo=contabilidad" target="_blank" style="text-decoration:none;background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE;">Contabilidad →</a>
+      </div>
+    </div>
+
+    <a class="mod live" href="https://vis-co-blond.vercel.app/comite/" target="_blank">
+      <div class="mod-ico">🧠</div>
+      <div>
+        <div class="mod-name">Inteligencia Comercial — Comité Automático</div>
+        <div class="mod-desc">Dashboard · Funnel · Marketing · Leads · Ventas · Cartera · Alertas · Informe semanal automático con 1 clic.</div>
+      </div>
+      <span class="mod-badge b-ok">✓ Activo</span>
+      <span class="mod-btn btn-go">Abrir →</span>
+    </a>
+
+    <a class="mod live" href="https://vis-co-blond.vercel.app/cierres/" target="_blank">
+      <div class="mod-ico">✅</div>
+      <div>
+        <div class="mod-name">Gestión de Cierres y Pagos</div>
+        <div class="mod-desc">Registra pagos, actualiza el Excel en OneDrive y ve qué está listo para facturar.</div>
+      </div>
+      <span class="mod-badge b-ok">✓ Activo</span>
+      <span class="mod-btn btn-go">Abrir →</span>
+    </a>
+
+<div class="mod off">
+      <div class="mod-ico">🏗️</div>
+      <div>
+        <div class="mod-name">Especificaciones Técnicas Digitales</div>
+        <div class="mod-desc">Formato digital con colores, referencias y observaciones por apartamento.</div>
+      </div>
+      <span class="mod-badge b-off">◦ Planeado</span>
+      <span class="mod-btn btn-wait">Pronto</span>
+    </div>
+  </div>
+
+  <!-- CALCULADORAS -->
+  <div class="sec-row2">
+    <span class="sec">Calculadoras por asesora</span>
+    <div class="sec-line"></div>
+  </div>
+  <div class="calc">
+    <div class="calc-hd">
+      <span style="font-size:15px">🧮</span>
+      <div>
+        <div class="calc-hd-t">Calculadora Comercial</div>
+        <div class="calc-hd-s">Cotiza en reunión o comparte el link para que el cliente cotice solo</div>
+      </div>
+    </div>
+    <div class="calc-grid">
+      <div class="cc">
+        <div class="cc-n">Karen</div>
+        <div class="cc-btns">
+          <a class="ca" href="https://calculadora.acabadosvis.com/?Test=Acabadosv15&utm_source=tidycal&utm_medium=asesora_karen&utm_campaign=assisted" target="_blank">🤝 Con cliente</a>
+          <a class="cb" href="https://calculadora.acabadosvis.com/?utm_source=whatsapp&utm_medium=asesora_karen&utm_campaign=auto" target="_blank">📤 Link solo</a>
+        </div>
+      </div>
+      <div class="cc">
+        <div class="cc-n">Angie</div>
+        <div class="cc-btns">
+          <a class="ca" href="https://calculadora.acabadosvis.com/?Test=Acabadosv15&utm_source=tidycal&utm_medium=asesora_angie&utm_campaign=assisted" target="_blank">🤝 Con cliente</a>
+          <a class="cb" href="https://calculadora.acabadosvis.com/?utm_source=whatsapp&utm_medium=asesora_angie&utm_campaign=auto" target="_blank">📤 Link solo</a>
+        </div>
+      </div>
+      <div class="cc">
+        <div class="cc-n">María Cristina</div>
+        <div class="cc-btns">
+          <a class="ca" href="https://calculadora.acabadosvis.com/?Test=Acabadosv15&utm_source=tidycal&utm_medium=asesora_maria&utm_campaign=assisted" target="_blank">🤝 Con cliente</a>
+          <a class="cb" href="https://calculadora.acabadosvis.com/?utm_source=whatsapp&utm_medium=asesora_maria&utm_campaign=auto" target="_blank">📤 Link solo</a>
+        </div>
+      </div>
+      <div class="cc">
+        <div class="cc-n">Nathalia</div>
+        <div class="cc-btns">
+          <a class="ca" href="https://calculadora.acabadosvis.com/?Test=Acabadosv15&utm_source=tidycal&utm_medium=asesora_nathalia&utm_campaign=assisted" target="_blank">🤝 Con cliente</a>
+          <a class="cb" href="https://calculadora.acabadosvis.com/?utm_source=whatsapp&utm_medium=asesora_nathalia&utm_campaign=auto" target="_blank">📤 Link solo</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERRAMIENTAS -->
+  <div class="sec-row2">
+    <span class="sec">Herramientas del equipo</span>
+    <div class="sec-line"></div>
+  </div>
+  <div class="tools">
+    <a class="tc" href="https://acabadosvis.bitrix24.co/" target="_blank">
+      <div class="ti">📈</div><div class="tn">Bitrix24 CRM</div><div class="td">Pipeline y negocios activos</div>
+    </a>
+    <a class="tc" href="https://acabadosvis.bitrix24.co/bi/dashboard/detail/12/" target="_blank">
+      <div class="ti">📊</div><div class="tn">Métricas BI</div><div class="td">Indicadores del equipo</div>
+    </a>
+    <a class="tc" href="https://formulario.acabadosvis.com/crear_negociacion/" target="_blank">
+      <div class="ti">➕</div><div class="tn">Crear Negociación</div><div class="td">Clientes en proyectos activos</div>
+    </a>
+    <a class="tc" href="https://tidycal.com/team/acabadosvis/programa-tu-cita-virtual" target="_blank">
+      <div class="ti">📅</div><div class="tn">Agendar Reunión</div><div class="td">Calendario virtual</div>
+    </a>
+    <a class="tc" href="https://acabadosvis.bubbleapps.io/" target="_blank">
+      <div class="ti">📱</div><div class="tn">App AcabadosVIS</div><div class="td">Aplicación interna</div>
+    </a>
+    <a class="tc" href="https://intranetacabadosvis.bitrix24.site/" target="_blank">
+      <div class="ti">🏢</div><div class="tn">Intranet</div><div class="td">Portal interno del equipo</div>
+    </a>
+    <a class="tc" href="https://acabadosvis.com/" target="_blank">
+      <div class="ti">🌐</div><div class="tn">Página Web</div><div class="td">Sitio público</div>
+    </a>
+    <a class="tc" href="https://api.whatsapp.com/send/?phone=3166511063&text=Hola%2C+me+gustar%C3%ADa+cotizar+mis+Acabados" target="_blank">
+      <div class="ti">💬</div><div class="tn">WhatsApp</div><div class="td">Contacto con clientes</div>
+    </a>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fl"><strong>VIS-CO</strong><span>·</span><span>AcabadosVIS</span><span>·</span><a href="https://acabadosvis.com" target="_blank">acabadosvis.com</a></div>
+  <div class="fl">
+    <a href="https://vis-co-blond.vercel.app/" target="_blank">Contratos</a><span>·</span>
+    <a href="https://github.com/Acabadosvis/VIS-CO" target="_blank">GitHub</a><span>·</span>
+    <a href="https://intranetacabadosvis.bitrix24.site/" target="_blank">Intranet</a><span>·</span>
+    <span>© 2026</span>
+  </div>
+</footer>
+
+</body>
+</html>
