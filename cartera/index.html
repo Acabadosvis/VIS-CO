@@ -717,12 +717,9 @@ function parseBuffer(buf) {
     // Determine días en mora (from oldest overdue block)
     const diasMora = oldestVenc ? Math.abs(daysDiff(oldestVenc)) : 0;
 
-    // Category
+    // Category — por estado y fechas; xrec=0 muestra $0 en su tab, no se traslada a adicionales
     let cat;
-    // Si el contrato está en $0 pero tiene adicionales pendientes → tab adicionales
-    if (xrec < 100 && adic >= 100) {
-      cat = 'adicionales';
-    } else if (ep==='ENTREGADO') {
+    if (ep==='ENTREGADO') {
       cat = 'mora';
     } else if (ep==='EN EJECUCIÓN') {
       if (vencAmt > 0)      cat = 'vencido';
