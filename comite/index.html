@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.06.25.4 -->
+<!-- v2026.06.25.5 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -1279,13 +1279,9 @@ function renderVentas(){
       var mesLabels=MES.slice(0,p.mi+1);
       var mesData=byMes.slice(0,p.mi+1);
       var maxV=Math.max.apply(null,mesData)||1;
-      var gradClrs=['#D97706','#CCBBA8','#B5A290','#E4721B','#7C3AED','#0891B2','#16A34A','#DC2626','#92400E','#0369A1','#6B7280','#B45309'];
-      /* color escalonado: más ventas = más intenso; mes actual = naranja AcabadosVIS */
-      var mesClrs=mesLabels.map(function(_,i){
-        if(i===p.mi)return '#E4721B';
-        var intensity=Math.round(40+(mesData[i]/maxV)*60);
-        return 'hsl(30,'+intensity+'%,'+(75-Math.round(mesData[i]/maxV*25))+'%)';
-      });
+      /* color único por mes — paleta VIS-CO */
+      var PALETTE=['#E4721B','#F5B800','#7C3AED','#0891B2','#16A34A','#DC2626','#0369A1','#D97706','#059669','#DB2777','#6366F1','#92400E'];
+      var mesClrs=mesLabels.map(function(_,i){return PALETTE[i%PALETTE.length];});
       /* mini KPIs arriba */
       var totalAno=mesData.reduce(function(s,v){return s+v;},0);
       var promMes=mesData.length>0?(totalAno/mesData.length).toFixed(1):0;
