@@ -390,6 +390,26 @@ tr:hover td{background:var(--b)}
 
 <!-- P3 VENTAS -->
 <div class="panel" id="p3">
+  <!-- CONFIG DE METAS -->
+  <div id="v-meta-bar" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--n);border-radius:var(--rad);padding:10px 14px;margin-bottom:10px">
+    <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:.65rem;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.4)">⚙ Metas mensuales</span>
+    <div style="display:flex;align-items:center;gap:5px">
+      <label style="font-size:.65rem;color:rgba(255,255,255,.4);white-space:nowrap">Ventas/mes</label>
+      <input id="mt_v" type="number" min="1" max="100" style="width:54px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;padding:3px 7px;text-align:center" oninput="saveMeta()">
+    </div>
+    <div style="display:flex;align-items:center;gap:5px">
+      <label style="font-size:.65rem;color:rgba(255,255,255,.4);white-space:nowrap">Valor mes ($M)</label>
+      <input id="mt_val" type="number" min="1" step="10" style="width:70px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:var(--y);font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;padding:3px 7px;text-align:center" oninput="saveMeta()">
+    </div>
+    <div style="display:flex;align-items:center;gap:5px">
+      <label style="font-size:.65rem;color:rgba(255,255,255,.4);white-space:nowrap">Ventas/año</label>
+      <input id="mt_va" type="number" min="1" style="width:60px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;padding:3px 7px;text-align:center" oninput="saveMeta()">
+    </div>
+    <div style="display:flex;align-items:center;gap:5px">
+      <label style="font-size:.65rem;color:rgba(255,255,255,.4);white-space:nowrap">Valor año ($M)</label>
+      <input id="mt_vala" type="number" min="1" step="100" style="width:70px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:var(--y);font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;padding:3px 7px;text-align:center" oninput="saveMeta()">
+    </div>
+  </div>
   <div class="msg msg-a" id="v-noex" style="display:none">&#128194; Carga <strong>202511 REPORTE DE VENTAS VISUALIZZA.xlsx</strong> &#8594; <a href="../reporte/index.html" target="_blank" style="color:var(--am);font-weight:700">Abrir Reporte Comercial</a></div>
   <div id="v-out"></div>
 </div>
@@ -425,6 +445,9 @@ tr:hover td{background:var(--b)}
 <script>
 /* ═══ CONSTANTES ═══ */
 const LS_R='vc3_redes_v1',LS_L='vc3_leads_v1',LS_C='vc3_conf_v2',LS_P='vc3_pasos_v1',LS_XL='vc3_xl_v1',LS_XLA='vc3_xla_v1';
+const LS_META='vc3_meta_v2';
+function getMeta(){const m=gLS(LS_META)||{};return{v:parseInt(m.v)||17,val:parseInt(m.val)||595000000,va:parseInt(m.va)||204,vala:parseInt(m.vala)||7200000000};}
+function saveMeta(){const m={v:parseInt(document.getElementById('mt_v')?.value)||17,val:Math.round((parseFloat(document.getElementById('mt_val')?.value)||595)*1e6),va:parseInt(document.getElementById('mt_va')?.value)||204,vala:Math.round((parseFloat(document.getElementById('mt_vala')?.value)||7200)*1e6)};sLS(LS_META,m);renderVentas();renderAlianzas?.();}
 const META_V=17,META_VAL=595000000,META_VA=204,META_VALA=7200000000;
 /* ALIANZA: todos los proyectos alianza/partner */
 const ALIANZA=['GRAN CENTRAL','WELL','KLIK','CONINSA','VANTI','CORNER VIEW','BONO GC','CORNER V','LAGOM','CANTOVAL','CREDIFAMILIA'];
@@ -1061,6 +1084,13 @@ function renderVentas(){
   const tv=vm.length,tVal=vm.reduce((s,r)=>s+gV(r),0),tAIU=vm.reduce((s,r)=>s+gAIU(r),0);
   const aliV=aliR.reduce((s,r)=>s+gV(r),0),orgV=orgR.reduce((s,r)=>s+gV(r),0),remV=remR.reduce((s,r)=>s+gV(r),0);
   const aliAIU=aliR.reduce((s,r)=>s+gAIU(r),0),orgAIU=orgR.reduce((s,r)=>s+gAIU(r),0),remAIU=remR.reduce((s,r)=>s+gAIU(r),0);
+  /* Metas dinámicas — leídas de localStorage */
+  const _m=getMeta();const META_V=_m.v,META_VAL=_m.val,META_VA=_m.va,META_VALA=_m.vala;
+  /* Poblar inputs de config si existen */
+  const _mti=document.getElementById('mt_v');if(_mti&&!_mti._init){_mti.value=META_V;_mti._init=true;}
+  const _mtv=document.getElementById('mt_val');if(_mtv&&!_mtv._init){_mtv.value=Math.round(META_VAL/1e6);_mtv._init=true;}
+  const _mtva=document.getElementById('mt_va');if(_mtva&&!_mtva._init){_mtva.value=META_VA;_mtva._init=true;}
+  const _mtvala=document.getElementById('mt_vala');if(_mtvala&&!_mtvala._init){_mtvala.value=Math.round(META_VALA/1e6);_mtvala._init=true;}
   const pV=pct(tv,META_V),pVal=pct(tVal,META_VAL);
   const tkAli=aliR.length?aliV/aliR.length:0,tkOrg=orgR.length?orgV/orgR.length:0,tkRem=remR.length?remV/remR.length:0,tkTot=tv?tVal/tv:0;
   /* Por origen: alianza=partner name, otros=r[12] */
