@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.06.25.10 -->
+<!-- v2026.06.25.11 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -1245,8 +1245,8 @@ function renderVentas(){
     <div class="vi-body">
       <div class="vi-circ">
         ${(function(){const r=52,c=2*Math.PI*r,d=Math.min(100,parseFloat(pV))/100*c;return`<div class="vi-svgw"><svg width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="${r}" stroke="#2a2a2a" stroke-width="9" fill="none"/><circle cx="55" cy="55" r="${r}" stroke="var(--o)" stroke-width="9" fill="none" stroke-dasharray="${d.toFixed(1)} ${c.toFixed(1)}" stroke-linecap="round"/></svg><div class="vi-svgpct">${Math.round(parseFloat(pV))}%</div></div>`})()}
-        <div class="vi-meta"><strong>META ${META_V} VTA</strong>MES: ${fmt(META_VAL)}<br>AÑO: ${fmt(META_VALA)}</div>
-        <div style="font-size:.6rem;color:rgba(255,255,255,.3);margin-top:3px">Año: ${tvA} vtas · ${fmt(tvAVal)}</div>
+        <div class="vi-meta"><strong>META ${META_V} VTA</strong><br><span style="opacity:.6">MES:</span> <strong>${fmt(META_VAL)}</strong><br><span style="opacity:.6">AÑO:</span> <strong>${fmt(META_VALA)}</strong></div>
+        <div style="font-size:.6rem;color:rgba(255,255,255,.3);margin-top:3px">Año: <strong style="color:rgba(255,255,255,.55)">${tvA} vtas</strong> · ${fmt(tvAVal)}</div>
       </div>
       <div class="vi-det">
         <div class="vi-slbl">Ticket promedio</div>
