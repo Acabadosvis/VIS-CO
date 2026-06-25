@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.06.25.7 -->
+<!-- v2026.06.25.8 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -303,24 +303,50 @@ tr:hover td{background:var(--b)}
 <div class="panel on" id="p0">
   <div class="card">
     <div class="card-hd">&#128241; M&#233;tricas digitales <span id="r0-per" style="color:var(--o)"></span><span class="card-hd-sub">&#193;ngela · ⚡WPP &#8594; Leads autom&#225;tico</span></div>
-    <div class="sec">WhatsApp &amp; Calculadora</div>
-    <div class="fg">
-      <div class="fl"><label>Leads / Mensajes WPP &#9889;</label><input type="number" id="r_wpp" min="0" placeholder="0"></div>
-      <div class="fl"><label>Clientes calculadora</label><input type="number" id="r_cli_calc" min="0" placeholder="0"></div>
-      <div class="fl"><label>Mensajes por redes sociales</label><input type="number" id="r_msg_redes" min="0" placeholder="0"></div>
-      <div class="fl" style="border-left:3px solid var(--up);padding-left:9px"><label style="color:var(--up)">Cierres org&#225;nicos &#127942;</label><input type="number" id="r_cierres_org" min="0" placeholder="0"></div>
+    <!-- WHATSAPP & CALCULADORA -->
+    <div class="sec">💬 WhatsApp &amp; Calculadora</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px">
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:10px;padding:12px 14px">
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:6px">💬 Llegaron por WPP ⚡</label>
+        <input type="number" id="r_wpp" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#16A34A;background:#fff;outline:none">
+      </div>
+      <div style="background:#FFF8F0;border:1.5px solid #ECCDB0;border-radius:10px;padding:12px 14px">
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--o);display:block;margin-bottom:6px">🧮 Hicieron la Calculadora</label>
+        <input type="number" id="r_cli_calc" min="0" placeholder="0" style="width:100%;border:1.5px solid #ECCDB0;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:var(--o);background:#fff;outline:none">
+      </div>
+      <div style="background:#F8FAFC;border:1.5px solid var(--brd);border-radius:10px;padding:12px 14px">
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--g);display:block;margin-bottom:6px">💬 Mensajes por Redes</label>
+        <input type="number" id="r_msg_redes" min="0" placeholder="0" style="width:100%;border:1.5px solid var(--brd);border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:var(--n);background:#fff;outline:none">
+      </div>
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:10px;padding:12px 14px">
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--up);display:block;margin-bottom:6px">🏆 Cierres Orgánicos</label>
+        <input type="number" id="r_cierres_org" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:var(--up);background:#fff;outline:none">
+      </div>
     </div>
-    <div class="sec">Redes sociales</div>
-    <div class="fg">
-      <div class="fl"><label>Alcance IG</label><input type="number" id="r_ig_alc" min="0" placeholder="0"></div>
-      <div class="fl"><label>Impresiones IG</label><input type="number" id="r_ig_imp" min="0" placeholder="0"></div>
-      <div class="fl"><label>Interacciones IG</label><input type="number" id="r_ig_int" min="0" placeholder="0"></div>
-      <div class="fl"><label>Alcance FB</label><input type="number" id="r_fb_alc" min="0" placeholder="0"></div>
-      <div class="fl"><label>Impresiones FB</label><input type="number" id="r_fb_imp" min="0" placeholder="0"></div>
-      <div class="fl"><label>Interacciones FB</label><input type="number" id="r_fb_int" min="0" placeholder="0"></div>
-      <div class="fl"><label>Alcance TikTok</label><input type="number" id="r_tk_alc" min="0" placeholder="0"></div>
-      <div class="fl"><label>Impresiones TK</label><input type="number" id="r_tk_imp" min="0" placeholder="0"></div>
-      <div class="fl"><label>Interacciones TK</label><input type="number" id="r_tk_int" min="0" placeholder="0"></div>
+    <!-- REDES SOCIALES POR PLATAFORMA -->
+    <div class="sec">📱 Redes Sociales</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:4px">
+      <!-- INSTAGRAM -->
+      <div style="background:#FDF2F8;border:1.5px solid #F9A8D4;border-radius:10px;padding:14px">
+        <div style="font-size:.72rem;font-weight:800;color:#DB2777;margin-bottom:10px;letter-spacing:.3px">📸 INSTAGRAM</div>
+        <div style="margin-bottom:8px"><label style="font-size:.62rem;color:#888;display:block;margin-bottom:3px">Alcance</label><input type="number" id="r_ig_alc" min="0" placeholder="0" style="width:100%;border:1px solid #F9A8D4;border-radius:6px;padding:6px 9px;font-size:.95rem;font-weight:700;color:#DB2777;background:#fff;outline:none"></div>
+        <div style="margin-bottom:8px"><label style="font-size:.62rem;color:#888;display:block;margin-bottom:3px">Impresiones</label><input type="number" id="r_ig_imp" min="0" placeholder="0" style="width:100%;border:1px solid #F9A8D4;border-radius:6px;padding:6px 9px;font-size:.95rem;font-weight:700;color:#DB2777;background:#fff;outline:none"></div>
+        <div><label style="font-size:.62rem;color:#888;display:block;margin-bottom:3px">Interacciones</label><input type="number" id="r_ig_int" min="0" placeholder="0" style="width:100%;border:1px solid #F9A8D4;border-radius:6px;padding:6px 9px;font-size:.95rem;font-weight:700;color:#DB2777;background:#fff;outline:none"></div>
+      </div>
+      <!-- FACEBOOK -->
+      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:10px;padding:14px">
+        <div style="font-size:.72rem;font-weight:800;color:#1877F2;margin-bottom:10px;letter-spacing:.3px">👍 FACEBOOK</div>
+        <div style="margin-bottom:8px"><label style="font-size:.62rem;color:#888;display:block;margin-bottom:3px">Alcance</label><input type="number" id="r_fb_alc" min="0" placeholder="0" style="width:100%;border:1px solid #93C5FD;border-radius:6px;padding:6px 9px;font-size:.95rem;font-weight:700;color:#1877F2;background:#fff;outline:none"></div>
+        <div style="margin-bottom:8px"><label style="font-size:.62rem;color:#888;display:block;margin-bottom:3px">Impresiones</label><input type="number" id="r_fb_imp" min="0" placeholder="0" style="width:100%;border:1px solid #93C5FD;border-radius:6px;padding:6px 9px;font-size:.95rem;font-weight:700;color:#1877F2;background:#fff;outline:none"></div>
+        <div><label style="font-size:.62rem;color:#888;display:block;margin-bottom:3px">Interacciones</label><input type="number" id="r_fb_int" min="0" placeholder="0" style="width:100%;border:1px solid #93C5FD;border-radius:6px;padding:6px 9px;font-size:.95rem;font-weight:700;color:#1877F2;background:#fff;outline:none"></div>
+      </div>
+      <!-- TIKTOK -->
+      <div style="background:#F9FAFB;border:1.5px solid #374151;border-radius:10px;padding:14px">
+        <div style="font-size:.72rem;font-weight:800;color:#111827;margin-bottom:10px;letter-spacing:.3px">🎵 TIKTOK</div>
+        <div style="margin-bottom:8px"><label style="font-size:.62rem;color:#888;display:block;margin-bottom:3px">Alcance</label><input type="number" id="r_tk_alc" min="0" placeholder="0" style="width:100%;border:1px solid #9CA3AF;border-radius:6px;padding:6px 9px;font-size:.95rem;font-weight:700;color:#111827;background:#fff;outline:none"></div>
+        <div style="margin-bottom:8px"><label style="font-size:.62rem;color:#888;display:block;margin-bottom:3px">Impresiones</label><input type="number" id="r_tk_imp" min="0" placeholder="0" style="width:100%;border:1px solid #9CA3AF;border-radius:6px;padding:6px 9px;font-size:.95rem;font-weight:700;color:#111827;background:#fff;outline:none"></div>
+        <div><label style="font-size:.62rem;color:#888;display:block;margin-bottom:3px">Interacciones</label><input type="number" id="r_tk_int" min="0" placeholder="0" style="width:100%;border:1px solid #9CA3AF;border-radius:6px;padding:6px 9px;font-size:.95rem;font-weight:700;color:#111827;background:#fff;outline:none"></div>
+      </div>
     </div>
     <div class="brow">
       <button class="btn btn-o" onclick="saveRedes()">&#128190; Guardar + sincronizar leads</button>
