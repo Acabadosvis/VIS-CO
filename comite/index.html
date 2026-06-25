@@ -303,16 +303,19 @@ tr:hover td{background:var(--b)}
   <div class="card">
     <div class="card-hd">&#128101; Clasificaci&#243;n de leads <span id="l-per" style="color:var(--o)"></span><span class="card-hd-sub">Referencia: Bitrix24 BI</span></div>
     <div class="fg">
-      <div class="fl" style="border-left:3px solid var(--up);padding-left:9px"><label style="color:var(--up)">WPP &#9889; (auto desde Redes)</label><input type="number" id="l_wpp" min="0" placeholder="0" style="border-color:var(--upb);background:var(--up2)"></div>
-      <div class="fl"><label>Leads calculadora</label><input type="number" id="l_total" min="0" placeholder="0" oninput="calcNI()"></div>
+      <div class="fl" style="border-left:3px solid #25D366;padding-left:9px"><label style="color:#16A34A">WPP &#9889; <span style="font-size:.68rem;font-weight:400;color:#888">auto desde Redes</span></label><input type="number" id="l_wpp" min="0" placeholder="0" style="border-color:#25D366;background:#F0FDF4"></div>
+      <div class="fl" style="border-left:3px solid var(--o);padding-left:9px"><label style="color:var(--o)">Leads calculadora</label><input type="number" id="l_total" min="0" placeholder="0" oninput="calcNI()"></div>
+      <div class="fl" style="border-left:3px solid #0891B2;padding-left:9px"><label style="color:#0891B2">&#10003; Verificados calc.</label><input type="number" id="l_ver" min="0" placeholder="0" oninput="calcNI()" style="border-color:#0891B2"></div>
+      <div class="fl"><label style="color:#64748B">&#10007; No verificados</label><input type="number" id="l_nver" min="0" placeholder="0"></div>
+    </div>
+    <div class="sec" style="margin-top:10px;font-size:.75rem;color:#64748B">De los verificados →</div>
+    <div class="fg">
       <div class="fl"><label>Calc. incompletas</label><input type="number" id="l_cno" min="0" placeholder="0" oninput="calcNI()"></div>
       <div class="fl"><label>Sin respuesta</label><input type="number" id="l_sr" min="0" placeholder="0" oninput="calcNI()"></div>
-      <div class="fl"><label style="color:#888">No interesados <span style="font-size:.68rem;background:#F3F4F6;border-radius:4px;padding:1px 5px">auto</span></label><input type="number" id="l_ni" min="0" placeholder="0" readonly style="background:#F9F9F9;color:#666;cursor:default"></div>
       <div class="fl"><label>Interesados &#11088;</label><input type="number" id="l_int" min="0" placeholder="0" oninput="calcNI()"></div>
+      <div class="fl"><label style="color:#888">No interesados <span style="font-size:.68rem;background:#F3F4F6;border-radius:4px;padding:1px 5px">auto</span></label><input type="number" id="l_ni" min="0" placeholder="0" readonly style="background:#F9F9F9;color:#666;cursor:default"></div>
       <div class="fl"><label>Vigentes seguimiento</label><input type="number" id="l_vig" min="0" placeholder="0"></div>
-      <div class="fl"><label>Cierres semana</label><input type="number" id="l_ci" min="0" placeholder="0"></div>
-      <div class="fl" style="border-left:3px solid #0891B2;padding-left:9px"><label style="color:#0891B2">&#10003; Verificados calculadora</label><input type="number" id="l_ver" min="0" placeholder="0" style="border-color:#0891B2"></div>
-      <div class="fl"><label>&#10007; No verificados</label><input type="number" id="l_nver" min="0" placeholder="0"></div>
+      <div class="fl" style="border-left:3px solid #9CA3AF;padding-left:9px"><label style="color:#6B7280">Cierres semana <span style="font-size:.68rem;font-weight:400">— aparte</span></label><input type="number" id="l_ci" min="0" placeholder="0" style="border-color:#9CA3AF"></div>
     </div>
     <div class="sec" style="margin-top:14px">Leads por alianza <span style="font-size:.72rem;color:#888;font-weight:400">— No cuentan en el embudo de calculadora</span></div>
     <div class="fg">
@@ -589,12 +592,13 @@ function renderRedes(){
 /* ═══ LEADS ═══ */
 const LF=[['total','l_total'],['wpp','l_wpp'],['cno','l_cno'],['sr','l_sr'],['ni','l_ni'],['int','l_int'],['vig','l_vig'],['ci','l_ci'],['ver','l_ver'],['nver','l_nver'],['gc','l_gc'],['cv','l_cv']];
 function calcNI(){
-  var tot=parseInt(document.getElementById('l_total')?.value||'0')||0;
+  var ver=parseInt(document.getElementById('l_ver')?.value||'0')||0;
   var cno=parseInt(document.getElementById('l_cno')?.value||'0')||0;
   var sr=parseInt(document.getElementById('l_sr')?.value||'0')||0;
   var int2=parseInt(document.getElementById('l_int')?.value||'0')||0;
-  var ni=Math.max(0,tot-cno-sr-int2);
-  var el=document.getElementById('l_ni');if(el){el.value=ni||'';el.style.background=ni>0?'#FFF3E6':'';}
+  var ni=Math.max(0,ver-cno-sr-int2);
+  var el=document.getElementById('l_ni');
+  if(el){el.value=ni>0?ni:'';el.style.background=ni>0?'#FFF3E6':'';}
 }
 function saveLeads(){
   calcNI();
@@ -643,7 +647,7 @@ function renderLeads(){
   /* WPP desde Redes si no hay en Leads */
   if(!d2.wpp){var rw=(allR[p2.sISO]||{}).wpp||0;if(rw){d2.wpp=rw;if(!d2.total)d2.total=rw;}}
   /* ni automático */
-  d2.ni=Math.max(0,(d2.total||0)-(d2.cno||0)-(d2.sr||0)-(d2.int||0));
+  d2.ni=Math.max(0,(d2.ver||0)-(d2.cno||0)-(d2.sr||0)-(d2.int||0));
   /* poblar form */
   LF.forEach(function(pair){
     var k=pair[0],id=pair[1];
@@ -657,34 +661,41 @@ function renderLeads(){
   var pInt=t2>0?((d2.int||0)/t2*100).toFixed(1):'0.0';
   var pCi=t2>0?((d2.ci||0)/t2*100).toFixed(2):'0.00';
   var kEl=document.getElementById('l-kpis');
+  var ver2c=d2.ver||0,nver2c=d2.nver||0,pVer=t2>0?pct(ver2c,t2,1):'0.0',pInt2=ver2c>0?pct(d2.int||0,ver2c,1):'0.0';
   if(kEl)kEl.innerHTML=
-    '<div class="kp o"><div class="kl">Leads calc.</div><div class="kv">'+t2+'</div><div class="ks">'+(pCrecT?(pCrecT>0?'+':'')+pCrecT+'% vs sem ant':'—')+'</div></div>'+
-    '<div class="kp g"><div class="kl">Interesados ★</div><div class="kv">'+(d2.int||0)+'</div><div class="ks">'+pInt+'% del total</div></div>'+
-    '<div class="kp b"><div class="kl">Vigentes</div><div class="kv">'+(d2.vig||0)+'</div><div class="ks">en seguimiento</div></div>'+
-    '<div class="kp n"><div class="kl">Cierres sem.</div><div class="kv">'+(d2.ci||0)+'</div><div class="ks">'+pCi+'% conv.</div></div>'+
-    '<div class="kp a"><div class="kl">Sin respuesta</div><div class="kv">'+(d2.sr||0)+'</div><div class="ks">'+(t2>0?pct(d2.sr||0,t2,1)+'%':'—')+'</div></div>'+
-    '<div class="kp p"><div class="kl">No interesados</div><div class="kv">'+(d2.ni||0)+'</div><div class="ks">'+(t2>0?pct(d2.ni||0,t2,1)+'%':'—')+'</div></div>'+
-    ((d2.gc||0)>0?'<div class="kp" style="background:#92400E;color:#fff"><div class="kl">Gran Central</div><div class="kv" style="color:#FCD34D">'+d2.gc+'</div><div class="ks">leads alianza</div></div>':'')+
-    ((d2.cv||0)>0?'<div class="kp" style="background:#0891B2;color:#fff"><div class="kl">Corner View</div><div class="kv" style="color:#BAE6FD">'+d2.cv+'</div><div class="ks">leads alianza</div></div>':'');
+    '<div class="kp" style="background:#F0FDF4;border-left:4px solid #25D366"><div class="kl">WPP WhatsApp</div><div class="kv" style="color:#16A34A">'+(d2.wpp||0)+'</div><div class="ks">'+(pCrecT?(pCrecT>0?'+':'')+pCrecT+'% vs sem ant':'—')+'</div></div>'+
+    '<div class="kp o"><div class="kl">Calculadora</div><div class="kv">'+t2+'</div><div class="ks">'+((d2.wpp||0)>0?pct(t2,d2.wpp||1,1)+'% del WPP':'—')+'</div></div>'+
+    '<div class="kp b"><div class="kl">✓ Verificados</div><div class="kv">'+ver2c+'</div><div class="ks">'+pVer+'% de calc.</div></div>'+
+    '<div class="kp" style="background:#F8FAFC;border-left:4px solid #94A3B8"><div class="kl">✗ No verificados</div><div class="kv" style="color:#64748B">'+nver2c+'</div><div class="ks">'+(t2>0?pct(nver2c,t2,1)+'%':'—')+'</div></div>'+
+    '<div class="kp g"><div class="kl">Interesados ★</div><div class="kv">'+(d2.int||0)+'</div><div class="ks">'+pInt2+'% de ver.</div></div>'+
+    '<div class="kp p"><div class="kl">No interesados</div><div class="kv">'+(d2.ni||0)+'</div><div class="ks">'+(ver2c>0?pct(d2.ni||0,ver2c,1)+'% de ver.':'—')+'</div></div>'+
+    '<div class="kp a"><div class="kl">Sin respuesta</div><div class="kv">'+(d2.sr||0)+'</div><div class="ks">'+(ver2c>0?pct(d2.sr||0,ver2c,1)+'% de ver.':'—')+'</div></div>'+
+    '<div class="kp" style="border-left:4px solid #9CA3AF"><div class="kl">Cierres (aparte)</div><div class="kv" style="color:#6B7280">'+(d2.ci||0)+'</div><div class="ks">'+(d2.ci>0?'orgánico/alianza/anterior':'—')+'</div></div>'+
+    ((d2.gc||0)>0?'<div class="kp" style="border-left:4px solid #92400E"><div class="kl">GC leads</div><div class="kv" style="color:#92400E">'+d2.gc+'</div><div class="ks">alianza</div></div>':'')+
+    ((d2.cv||0)>0?'<div class="kp" style="border-left:4px solid #0891B2"><div class="kl">CV leads</div><div class="kv" style="color:#0891B2">'+d2.cv+'</div><div class="ks">alianza</div></div>':'');
   /* Embudo */
-  var funV=[t2,d2.wpp||0,(d2.ver||0)+(d2.nver||0)||d2.cno||0,d2.ver||0,d2.int||0,d2.vig||0,d2.ci||0];
-  var funL=['Total leads','WPP','Calculadora','Verificados','Interesados','Vigentes','Cierres'];
-  var funC=['#E4721B','#25D366','#0891B2','#0369A1','#16A34A','#7C3AED','#DC2626'];
+  var wpp2=d2.wpp||0,calc2=d2.total||0,ver2b=d2.ver||0,nver2=d2.nver||0,cno2=d2.cno||0,sr2=d2.sr||0,int2=d2.int||0,ni2=d2.ni||0,vig2=d2.vig||0,ci2=d2.ci||0;
+  var funV=[wpp2,calc2,ver2b,nver2,cno2,sr2,int2,ni2];
+  var funL=['WPP WhatsApp','Calculadora','✓ Verificados','✗ No verificados','Incompletas','Sin respuesta','Interesados ★','No interesados'];
+  var funC=['#25D366','#F97316','#0891B2','#94A3B8','#D97706','#64748B','#16A34A','#6B7280'];
   var maxF=funV[0]||1;
   var funnelRows=funL.map(function(l,i){
-    var w=funV[i];var pw=maxF>0?Math.max(8,Math.round(w/maxF*100)):8;
-    var conv=i>0&&funV[i-1]>0?Math.round(w/funV[i-1]*100):100;
-    return'<div class="fn-row"><div class="fn-lbl">'+l+'</div><div class="fn-bar-wrap"><div class="fn-bar" style="width:'+pw+'%;background:'+funC[i]+'">'+w+'</div></div><div class="fn-conv">'+(i>0?conv+'%':'')+'</div></div>';
+    var w=funV[i];var pw=maxF>0?Math.max(6,Math.round(w/maxF*100)):6;
+    var conv='';
+    if(i===1&&funV[0]>0)conv=Math.round(w/funV[0]*100)+'% WPP';
+    else if(i===2&&funV[1]>0)conv=Math.round(w/funV[1]*100)+'% calc';
+    else if(i===3&&funV[1]>0)conv=Math.round(w/funV[1]*100)+'% calc';
+    else if(i>=4&&funV[2]>0)conv=Math.round(w/funV[2]*100)+'% ver';
+    var sep=i===4?'<div style="font-size:.68rem;color:#64748B;padding:4px 0 2px;margin-left:110px">De los verificados →</div>':'';
+    return sep+'<div class="fn-row"><div class="fn-lbl">'+l+'</div><div class="fn-bar-wrap"><div class="fn-bar" style="width:'+pw+'%;background:'+funC[i]+'">'+w+'</div></div><div class="fn-conv">'+conv+'</div></div>';
   }).join('');
+  var ci2b=d2.ci||0;
+  var cierresBadge=ci2b>0?'<div style="margin-top:8px;display:flex;align-items:center;gap:8px;padding:7px 10px;background:#F9FAFB;border-radius:6px;border:1px solid #E5E7EB;flex-wrap:wrap"><span style="font-size:.75rem;color:#6B7280;font-weight:600">Cierres semana:</span><strong style="color:#374151;font-size:1rem">'+ci2b+'</strong><span style="font-size:.68rem;color:#9CA3AF">— fuera del embudo (pueden ser orgánicos, alianza o de sem. anteriores)</span></div>':'';
   var fEl=document.getElementById('l-funnel');
-  if(fEl)fEl.innerHTML='<div class="fn-title">Embudo de conversión</div>'+funnelRows;
-  /* Verificados */
-  var ver2=d2.ver||0,nver2=d2.nver||0,totCalc=ver2+nver2;
+  if(fEl)fEl.innerHTML='<div class="fn-title">Embudo de conversión</div>'+funnelRows+cierresBadge;
+  /* l-ver-kpi hidden (info now in KPIs + funnel) */
   var vkEl=document.getElementById('l-ver-kpi');
-  if(vkEl){
-    if(totCalc>0){var vp=Math.round(ver2/totCalc*100);vkEl.innerHTML='<div class="kp b"><div class="kl">Verificados</div><div class="kv">'+ver2+'</div><div class="ks">'+vp+'% de '+totCalc+'</div></div><div class="kp n"><div class="kl">No verificados</div><div class="kv">'+nver2+'</div><div class="ks">'+(100-vp)+'%</div></div>';vkEl.style.display='grid';}
-    else vkEl.style.display='none';
-  }
+  if(vkEl)vkEl.style.display='none';
   /* Tabla comparativa */
   var cats2=[{k:'cno',lbl:'Calc. incompletas'},{k:'sr',lbl:'Sin respuesta'},{k:'ni',lbl:'No interesados'},{k:'int',lbl:'Interesados ★'}];
   var rows2=cats2.map(function(cat){
