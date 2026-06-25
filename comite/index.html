@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.06.25.8 -->
+<!-- v2026.06.25.9 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -314,6 +314,10 @@ tr:hover td{background:var(--b)}
         <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--o);display:block;margin-bottom:6px">🧮 Hicieron la Calculadora</label>
         <input type="number" id="r_cli_calc" min="0" placeholder="0" style="width:100%;border:1.5px solid #ECCDB0;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:var(--o);background:#fff;outline:none">
       </div>
+      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:10px;padding:12px 14px">
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#0891B2;display:block;margin-bottom:6px">✅ Calculadoras Verificadas</label>
+        <input type="number" id="r_cli_ver" min="0" placeholder="0" style="width:100%;border:1.5px solid #93C5FD;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#0891B2;background:#fff;outline:none">
+      </div>
       <div style="background:#F8FAFC;border:1.5px solid var(--brd);border-radius:10px;padding:12px 14px">
         <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--g);display:block;margin-bottom:6px">💬 Mensajes por Redes</label>
         <input type="number" id="r_msg_redes" min="0" placeholder="0" style="width:100%;border:1.5px solid var(--brd);border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:var(--n);background:#fff;outline:none">
@@ -583,7 +587,7 @@ function onFilesAptos(inp){
 }
 
 /* ═══ REDES ═══ */
-const RF=[['wpp','r_wpp'],['cli_calc','r_cli_calc'],['msg_redes','r_msg_redes'],['cierres_org','r_cierres_org'],['ig_alc','r_ig_alc'],['ig_imp','r_ig_imp'],['ig_int','r_ig_int'],['fb_alc','r_fb_alc'],['fb_imp','r_fb_imp'],['fb_int','r_fb_int'],['tk_alc','r_tk_alc'],['tk_imp','r_tk_imp'],['tk_int','r_tk_int']];
+const RF=[['wpp','r_wpp'],['cli_calc','r_cli_calc'],['cli_ver','r_cli_ver'],['msg_redes','r_msg_redes'],['cierres_org','r_cierres_org'],['ig_alc','r_ig_alc'],['ig_imp','r_ig_imp'],['ig_int','r_ig_int'],['fb_alc','r_fb_alc'],['fb_imp','r_fb_imp'],['fb_int','r_fb_int'],['tk_alc','r_tk_alc'],['tk_imp','r_tk_imp'],['tk_int','r_tk_int']];
 function saveRedes(){
   const p=getPer();const d=gLS(LS_R);const o={};
   RF.forEach(([k,id])=>{o[k]=parseInt(document.getElementById(id)?.value||'0')||0;});
@@ -641,7 +645,9 @@ function renderRedes(){
     secRow('📱 WhatsApp & Calculadora')+
     metRow('Llegaron por WhatsApp',d0.wpp||0,d1.wpp||0,d2.wpp||0,'💬')+
     metRow('Hicieron la calculadora',d0.cli_calc||0,d1.cli_calc||0,d2.cli_calc||0,'🧮')+
+    metRow('Calculadoras verificadas',d0.cli_ver||0,d1.cli_ver||0,d2.cli_ver||0,'✅')+
     calcRow('conversión WPP → Calculadora',d0.cli_calc||0,d0.wpp||0,d1.cli_calc||0,d1.wpp||0,d2.cli_calc||0,d2.wpp||0)+
+    calcRow('% verificadas / calculadora',d0.cli_ver||0,d0.cli_calc||0,d1.cli_ver||0,d1.cli_calc||0,d2.cli_ver||0,d2.cli_calc||0)+
     metRow('Cierres orgánicos',d0.cierres_org||0,d1.cierres_org||0,d2.cierres_org||0,'🏆')+
     secRow('📸 Instagram')+
     metRow('Alcance',d0.ig_alc||0,d1.ig_alc||0,d2.ig_alc||0)+
