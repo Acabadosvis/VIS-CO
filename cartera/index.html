@@ -655,20 +655,20 @@ function parseBuffer(buf) {
 
   for (let i=3; i<rows.length; i++) {
     const r = rows[i];
-    if (!r||!r[0]||!r[6]) continue;
-    let ep = String(r[7]||'').trim().toUpperCase();
+    if (!r||!r[0]||!r[7]) continue;
+    let ep = String(r[8]||'').trim().toUpperCase();
     if (ep==='EN EJECUCION') ep='EN EJECUCIÓN';
     if (!VALID_ESTADOS.has(ep)) continue;
 
-    const xrec = xlM(r[68]);
-    const adic = xlM(r[14]);
+    const xrec = xlM(r[69]);
+    const adic = xlM(r[15]);
     if (xrec < 100 && adic < 100) continue; // pagado/cerrado completamente
 
-    const total = xlM(r[18]);
-    const recaudado = xlM(r[67]);
+    const total = xlM(r[19]);
+    const recaudado = xlM(r[68]);
     const cid = String(r[0]);
-    const cli = String(r[6]||'').trim();
-    const proy = String(r[8]||'').trim();
+    const cli = String(r[7]||'').trim();
+    const proy = String(r[9]||'').trim();
     const asesor = String(r[2]||'').trim();
 
     // Parse blocks — usa recaudado total como fuente autoritativa
@@ -734,8 +734,8 @@ function parseBuffer(buf) {
 
     result.push({
       cid, cli, ep, proy, asesor,
-      torre: String(r[9]||'').trim(),
-      apto: String(r[10]||'').trim(),
+      torre: String(r[10]||'').trim(),
+      apto: String(r[11]||'').trim(),
       total, recaudado, xrec, adic,
       vencAmt, semAmt, proxAmt, diasMora, oldestVenc,
       pct: total>0 ? recaudado/total : 0,
