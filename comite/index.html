@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.06.25.5 -->
+<!-- v2026.06.25.6 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -584,13 +584,16 @@ function renderRedes(){
   // KPIs ejecutivos
   const pCrecWPP=d1.wpp>0?((((d2.wpp||0)-(d1.wpp||0))/(d1.wpp||1))*100).toFixed(1):null;
   const pCrecAlc=d1.alc>0?((((d2.alc||0)-(d1.alc||0))/(d1.alc||1))*100).toFixed(1):null;
+  const wpp2=d2.wpp||0,calc2=d2.cli_calc||0;
+  const pctCalc=wpp2>0?((calc2/wpp2)*100).toFixed(1):0;
+  const pCrecCalc=d1.cli_calc>0?((((d2.cli_calc||0)-(d1.cli_calc||0))/(d1.cli_calc||1))*100).toFixed(1):null;
   document.getElementById('r0-kpis').innerHTML=`
-    <div class="kp o"><div class="kl">Leads WPP</div><div class="kv">${d2.wpp||0}</div><div class="ks">${pCrecWPP?`${pCrecWPP>0?'+':''}${pCrecWPP}% vs sem ant`:'—'}</div></div>
-    <div class="kp b"><div class="kl">Alcance total</div><div class="kv md">${fmtn(d2.alc||0)}</div><div class="ks">${pCrecAlc?`${pCrecAlc>0?'+':''}${pCrecAlc}%`:'—'}</div></div>
-    <div class="kp n"><div class="kl">Visualizaciones</div><div class="kv md">${fmtn(d2.views||0)}</div><div class="ks">esta semana</div></div>
-    <div class="kp a"><div class="kl">Interacciones</div><div class="kv">${fmtn(d2.int||0)}</div><div class="ks">${d1.int?dH(d2.int||0,d1.int):''}</div></div>
-    <div class="kp p"><div class="kl">Clics enlaces</div><div class="kv">${fmtn(d2.clics||0)}</div><div class="ks">esta semana</div></div>
-    <div class="kp g"><div class="kl">Cierres org.</div><div class="kv">${d2.cierres_org||0}</div><div class="ks">conversión directa</div></div>`;
+    <div class="kp" style="background:#F0FDF4;border-top:3px solid #25D366"><div class="kl">💬 Llegaron WPP</div><div class="kv" style="color:#16A34A">${wpp2}</div><div class="ks">${pCrecWPP?`${pCrecWPP>0?'+':''}${pCrecWPP}% vs sem ant`:'—'}</div></div>
+    <div class="kp o"><div class="kl">🧮 Calculadora</div><div class="kv">${calc2}</div><div class="ks">${pCrecCalc?`${pCrecCalc>0?'+':''}${pCrecCalc}% vs sem ant`:'—'}</div></div>
+    <div class="kp" style="background:#FFFBF0;border-top:3px solid var(--y)"><div class="kl">% WPP → Calc.</div><div class="kv" style="color:var(--am)">${pctCalc}%</div><div class="ks">conversión clave</div></div>
+    <div class="kp a"><div class="kl">IG Interacciones</div><div class="kv md">${fmtn(d2.ig_int||0)}</div><div class="ks">${d1.ig_int?dH(d2.ig_int||0,d1.ig_int):''}</div></div>
+    <div class="kp b"><div class="kl">FB Interacciones</div><div class="kv md">${fmtn(d2.fb_int||0)}</div><div class="ks">${d1.fb_int?dH(d2.fb_int||0,d1.fb_int):''}</div></div>
+    <div class="kp g"><div class="kl">🏆 Cierres org.</div><div class="kv">${d2.cierres_org||0}</div><div class="ks">conversión directa</div></div>`;
   // Insights automáticos
   const ins=[];
   if(d2.wpp&&d1.wpp){const v=((d2.wpp-d1.wpp)/d1.wpp*100).toFixed(1);ins.push(v>0?{ic:'📈',t:`Los leads WPP crecieron <strong>${v}%</strong> (${d1.wpp}→${d2.wpp}). Estrategia de campañas funcionando.`}:{ic:'📉',t:`Los leads WPP bajaron <strong>${Math.abs(v)}%</strong> (${d1.wpp}→${d2.wpp}). Revisar campañas activas.`});}
@@ -599,30 +602,40 @@ function renderRedes(){
   const insEl=document.getElementById('r0-ins');
   if(ins.length){insEl.style.display='block';insEl.innerHTML=`<div class="ins-hd">💡 Insights automáticos</div>${ins.map(i=>`<div class="ins-item"><span class="ic">${i.ic}</span><span>${i.t}</span></div>`).join('')}`;}
   else insEl.style.display='none';
-  // Comparativo 3 semanas - tabla completa por plataforma
-  const allMet=[
-    {k:'wpp',    lbl:'WPP mensajes recibidos'},
-    {k:'cli_calc',lbl:'Clientes calculadora'},
-    {k:'msg_redes',lbl:'Mensajes redes sociales'},
-    {k:'cierres_org',lbl:'Cierres orgánicos'},
-    {k:'views',  lbl:'Visualizaciones total'},
-    {k:'alc',    lbl:'Alcance total'},
-    {k:'int',    lbl:'Interacciones total'},
-    {k:'clics',  lbl:'Clics en enlaces'},
-    {k:'visitas',lbl:'Visitas al perfil'},
-    {k:'ig_alc', lbl:'IG Alcance'},
-    {k:'ig_imp', lbl:'IG Impresiones'},
-    {k:'ig_int', lbl:'IG Interacciones'},
-    {k:'fb_alc', lbl:'FB Alcance'},
-    {k:'fb_imp', lbl:'FB Impresiones'},
-    {k:'fb_int', lbl:'FB Interacciones'},
-    {k:'tk_alc', lbl:'TK Alcance'},
-    {k:'tk_imp', lbl:'TK Impresiones'},
-    {k:'tk_int', lbl:'TK Interacciones'},
-  ];
-  const tblRows=allMet.map(m=>`<tr><td class="mc">${m.lbl}</td><td class="tr">${fmtn(d0[m.k]||0)}</td><td class="tr">${fmtn(d1[m.k]||0)}</td><td class="tr"><strong>${fmtn(d2[m.k]||0)}</strong></td><td class="tr">${dH(d2[m.k]||0,d1[m.k]||0)}</td></tr>`).join('');
+  // Comparativo 3 semanas - tabla agrupada por canal
+  function pctStr(a,b){return b>0?((a/b)*100).toFixed(1)+'%':'—';}
+  function secRow(lbl){return`<tr style="background:var(--gc)"><td colspan="5" style="font-size:.68rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--g);padding:5px 10px">${lbl}</td></tr>`;}
+  function metRow(lbl,v0,v1,v2,icon=''){
+    return`<tr><td class="mc">${icon?icon+' ':''}<span style="font-weight:600">${lbl}</span></td><td class="tr">${fmtn(v0)}</td><td class="tr">${fmtn(v1)}</td><td class="tr"><strong>${fmtn(v2)}</strong></td><td class="tr">${dH(v2,v1)}</td></tr>`;
+  }
+  function calcRow(lbl,num0,den0,num1,den1,num2,den2){
+    const pct0=den0>0?((num0/den0)*100).toFixed(1)+'%':'—';
+    const pct1=den1>0?((num1/den1)*100).toFixed(1)+'%':'—';
+    const pct2=den2>0?((num2/den2)*100).toFixed(1)+'%':'—';
+    const diff=den2>0&&den1>0?(((num2/den2)-(num1/den1))*100).toFixed(1):null;
+    const badge=diff!==null?`<span style="font-size:.68rem;padding:1px 5px;border-radius:4px;background:${parseFloat(diff)>=0?'#F0FDF4':'#FEF2F2'};color:${parseFloat(diff)>=0?'#16A34A':'#DC2626'}">${parseFloat(diff)>=0?'+':''}${diff}pp</span>`:'—';
+    return`<tr style="background:#FFFBF0"><td class="mc" style="color:var(--o);font-style:italic">% ${lbl}</td><td class="tr" style="color:#888">${pct0}</td><td class="tr" style="color:#888">${pct1}</td><td class="tr"><strong style="color:var(--o)">${pct2}</strong></td><td class="tr">${badge}</td></tr>`;
+  }
+  const tblRows=
+    secRow('📱 WhatsApp & Calculadora')+
+    metRow('Llegaron por WhatsApp',d0.wpp||0,d1.wpp||0,d2.wpp||0,'💬')+
+    metRow('Hicieron la calculadora',d0.cli_calc||0,d1.cli_calc||0,d2.cli_calc||0,'🧮')+
+    calcRow('conversión WPP → Calculadora',d0.cli_calc||0,d0.wpp||0,d1.cli_calc||0,d1.wpp||0,d2.cli_calc||0,d2.wpp||0)+
+    metRow('Cierres orgánicos',d0.cierres_org||0,d1.cierres_org||0,d2.cierres_org||0,'🏆')+
+    secRow('📸 Instagram')+
+    metRow('Alcance',d0.ig_alc||0,d1.ig_alc||0,d2.ig_alc||0)+
+    metRow('Impresiones',d0.ig_imp||0,d1.ig_imp||0,d2.ig_imp||0)+
+    metRow('Interacciones',d0.ig_int||0,d1.ig_int||0,d2.ig_int||0)+
+    secRow('👍 Facebook')+
+    metRow('Alcance',d0.fb_alc||0,d1.fb_alc||0,d2.fb_alc||0)+
+    metRow('Impresiones',d0.fb_imp||0,d1.fb_imp||0,d2.fb_imp||0)+
+    metRow('Interacciones',d0.fb_int||0,d1.fb_int||0,d2.fb_int||0)+
+    secRow('🎵 TikTok')+
+    metRow('Alcance',d0.tk_alc||0,d1.tk_alc||0,d2.tk_alc||0)+
+    metRow('Impresiones',d0.tk_imp||0,d1.tk_imp||0,d2.tk_imp||0)+
+    metRow('Interacciones',d0.tk_int||0,d1.tk_int||0,d2.tk_int||0);
   document.getElementById('r0-cmp').innerHTML=
-    `<div class="card"><div class="card-hd">Comparaci&#243;n digital &#8211; 3 semanas</div><div class="tw"><table><thead><tr><th>M&#233;trica</th><th class="tr">${wShort(p0)}</th><th class="tr">${wShort(p1)}</th><th class="tr">${wShort(p2)}</th><th class="tr">Variaci&#243;n</th></tr></thead><tbody>${tblRows}</tbody></table></div></div>
+    `<div class="card"><div class="card-hd">📊 Comparación digital — 3 semanas</div><div class="tw"><table><thead><tr><th>Métrica</th><th class="tr">${wShort(p0)}</th><th class="tr">${wShort(p1)}</th><th class="tr">${wShort(p2)}</th><th class="tr">Variación</th></tr></thead><tbody>${tblRows}</tbody></table></div></div>
     <div class="chg2">
       <div class="ch"><div class="chl">Leads WPP &#8212; &#250;ltimas 6 semanas</div><canvas id="r_ch_wpp" height="180"></canvas></div>
       <div class="ch"><div class="chl">Interacciones Instagram</div><canvas id="r_ch_ig" height="180"></canvas></div>
@@ -713,9 +726,11 @@ function renderLeads(){
   var pCi=t2>0?((d2.ci||0)/t2*100).toFixed(2):'0.00';
   var kEl=document.getElementById('l-kpis');
   var ver2c=d2.ver||0,nver2c=d2.nver||0,pVer=t2>0?pct(ver2c,t2,1):'0.0',pInt2=ver2c>0?pct(d2.int||0,ver2c,1):'0.0';
+  var pctWppCalc=(d2.wpp||0)>0?pct(t2,d2.wpp||1,1):'0.0';
   if(kEl)kEl.innerHTML=
-    '<div class="kp" style="background:#F0FDF4;border-left:4px solid #25D366"><div class="kl">WPP WhatsApp</div><div class="kv" style="color:#16A34A">'+(d2.wpp||0)+'</div><div class="ks">'+(pCrecT?(pCrecT>0?'+':'')+pCrecT+'% vs sem ant':'—')+'</div></div>'+
-    '<div class="kp o"><div class="kl">Calculadora</div><div class="kv">'+t2+'</div><div class="ks">'+((d2.wpp||0)>0?pct(t2,d2.wpp||1,1)+'% del WPP':'—')+'</div></div>'+
+    '<div class="kp" style="background:#F0FDF4;border-top:3px solid #25D366"><div class="kl">💬 Llegaron WPP</div><div class="kv" style="color:#16A34A">'+(d2.wpp||0)+'</div><div class="ks">'+(pCrecT?(pCrecT>0?'+':'')+pCrecT+'% vs sem ant':'—')+'</div></div>'+
+    '<div class="kp o"><div class="kl">🧮 Calculadora</div><div class="kv">'+t2+'</div><div class="ks">'+pctWppCalc+'% del WPP</div></div>'+
+    '<div class="kp" style="background:#FFFBF0;border-top:3px solid var(--y)"><div class="kl">% WPP → Calc.</div><div class="kv" style="color:var(--am)">'+pctWppCalc+'%</div><div class="ks">conversión clave</div></div>'+
     '<div class="kp b"><div class="kl">✓ Verificados</div><div class="kv">'+ver2c+'</div><div class="ks">'+pVer+'% de calc.</div></div>'+
     '<div class="kp" style="background:#F8FAFC;border-left:4px solid #94A3B8"><div class="kl">✗ No verificados</div><div class="kv" style="color:#64748B">'+nver2c+'</div><div class="ks">'+(t2>0?pct(nver2c,t2,1)+'%':'—')+'</div></div>'+
     '<div class="kp g"><div class="kl">Interesados ★</div><div class="kv">'+(d2.int||0)+'</div><div class="ks">'+pInt2+'% de ver.</div></div>'+
