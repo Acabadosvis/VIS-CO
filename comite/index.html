@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.06.25.12 -->
+<!-- v2026.06.25.13 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -125,7 +125,7 @@ tr:hover td{background:var(--b)}
 .vi-top{display:grid;grid-template-columns:170px 1fr 290px;background:#1A0D00;min-height:200px}
 .vi-ttl{background:var(--y);padding:20px 16px;display:flex;flex-direction:column;justify-content:center}
 .vi-ttl-t{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:#1A1A1A;line-height:1.3;text-transform:uppercase}
-.vi-ttl-s{font-size:.64rem;color:rgba(0,0,0,.5);margin-top:4px}
+.vi-ttl-s{font-size:.64rem;color:rgba(0,0,0,.75);margin-top:4px;font-weight:600}
 .vi-kp{padding:18px 18px;border-right:1px solid rgba(255,255,255,.1)}
 .vi-big{font-family:'Syne',sans-serif;font-weight:700;font-size:2.8rem;color:#fff;display:flex;align-items:baseline;gap:9px;letter-spacing:-2px}
 .vi-pct{font-size:.82rem;color:var(--y);font-weight:700}
@@ -1131,12 +1131,15 @@ function renderVentas(){
   const tv=vm.length,tVal=vm.reduce((s,r)=>s+gV(r),0),tAIU=vm.reduce((s,r)=>s+gAIU(r),0);
   const aliV=aliR.reduce((s,r)=>s+gV(r),0),orgV=orgR.reduce((s,r)=>s+gV(r),0),remV=remR.reduce((s,r)=>s+gV(r),0);
   const aliAIU=aliR.reduce((s,r)=>s+gAIU(r),0),orgAIU=orgR.reduce((s,r)=>s+gAIU(r),0),remAIU=remR.reduce((s,r)=>s+gAIU(r),0);
-  /* Meta automática: mismo mes año anterior × 1.5 */
+  /* Meta automática: valor mismo mes año anterior × 1.5 ÷ ticket promedio $37M */
+  const TICKET_PROM=37000000;
   const vmPrevYr=(xlR||[]).filter(r=>{const raw=(r[3]||'').toString().toLowerCase().trim();const m=MN[raw];const est=(r[7]||'').toString().toUpperCase().trim();return m===p.mi&&(parseInt(r[4])||0)===(p.yr-1)&&est!=='CAIDO'&&est!=='';});
-  const autoMetaV=vmPrevYr.length>0?Math.ceil(vmPrevYr.length*1.5):null;
+  const vmPrevYrVal=vmPrevYr.reduce((s,r)=>s+gV(r),0);
+  const metaValorTarget=vmPrevYrVal>0?vmPrevYrVal*1.5:0;
+  const autoMetaV=metaValorTarget>0?Math.ceil(metaValorTarget/TICKET_PROM):null;
   /* Metas dinámicas — leídas de localStorage */
-  const _m=getMeta();const META_VAL=_m.val,META_VA=_m.va,META_VALA=_m.vala;
-  /* Si hay dato histórico, la meta mensual se calcula automáticamente */
+  const _m=getMeta();const META_VAL=metaValorTarget||_m.val,META_VA=_m.va,META_VALA=_m.vala;
+  /* Meta ventas: calculada del histórico */
   const META_V=autoMetaV||_m.v;
   /* Poblar inputs de config si existen */
   const _mti=document.getElementById('mt_v');if(_mti&&!_mti._init){_mti.value=META_V;_mti._init=true;}
@@ -1250,23 +1253,19 @@ function renderVentas(){
     </div>
     <div class="vi-body">
       <div class="vi-circ">
-        ${(function(){
-          const r=52,c=2*Math.PI*r,pNum=parseFloat(pV);
-          const d=Math.min(100,pNum)/100*c;
-          // Si supera 100%, arco naranja completo + arco verde encima pequeño para "exceso"
-          const over=pNum>100;
-          const excessD=Math.min(pNum-100,50)/100*c;
-          return`<div class="vi-svgw" style="width:120px;height:120px"><svg width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="${r}" stroke="#2a2a2a" stroke-width="9" fill="none"/>
-          <circle cx="60" cy="60" r="${r}" stroke="${over?'#16A34A':'var(--o)'}" stroke-width="9" fill="none" stroke-dasharray="${d.toFixed(1)} ${c.toFixed(1)}" stroke-linecap="round"/>
-          ${over?`<circle cx="60" cy="60" r="${r}" stroke="#86EFAC" stroke-width="3" fill="none" stroke-dasharray="${excessD.toFixed(1)} ${c.toFixed(1)}" stroke-linecap="round" opacity=".7"/>`:''}
-          </svg>
-          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
-            <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:${over?'#4ADE80':'var(--o)'};letter-spacing:-1px;line-height:1">${tv}<span style="font-size:.7rem;opacity:.5;font-weight:400"> / ${META_V}</span></span>
-            <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:.65rem;color:${over?'#4ADE80':'rgba(255,255,255,.6)'};">${pV}%</span>
-          </div></div>`;
-        })()}
-        <div class="vi-meta"><strong>META ${META_V} VTA</strong>${autoMetaV?`<br><span style="font-size:.58rem;color:var(--o);font-weight:700">📐 ${vmPrevYr.length} vtas jun ${p.yr-1} × 1.5</span>`:''}<br><span style="color:rgba(255,255,255,.85)">MES: <strong>${fmt(META_VAL)}</strong></span><br><span style="color:rgba(255,255,255,.85)">AÑO: <strong>${fmt(META_VALA)}</strong></span></div>
-        <div style="font-size:.6rem;color:rgba(255,255,255,.55);margin-top:3px">Año: <strong style="color:rgba(255,255,255,.8)">${tvA} vtas</strong> · ${fmt(tvAVal)}</div>
+        <!-- caja meta automática -->
+        <div style="background:#1A1A1A;border:1px solid #333;border-radius:10px;padding:14px 16px;min-width:160px;text-align:center">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.58rem;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.55);margin-bottom:8px">Meta ${p.mes} ${p.yr}</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:2.4rem;color:var(--o);letter-spacing:-2px;line-height:1">${META_V}<span style="font-size:.9rem;font-weight:400;color:rgba(255,255,255,.4);margin-left:4px">vtas</span></div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:${parseFloat(pV)>=100?'#4ADE80':'#fff'};margin-top:4px">${tv} <span style="font-size:.65rem;opacity:.5">/ ${META_V} · ${pV}%</span></div>
+          ${autoMetaV?`<div style="margin-top:10px;border-top:1px solid #333;padding-top:8px;font-size:.58rem;color:rgba(255,255,255,.55);line-height:1.7;text-align:left">
+            <div>📅 ${p.mes} ${p.yr-1}: <strong style="color:#fff">${fmtC(vmPrevYrVal)}</strong></div>
+            <div>× 1.5 = <strong style="color:var(--o)">${fmtC(metaValorTarget)}</strong></div>
+            <div>÷ $37M ticket = <strong style="color:var(--y)">${META_V} ventas</strong></div>
+          </div>`:''}
+        </div>
+        <div style="font-size:.6rem;color:rgba(255,255,255,.7);margin-top:8px;text-align:center">MES: <strong style="color:#fff">${fmt(META_VAL)}</strong><br>AÑO: <strong style="color:#fff">${fmt(META_VALA)}</strong></div>
+        <div style="font-size:.58rem;color:rgba(255,255,255,.5);margin-top:4px;text-align:center">Año: <strong style="color:rgba(255,255,255,.8)">${tvA} vtas</strong> · ${fmtC(tvAVal)}</div>
       </div>
       <div class="vi-det">
         <div class="vi-slbl">Ticket promedio</div>
