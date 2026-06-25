@@ -111,6 +111,12 @@ tr:hover td{background:var(--b)}
 .rcml{font-size:.59rem;color:var(--g);margin-top:1px}
 .rcin{display:flex;gap:5px}
 .rcin .fl{flex:1;margin:0}
+/* YO SOY selector */
+#yo-banner{background:#F0F4FF;border:1px solid #C7D2FE;border-radius:8px;padding:9px 14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.yo-btn{border:1px solid #C7D2FE;background:#fff;border-radius:6px;padding:4px 11px;font-size:.73rem;cursor:pointer;color:#3730A3;font-weight:600;font-family:'Syne',sans-serif;transition:all .15s}
+.yo-btn:hover{background:#EEF2FF}
+.yo-btn.active{background:#4F46E5;color:#fff;border-color:#4338CA;box-shadow:0 2px 6px rgba(79,70,229,.3)}
+#yo-status{font-size:.68rem;color:#64748B;margin-left:auto;font-style:italic}
 /* VENTAS */
 .vi{background:var(--w);border:1px solid var(--brd);border-radius:var(--rad);overflow:hidden;margin-bottom:12px;box-shadow:var(--sh)}
 .vi-top{display:grid;grid-template-columns:170px 1fr 290px;background:#1A0D00;min-height:200px}
@@ -344,6 +350,15 @@ tr:hover td{background:var(--b)}
 
 <!-- P2 REUNIONES -->
 <div class="panel" id="p2">
+  <!-- Selector de identidad multi-dispositivo -->
+  <div id="yo-banner">
+    <span style="font-size:.73rem;font-weight:700;color:#3730A3;font-family:'Syne',sans-serif">☁️ Soy:</span>
+    <button class="yo-btn" data-yo="KM" onclick="setYo('KM')">KM · Karen</button>
+    <button class="yo-btn" data-yo="AB" onclick="setYo('AB')">AB · Angie</button>
+    <button class="yo-btn" data-yo="NM" onclick="setYo('NM')">NM · Nathalia</button>
+    <button class="yo-btn" data-yo="ADMIN" onclick="setYo('ADMIN')">👁 Admin</button>
+    <span id="yo-status">Selecciona quién eres para guardar en la nube ☁️</span>
+  </div>
   <div class="card">
     <div class="card-hd">Confirmaciones individuales <span id="r2-per" style="color:var(--o)"></span><span class="card-hd-sub">% calculado sobre leads calculadora — alianzas se miden aparte</span></div>
     <div class="rconf" id="reu-cards"></div>
@@ -848,25 +863,84 @@ const ALI_PER={
   AB:[{k:'gc',lbl:'Gran Central',clr:'#92400E'},{k:'cv',lbl:'Corner View',clr:'#0891B2'}],
   NM:[{k:'gc',lbl:'Gran Central',clr:'#92400E'},{k:'cv',lbl:'Corner View',clr:'#0891B2'},{k:'gomm',lbl:'LAGOM',clr:'#7C3AED'}]
 };
-function saveConf(){
-  const p=getPer();const d=gLS(LS_C);const w=d[p.sISO]||{};
-  /* reuniones normales */
-  ['KM','AB','NM'].forEach(a=>{
-    w[a]={prog:parseInt(document.getElementById('cp_'+a)?.value||'0')||0,ef:parseInt(document.getElementById('ce_'+a)?.value||'0')||0};
-  });
-  /* alianzas por asesora */
-  Object.entries(ALI_PER).forEach(([a,ali])=>{
-    if(!w['ali_'+a])w['ali_'+a]={};
-    ali.forEach(({k})=>{
+/* ── Identidad multi-dispositivo ── */
+const YO_LS='vc3_yo';
+function getYo(){return localStorage.getItem(YO_LS)||'';}
+function setYo(yo){
+  localStorage.setItem(YO_LS,yo);
+  document.querySelectorAll('.yo-btn').forEach(b=>b.classList.toggle('active',b.dataset.yo===yo));
+  const st=document.getElementById('yo-status');
+  if(st)st.textContent=yo==='ADMIN'?'Vista completa — puedes editar todos':'Tus datos se guardarán en la nube ☁️ al presionar Guardar';
+  renderReuniones();
+}
+function initYoBanner(){
+  const yo=getYo();
+  if(yo){document.querySelectorAll('.yo-btn').forEach(b=>b.classList.toggle('active',b.dataset.yo===yo));}
+}
+/* ── saveConf: guarda solo los datos del comercial activo (o todos si es Admin) ── */
+async function saveConf(){
+  const yo=getYo();
+  const p=getPer();
+  const d=gLS(LS_C);
+  if(!d[p.sISO])d[p.sISO]={};
+  const w={};
+  /* qué comerciales guarda este dispositivo */
+  const toSave=(yo===''||yo==='ADMIN')?['KM','AB','NM']:[yo];
+  toSave.forEach(a=>{
+    const prog=parseInt(document.getElementById('cp_'+a)?.value||'0')||0;
+    const ef=parseInt(document.getElementById('ce_'+a)?.value||'0')||0;
+    w[a]={prog,ef};
+    w['ali_'+a]={};
+    (ALI_PER[a]||[]).forEach(({k})=>{
       w['ali_'+a][k]={
         prog:parseInt(document.getElementById('pa_'+a+'_'+k+'_p')?.value||'0')||0,
         ef:parseInt(document.getElementById('pa_'+a+'_'+k+'_e')?.value||'0')||0
       };
     });
   });
-  d[p.sISO]=w;sLS(LS_C,d);renderReuniones();
+  /* guardar local como respaldo */
+  Object.assign(d[p.sISO],w);
+  sLS(LS_C,d);
+  /* guardar en la nube */
+  const st=document.getElementById('yo-status');
+  const apiCom=yo||'ADMIN';
+  if(st)st.textContent='Guardando ☁️…';
+  try{
+    const r=await fetch('/api/reuniones?week='+p.sISO+'&comercial='+apiCom,{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(w)
+    });
+    const j=await r.json();
+    if(j.ok){
+      if(st)st.textContent='✅ Guardado '+new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+    } else {
+      if(st)st.textContent='⚠️ Solo local: '+j.error;
+    }
+  }catch(e){
+    if(st)st.textContent='⚠️ Sin conexión — guardado solo local';
+  }
+  renderReunionesLocal();
 }
+/* ── Carga datos de la API y mezcla con local, luego renderiza ── */
 function renderReuniones(){
+  const p2=getPer(off);
+  /* render inmediato con datos locales */
+  renderReunionesLocal();
+  /* fetch API en background — actualiza si hay datos nuevos */
+  fetch('/api/reuniones?week='+p2.sISO)
+    .then(r=>r.json())
+    .then(j=>{
+      if(!j.ok||!j.data||Object.keys(j.data).length===0)return;
+      const d=gLS(LS_C);
+      if(!d[p2.sISO])d[p2.sISO]={};
+      let changed=false;
+      Object.entries(j.data).forEach(([k,v])=>{
+        if(JSON.stringify(d[p2.sISO][k])!==JSON.stringify(v)){d[p2.sISO][k]=v;changed=true;}
+      });
+      if(changed){sLS(LS_C,d);renderReunionesLocal();}
+    })
+    .catch(()=>{/* sin conexión, quedan los datos locales */});
+}
+function renderReunionesLocal(){
   const p2=getPer(off),p1=getPer(off-1),p0=getPer(off-2);
   document.getElementById('r2-per').textContent=wShort(p2);
   const allC=gLS(LS_C);const allL=gLS(LS_L);
@@ -1345,6 +1419,9 @@ function renderAll(){try{renderRedes();}catch(e){console.error('Redes:',e);}try{
 (async function init(){
   await initStorage();
   upWLbl();renderAll();
+  initYoBanner();
+  /* Auto-refresh reuniones desde la nube cada 45s */
+  setInterval(()=>{try{renderReuniones();}catch(e){}},45000);
   // Restaurar Excel desde localStorage al refrescar
   try{
     var saved=VC3[LS_XL];
