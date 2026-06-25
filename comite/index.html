@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.06.25.11 -->
+<!-- v2026.06.25.12 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -138,8 +138,8 @@ tr:hover td{background:var(--b)}
 .vi-svgw{position:relative;width:110px;height:110px}
 .vi-svgw svg{transform:rotate(-90deg)}
 .vi-svgpct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:1.45rem;color:var(--o);letter-spacing:-1px}
-.vi-meta{font-size:.62rem;color:rgba(255,255,255,.65);text-align:center;line-height:1.9;margin-top:2px}
-.vi-meta strong{color:rgba(255,255,255,.95);font-size:.68rem}
+.vi-meta{font-size:.62rem;color:rgba(255,255,255,.9);text-align:center;line-height:1.9;margin-top:2px}
+.vi-meta strong{color:#fff;font-size:.68rem}
 .vi-det{padding:13px 15px}
 .vi-slbl{font-family:'Syne',sans-serif;font-weight:700;font-size:.58rem;text-transform:uppercase;letter-spacing:.6px;color:var(--g);margin-bottom:6px;margin-top:9px}
 .vi-slbl:first-child{margin-top:0}
@@ -476,7 +476,8 @@ function getMeta(){const m=gLS(LS_META)||{};return{v:parseInt(m.v)||17,val:parse
 function saveMeta(){const m={v:parseInt(document.getElementById('mt_v')?.value)||17,val:Math.round((parseFloat(document.getElementById('mt_val')?.value)||595)*1e6),va:parseInt(document.getElementById('mt_va')?.value)||204,vala:Math.round((parseFloat(document.getElementById('mt_vala')?.value)||7200)*1e6)};sLS(LS_META,m);renderVentas();renderAlianzas?.();}
 const META_V=17,META_VAL=595000000,META_VA=204,META_VALA=7200000000;
 /* ALIANZA: todos los proyectos alianza/partner */
-const ALIANZA=['GRAN CENTRAL','WELL','KLIK','CONINSA','VANTI','CORNER VIEW','BONO GC','CORNER V','LAGOM','CANTOVAL','CREDIFAMILIA'];
+const ALIANZA=['GRAN CENTRAL','WELL','KLIK','CONINSA','VANTI','CORNER VIEW','BONO GC','CORNER V','CANTOVAL','CREDIFAMILIA'];
+/* LAGOM = presupuesto, NO alianza */
 /* CONVENIO: sub-conjunto de alianza que son convenio */
 const CONV_KW=['GRAN CENTRAL - CONVENIO','GRAN CENTRAL CONVENIO','KLIK CONVENIO','KLIK - CONVENIO','WELL CONVENIO','WELL - CONVENIO','BONO GC'];
 const VDN={KM:'Karen Mendivelso',AB:'Angie Bustos',NM:'Nathalia Mora',LC:'Laura C.'};
@@ -1130,8 +1131,13 @@ function renderVentas(){
   const tv=vm.length,tVal=vm.reduce((s,r)=>s+gV(r),0),tAIU=vm.reduce((s,r)=>s+gAIU(r),0);
   const aliV=aliR.reduce((s,r)=>s+gV(r),0),orgV=orgR.reduce((s,r)=>s+gV(r),0),remV=remR.reduce((s,r)=>s+gV(r),0);
   const aliAIU=aliR.reduce((s,r)=>s+gAIU(r),0),orgAIU=orgR.reduce((s,r)=>s+gAIU(r),0),remAIU=remR.reduce((s,r)=>s+gAIU(r),0);
+  /* Meta automática: mismo mes año anterior × 1.5 */
+  const vmPrevYr=(xlR||[]).filter(r=>{const raw=(r[3]||'').toString().toLowerCase().trim();const m=MN[raw];const est=(r[7]||'').toString().toUpperCase().trim();return m===p.mi&&(parseInt(r[4])||0)===(p.yr-1)&&est!=='CAIDO'&&est!=='';});
+  const autoMetaV=vmPrevYr.length>0?Math.ceil(vmPrevYr.length*1.5):null;
   /* Metas dinámicas — leídas de localStorage */
-  const _m=getMeta();const META_V=_m.v,META_VAL=_m.val,META_VA=_m.va,META_VALA=_m.vala;
+  const _m=getMeta();const META_VAL=_m.val,META_VA=_m.va,META_VALA=_m.vala;
+  /* Si hay dato histórico, la meta mensual se calcula automáticamente */
+  const META_V=autoMetaV||_m.v;
   /* Poblar inputs de config si existen */
   const _mti=document.getElementById('mt_v');if(_mti&&!_mti._init){_mti.value=META_V;_mti._init=true;}
   const _mtv=document.getElementById('mt_val');if(_mtv&&!_mtv._init){_mtv.value=Math.round(META_VAL/1e6);_mtv._init=true;}
@@ -1244,9 +1250,23 @@ function renderVentas(){
     </div>
     <div class="vi-body">
       <div class="vi-circ">
-        ${(function(){const r=52,c=2*Math.PI*r,d=Math.min(100,parseFloat(pV))/100*c;return`<div class="vi-svgw"><svg width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="${r}" stroke="#2a2a2a" stroke-width="9" fill="none"/><circle cx="55" cy="55" r="${r}" stroke="var(--o)" stroke-width="9" fill="none" stroke-dasharray="${d.toFixed(1)} ${c.toFixed(1)}" stroke-linecap="round"/></svg><div class="vi-svgpct">${Math.round(parseFloat(pV))}%</div></div>`})()}
-        <div class="vi-meta"><strong>META ${META_V} VTA</strong><br><span style="opacity:.6">MES:</span> <strong>${fmt(META_VAL)}</strong><br><span style="opacity:.6">AÑO:</span> <strong>${fmt(META_VALA)}</strong></div>
-        <div style="font-size:.6rem;color:rgba(255,255,255,.3);margin-top:3px">Año: <strong style="color:rgba(255,255,255,.55)">${tvA} vtas</strong> · ${fmt(tvAVal)}</div>
+        ${(function(){
+          const r=52,c=2*Math.PI*r,pNum=parseFloat(pV);
+          const d=Math.min(100,pNum)/100*c;
+          // Si supera 100%, arco naranja completo + arco verde encima pequeño para "exceso"
+          const over=pNum>100;
+          const excessD=Math.min(pNum-100,50)/100*c;
+          return`<div class="vi-svgw" style="width:120px;height:120px"><svg width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="${r}" stroke="#2a2a2a" stroke-width="9" fill="none"/>
+          <circle cx="60" cy="60" r="${r}" stroke="${over?'#16A34A':'var(--o)'}" stroke-width="9" fill="none" stroke-dasharray="${d.toFixed(1)} ${c.toFixed(1)}" stroke-linecap="round"/>
+          ${over?`<circle cx="60" cy="60" r="${r}" stroke="#86EFAC" stroke-width="3" fill="none" stroke-dasharray="${excessD.toFixed(1)} ${c.toFixed(1)}" stroke-linecap="round" opacity=".7"/>`:''}
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
+            <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:${over?'#4ADE80':'var(--o)'};letter-spacing:-1px;line-height:1">${tv}<span style="font-size:.7rem;opacity:.5;font-weight:400"> / ${META_V}</span></span>
+            <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:.65rem;color:${over?'#4ADE80':'rgba(255,255,255,.6)'};">${pV}%</span>
+          </div></div>`;
+        })()}
+        <div class="vi-meta"><strong>META ${META_V} VTA</strong>${autoMetaV?`<br><span style="font-size:.58rem;color:var(--o);font-weight:700">📐 ${vmPrevYr.length} vtas jun ${p.yr-1} × 1.5</span>`:''}<br><span style="color:rgba(255,255,255,.85)">MES: <strong>${fmt(META_VAL)}</strong></span><br><span style="color:rgba(255,255,255,.85)">AÑO: <strong>${fmt(META_VALA)}</strong></span></div>
+        <div style="font-size:.6rem;color:rgba(255,255,255,.55);margin-top:3px">Año: <strong style="color:rgba(255,255,255,.8)">${tvA} vtas</strong> · ${fmt(tvAVal)}</div>
       </div>
       <div class="vi-det">
         <div class="vi-slbl">Ticket promedio</div>
