@@ -790,9 +790,9 @@ function renderKPIs() {
     {c:'semana', val:sum(grp('semana'),'semAmt'),  cnt:clts(grp('semana')), tag:'k3'},
     {c:'recibir',val:sum(grp('recibir'),'xrec'),   cnt:clts(grp('recibir')),tag:'k4'},
     {c:'aldia',  val:sum(grp('aldia'),'xrec'),     cnt:clts(grp('aldia')),  tag:'k5'},
-    // adicionales: clients with adic>0 in active view
-    {c:'adicionales', val:getActiveData().filter(c=>c.adic>0).reduce((s,c)=>s+c.adic,0),
-     cnt:getActiveData().filter(c=>c.adic>0).length, tag:'k6'},
+    // adicionales: solo clientes cuyo contrato ya está en $0 y tienen adic pendiente
+    {c:'adicionales', val:getActiveData().filter(c=>c.cat==='adicionales').reduce((s,c)=>s+c.adic,0),
+     cnt:getActiveData().filter(c=>c.cat==='adicionales').length, tag:'k6'},
     // cola: pending soportes
     {c:'cola', val:Object.values(getSoportes()).filter(v=>v.estado==='pendiente').reduce((a,v)=>a+(v.monto||0),0),
      cnt:Object.values(getSoportes()).filter(v=>v.estado==='pendiente').length, tag:'k7'},
@@ -804,7 +804,7 @@ function renderKPIs() {
     </div>`).join('');
   document.getElementById('kpis').innerHTML = html;
   // Adicionales KPI
-  const adArr = getActiveData().filter(c=>c.adic>0);
+  const adArr = getActiveData().filter(c=>c.cat==='adicionales');
   const adTotal = adArr.reduce((s,c)=>s+c.adic,0);
   const adKpi = document.getElementById('adic-kpi');
   if(adKpi){
@@ -822,7 +822,7 @@ function renderTabs() {
   const af = arr=>applyFilters(arr);
   document.getElementById('tabs').innerHTML = CATS.map(c=>{
     const cnt = c==='adicionales'
-      ? af(getActiveData().filter(x=>x.adic>0)).length
+      ? af(getActiveData().filter(x=>x.cat==='adicionales')).length
       : c==='cola'
       ? Object.values(getSoportes()).filter(v=>v.estado==='pendiente').length
       : af(getActiveData().filter(x=>x.cat===c)).length;
@@ -1110,7 +1110,7 @@ function closeModal(){document.getElementById('ov').classList.remove('open');doc
 function renderAdicionales() {
   const adics_meta = getAdics();
   const sops = getSoportes();
-  const items = applyFilters(getActiveData().filter(c=>c.adic>0));
+  const items = applyFilters(getActiveData().filter(c=>c.cat==='adicionales'));
   document.getElementById('ptitle').textContent = '🔧 Adicionales';
   document.getElementById('phint').textContent  = 'Cobros adicionales fuera del contrato principal';
   document.getElementById('fcnt').innerHTML = `<strong>${items.length}</strong> clientes`;
