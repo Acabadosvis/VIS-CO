@@ -661,11 +661,11 @@ function parseBuffer(buf) {
     if (!VALID_ESTADOS.has(ep)) continue;
 
     const xrec = xlM(r[68]);
-    if (xrec < 100) continue; // pagado/cerrado
+    const adic = xlM(r[14]);
+    if (xrec < 100 && adic < 100) continue; // pagado/cerrado completamente
 
     const total = xlM(r[18]);
     const recaudado = xlM(r[67]);
-    const adic = xlM(r[14]);
     const cid = String(r[0]);
     const cli = String(r[6]||'').trim();
     const proy = String(r[8]||'').trim();
@@ -719,7 +719,10 @@ function parseBuffer(buf) {
 
     // Category
     let cat;
-    if (ep==='ENTREGADO') {
+    // Si el contrato está en $0 pero tiene adicionales pendientes → tab adicionales
+    if (xrec < 100 && adic >= 100) {
+      cat = 'adicionales';
+    } else if (ep==='ENTREGADO') {
       cat = 'mora';
     } else if (ep==='EN EJECUCIÓN') {
       if (vencAmt > 0)      cat = 'vencido';
@@ -1225,10 +1228,8 @@ function saveAdicObs(cid){
 // ── PAGO CELL (inline en tabla) ──────────────────────────────
 function renderPagoCellRow(c) {
   const sops = getSoportes();
-  // Mora/X RECIBIR: cualquier bloque con saldo. Otros: vencido o semana.
-  const activeBlocks = (c.blocks||[]).filter(b=>b.saldo>0&&(
-    (c.ep==='ENTREGADO'||c.ep==='X RECIBIR') ? true : (b.bst==='vencido'||b.bst==='semana')
-  ));
+  // Cualquier bloque con saldo pendiente puede recibir soporte
+  const activeBlocks = (c.blocks||[]).filter(b=>b.saldo>0);
   if(!activeBlocks.length) return '<span style="color:#CCC;font-size:10px">—</span>';
   // Check any soporte registered for this client
   const anyPend = activeBlocks.some(b=>{ const s=sops[pagoKey(c.cid,b.etapa)]; return s&&s.estado==='pendiente'; });
@@ -1242,28 +1243,37 @@ function renderPagoCellRow(c) {
 function onSoporteRapido(cid,input){
   const f=input.files[0]; if(!f) return;
   const c=DATA.find(x=>x.cid===cid); if(!c) return;
-  // Solo el PRIMER bloque pendiente en orden (no se salta etapas sin pagar)
-  const candidatos=(c.blocks||[]).filter(b=>b.saldo>0&&(
-    (c.ep==='ENTREGADO'||c.ep==='X RECIBIR') ? true : (b.bst==='vencido'||b.bst==='semana')
-  ));
+  // Solo el PRIMER bloque pendiente en orden (cualquier bloque con saldo)
+  const candidatos=(c.blocks||[]).filter(b=>b.saldo>0);
   const sActual=getSoportes();
   const primerBloque=candidatos.find(b=>{
     const est=sActual[pagoKey(cid,b.etapa)]?.estado||'';
     return est===''||est==='rechazado';
   });
   if(!primerBloque){ toast('No hay etapas pendientes para '+c.cli,'warn'); return; }
+  // Preguntar monto real (puede diferir del saldo en cartera)
+  const rawMonto = prompt(
+    '💰 Monto del pago de ' + c.cli + '\n' +
+    'Etapa: ' + primerBloque.label + '\n\n' +
+    'Cartera muestra: $' + primerBloque.saldo.toLocaleString('es-CO') + '\n' +
+    'Escribe el valor real si es diferente:',
+    primerBloque.saldo
+  );
+  if(rawMonto === null) return; // canceló
+  const montoReal = rawMonto ? (parseInt(rawMonto.toString().replace(/\D/g,'')) || primerBloque.saldo) : primerBloque.saldo;
   const reader=new FileReader();
   reader.onload=function(e){
     const s=getSoportes();
     const pk=pagoKey(cid,primerBloque.etapa);
     s[pk]={estado:'pendiente',filename:f.name,size:f.size,
       dataUrl:e.target.result,
-      monto:primerBloque.saldo,etapa:primerBloque.etapa,etapa_label:primerBloque.label,
+      monto:montoReal, montoCartera:primerBloque.saldo,
+      etapa:primerBloque.etapa,etapa_label:primerBloque.label,
       cli:c.cli,proy:c.proy,torre:c.torre,apto:c.apto,
       fecha_soporte:new Date().toISOString().slice(0,10),
       semana:WEEK.ss};
     _saveSop(s); render();
-    toast('📤 Soporte '+primerBloque.label+' registrado para '+c.cli,'ok');
+    toast('📤 Soporte '+primerBloque.label+' por '+fmtMF(montoReal)+' registrado para '+c.cli,'ok');
   };
   reader.readAsDataURL(f);
 }
@@ -1311,7 +1321,10 @@ function renderCola(){
       <td style="font-weight:500">${v.cli||'—'}</td>
       <td style="font-size:11px;color:var(--g)">${v.proy||'—'} · T${v.torre||'—'} A${v.apto||'—'}</td>
       <td><span class="betapa">${v.etapa_label||v.etapa||'—'}</span></td>
-      <td class="m" style="text-align:right;font-weight:700;color:${color}">${fmtMF(v.monto||0)}</td>
+      <td class="m" style="text-align:right;font-weight:700;color:${color}">
+        ${fmtMF(v.monto||0)}
+        ${v.montoCartera && v.montoCartera!==v.monto ? `<div style="font-size:9px;font-weight:400;color:#9CA3AF;margin-top:1px">Cartera: ${fmtMF(v.montoCartera)}</div>` : ''}
+      </td>
       <td style="font-size:11px">${v.dataUrl
         ? `<button onclick="verSoporte('${k}')" style="padding:2px 9px;border-radius:6px;border:1.5px solid #BFDBFE;background:#EFF6FF;color:#1D4ED8;cursor:pointer;font-size:10px;font-weight:700">🔍 Ver soporte</button><div style="color:var(--g);margin-top:2px">${v.filename||''}</div>`
         : `📎 ${v.filename||'—'}`}</td>
