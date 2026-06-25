@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.06.25.15 -->
+<!-- v2026.06.25.16 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -129,7 +129,7 @@ tr:hover td{background:var(--b)}
 .vi-kp{padding:18px 18px;border-right:1px solid rgba(255,255,255,.1)}
 .vi-big{font-family:'Syne',sans-serif;font-weight:700;font-size:2.8rem;color:#fff;display:flex;align-items:baseline;gap:9px;letter-spacing:-2px}
 .vi-pct{font-size:.82rem;color:var(--y);font-weight:700}
-.vi-tipo{display:flex;align-items:center;gap:5px;font-size:.7rem;color:rgba(255,255,255,.6);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.vi-tipo{display:flex;align-items:center;gap:5px;font-size:.7rem;color:#fff;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.1)}
 .vi-tipo:last-child{border:none}
 .vi-tipodot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .vi-tipon{font-family:'Syne',sans-serif;font-weight:700;font-size:.79rem;color:#fff;margin-left:auto}
@@ -1185,7 +1185,7 @@ function renderVentas(){
   <div class="vi-hero">
     <div class="vi-hero-card ven">
       <div class="vi-hero-lbl">Meta ventas · ${p.mes} ${p.yr}</div>
-      <div class="vi-hero-num">${tv}<span style="font-size:1.1rem;font-weight:400;color:rgba(255,255,255,.35);margin-left:6px">/ ${META_V}</span></div>
+      <div class="vi-hero-num">${tv}<span style="font-size:1.1rem;font-weight:600;color:rgba(255,255,255,.8);margin-left:6px">/ ${META_V}</span></div>
       <div class="vi-hero-pct" style="background:${pVColor}22;color:${pVColor};border:1px solid ${pVColor}44">${pV}% cumplido</div>
       <div class="vi-hero-sub">ventas confirmadas este mes</div>
       <div class="vi-hero-bar-wrap"><div class="vi-hero-bar-fill" style="width:${Math.min(100,parseFloat(pV))}%;background:${pVColor}"></div></div>
@@ -1209,8 +1209,8 @@ function renderVentas(){
         <div class="vi-ttl-s">Meta: ${META_V} vtas</div>
       </div>
       <div class="vi-kp">
-        <div class="vi-big" style="font-size:3.2rem">${tv} <span style="font-size:1rem;font-weight:400;color:rgba(255,255,255,.5)">ventas</span> <span class="vi-pct" style="font-size:1.1rem">${pV}%</span></div>
-        <div style="font-size:.72rem;color:rgba(255,255,255,.45);margin-bottom:8px">${fmtC(tVal)} &nbsp;·&nbsp; AIU ${fmtC(tAIU)}</div>
+        <div class="vi-big" style="font-size:3.2rem">${tv} <span style="font-size:1rem;font-weight:600;color:#fff">ventas</span> <span class="vi-pct" style="font-size:1.1rem">${pV}%</span></div>
+        <div style="font-size:.72rem;color:#fff;font-weight:600;margin-bottom:8px">${fmtC(tVal)} &nbsp;·&nbsp; AIU ${fmtC(tAIU)}</div>
         <div style="margin-top:4px">
           <div class="vi-tipo"><span class="vi-tipodot" style="background:#888"></span>Presupuestos <span class="vi-tipon">${remR.length} &nbsp;·&nbsp; ${fmt(remV)}</span></div>
           <div class="vi-tipo"><span class="vi-tipodot" style="background:var(--o)"></span>Orgánicos <span class="vi-tipon">${orgR.length} &nbsp;·&nbsp; ${fmt(orgV)}</span></div>
@@ -1218,7 +1218,7 @@ function renderVentas(){
         </div>
       </div>
       <div class="vi-kp" style="border-right:none">
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.6rem;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.4);margin-bottom:6px">Por origen / alianza</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.6rem;text-transform:uppercase;letter-spacing:.5px;color:#fff;margin-bottom:6px">Por origen / alianza</div>
         <div class="vi-org-grid">
           ${(function(){
             const FIXED=[
