@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.06.25.9 -->
+<!-- v2026.06.25.10 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -539,6 +539,9 @@ function mkC(id,cfg){if(charts[id]){try{charts[id].destroy();}catch(e){}delete c
 function mkBar(id,lbl,data,clrs){var cl=clrs||data.map(function(_,i){return COLS[i%COLS.length];});return mkC(id,{type:'bar',data:{labels:lbl,datasets:[{data:data,backgroundColor:cl,borderRadius:5,borderSkipped:false}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#EDEBE6'},ticks:{font:{size:9}}},x:{grid:{display:false},ticks:{font:{size:9}}}}}});}
 function mkBarG(id,lbl,ds){return mkC(id,{type:'bar',data:{labels:lbl,datasets:ds.map(d=>({...d,borderRadius:4,borderSkipped:false}))},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:9.5},boxWidth:11}}},scales:{y:{beginAtZero:true,grid:{color:'#EDEBE6'},ticks:{font:{size:9}}},x:{grid:{display:false},ticks:{font:{size:9}}}}}});}
 function mkLine(id,lbl,ds){return mkC(id,{type:'line',data:{labels:lbl,datasets:ds.map(d=>({...d,tension:.4,pointRadius:4,pointHoverRadius:6}))},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:9.5},boxWidth:11}}},scales:{y:{beginAtZero:true,grid:{color:'#EDEBE6'},ticks:{font:{size:9}}},x:{grid:{display:false},ticks:{font:{size:9}}}}}});}
+/* ── Chart.js: fuente global Syne para todos los gráficos ── */
+if(typeof Chart!=='undefined'){Chart.defaults.font.family='Syne';Chart.defaults.font.weight='700';}
+
 function mkDona(id,lbl,data,clrs){
   var tot=data.reduce(function(a,b){return a+b;},0);
   return mkC(id,{type:'doughnut',data:{labels:lbl,datasets:[{data:data,backgroundColor:clrs||COLS.slice(0,data.length),borderWidth:2,borderColor:'#fff',hoverOffset:6}]},
@@ -1354,8 +1357,8 @@ function renderVentas(){
           legend:{display:false},
           tooltip:{callbacks:{label:function(ctx){if(ctx.datasetIndex===1)return'Meta: '+META_V;var pp=Math.round(ctx.raw/META_V*100);return ctx.raw+' ventas ('+pp+'% meta)';}}}
         },scales:{
-          y:{beginAtZero:true,grid:{color:'#EDEBE6'},ticks:{font:{size:9}},suggestedMax:Math.max(META_V+2,maxV+2)},
-          x:{grid:{display:false},ticks:{font:{size:9}}}
+          y:{beginAtZero:true,grid:{color:'#EDEBE6'},ticks:{font:{family:'Syne',size:9,weight:'700'},color:'#555'},suggestedMax:Math.max(META_V+2,maxV+2)},
+          x:{grid:{display:false},ticks:{font:{family:'Syne',size:9,weight:'600'},color:'#333'}}
         }}
       });
     })();
