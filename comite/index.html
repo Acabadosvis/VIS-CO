@@ -53,7 +53,7 @@ header{background:var(--n);display:flex;align-items:center;gap:8px;padding:0 18p
 .kp{background:var(--w);border:1px solid var(--brd);border-radius:var(--rad);padding:12px 13px;box-shadow:var(--sh);overflow:hidden}
 .kp.o{border-top:3px solid var(--o)}.kp.g{border-top:3px solid var(--up)}.kp.b{border-top:3px solid var(--bl)}.kp.a{border-top:3px solid var(--am)}.kp.p{border-top:3px solid var(--pur)}.kp.n{border-top:3px solid var(--n)}.kp.y{border-top:3px solid var(--y)}
 .kl{font-family:'Syne',sans-serif;font-size:.59rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--g);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kv{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.35rem;color:var(--n);line-height:1.05;letter-spacing:-.3px}
+.kv{font-family:'Syne',sans-serif;font-weight:800;font-size:1.28rem;color:var(--n);line-height:1.05;letter-spacing:-.5px}
 .kv.md{font-size:1.05rem}.kv.sm{font-size:.85rem}
 .ks{font-size:.64rem;color:var(--g);margin-top:3px}
 /* INSIGHT BOX */
@@ -124,7 +124,7 @@ tr:hover td{background:var(--b)}
 .vi-ttl-t{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:#1A1A1A;line-height:1.3;text-transform:uppercase}
 .vi-ttl-s{font-size:.64rem;color:rgba(0,0,0,.5);margin-top:4px}
 .vi-kp{padding:18px 18px;border-right:1px solid rgba(255,255,255,.1)}
-.vi-big{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:2.8rem;color:#fff;display:flex;align-items:baseline;gap:9px}
+.vi-big{font-family:'Syne',sans-serif;font-weight:800;font-size:2.8rem;color:#fff;display:flex;align-items:baseline;gap:9px;letter-spacing:-1px}
 .vi-pct{font-size:.82rem;color:var(--y);font-weight:700}
 .vi-tipo{display:flex;align-items:center;gap:5px;font-size:.7rem;color:rgba(255,255,255,.6);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.06)}
 .vi-tipo:last-child{border:none}
@@ -134,7 +134,7 @@ tr:hover td{background:var(--b)}
 .vi-circ{background:var(--n);padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:7px}
 .vi-svgw{position:relative;width:110px;height:110px}
 .vi-svgw svg{transform:rotate(-90deg)}
-.vi-svgpct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.6rem;color:var(--o)}
+.vi-svgpct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:1.45rem;color:var(--o);letter-spacing:-1px}
 .vi-meta{font-size:.62rem;color:rgba(255,255,255,.4);text-align:center;line-height:1.9;margin-top:2px}
 .vi-meta strong{color:rgba(255,255,255,.75);font-size:.68rem}
 .vi-det{padding:13px 15px}
@@ -147,7 +147,7 @@ tr:hover td{background:var(--b)}
 .vi-r3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:5px}
 .vi-c3{background:var(--gc);border-radius:var(--rsm);padding:7px;text-align:center}
 .vi-c3l{font-size:.56rem;font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;color:var(--g);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.vi-c3v{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;color:var(--n)}
+.vi-c3v{font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;color:var(--n);letter-spacing:-.3px}
 /* SEMANA BADGE */
 .sbadge{display:inline-flex;align-items:center;gap:4px;background:var(--o);color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:.62rem;padding:3px 9px;border-radius:12px}
 /* APTOS */
@@ -234,6 +234,18 @@ tr:hover td{background:var(--b)}
 .fn-bar-wrap{background:#F5F0EA;border-radius:20px;height:26px;overflow:hidden}
 .fn-bar{height:100%;border-radius:20px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;font-size:.72rem;font-weight:700;color:#fff;min-width:30px;transition:width .4s ease}
 .fn-conv{font-size:.68rem;color:var(--g);font-weight:600;text-align:right}
+/* HERO % cumplimiento */
+.vi-hero{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.vi-hero-card{border-radius:var(--rad);padding:16px 18px;display:flex;flex-direction:column;gap:5px;position:relative;overflow:hidden}
+.vi-hero-card.ven{background:var(--n)}
+.vi-hero-card.val{background:#0A2540}
+.vi-hero-lbl{font-family:'Syne',sans-serif;font-weight:700;font-size:.6rem;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.45)}
+.vi-hero-num{font-family:'Syne',sans-serif;font-weight:800;font-size:2.6rem;color:#fff;letter-spacing:-2px;line-height:1}
+.vi-hero-pct{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;padding:3px 10px;border-radius:20px;display:inline-block;width:fit-content}
+.vi-hero-sub{font-size:.68rem;color:rgba(255,255,255,.45);margin-top:2px}
+.vi-hero-bar-wrap{background:rgba(255,255,255,.1);border-radius:3px;height:5px;margin-top:6px;overflow:hidden}
+.vi-hero-bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
+.vi-hero-watermark{position:absolute;right:-8px;bottom:-10px;font-family:'Syne',sans-serif;font-weight:800;font-size:5rem;color:rgba(255,255,255,.04);pointer-events:none;letter-spacing:-4px}
 .vi-org-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px 14px;margin-top:4px}
 .vi-org-row{display:flex;align-items:center;gap:6px;font-size:.76rem;color:rgba(255,255,255,.8);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.06)}
 .vi-org-row span.val{font-family:'Syne',sans-serif;font-weight:800;font-size:.8rem;color:#fff;margin-left:auto}
@@ -1073,9 +1085,35 @@ function renderVentas(){
   if(aliR.length>0)vIns.push({ic:'🤝',t:`Alianza aporta <strong>${aliR.length} ventas (${pct(aliR.length,tv,0)}%)</strong>. Ticket promedio: ${fmt(tkAli)}.`});
   if(orgR.length>0)vIns.push({ic:'🌱',t:`Orgánicos: <strong>${orgR.length} ventas</strong>. Ticket promedio: ${fmt(tkOrg)}.`});
 
+  /* colores por origen para gráfica */
+  const ORG_CLR={'GRAN CENTRAL':'#92400E','GC CONVENIO':'#B45309','GRAN CENTRAL CONVENIO':'#B45309','WELL':'#0891B2','KLIK':'#7C3AED','CORNER VIEW':'#0369A1','CORNER V':'#0369A1','CONINSA':'#64748B','VANTI':'#16A34A','LAGOM':'#9333EA','ORGÁNICO':'#16A34A','ORGÁNICO ':'#16A34A'};
+  const fpVal=parseFloat(pVal);
+  const pVColor=parseFloat(pV)>=100?'#16A34A':parseFloat(pV)>=70?'#E4721B':'#DC2626';
+  const pValColor=fpVal>=100?'#16A34A':fpVal>=70?'#E4721B':'#DC2626';
+
   el.innerHTML=`<!-- FILTROS -->
   <div class="fb">
     <span>Asesora:</span>${['Todas','KM','AB','NM'].map(v=>`<button class="fbtn ${vFVD===v?'on':''}" onclick="vFVD='${v}';renderVentas()">${v==='Todas'?'Todas':VDN[v]}</button>`).join('')}
+  </div>
+
+  <!-- HERO % CUMPLIMIENTO -->
+  <div class="vi-hero">
+    <div class="vi-hero-card ven">
+      <div class="vi-hero-lbl">Meta ventas · ${p.mes} ${p.yr}</div>
+      <div class="vi-hero-num">${tv}<span style="font-size:1.1rem;font-weight:400;color:rgba(255,255,255,.35);margin-left:6px">/ ${META_V}</span></div>
+      <div class="vi-hero-pct" style="background:${pVColor}22;color:${pVColor};border:1px solid ${pVColor}44">${pV}% cumplido</div>
+      <div class="vi-hero-sub">ventas confirmadas este mes</div>
+      <div class="vi-hero-bar-wrap"><div class="vi-hero-bar-fill" style="width:${Math.min(100,parseFloat(pV))}%;background:${pVColor}"></div></div>
+      <div class="vi-hero-watermark">${pV}%</div>
+    </div>
+    <div class="vi-hero-card val">
+      <div class="vi-hero-lbl">Meta valor · ${p.mes} ${p.yr}</div>
+      <div class="vi-hero-num" style="font-size:1.7rem;letter-spacing:-1px">${fmtC(tVal)}</div>
+      <div class="vi-hero-pct" style="background:${pValColor}22;color:${pValColor};border:1px solid ${pValColor}44">${pVal}% cumplido</div>
+      <div class="vi-hero-sub">AIU ${fmtC(tAIU)} · meta ${fmtC(META_VAL)}</div>
+      <div class="vi-hero-bar-wrap"><div class="vi-hero-bar-fill" style="width:${Math.min(100,fpVal)}%;background:${pValColor}"></div></div>
+      <div class="vi-hero-watermark">${pVal}%</div>
+    </div>
   </div>
 
   <!-- 1. INFORME MES (PRIMERO - grande y prominente) -->
@@ -1253,7 +1291,16 @@ function renderVentas(){
       });
     })();
     mkDona('cv_tipo',['Presupuestos','Orgánicos','Alianza'],[remR.length,orgR.length,aliR.length],['#888','#E4721B','#F5B800']);
-    if(orgSort.length>2)mkBarH('cv_orig',orgSort.map(function(e){return e[0];}),orgSort.map(function(e){return e[1];}));
+    if(orgSort.length>2){
+      var origLbls=orgSort.map(function(e){return e[0];});
+      var origData=orgSort.map(function(e){return e[1];});
+      var origClrs=origLbls.map(function(k){return ORG_CLR[k.toUpperCase()]||'#E4721B';});
+      var cvOrig=document.getElementById('cv_orig');
+      if(cvOrig){
+        if(charts['cv_orig']){try{charts['cv_orig'].destroy();}catch(e){}delete charts['cv_orig'];}
+        charts['cv_orig']=new Chart(cvOrig,{type:'bar',data:{labels:origLbls,datasets:[{data:origData,backgroundColor:origClrs,borderRadius:5,borderSkipped:false,borderWidth:0}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+' ventas';}}}},scales:{x:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{family:'Syne',size:9,weight:'700'},color:'#555'}},y:{grid:{display:false},ticks:{font:{family:'Syne',size:9,weight:'600'},color:'#333'}}}}});
+      }
+    }
   },90);
 }
 /* === APTOS - usa xlA (PROYECTOS EN EJECUCION xlsx) === */
