@@ -1246,8 +1246,7 @@ function renderPagoCellRow(c) {
     if(c.ep==='X RECIBIR' || c.cat==='recibir') {
       const pk = pagoKey(c.cid,'GEN');
       const sop = sops[pk]||{};
-      if(sop.estado==='soporte')   return `<span class="pago-badge soporte" onclick="openModal('${c.cid}')" style="cursor:pointer">📤 Soporte</span>`;
-      if(sop.estado==='revision')  return `<span class="pago-badge pendiente" onclick="openModal('${c.cid}')" style="cursor:pointer">🔍 Revisión</span>`;
+      if(sop.estado==='pendiente') return `<span class="pago-badge pendiente" onclick="openModal('${c.cid}')" style="cursor:pointer">📤 Pend. contab.</span>`;
       if(sop.estado==='entro')     return `<span class="pago-badge entro" onclick="openModal('${c.cid}')" style="cursor:pointer">✅ Entró</span>`;
       return `<label class="fbtn upload" style="padding:3px 9px;font-size:10px;display:inline-flex" title="Cargar soporte de pago">
         📤 Soporte<input type="file" accept="image/*,.pdf" onchange="onSoporteRapido('${c.cid}',this,'GEN')">
@@ -1278,7 +1277,7 @@ function onSoporteRapido(cid,input,etapaFija){
     reader2.onload=function(e2){
       const s2=getSoportes();
       const pk2=pagoKey(cid,etapaFija);
-      s2[pk2]={estado:'soporte',filename:f.name,size:f.size,
+      s2[pk2]={estado:'pendiente',filename:f.name,size:f.size,
         dataUrl:e2.target.result, monto:montoReal,
         etapa:etapaFija, etapa_label:'Pago',
         cli:c.cli,proy:c.proy,torre:c.torre,apto:c.apto,
@@ -1339,7 +1338,7 @@ function onSoporteAdicRapido(cid, input) {
   reader.onload = function(e) {
     const s = getSoportes();
     const pk = cid+'_ADIC';
-    s[pk] = {estado:'soporte', filename:f.name, size:f.size,
+    s[pk] = {estado:'pendiente', filename:f.name, size:f.size,
       dataUrl:e.target.result, monto:montoReal,
       etapa:'ADIC', etapa_label:'Adicional',
       cli:c.cli, proy:c.proy, torre:c.torre, apto:c.apto,
