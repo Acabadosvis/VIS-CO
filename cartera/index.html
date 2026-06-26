@@ -547,10 +547,10 @@ const MODO_CONTAB = new URLSearchParams(location.search).get('modo')==='contabil
 // ── FECHA ─────────────────────────────────────────────────────
 function calcWeek(ref) {
   const d = new Date(ref); d.setHours(12,0,0,0);
-  const wd = d.getDay(); // 0=Sun,6=Sat
-  const dsSat = (wd - 6 + 7) % 7;
-  const ws = new Date(d); ws.setDate(ws.getDate() - dsSat); ws.setHours(0,0,0,0);
-  const we = new Date(ws); we.setDate(we.getDate() + 7); we.setHours(23,59,59,0);
+  const wd = d.getDay(); // 0=Sun … 5=Fri … 6=Sat
+  const dsFri = (wd - 5 + 7) % 7;   // días desde el viernes más reciente
+  const ws = new Date(d); ws.setDate(ws.getDate() - dsFri); ws.setHours(0,0,0,0);
+  const we = new Date(ws); we.setDate(we.getDate() + 6); we.setHours(23,59,59,0);
   return {start:ws, end:we, ss:ws.toISOString().slice(0,10), es:we.toISOString().slice(0,10)};
 }
 function setWeekInputs() {
@@ -1150,7 +1150,9 @@ function renderAdicionales() {
       <td class="m" style="text-align:right;font-size:11px;color:var(--g)">${fmtMF(c.adic)}</td>
       <td class="m adic-col" style="text-align:right;font-size:13px;font-weight:700">${fmtMF(c.pending_adic)}</td>
       <td style="font-size:11px">${fechaCobro?fmtD(fechaCobro):'<span style="color:#CCC">Sin fecha</span>'}</td>
-      <td>${badgeTxt||'<span style="color:#CCC;font-size:11px">Sin gestión</span>'}</td>
+      <td onclick="event.stopPropagation()">${badgeTxt||`<label class="fbtn upload" style="padding:3px 9px;font-size:10px;display:inline-flex" title="Cargar soporte adicional">
+        📤 Soporte<input type="file" accept="image/*,.pdf" onchange="onSoporteAdicRapido('${c.cid}',this)">
+      </label>`}</td>
     </tr>`;
   }).join('');
 }
@@ -1316,6 +1318,31 @@ function onSoporteRapido(cid,input,etapaFija){
       semana:WEEK.ss};
     _saveSop(s); render();
     toast('📤 Soporte '+primerBloque.label+' por '+fmtMF(montoReal)+' registrado para '+c.cli,'ok');
+  };
+  reader.readAsDataURL(f);
+}
+
+function onSoporteAdicRapido(cid, input) {
+  const f = input.files[0]; if(!f) return;
+  const c = DATA.find(x=>x.cid===cid); if(!c) return;
+  const rawMonto = prompt(
+    '💰 Valor del adicional pendiente de '+c.cli+'\n'+
+    'Cartera muestra: $'+c.pending_adic.toLocaleString('es-CO')+'\n\nEscribe el valor real si es diferente:',
+    c.pending_adic
+  );
+  if(rawMonto === null) return;
+  const montoReal = rawMonto ? (parseInt(rawMonto.toString().replace(/\D/g,''))||c.pending_adic) : c.pending_adic;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const s = getSoportes();
+    const pk = cid+'_ADIC';
+    s[pk] = {estado:'soporte', filename:f.name, size:f.size,
+      dataUrl:e.target.result, monto:montoReal,
+      etapa:'ADIC', etapa_label:'Adicional',
+      cli:c.cli, proy:c.proy, torre:c.torre, apto:c.apto,
+      fecha_soporte:new Date().toISOString().slice(0,10), semana:WEEK.ss};
+    _saveSop(s); renderAdicionales();
+    toast('📤 Soporte adicional registrado para '+c.cli,'ok');
   };
   reader.readAsDataURL(f);
 }
