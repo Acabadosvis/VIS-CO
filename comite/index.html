@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.06.25.16 -->
+<!-- v2026.06.25.17 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -771,36 +771,64 @@ function renderLeads(){
     ((d2.gc||0)>0?'<div class="kp" style="border-left:4px solid #92400E"><div class="kl">GC leads</div><div class="kv" style="color:#92400E">'+d2.gc+'</div><div class="ks">alianza</div></div>':'')+
     ((d2.cv||0)>0?'<div class="kp" style="border-left:4px solid #0891B2"><div class="kl">CV leads</div><div class="kv" style="color:#0891B2">'+d2.cv+'</div><div class="ks">alianza</div></div>':'');
   /* Embudo */
-  var wpp2=d2.wpp||0,calc2=d2.total||0,ver2b=d2.ver||0,nver2=d2.nver||0,cno2=d2.cno||0,sr2=d2.sr||0,int2=d2.int||0,ni2=d2.ni||0,vig2=d2.vig||0,ci2=d2.ci||0;
-  var funV=[wpp2,calc2,ver2b,nver2,cno2,sr2,int2,ni2];
-  var funL=['WPP WhatsApp','Calculadora','✓ Verificados','✗ No verificados','Incompletas','Sin respuesta','Interesados ★','No interesados'];
-  var funC=['#25D366','#F97316','#0891B2','#94A3B8','#D97706','#64748B','#16A34A','#6B7280'];
-  var maxF=funV[0]||1;
-  var funnelRows=funL.map(function(l,i){
-    var w=funV[i];var pw=maxF>0?Math.max(6,Math.round(w/maxF*100)):6;
-    var conv='';
-    if(i===1&&funV[0]>0)conv=Math.round(w/funV[0]*100)+'% WPP';
-    else if(i===2&&funV[1]>0)conv=Math.round(w/funV[1]*100)+'% calc';
-    else if(i===3&&funV[1]>0)conv=Math.round(w/funV[1]*100)+'% calc';
-    else if(i>=4&&funV[2]>0)conv=Math.round(w/funV[2]*100)+'% ver';
-    var sep=i===4?'<div style="font-size:.68rem;color:#64748B;padding:4px 0 2px;margin-left:110px">De los verificados →</div>':'';
-    return sep+'<div class="fn-row"><div class="fn-lbl">'+l+'</div><div class="fn-bar-wrap"><div class="fn-bar" style="width:'+pw+'%;background:'+funC[i]+'">'+w+'</div></div><div class="fn-conv">'+conv+'</div></div>';
-  }).join('');
-  var ci2b=d2.ci||0;
-  var cierresBadge=ci2b>0?'<div style="margin-top:8px;display:flex;align-items:center;gap:8px;padding:7px 10px;background:#F9FAFB;border-radius:6px;border:1px solid #E5E7EB;flex-wrap:wrap"><span style="font-size:.75rem;color:#6B7280;font-weight:600">Cierres semana:</span><strong style="color:#374151;font-size:1rem">'+ci2b+'</strong><span style="font-size:.68rem;color:#9CA3AF">— fuera del embudo (pueden ser orgánicos, alianza o de sem. anteriores)</span></div>':'';
+  var wpp2=d2.wpp||0,calc2=d2.total||0,ver2b=d2.ver||0,nver2=Math.max(0,calc2-ver2b),cno2=d2.cno||0,sr2=d2.sr||0,int2=d2.int||0,ni2=d2.ni||0,ci2=d2.ci||0;
+  /* ── EMBUDO REDISEÑADO ── escala correcta sobre el máximo real */
+  var maxF=Math.max(wpp2,calc2,ver2b,1);
+  function fnBar(val,color,label,conv,note){
+    var pw=Math.max(4,Math.round(val/maxF*100));
+    return'<div class="fn-row"><div class="fn-lbl">'+label+'</div>'+
+      '<div class="fn-bar-wrap"><div class="fn-bar" style="width:'+pw+'%;background:'+color+'"><span style="padding:0 8px;font-weight:700;font-size:.75rem;color:#fff">'+val+'</span></div></div>'+
+      '<div class="fn-conv" style="min-width:70px;text-align:right;font-size:.72rem;font-weight:700;color:#555">'+conv+'</div></div>'+
+      (note?'<div style="font-size:.65rem;color:#888;margin:-2px 0 4px 110px">'+note+'</div>':'');
+  }
+  var pWppCalc=wpp2>0?Math.round(calc2/wpp2*100)+'%':'—';
+  var pCalcVer=calc2>0?Math.round(ver2b/calc2*100)+'%':'—';
+  var pVerInt=ver2b>0?Math.round(int2/ver2b*100)+'%':'—';
+  var pVerSr=ver2b>0?Math.round(sr2/ver2b*100)+'%':'—';
+  var pVerNi=ver2b>0?Math.round(ni2/ver2b*100)+'%':'—';
+  var pVerCno=ver2b>0?Math.round(cno2/ver2b*100)+'%':'—';
+  var funnelHTML=
+    fnBar(wpp2,'#25D366','💬 WPP','','')+
+    fnBar(calc2,'#F97316','🧮 Calculadora',pWppCalc,wpp2>0?'del WPP':'')+
+    fnBar(ver2b,'#0891B2','✅ Verificados',pCalcVer,'de calculadora')+
+    (nver2>0?fnBar(nver2,'#CBD5E1','⏳ Pendientes por verificar',calc2>0?Math.round(nver2/calc2*100)+'%':'—','sin clasificar aún'):'') +
+    '<div style="font-size:.7rem;font-weight:700;color:#0891B2;padding:8px 0 2px 110px;border-top:2px dashed #0891B200;margin-top:4px">▼ De los '+ver2b+' verificados:</div>'+
+    fnBar(int2,'#16A34A','⭐ Interesados',pVerInt,'de verificados')+
+    fnBar(sr2,'#64748B','💬 Sin respuesta',pVerSr,'de verificados')+
+    fnBar(ni2,'#94A3B8','👎 No interesados',pVerNi,'de verificados')+
+    fnBar(cno2,'#D97706','📋 Incompletas',pVerCno,'de verificados')+
+    (ci2>0?'<div style="margin-top:10px;padding:8px 12px;background:#F0FDF4;border-radius:8px;border:1px solid #86EFAC;font-size:.75rem;color:#166534;font-weight:700">🏆 Cierres semana: '+ci2+' <span style="font-weight:400;color:#4B7563">— orgánicos, alianza o de semanas anteriores</span></div>':'');
   var fEl=document.getElementById('l-funnel');
-  if(fEl)fEl.innerHTML='<div class="fn-title">Embudo de conversión</div>'+funnelRows+cierresBadge;
-  /* l-ver-kpi hidden (info now in KPIs + funnel) */
-  var vkEl=document.getElementById('l-ver-kpi');
-  if(vkEl)vkEl.style.display='none';
-  /* Tabla comparativa */
-  var cats2=[{k:'cno',lbl:'Calc. incompletas'},{k:'sr',lbl:'Sin respuesta'},{k:'ni',lbl:'No interesados'},{k:'int',lbl:'Interesados ★'}];
+  if(fEl)fEl.innerHTML='<div class="fn-title">Embudo de conversión</div>'+funnelHTML;
+  var vkEl=document.getElementById('l-ver-kpi');if(vkEl)vkEl.style.display='none';
+
+  /* ── TABLA: base = VERIFICADOS, comparación semana a semana ── */
+  var ver0=d0.ver||0,ver1=d1.ver||0;
+  var cats2=[
+    {k:'ver',lbl:'✅ Base: Verificados',base0:null,base1:null,base2:null,bold:true},
+    {k:'int',lbl:'⭐ Interesados',base0:ver0,base1:ver1,base2:ver2b},
+    {k:'sr', lbl:'💬 Sin respuesta',  base0:ver0,base1:ver1,base2:ver2b},
+    {k:'ni', lbl:'👎 No interesados', base0:ver0,base1:ver1,base2:ver2b},
+    {k:'cno',lbl:'📋 Incompletas',    base0:ver0,base1:ver1,base2:ver2b}
+  ];
+  function pctOf(v,b){return b>0?'<span style="font-size:.65rem;color:#888;font-weight:400"> ('+Math.round(v/b*100)+'%)</span>':'';}
   var rows2=cats2.map(function(cat){
     var v0=d0[cat.k]||0,v1=d1[cat.k]||0,v2=d2[cat.k]||0;
-    return'<tr><td class="mc">'+cat.lbl+'</td><td class="tr">'+v0+'</td><td class="tr">'+v1+'</td><td class="tr"><strong>'+v2+'</strong></td><td class="tr">'+dH(v1,v0,cat.k!='int')+'</td><td class="tr">'+dH(v2,v1,cat.k!='int')+'</td></tr>';
+    var b=cat.bold;
+    return'<tr'+(b?' class="tot"':'')+'><td class="mc">'+(b?'<strong>':'')+cat.lbl+(b?'</strong>':'')+'</td>'+
+      '<td class="tr">'+(b?'<strong>':'')+v0+(b?'</strong>':'')+pctOf(v0,cat.base0)+'</td>'+
+      '<td class="tr">'+(b?'<strong>':'')+v1+(b?'</strong>':'')+pctOf(v1,cat.base1)+'</td>'+
+      '<td class="tr">'+(b?'<strong>':'')+v2+(b?'</strong>':'')+pctOf(v2,cat.base2)+'</td>'+
+      '<td class="tr">'+dH(v1,v0,cat.k!='int'&&cat.k!='ver')+'</td>'+
+      '<td class="tr">'+dH(v2,v1,cat.k!='int'&&cat.k!='ver')+'</td></tr>';
   }).join('');
+  var calc0=d0.total||0,calc1=d1.total||0;
+  var convRow='<tr style="background:#EFF6FF"><td class="mc" style="font-size:.68rem;color:#0891B2;font-weight:700">% Verificados / Calc.</td>'+
+    '<td class="tr" style="font-size:.72rem;color:#0891B2;font-weight:700">'+(calc0>0?Math.round(ver0/calc0*100)+'%':'—')+'</td>'+
+    '<td class="tr" style="font-size:.72rem;color:#0891B2;font-weight:700">'+(calc1>0?Math.round(ver1/calc1*100)+'%':'—')+'</td>'+
+    '<td class="tr" style="font-size:.72rem;color:#0891B2;font-weight:700">'+(calc2>0?Math.round(ver2b/calc2*100)+'%':'—')+'</td><td></td><td></td></tr>';
   var cmpEl=document.getElementById('l-cmp');
-  if(cmpEl)cmpEl.innerHTML='<div class="card lct"><div class="card-hd">Clasificación comercial de leads</div><div class="tw"><table><thead><tr><th>Clasificación</th><th class="tr">'+wShort(p0)+'</th><th class="tr">'+wShort(p1)+'</th><th class="tr">'+wShort(p2)+'</th><th class="tr">Var ant</th><th class="tr">Var act</th></tr></thead><tbody><tr class="tot"><td class="mc">Total</td><td class="tr">'+t0+'</td><td class="tr">'+t1+'</td><td class="tr"><strong>'+t2+'</strong></td><td class="tr">'+dH(t1,t0,false)+'</td><td class="tr">'+dH(t2,t1,false)+'</td></tr>'+rows2+'</tbody></table></div></div>';
+  if(cmpEl)cmpEl.innerHTML='<div class="card lct"><div class="card-hd">Leads verificados — comparativo semanal <span class="card-hd-sub" style="color:#0891B2">base: verificados</span></div><div class="tw"><table><thead><tr><th>Clasificación</th><th class="tr">'+wShort(p0)+'</th><th class="tr">'+wShort(p1)+'</th><th class="tr">'+wShort(p2)+'</th><th class="tr">Var ant</th><th class="tr">Var act</th></tr></thead><tbody>'+rows2+convRow+'</tbody></table></div></div>';
   /* Gráficas */
   var w6=[pm3,pm2,pm1,p0,p1,p2];
   var wlbls6=w6.map(function(w){return wShort(w);});
