@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contabilidad · Cola de Pagos — VIS-CO</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ok:#059669;--ok-bg:#ECFDF5;--ok-brd:#A7F3D0;
+  --warn:#D97706;--warn-bg:#FFFBEB;--warn-brd:#FDE68A;
+  --err:#DC2626;--err-bg:#FEF2F2;--err-brd:#FECACA;
+  --g:#6B7280;--brd:#E5E7EB;--bg:#F9FAFB;--w:#FFF;
+  --brand:#E8650A;--brand-bg:#FFF7F0;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:#111;min-height:100vh}
+
+/* HEADER */
+.hdr{background:var(--w);border-bottom:1.5px solid var(--brd);padding:0 24px;height:58px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10}
+.hlogo{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--brand);letter-spacing:-.02em}
+.hbadge{background:var(--ok-bg);border:1.5px solid var(--ok-brd);color:#065F46;border-radius:20px;padding:3px 12px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.hright{margin-left:auto;display:flex;align-items:center;gap:10px}
+.htime{font-size:11px;color:var(--g)}
+.btn-refresh{font-size:11px;padding:5px 14px;border-radius:8px;border:1.5px solid var(--brd);background:var(--w);color:var(--g);cursor:pointer;font-family:inherit;font-weight:600;transition:.15s}
+.btn-refresh:hover{border-color:#9CA3AF}
+
+/* MAIN */
+.main{max-width:1100px;margin:0 auto;padding:28px 20px}
+
+/* RESUMEN KPIs */
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.kpi{background:var(--w);border:1.5px solid var(--brd);border-radius:12px;padding:16px 20px}
+.kpi.pend{border-color:var(--warn-brd);background:var(--warn-bg)}
+.kpi.ok{border-color:var(--ok-brd);background:var(--ok-bg)}
+.kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--g);margin-bottom:6px}
+.kpi.pend .kpi-lbl{color:#92400E}
+.kpi.ok .kpi-lbl{color:#065F46}
+.kpi-val{font-size:24px;font-weight:800;color:#111}
+.kpi.pend .kpi-val{color:var(--warn)}
+.kpi.ok .kpi-val{color:var(--ok)}
+.kpi-sub{font-size:11px;color:var(--g);margin-top:3px}
+
+/* SECCIÓN */
+.sec{background:var(--w);border:1.5px solid var(--brd);border-radius:14px;margin-bottom:20px;overflow:hidden}
+.sec-hdr{padding:14px 20px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px}
+.sec-title{font-weight:700;font-size:14px}
+.cnt-badge{background:var(--brd);color:#374151;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700}
+.cnt-badge.warm{background:var(--warn-bg);color:#92400E;border:1px solid var(--warn-brd)}
+.cnt-badge.green{background:var(--ok-bg);color:#065F46;border:1px solid var(--ok-brd)}
+
+/* TABLA */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--g);border-bottom:1px solid var(--brd);background:var(--bg)}
+td{padding:12px 14px;border-bottom:1px solid #F3F4F6;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFAFA}
+.cli{font-weight:600;font-size:13px}
+.sub{font-size:11px;color:var(--g);margin-top:2px}
+.etapa{display:inline-block;background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700}
+.monto{font-weight:800;font-size:15px;color:var(--warn)}
+.monto.ok{color:var(--ok)}
+.fecha{font-size:11px;color:var(--g)}
+
+/* BOTONES ACCIÓN */
+.acciones{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font-family:inherit;cursor:pointer;border-radius:8px;font-weight:700;font-size:11px;padding:6px 13px;border:1.5px solid;transition:.15s;white-space:nowrap}
+.btn:hover{filter:brightness(.95)}
+.btn-ok{background:var(--ok-bg);border-color:var(--ok-brd);color:#065F46}
+.btn-rej{background:var(--err-bg);border-color:var(--err-brd);color:var(--err)}
+.btn-rev{background:var(--bg);border-color:var(--brd);color:var(--g)}
+.btn-ver{background:#EFF6FF;border-color:#BFDBFE;color:#1D4ED8}
+
+/* ESTADO CONFIRMADO */
+.conf-info{font-size:11px;line-height:1.6}
+.conf-date{font-weight:700;color:var(--ok)}
+.rech-date{font-weight:700;color:var(--err)}
+
+/* EMPTY */
+.empty{padding:32px;text-align:center;color:var(--g);font-size:13px}
+.empty-ico{font-size:28px;margin-bottom:8px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:#FFF;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:.3s}
+.toast.show{opacity:1}
+
+/* MODAL soporte */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--w);border-radius:16px;padding:28px;max-width:520px;width:95%;max-height:90vh;overflow-y:auto;position:relative}
+.modal-close{position:absolute;top:14px;right:16px;font-size:18px;cursor:pointer;color:var(--g);background:none;border:none;line-height:1}
+.modal-img{width:100%;border-radius:10px;margin:14px 0;border:1px solid var(--brd)}
+.modal-title{font-weight:800;font-size:16px;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--g);margin-bottom:16px}
+.field{margin-top:12px}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--g);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.field input,.field select,.field textarea{width:100%;padding:8px 11px;border:1.5px solid var(--brd);border-radius:8px;font-family:inherit;font-size:13px;outline:none;transition:.15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#9CA3AF}
+.modal-btns{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+
+/* AUTO-REFRESH indicator */
+.refresh-bar{height:3px;background:var(--brand-bg);border-radius:2px;overflow:hidden;margin-bottom:20px}
+.refresh-fill{height:100%;background:var(--brand);border-radius:2px;transition:width linear}
+
+@media(max-width:600px){
+  .kpis{grid-template-columns:1fr 1fr}
+  .acciones{flex-direction:column}
+  .hdr{padding:0 14px}
+  .main{padding:16px 12px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hlogo">VIS-CO</div>
+  <span class="hbadge">🔒 Contabilidad</span>
+  <div class="hright">
+    <span class="htime" id="htime">—</span>
+    <button class="btn-refresh" onclick="cargar()">↺ Actualizar</button>
+  </div>
+</header>
+
+<div class="main">
+  <!-- barra de auto-refresh -->
+  <div class="refresh-bar"><div class="refresh-fill" id="rfill" style="width:100%"></div></div>
+
+  <!-- KPIs -->
+  <div class="kpis" id="kpis">
+    <div class="kpi pend"><div class="kpi-lbl">📤 Pendientes</div><div class="kpi-val" id="k-pend">—</div><div class="kpi-sub" id="k-pend-sub">cargando...</div></div>
+    <div class="kpi ok"><div class="kpi-lbl">✅ Confirmados hoy</div><div class="kpi-val" id="k-ok">—</div><div class="kpi-sub" id="k-ok-sub"></div></div>
+    <div class="kpi"><div class="kpi-lbl">❌ Rechazados</div><div class="kpi-val" id="k-rej">—</div><div class="kpi-sub" id="k-rej-sub"></div></div>
+  </div>
+
+  <!-- PENDIENTES -->
+  <div class="sec" id="sec-pend">
+    <div class="sec-hdr">
+      <span class="sec-title">⏳ Soportes pendientes de aprobación</span>
+      <span class="cnt-badge warm" id="cnt-pend">0</span>
+    </div>
+    <div id="tbody-pend"><div class="empty"><div class="empty-ico">✅</div>Sin pagos pendientes</div></div>
+  </div>
+
+  <!-- CONFIRMADOS HOY -->
+  <div class="sec" id="sec-ok">
+    <div class="sec-hdr">
+      <span class="sec-title">✅ Confirmados esta semana</span>
+      <span class="cnt-badge green" id="cnt-ok">0</span>
+    </div>
+    <div id="tbody-ok"><div class="empty"><div class="empty-ico">💳</div>Sin confirmaciones</div></div>
+  </div>
+</div>
+
+<!-- MODAL SOPORTE -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="m-title">—</div>
+    <div class="modal-sub" id="m-sub">—</div>
+    <div id="m-img-wrap"></div>
+    <div class="field"><label>Banco / Entidad</label><input id="m-banco" placeholder="Ej: Bancolombia, Nequi..."></div>
+    <div class="field"><label>Referencia / Nro. transacción</label><input id="m-ref" placeholder="Nro. de referencia"></div>
+    <div class="field"><label>Observación (opcional)</label><textarea id="m-obs" rows="2" placeholder="Ej: valor parcial, pendiente confirmar..."></textarea></div>
+    <div class="modal-btns">
+      <button class="btn btn-ok" id="m-btn-ok" onclick="confirmarDesdeModal()">✅ Confirmar — Entró</button>
+      <button class="btn btn-rej" id="m-btn-rej" onclick="rechazarDesdeModal()">❌ Rechazar</button>
+      <button class="btn btn-rev" onclick="closeModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '/api/soportes';
+let SOPS = {};
+let activeKey = null;
+const hoy = new Date().toISOString().slice(0,10);
+
+// ── FORMATO ──────────────────────────────────────────────────
+function fmtM(v){ return '$'+(v||0).toLocaleString('es-CO'); }
+
+// ── CARGA DESDE API ───────────────────────────────────────────
+async function cargar(){
+  document.getElementById('rfill').style.transition='none';
+  document.getElementById('rfill').style.width='100%';
+  try{
+    const r = await fetch(API+'?t='+Date.now());
+    if(r.ok){ SOPS = await r.json(); }
+  } catch(e){ toast('Sin conexión — mostrando datos locales','warn'); }
+  render();
+  startBar();
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function render(){
+  const all = Object.entries(SOPS);
+  const pending   = all.filter(([k,v])=>v.estado==='pendiente');
+  const entrados  = all.filter(([k,v])=>v.estado==='entro');
+  const rechazados= all.filter(([k,v])=>v.estado==='rechazado');
+  const hoyConf   = entrados.filter(([k,v])=>v.fecha_entro===hoy);
+
+  const pendMonto = pending.reduce((a,[k,v])=>a+(v.monto||0),0);
+  const okMonto   = hoyConf.reduce((a,[k,v])=>a+(v.monto||0),0);
+
+  document.getElementById('k-pend').textContent    = fmtM(pendMonto);
+  document.getElementById('k-pend-sub').textContent= pending.length+' soporte'+(pending.length!==1?'s':'');
+  document.getElementById('k-ok').textContent      = fmtM(okMonto);
+  document.getElementById('k-ok-sub').textContent  = hoyConf.length+' hoy · '+entrados.length+' total';
+  document.getElementById('k-rej').textContent     = rechazados.length;
+  document.getElementById('k-rej-sub').textContent = rechazados.length ? rechazados.map(([k,v])=>v.cli||'—').join(', ').slice(0,50) : '';
+
+  document.getElementById('cnt-pend').textContent  = pending.length;
+  document.getElementById('cnt-ok').textContent    = entrados.length;
+
+  // Tabla pendientes
+  if(pending.length){
+    document.getElementById('tbody-pend').innerHTML = tblPend(pending);
+  } else {
+    document.getElementById('tbody-pend').innerHTML = '<div class="empty"><div class="empty-ico">✅</div>Sin pagos pendientes de aprobación</div>';
+  }
+
+  // Tabla confirmados
+  const recientes = entrados.slice(-20).reverse();
+  if(recientes.length){
+    document.getElementById('tbody-ok').innerHTML = tblOk(recientes);
+  } else {
+    document.getElementById('tbody-ok').innerHTML = '<div class="empty"><div class="empty-ico">💳</div>Sin confirmaciones</div>';
+  }
+
+  document.getElementById('htime').textContent = 'Última actualización: '+new Date().toLocaleTimeString('es-CO');
+}
+
+function tblPend(rows){
+  return `<table><thead><tr>
+    <th>Cliente</th><th>Proyecto / Apto</th><th>Etapa</th>
+    <th>Monto</th><th>Soporte</th><th>Fecha soporte</th><th>Acción</th>
+  </tr></thead><tbody>
+  ${rows.map(([k,v])=>`<tr>
+    <td><div class="cli">${v.cli||'—'}</div></td>
+    <td><div class="sub">${v.proy||'—'} · T${v.torre||'—'} A${v.apto||'—'}</div></td>
+    <td><span class="etapa">${v.etapa_label||v.etapa||'—'}</span></td>
+    <td><div class="monto">${fmtM(v.monto||0)}</div>${v.montoCartera&&v.montoCartera!==v.monto?`<div class="fecha">Cartera: ${fmtM(v.montoCartera)}</div>`:''}</td>
+    <td>${v.dataUrl?`<button class="btn btn-ver" onclick="verSop('${k}')">🔍 Ver archivo</button><div class="fecha" style="margin-top:4px">${v.filename||''}</div>`:'<span style="color:var(--g);font-size:11px">Sin adjunto</span>'}</td>
+    <td class="fecha">${v.fecha_soporte||'—'}</td>
+    <td><div class="acciones">
+      <button class="btn btn-ok" onclick="openModal('${k}')">✅ Aprobar</button>
+      <button class="btn btn-rej" onclick="rechazar('${k}')">❌ Rechazar</button>
+    </div></td>
+  </tr>`).join('')}
+  </tbody></table>`;
+}
+
+function tblOk(rows){
+  return `<table><thead><tr>
+    <th>Cliente</th><th>Proyecto / Apto</th><th>Etapa</th>
+    <th>Monto</th><th>Fecha confirmación</th><th>Detalle</th><th></th>
+  </tr></thead><tbody>
+  ${rows.map(([k,v])=>`<tr>
+    <td><div class="cli">${v.cli||'—'}</div></td>
+    <td><div class="sub">${v.proy||'—'} · T${v.torre||'—'} A${v.apto||'—'}</div></td>
+    <td><span class="etapa">${v.etapa_label||v.etapa||'—'}</span></td>
+    <td><div class="monto ok">${fmtM(v.monto||0)}</div></td>
+    <td><div class="conf-date">${v.fecha_entro||'—'}</div></td>
+    <td class="conf-info">${v.banco?`🏦 ${v.banco}<br>`:''}${v.referencia?`🔖 ${v.referencia}<br>`:''}${v.obs_contab?`"${v.obs_contab}"`:'—'}</td>
+    <td><button class="btn btn-rev" style="font-size:10px" onclick="reversar('${k}')">↩ Reversar</button></td>
+  </tr>`).join('')}
+  </tbody></table>`;
+}
+
+// ── MODAL APROBACIÓN ─────────────────────────────────────────
+function openModal(key){
+  const v = SOPS[key]; if(!v) return;
+  activeKey = key;
+  document.getElementById('m-title').textContent = v.cli||'—';
+  document.getElementById('m-sub').textContent   = `${v.proy||'—'} · T${v.torre||'—'} A${v.apto||'—'} · ${v.etapa_label||v.etapa||'—'} · ${fmtM(v.monto||0)}`;
+  document.getElementById('m-banco').value = v.banco||'';
+  document.getElementById('m-ref').value   = v.referencia||'';
+  document.getElementById('m-obs').value   = v.obs_contab||'';
+  const wrap = document.getElementById('m-img-wrap');
+  if(v.dataUrl){
+    if(v.dataUrl.startsWith('data:image')){
+      wrap.innerHTML=`<img class="modal-img" src="${v.dataUrl}">`;
+    } else {
+      wrap.innerHTML=`<a class="btn btn-ver" href="${v.dataUrl}" target="_blank" style="display:inline-block;margin:10px 0">📄 Ver PDF adjunto</a>`;
+    }
+  } else { wrap.innerHTML=''; }
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal(){ document.getElementById('overlay').classList.remove('open'); activeKey=null; }
+
+async function confirmarDesdeModal(){
+  if(!activeKey) return;
+  const banco = document.getElementById('m-banco').value.trim();
+  const ref   = document.getElementById('m-ref').value.trim();
+  const obs   = document.getElementById('m-obs').value.trim();
+  const v = SOPS[activeKey]||{};
+  SOPS[activeKey] = {...v, estado:'entro', fecha_entro:hoy, banco, referencia:ref, obs_contab:obs};
+  closeModal();
+  await guardar();
+  toast('✅ Pago confirmado — '+(v.cli||''), 'ok');
+  render();
+}
+
+async function rechazarDesdeModal(){
+  if(!activeKey) return;
+  const obs = document.getElementById('m-obs').value.trim() || prompt('Razón del rechazo (opcional):','') || '';
+  const v = SOPS[activeKey]||{};
+  SOPS[activeKey] = {...v, estado:'rechazado', fecha_rechazo:hoy, obs_contab:obs};
+  closeModal();
+  await guardar();
+  toast('❌ Soporte rechazado — '+(v.cli||''), 'warn');
+  render();
+}
+
+async function rechazar(key){
+  const v = SOPS[key]; if(!v) return;
+  const obs = prompt('Razón del rechazo (opcional):', '');
+  if(obs === null) return;
+  SOPS[key] = {...v, estado:'rechazado', fecha_rechazo:hoy, obs_contab:obs};
+  await guardar();
+  toast('❌ Rechazado — '+(v.cli||''), 'warn');
+  render();
+}
+
+async function reversar(key){
+  const v = SOPS[key]; if(!v) return;
+  if(!confirm('¿Reversar a pendiente?')) return;
+  SOPS[key] = {...v, estado:'pendiente', fecha_entro:undefined, fecha_rechazo:undefined};
+  delete SOPS[key].fecha_entro;
+  delete SOPS[key].fecha_rechazo;
+  await guardar();
+  toast('↩ Reversado a pendiente', 'warn');
+  render();
+}
+
+function verSop(key){
+  const v = SOPS[key]; if(!v||!v.dataUrl) return;
+  const w = window.open('','_blank');
+  if(v.dataUrl.startsWith('data:image')){
+    w.document.write(`<html><body style="margin:0;background:#111"><img src="${v.dataUrl}" style="max-width:100%;display:block;margin:auto"></body></html>`);
+  } else {
+    w.location = v.dataUrl;
+  }
+}
+
+// ── GUARDAR EN API ────────────────────────────────────────────
+async function guardar(){
+  try{
+    await fetch(API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(SOPS)});
+  } catch(e){ toast('Error guardando — sin conexión','err'); }
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type==='ok'?'#065F46':type==='warn'?'#92400E':type==='err'?'#7F1D1D':'#111';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+// ── AUTO-REFRESH cada 60 s ───────────────────────────────────
+let rfTimer, rfStart;
+function startBar(){
+  clearInterval(rfTimer);
+  rfStart = Date.now();
+  const fill = document.getElementById('rfill');
+  fill.style.transition = 'none';
+  fill.style.width = '100%';
+  setTimeout(()=>{
+    fill.style.transition = 'width 60s linear';
+    fill.style.width = '0%';
+  }, 50);
+  rfTimer = setInterval(()=>{
+    cargar();
+  }, 60000);
+}
+
+// Cerrar modal con Escape
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+// ── INIT ──────────────────────────────────────────────────────
+cargar();
+</script>
+</body>
+</html>
