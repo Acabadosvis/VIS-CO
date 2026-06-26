@@ -1399,4 +1399,315 @@ function confirmarEntro(key){
       <textarea class="fi" id="cv-obs" rows="2" placeholder="Notas adicionales...">${cur.obs_contab||''}</textarea></div>
     <div style="display:flex;gap:9px;justify-content:flex-end;margin-top:16px">
       <button class="bsec" onclick="document.getElementById('ov2').style.display='none'">Cancelar</button>
-      <button class="bpri" onclick="guardarConfirmacion('${key}')">✅ C
+      <button class="bpri" onclick="guardarConfirmacion('${key}')">✅ Confirmar que entró</button>
+    </div>`;
+  ov.style.display='flex';
+}
+function limpiarSoportes(){
+  if(!confirm('¿Borrar todos los registros de soportes? Esta acción no se puede deshacer.')) return;
+  localStorage.removeItem(LS_SOPORTES);
+  parseAndRender(null); // recalculate saldos
+  toast('🗑 Soportes eliminados','ok');
+}
+function rechazarPago(key){
+  const s=getSoportes(); const cur=s[key]||{};
+  s[key]={...cur,estado:'rechazado',fecha_rechazo:new Date().toISOString().slice(0,10)};
+  _saveSop(s); parseAndRender(null);
+  toast('❌ Pago marcado como rechazado','ok');
+}
+function reversarPago(key){
+  if(!confirm('¿Reversar este pago? Volverá a aparecer en la cartera pendiente.')) return;
+  const s=getSoportes(); delete s[key];
+  _saveSop(s); parseAndRender(null);
+  toast('↩ Pago reversado — vuelve a cartera','ok');
+}
+function guardarConfirmacion(key){
+  const banco=document.getElementById('cv-banco')?.value.trim()||'';
+  const ref  =document.getElementById('cv-ref')?.value.trim()||'';
+  const obs  =document.getElementById('cv-obs')?.value.trim()||'';
+  const s=getSoportes(); const cur=s[key]||{};
+  s[key]={...cur,estado:'entro',banco,referencia:ref,obs_contab:obs,
+    fecha_entro:new Date().toISOString().slice(0,10),
+    updated:new Date().toISOString().slice(0,10)};
+  _saveSop(s);
+  document.getElementById('ov2').style.display='none';
+  parseAndRender(null); // recalculate so block disappears from cartera
+  toast('✅ Pago confirmado y registrado','ok');
+}
+
+// ── EXPORT CONFIRMACIONES ────────────────────────────────────
+function exportConfirmaciones(){
+  const sops = getSoportes();
+  const all  = Object.values(sops).filter(v=>v.estado==='entro');
+  if(!all.length){ toast('Sin confirmaciones para exportar','warn'); return; }
+
+  const BOM = '\ufeff'; // UTF-8 BOM para que Excel abra bien tildes
+  const cols = [
+    'Fecha Confirmación','Semana','Cliente','Proyecto','Torre','Apto',
+    'Etapa','Monto','Fecha Soporte','Banco / Cuenta','Referencia','Observación Contabilidad'
+  ];
+  const rows = all
+    .sort((a,b)=>(a.fecha_entro||'').localeCompare(b.fecha_entro||''))
+    .map(v=>[
+      v.fecha_entro||'',
+      v.semana||'',
+      v.cli||'',
+      v.proy||'',
+      v.torre||'',
+      v.apto||'',
+      v.etapa_label||v.etapa||'',
+      v.monto||0,
+      v.fecha_soporte||'',
+      v.banco||'',
+      v.referencia||'',
+      v.obs_contab||''
+    ].map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(','));
+
+  const csv = BOM + [cols.join(','), ...rows].join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'confirmaciones-cartera-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  toast('📥 CSV descargado — '+all.length+' confirmaciones','ok');
+}
+
+function exportPendientes(){
+  const sops = getSoportes();
+  const all  = Object.values(sops).filter(v=>v.estado==='pendiente');
+  if(!all.length){ toast('Sin pendientes para exportar','warn'); return; }
+
+  const BOM = '\ufeff';
+  const cols = ['Fecha Soporte','Semana','Cliente','Proyecto','Torre','Apto','Etapa','Monto','Archivo Soporte'];
+  const rows = all
+    .sort((a,b)=>(a.fecha_soporte||'').localeCompare(b.fecha_soporte||''))
+    .map(v=>[
+      v.fecha_soporte||'',
+      v.semana||'',
+      v.cli||'',
+      v.proy||'',
+      v.torre||'',
+      v.apto||'',
+      v.etapa_label||v.etapa||'',
+      v.monto||0,
+      v.filename||''
+    ].map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(','));
+
+  const csv = BOM + [cols.join(','), ...rows].join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'soportes-pendientes-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  toast('📥 CSV pendientes descargado','ok');
+}
+
+// ── EXPORT CSV ────────────────────────────────────────────────
+function exportCSV(){
+  const reasons=JSON.parse(localStorage.getItem(LS_REASONS)||'{}');
+  const notes=JSON.parse(localStorage.getItem(LS_NOTES)||'{}');
+  const h=['Categoría','Estado','Cliente','Proyecto','Torre','Apto','Asesor','Total Contrato','Recaudado','X Recaudar','Vencido','Esta Semana','%Recaudo','Días Mora','Razón Atraso','Observaciones'];
+  const rows=DATA.map(c=>[
+    c.cat,c.ep,c.cli,c.proy,c.torre,c.apto,c.asesor,
+    c.total,c.recaudado,c.xrec,c.vencAmt,c.semAmt,
+    Math.round(c.pct*100)+'%',c.diasMora,
+    reasons[c.cid]||'',notes[c.cid]||''
+  ].map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(','));
+  const csv=[h.join(','),...rows].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='cartera-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click(); toast('CSV exportado','ok');
+}
+
+// ── FILE LOADING ──────────────────────────────────────────────
+function setLBar(on){
+  const lb=document.getElementById('lbar');
+  lb.style.width=on?'70%':'100%';
+  if(!on) setTimeout(()=>lb.style.width='0',400);
+}
+
+function parseAndRender(buf) {
+  if (MODO_CONTAB && !buf) { renderCola(); return; }
+  if (buf) {
+    try { DATA = parseBuffer(buf); }
+    catch(e) { toast('Error: '+e.message,'err'); setLBar(false); return; }
+  } else {
+    // Re-classify with new week
+    // Re-parse not possible without buffer — just re-render with existing data
+    // Reclassify based on new week
+    for (const c of DATA) {
+      let vencAmt=0, semAmt=0, proxAmt=0, oldestVenc=null;
+      const _sops2 = JSON.parse(localStorage.getItem('visco_sop2')||'{}');
+      for (const b of c.blocks) {
+        // Si contabilidad confirmó este bloque, excluirlo del cálculo
+        if (_sops2[pagoKey(c.cid,b.etapa)]?.estado === 'entro') {
+          b.bst='pagado'; continue;
+        }
+        const fd = b.fc ? new Date(b.fc+'T12:00:00') : null;
+        if (!fd) { b.bst='proximo'; continue; }
+        if (fd < WEEK.start) {
+          b.bst='vencido'; vencAmt+=b.saldo;
+          if(!oldestVenc||b.fc<oldestVenc)oldestVenc=b.fc;
+        } else if (fd<=WEEK.end) {
+          b.bst='semana'; semAmt+=b.saldo;
+        } else {
+          b.bst='proximo'; proxAmt+=b.saldo;
+        }
+      }
+      c.vencAmt=vencAmt; c.semAmt=semAmt; c.proxAmt=proxAmt;
+      c.oldestVenc=oldestVenc;
+      c.diasMora=oldestVenc?Math.abs(daysDiff(oldestVenc)):0;
+      if(c.ep==='ENTREGADO') c.cat='mora';
+      else if(c.ep==='EN EJECUCIÓN'){
+        if(vencAmt>0)c.cat='vencido';
+        else if(semAmt>0)c.cat='semana';
+        else c.cat='aldia';
+      } else { // X RECIBIR — siempre recibir
+        c.cat='recibir';
+      }
+    }
+  }
+  populateFilters();
+  showDash();
+  render();
+  setLBar(false);
+}
+
+function showDash(){
+  document.getElementById('first-screen').style.display='none';
+  document.getElementById('dash').classList.add('show');
+  document.getElementById('file-pill').style.display='flex';
+  document.getElementById('btn-csv').style.display='flex';
+  document.getElementById('cmodo-wrap').style.display='flex';
+}
+
+async function onFileInput(input){
+  const file=input.files[0]; if(!file) return;
+  setLBar(true);
+  // Try to save File System handle
+  if(input.files[0] && window.FileSystemFileHandle===undefined){
+    // Fallback: read as ArrayBuffer
+  }
+  // Save to IndexedDB if possible (modern Chrome/Edge)
+  // We can't get FileSystemFileHandle from <input type=file>, only from showOpenFilePicker
+  // So for <input>, just read and cache filename
+  fileName = file.name;
+  document.getElementById('file-name').textContent = fileName;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    parseAndRender(new Uint8Array(e.target.result));
+    toast('✅ '+fileName+' cargado','ok');
+  };
+  reader.readAsArrayBuffer(file);
+  input.value='';
+}
+
+async function recargar(){
+  if(fileHandle){
+    await loadFromHandle();
+  } else {
+    toast('Selecciona el archivo con el botón "Cambiar archivo"','warn');
+  }
+}
+
+// File System Access API — auto-open
+async function tryAutoOpen(){
+  if(!window.showOpenFilePicker){
+    // Browser doesn't support FSA
+    checkCachedName();
+    return;
+  }
+  const h = await loadHandle();
+  if(!h){ checkCachedName(); return; }
+  fileHandle = h;
+  const savedName = await h.name.catch?.(()=>null) || h.name;
+  if(savedName){
+    document.getElementById('fs-saved-name').textContent = savedName;
+    document.getElementById('fs-saved').classList.add('show');
+  }
+}
+
+async function loadFromHandle(){
+  if(!fileHandle) return;
+  setLBar(true);
+  try{
+    const perm = await fileHandle.queryPermission({mode:'read'});
+    const final = perm==='granted' ? 'granted' : await fileHandle.requestPermission({mode:'read'});
+    if(final!=='granted'){ toast('Permiso denegado','err'); setLBar(false); return; }
+    const file = await fileHandle.getFile();
+    fileName = file.name;
+    document.getElementById('file-name').textContent = fileName;
+    const buf = await file.arrayBuffer();
+    parseAndRender(new Uint8Array(buf));
+    toast('✅ '+fileName+' cargado','ok');
+  }catch(e){ toast('Error al leer el archivo: '+e.message,'err'); setLBar(false); }
+}
+
+async function openWithFSA(){
+  if(!window.showOpenFilePicker){ toast('Tu navegador no soporta esta función. Usa Chrome o Edge.','warn'); return; }
+  try{
+    const [h] = await window.showOpenFilePicker({
+      types:[{description:'Excel',accept:{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':['.xlsx','.xls']}}]
+    });
+    fileHandle = h;
+    await saveHandle(h);
+    await loadFromHandle();
+  }catch(e){ if(e.name!=='AbortError') toast('Error: '+e.message,'err'); }
+}
+
+function checkCachedName(){
+  // No FSA support — just show the normal screen
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function toast(msg,type,dur=3200){
+  const el=document.createElement('div');
+  el.className='tmsg '+(type==='ok'?'ok':type==='err'?'err':type==='warn'?'warn':'');
+  el.textContent=msg;
+  document.getElementById('toast').appendChild(el);
+  setTimeout(()=>el.remove(),dur);
+}
+
+// ── UTILS ─────────────────────────────────────────────────────
+function getCSSVar(name){return getComputedStyle(document.documentElement).getPropertyValue(name);}
+
+// ── KEYBOARD ─────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+['fa','fp','fe'].forEach(id=>document.addEventListener('change',e=>{if(e.target.id===id)render();}));
+document.getElementById('fs2')?.addEventListener('input',()=>render());
+
+// ── MODO CONTABILIDAD ─────────────────────────────────
+function initContabMode(){
+  document.getElementById('first-screen').style.display='none';
+  document.getElementById('dash').classList.add('show');
+  document.querySelectorAll('.hbtn,#file-pill,#cmodo-wrap,#btn-csv').forEach(function(el){el.style.display='none';});
+  document.querySelector('.week-pill').style.display='none';
+  document.getElementById('kpis').style.display='none';
+  document.getElementById('adic-kpi').style.display='none';
+  document.querySelector('.fbar').style.display='none';
+  document.querySelector('.tabs-wrap').style.display='none';
+  document.querySelector('.hbadge').textContent='Contabilidad';
+  var badge=document.createElement('span');
+  badge.style.cssText='background:#ECFDF5;border:1.5px solid #A7F3D0;color:#065F46;border-radius:20px;padding:3px 12px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-right:8px;';
+  badge.textContent='🔒 Contabilidad';
+  document.querySelector('.hright').prepend(badge);
+  var btnBack=document.createElement('button');
+  btnBack.textContent='← Cartera completa';
+  btnBack.style.cssText='font-size:10px;font-weight:700;padding:6px 13px;border-radius:8px;border:1.5px solid var(--brd);background:var(--w);color:var(--g);cursor:pointer;';
+  btnBack.onclick=function(){ window.location.href=location.pathname; };
+  document.querySelector('.hright').appendChild(btnBack);
+  var dt=document.getElementById('dash-title');
+  if(dt) dt.innerHTML='<span>Cola de pagos &mdash; Contabilidad</span>';
+  curTab='cola';
+  renderCola();
+}
+
+// ── INIT ──────────────────────────────────────────────
+setWeekInputs();
+loadSoportesFromAPI().then(function(){
+  if (MODO_CONTAB) { initContabMode(); } else { tryAutoOpen(); }
+});
+</script>
+</body>
+</html>
