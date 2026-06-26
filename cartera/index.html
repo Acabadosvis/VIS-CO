@@ -798,8 +798,8 @@ function renderKPIs() {
     {c:'semana', val:sum(grp('semana'),'semAmt'),  cnt:clts(grp('semana')), tag:'k3'},
     {c:'recibir',val:sum(grp('recibir'),'xrec'),   cnt:clts(grp('recibir')),tag:'k4'},
     {c:'aldia',  val:sum(grp('aldia'),'xrec'),     cnt:clts(grp('aldia')),  tag:'k5'},
-    {c:'adicionales', val:getActiveData().filter(c=>c.adic>0).reduce((s,c)=>s+c.adic,0),
-     cnt:getActiveData().filter(c=>c.adic>0).length, tag:'k6'},
+    {c:'adicionales', val:getActiveData().filter(c=>c.pending_adic>0).reduce((s,c)=>s+c.pending_adic,0),
+     cnt:getActiveData().filter(c=>c.pending_adic>0).length, tag:'k6'},
     // cola: pending soportes
     {c:'cola', val:Object.values(getSoportes()).filter(v=>v.estado==='pendiente').reduce((a,v)=>a+(v.monto||0),0),
      cnt:Object.values(getSoportes()).filter(v=>v.estado==='pendiente').length, tag:'k7'},
@@ -810,10 +810,10 @@ function renderKPIs() {
       <div class="ksub">${cnt} clientes</div>
     </div>`).join('');
   document.getElementById('kpis').innerHTML = html;
-  // Adicionales KPI
-  const adArr = getActiveData().filter(c=>c.adic>0);
-  const adTotal = adArr.reduce((s,c)=>s+c.adic,0);
+  // Adicionales KPI — solo los que tienen saldo pendiente real
   const adKpi = document.getElementById('adic-kpi');
+  const adArr = getActiveData().filter(c=>c.pending_adic>0);
+  const adTotal = adArr.reduce((s,c)=>s+c.pending_adic,0);
   if(adKpi){
     if(adTotal>0){
       adKpi.style.display='flex';
@@ -907,13 +907,12 @@ function render() {
     <th onclick="doSort('total')" style="text-align:right">Total Contrato</th>
     <th onclick="doSort('recaudado')" style="text-align:right">Recaudado</th>
     <th onclick="doSort('xrec')" style="text-align:right">X Recaudar</th>
-    <th onclick="doSort('adic')" style="text-align:right">Adicionales</th>
     ${showVencAmt?'<th style="text-align:right">Vencido</th>':''}
     ${showSemAmt?'<th style="text-align:right">Esta Semana</th>':''}
     <th>Recaudo %</th>
     ${showDias?'<th>Fecha pago</th>':''}
     ${showReason?'<th>Razón atraso</th>':''}
-    ${showPagoBtn?'<th>Pago</th>':''}
+    ${showPagoBtn?'<th>Soporte</th>':''}
     <th>Obs.</th>
   </tr>`;
 
@@ -975,8 +974,7 @@ function render() {
       <td style="font-size:11px;color:var(--g)">${c.torre||'—'} · ${c.apto||'—'}</td>
       <td class="m" style="text-align:right">${fmtMF(c.total)}</td>
       <td class="m mok" style="text-align:right">${fmtMF(c.recaudado)}</td>
-      <td class="m ${xRecClass}" style="text-align:right">${fmtMF(c.xrec)}</td>
-      <td class="m adic-col" style="text-align:right">${c.adic>0?fmtMF(c.adic):'—'}</td>
+      <td class="m ${xRecClass}" style="text-align:right">${fmtMF(c.xrec)}${c.pending_adic>0?`<br><span style="font-size:9px;color:#D97706;font-weight:600">+${fmtM(c.pending_adic)} adic.</span>`:''}</td>
       ${showVencAmt?`<td class="m mv" style="text-align:right">${fmtMF(c.vencAmt)}</td>`:''}
       ${showSemAmt?`<td class="m ms" style="text-align:right">${fmtMF(c.semAmt)}</td>`:''}
       <td>${pctBar}</td>
@@ -1117,15 +1115,16 @@ function closeModal(){document.getElementById('ov').classList.remove('open');doc
 function renderAdicionales() {
   const adics_meta = getAdics();
   const sops = getSoportes();
-  const items = applyFilters(getActiveData().filter(c=>c.adic>0));
+  const items = applyFilters(getActiveData().filter(c=>c.pending_adic>0));
   document.getElementById('ptitle').textContent = '🔧 Adicionales';
-  document.getElementById('phint').textContent  = 'Cobros adicionales fuera del contrato principal';
+  document.getElementById('phint').textContent  = 'Adicionales con saldo pendiente — separados del contrato base';
   document.getElementById('fcnt').innerHTML = `<strong>${items.length}</strong> clientes`;
 
   document.getElementById('thead').innerHTML = `<tr>
     <th>Estado</th><th>Cliente</th><th>Proyecto</th><th>Torre/Apto</th>
-    <th style="text-align:right">Valor Adicional</th>
-    <th>Descripción</th><th>Fecha cobro</th><th>Soporte / Flujo</th>
+    <th style="text-align:right">Adic. total</th>
+    <th style="text-align:right">Adic. pendiente</th>
+    <th>Fecha cobro</th><th>Soporte / Flujo</th>
   </tr>`;
 
   if(!items.length){
@@ -1148,8 +1147,8 @@ function renderAdicionales() {
       <td style="font-weight:500;max-width:160px" title="${c.cli}">${c.cli}<br><span style="font-size:10px;color:var(--g);font-weight:400">T${c.torre||'—'} A${c.apto||'—'}</span></td>
       <td><span class="bproy">${c.proy}</span></td>
       <td style="font-size:11px;color:var(--g)">${c.torre||'—'} · ${c.apto||'—'}</td>
-      <td class="m adic-col" style="text-align:right;font-size:13px;font-weight:700">${fmtMF(c.adic)}</td>
-      <td style="font-size:11px;color:var(--g)">Adicionales/Ajustes</td>
+      <td class="m" style="text-align:right;font-size:11px;color:var(--g)">${fmtMF(c.adic)}</td>
+      <td class="m adic-col" style="text-align:right;font-size:13px;font-weight:700">${fmtMF(c.pending_adic)}</td>
       <td style="font-size:11px">${fechaCobro?fmtD(fechaCobro):'<span style="color:#CCC">Sin fecha</span>'}</td>
       <td>${badgeTxt||'<span style="color:#CCC;font-size:11px">Sin gestión</span>'}</td>
     </tr>`;
@@ -1235,9 +1234,23 @@ function saveAdicObs(cid){
 // ── PAGO CELL (inline en tabla) ──────────────────────────────
 function renderPagoCellRow(c) {
   const sops = getSoportes();
-  // Cualquier bloque con saldo pendiente puede recibir soporte
   const activeBlocks = (c.blocks||[]).filter(b=>b.saldo>0);
-  if(!activeBlocks.length) return '<span style="color:#CCC;font-size:10px">—</span>';
+
+  // X RECIBIR sin bloques de pago definidos → usar clave genérica 'GEN'
+  if(!activeBlocks.length) {
+    if(c.ep==='X RECIBIR' || c.cat==='recibir') {
+      const pk = pagoKey(c.cid,'GEN');
+      const sop = sops[pk]||{};
+      if(sop.estado==='soporte')   return `<span class="pago-badge soporte" onclick="openModal('${c.cid}')" style="cursor:pointer">📤 Soporte</span>`;
+      if(sop.estado==='revision')  return `<span class="pago-badge pendiente" onclick="openModal('${c.cid}')" style="cursor:pointer">🔍 Revisión</span>`;
+      if(sop.estado==='entro')     return `<span class="pago-badge entro" onclick="openModal('${c.cid}')" style="cursor:pointer">✅ Entró</span>`;
+      return `<label class="fbtn upload" style="padding:3px 9px;font-size:10px;display:inline-flex" title="Cargar soporte de pago">
+        📤 Soporte<input type="file" accept="image/*,.pdf" onchange="onSoporteRapido('${c.cid}',this,'GEN')">
+      </label>`;
+    }
+    return '<span style="color:#CCC;font-size:10px">—</span>';
+  }
+
   // Check any soporte registered for this client
   const anyPend = activeBlocks.some(b=>{ const s=sops[pagoKey(c.cid,b.etapa)]; return s&&s.estado==='pendiente'; });
   const anyEntro= activeBlocks.some(b=>{ const s=sops[pagoKey(c.cid,b.etapa)]; return s&&s.estado==='entro'; });
@@ -1247,9 +1260,31 @@ function renderPagoCellRow(c) {
     📤 Soporte<input type="file" accept="image/*,.pdf" onchange="onSoporteRapido('${c.cid}',this)">
   </label>`;
 }
-function onSoporteRapido(cid,input){
+function onSoporteRapido(cid,input,etapaFija){
   const f=input.files[0]; if(!f) return;
   const c=DATA.find(x=>x.cid===cid); if(!c) return;
+
+  // Si se pasa etapaFija (ej: 'GEN' para X RECIBIR sin bloques)
+  if(etapaFija){
+    const rawMonto = prompt('💰 Monto del pago de '+c.cli+'\nEscribe el valor:', c.xrec||0);
+    if(rawMonto === null) return;
+    const montoReal = rawMonto ? (parseInt(rawMonto.toString().replace(/\D/g,''))||0) : 0;
+    const reader2=new FileReader();
+    reader2.onload=function(e2){
+      const s2=getSoportes();
+      const pk2=pagoKey(cid,etapaFija);
+      s2[pk2]={estado:'soporte',filename:f.name,size:f.size,
+        dataUrl:e2.target.result, monto:montoReal,
+        etapa:etapaFija, etapa_label:'Pago',
+        cli:c.cli,proy:c.proy,torre:c.torre,apto:c.apto,
+        fecha_soporte:new Date().toISOString().slice(0,10), semana:WEEK.ss};
+      _saveSop(s2); render();
+      toast('📤 Soporte registrado para '+c.cli,'ok');
+    };
+    reader2.readAsDataURL(f);
+    return;
+  }
+
   // Solo el PRIMER bloque pendiente en orden (cualquier bloque con saldo)
   const candidatos=(c.blocks||[]).filter(b=>b.saldo>0);
   const sActual=getSoportes();
