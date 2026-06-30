@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.06.25.17 -->
+<!-- v2026.06.30.18 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -533,7 +533,35 @@ function wLbl(p){return`${dS(p.s)} ✦ ${dS(p.e)} ${p.e.getFullYear()}`;}
 function wShort(p){return`${dS(p.s)}–${dS(p.e)}`;}
 function upWLbl(){document.getElementById('wlbl').textContent=wLbl(getPer());}
 function chW(d){off+=d;upWLbl();const el=document.getElementById('wlbl');if(el){el.style.opacity='.4';setTimeout(()=>{el.style.opacity='1';},250);}renderAll();}
-function goTab(i){document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('on',i===j));document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('on',i===j));}
+/* ── syncDatosAPI: descarga datos de la nube y mezcla con local ── */
+async function syncDatosAPI(tipo,weeks){
+  var storeKey=tipo==='redes'?LS_R:LS_L;
+  var all=gLS(storeKey);var changed=false;
+  await Promise.all(weeks.map(async function(w){
+    try{
+      var r=await fetch('/api/datos?tipo='+tipo+'&week='+w);
+      var j=await r.json();
+      if(j.ok&&j.data&&Object.keys(j.data).length>0){
+        var merged=Object.assign({},all[w]||{},j.data);
+        if(JSON.stringify(all[w])!==JSON.stringify(merged)){all[w]=merged;changed=true;}
+      }
+    }catch(e){}
+  }));
+  if(changed)sLS(storeKey,all);
+  return changed;
+}
+function goTab(i){
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('on',i===j));
+  document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('on',i===j));
+  if(i===0){
+    var wR=[getPer(off-5),getPer(off-4),getPer(off-3),getPer(off-2),getPer(off-1),getPer(off)].map(w=>w.sISO);
+    syncDatosAPI('redes',wR).then(function(ch){if(ch)renderRedes();});
+  }
+  if(i===1){
+    var wL=[getPer(off-2),getPer(off-1),getPer(off)].map(w=>w.sISO);
+    syncDatosAPI('leads',wL).then(function(ch){if(ch)renderLeads();});
+  }
+}
 
 /* ═══ CHARTS ═══ */
 function mkC(id,cfg){if(charts[id]){try{charts[id].destroy();}catch(e){}delete charts[id];}const ctx=document.getElementById(id);if(!ctx)return null;charts[id]=new Chart(ctx,cfg);return charts[id];}
@@ -592,7 +620,7 @@ function onFilesAptos(inp){
 
 /* ═══ REDES ═══ */
 const RF=[['wpp','r_wpp'],['cli_calc','r_cli_calc'],['cli_ver','r_cli_ver'],['msg_redes','r_msg_redes'],['cierres_org','r_cierres_org'],['ig_alc','r_ig_alc'],['ig_imp','r_ig_imp'],['ig_int','r_ig_int'],['fb_alc','r_fb_alc'],['fb_imp','r_fb_imp'],['fb_int','r_fb_int'],['tk_alc','r_tk_alc'],['tk_imp','r_tk_imp'],['tk_int','r_tk_int']];
-function saveRedes(){
+async function saveRedes(){
   const p=getPer();const d=gLS(LS_R);const o={};
   RF.forEach(([k,id])=>{o[k]=parseInt(document.getElementById(id)?.value||'0')||0;});
   d[p.sISO]=o;sLS(LS_R,d);
@@ -602,8 +630,19 @@ function saveRedes(){
   if(!lw.total||lw.total<o.wpp)lw.total=o.wpp;
   ld[p.sISO]=lw;sLS(LS_L,ld);
   renderRedes();renderLeads();
-  // Update l_wpp field if Leads tab is showing
   const lf=document.getElementById('l_wpp');if(lf)lf.value=o.wpp||'';
+  // ☁️ Subir a la nube para sincronizar con otros dispositivos
+  const btn=document.querySelector('[onclick="saveRedes()"]');
+  if(btn)btn.textContent='☁️ Guardando…';
+  try{
+    const r=await fetch('/api/datos?tipo=redes&week='+p.sISO,{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(o)
+    });
+    const j=await r.json();
+    if(btn){btn.textContent=j.ok?'✅ Guardado en la nube ☁️':'⚠️ Solo local';setTimeout(()=>{btn.innerHTML='💾 Guardar + sincronizar leads';},2000);}
+  }catch(e){
+    if(btn){btn.textContent='⚠️ Sin conexión — guardado local';setTimeout(()=>{btn.innerHTML='💾 Guardar + sincronizar leads';},2000);}
+  }
 }
 function renderRedes(){
   const p2=getPer(off),p1=getPer(off-1),p0=getPer(off-2);
@@ -695,7 +734,7 @@ function calcNI(){
   var el=document.getElementById('l_ni');
   if(el){el.value=ni>0?ni:'';el.style.background=ni>0?'#FFF3E6':'';}
 }
-function saveLeads(){
+async function saveLeads(){
   calcNI();
   /* leer formulario */
   const o={};
@@ -704,22 +743,26 @@ function saveLeads(){
     var el=document.getElementById(id);
     o[k]=el?Math.max(0,parseInt(el.value)||0):0;
   });
-  /* guardar */
+  /* guardar local */
   var key=getPer().sISO;
   var store=gLS(LS_L);
-  store[key]=o;
-  sLS(LS_L,store);
-  /* feedback visual */
-  var btn=document.querySelector('[onclick="saveLeads()"]');
-  if(btn){btn.textContent='✅ Guardado';setTimeout(function(){btn.innerHTML='💾 Guardar leads';},1600);}
+  store[key]=o;sLS(LS_L,store);
   /* mostrar debug */
   var dbgEl=document.getElementById('l-dbg');
-  if(dbgEl){
-    var readback=gLS(LS_L)[key]||{};
-    dbgEl.style.display='block';
-    dbgEl.innerHTML='Semana: '+key+' | Total: '+readback.total+' | WPP: '+readback.wpp+' | Interesados: '+readback.int+' | Cierres: '+readback.ci;
-  }
+  if(dbgEl){var readback=gLS(LS_L)[key]||{};dbgEl.style.display='block';dbgEl.innerHTML='Semana: '+key+' | Total: '+readback.total+' | WPP: '+readback.wpp+' | Interesados: '+readback.int+' | Cierres: '+readback.ci;}
   renderLeads();
+  /* ☁️ Subir a la nube */
+  var btn=document.querySelector('[onclick="saveLeads()"]');
+  if(btn)btn.textContent='☁️ Guardando…';
+  try{
+    var r=await fetch('/api/datos?tipo=leads&week='+key,{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(o)
+    });
+    var j=await r.json();
+    if(btn){btn.textContent=j.ok?'✅ Guardado en la nube ☁️':'⚠️ Solo local';setTimeout(function(){btn.innerHTML='💾 Guardar leads';},2000);}
+  }catch(e){
+    if(btn){btn.textContent='⚠️ Sin conexión — guardado local';setTimeout(function(){btn.innerHTML='💾 Guardar leads';},2000);}
+  }
 }
 function calcNI(){
   var tot=parseInt(document.getElementById('l_total')?.value)||0;
@@ -1587,8 +1630,18 @@ function renderAll(){try{renderRedes();}catch(e){console.error('Redes:',e);}try{
   await initStorage();
   upWLbl();renderAll();
   initYoBanner();
+  /* ── Sincronización inicial desde la nube ── */
+  var w6=[ getPer(off-5),getPer(off-4),getPer(off-3),getPer(off-2),getPer(off-1),getPer(off) ].map(function(w){return w.sISO;});
+  syncDatosAPI('redes',w6).then(function(ch){if(ch)renderRedes();});
+  var w3=[ getPer(off-2),getPer(off-1),getPer(off) ].map(function(w){return w.sISO;});
+  syncDatosAPI('leads',w3).then(function(ch){if(ch)renderLeads();});
   /* Auto-refresh reuniones desde la nube cada 45s */
   setInterval(()=>{try{renderReuniones();}catch(e){}},45000);
+  /* Auto-refresh redes y leads desde la nube cada 60s */
+  setInterval(function(){
+    syncDatosAPI('redes',w6).then(function(ch){if(ch)renderRedes();});
+    syncDatosAPI('leads',w3).then(function(ch){if(ch)renderLeads();});
+  },60000);
   // Restaurar Excel desde localStorage al refrescar
   try{
     var saved=VC3[LS_XL];
