@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.06.30.18 -->
+<!-- v2026.06.30.19 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -1630,6 +1630,21 @@ function renderAll(){try{renderRedes();}catch(e){console.error('Redes:',e);}try{
   await initStorage();
   upWLbl();renderAll();
   initYoBanner();
+  /* ── Migración única: sube datos locales previos a la nube ── */
+  (async function migrarLocal(){
+    var MIG='vc3_migrated_v2';
+    if(localStorage.getItem(MIG)) return;
+    var allR=gLS(LS_R),allL=gLS(LS_L);
+    var rTasks=Object.entries(allR).filter(function(e){return e[1]&&Object.keys(e[1]).length>0;}).map(async function(e){
+      try{await fetch('/api/datos?tipo=redes&week='+e[0],{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(e[1])});}catch(ex){}
+    });
+    var lTasks=Object.entries(allL).filter(function(e){return e[1]&&Object.keys(e[1]).length>0;}).map(async function(e){
+      try{await fetch('/api/datos?tipo=leads&week='+e[0],{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(e[1])});}catch(ex){}
+    });
+    await Promise.all([...rTasks,...lTasks]);
+    localStorage.setItem(MIG,'1');
+    console.log('VIS-CO: datos locales migrados a la nube ✅');
+  })();
   /* ── Sincronización inicial desde la nube ── */
   var w6=[ getPer(off-5),getPer(off-4),getPer(off-3),getPer(off-2),getPer(off-1),getPer(off) ].map(function(w){return w.sISO;});
   syncDatosAPI('redes',w6).then(function(ch){if(ch)renderRedes();});
