@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.06.30.19 -->
+<!-- v2026.07.01.20 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -302,7 +302,7 @@ tr:hover td{background:var(--b)}
 <!-- P0 REDES -->
 <div class="panel on" id="p0">
   <div class="card">
-    <div class="card-hd">&#128241; M&#233;tricas digitales <span id="r0-per" style="color:var(--o)"></span><span class="card-hd-sub">&#193;ngela · ⚡WPP &#8594; Leads autom&#225;tico</span></div>
+    <div class="card-hd" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">&#128241; M&#233;tricas digitales <span id="r0-per" style="color:var(--o)"></span><span class="card-hd-sub">&#193;ngela · ⚡WPP &#8594; Leads autom&#225;tico</span><button onclick="syncRedesAhora()" style="margin-left:auto;background:var(--gc);border:1.5px solid var(--brd);border-radius:6px;padding:3px 11px;font-size:.7rem;cursor:pointer;font-family:Syne,sans-serif;font-weight:700;color:var(--n)">🔄 <span id="sync-redes-lbl">Actualizar</span></button><span id="sync-redes-ts" style="font-size:.6rem;color:var(--g);font-weight:400;min-width:80px"></span></div>
     <!-- WHATSAPP & CALCULADORA -->
     <div class="sec">💬 WhatsApp &amp; Calculadora</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px">
@@ -550,13 +550,33 @@ async function syncDatosAPI(tipo,weeks){
   if(changed)sLS(storeKey,all);
   return changed;
 }
+function toastNube(msg){
+  var t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:78px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:7px 18px;border-radius:20px;font-size:.76rem;font-weight:700;z-index:9999;pointer-events:none;font-family:Syne,sans-serif;opacity:0;transition:opacity .25s';
+  t.textContent=msg;document.body.appendChild(t);
+  requestAnimationFrame(function(){t.style.opacity='1';});
+  setTimeout(function(){t.style.opacity='0';setTimeout(function(){t.remove();},300);},2500);
+}
+async function syncRedesAhora(){
+  var lbl=document.getElementById('sync-redes-lbl');
+  var ts=document.getElementById('sync-redes-ts');
+  if(lbl)lbl.textContent='⏳';
+  var wR=[getPer(off-5),getPer(off-4),getPer(off-3),getPer(off-2),getPer(off-1),getPer(off)].map(function(w){return w.sISO;});
+  var wL=[getPer(off-2),getPer(off-1),getPer(off)].map(function(w){return w.sISO;});
+  var results=await Promise.all([syncDatosAPI('redes',wR),syncDatosAPI('leads',wL)]);
+  var ch=results[0],chL=results[1];
+  if(ch)renderRedes();
+  if(chL)renderLeads();
+  var now=new Date();
+  var hm=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
+  if(lbl)lbl.textContent='Actualizar';
+  if(ts)ts.textContent='sync '+hm;
+  if(ch)toastNube('☁️ Datos de redes actualizados');
+}
 function goTab(i){
   document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('on',i===j));
   document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('on',i===j));
-  if(i===0){
-    var wR=[getPer(off-5),getPer(off-4),getPer(off-3),getPer(off-2),getPer(off-1),getPer(off)].map(w=>w.sISO);
-    syncDatosAPI('redes',wR).then(function(ch){if(ch)renderRedes();});
-  }
+  if(i===0){syncRedesAhora();}
   if(i===1){
     var wL=[getPer(off-2),getPer(off-1),getPer(off)].map(w=>w.sISO);
     syncDatosAPI('leads',wL).then(function(ch){if(ch)renderLeads();});
@@ -1654,9 +1674,14 @@ function renderAll(){try{renderRedes();}catch(e){console.error('Redes:',e);}try{
   setInterval(()=>{try{renderReuniones();}catch(e){}},45000);
   /* Auto-refresh redes y leads desde la nube cada 60s */
   setInterval(function(){
-    syncDatosAPI('redes',w6).then(function(ch){if(ch)renderRedes();});
+    syncDatosAPI('redes',w6).then(function(ch){
+      if(ch){renderRedes();toastNube('☁️ Redes actualizado');}
+      var now=new Date();
+      var ts=document.getElementById('sync-redes-ts');
+      if(ts)ts.textContent='sync '+now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
+    });
     syncDatosAPI('leads',w3).then(function(ch){if(ch)renderLeads();});
-  },60000);
+  },15000);
   // Restaurar Excel desde localStorage al refrescar
   try{
     var saved=VC3[LS_XL];
