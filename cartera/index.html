@@ -518,16 +518,16 @@ function getSumSoportesBySemana(ss,estado){
 const DB_NAME = 'visco_cartera';
 const DB_STORE = 'handles';
 
-// Columnas (0-indexed)
+// Columnas (0-indexed) — ajustadas +1 por columna CODIGO COT en col[6]
 const BLOCKS = [
-  {n:'SEP', mc:22, fc:23, mr:null, fr:null},
-  {n:'ANT', mc:26, fc:27, mr:29,   fr:30},
-  {n:'P1',  mc:32, fc:33, mr:35,   fr:36},
-  {n:'P2',  mc:38, fc:39, mr:41,   fr:42},
-  {n:'P3',  mc:44, fc:45, mr:47,   fr:48},
-  {n:'P4',  mc:50, fc:51, mr:53,   fr:54},
-  {n:'P5',  mc:56, fc:57, mr:59,   fr:60},
-  {n:'P6',  mc:62, fc:63, mr:65,   fr:66},
+  {n:'SEP', mc:23, fc:24, mr:null, fr:null},
+  {n:'ANT', mc:27, fc:28, mr:30,   fr:31},
+  {n:'P1',  mc:33, fc:34, mr:36,   fr:37},
+  {n:'P2',  mc:39, fc:40, mr:42,   fr:43},
+  {n:'P3',  mc:45, fc:46, mr:48,   fr:49},
+  {n:'P4',  mc:51, fc:52, mr:54,   fr:55},
+  {n:'P5',  mc:57, fc:58, mr:60,   fr:61},
+  {n:'P6',  mc:63, fc:64, mr:66,   fr:67},
 ];
 const ETAPA_LABELS = {SEP:'Separación',ANT:'Anticipo',P1:'Obra Blanca',P2:'Carpintería',P3:'Entrega',P4:'Pago 4',P5:'Pago 5',P6:'Pago 6'};
 const VALID_ESTADOS = new Set(['EN EJECUCIÓN','EN EJECUCION','ENTREGADO','X RECIBIR']);
@@ -658,22 +658,22 @@ function parseBuffer(buf) {
     // col[1]=CODIGO NEGOCIO, col[6]=CLIENTE, col[7]=ESTADO, col[8]=PROYECTO
     // col[9]=TORRE, col[10]=APTO, col[13]=COTIZACIÓN, col[14]=ADICIONALES
     // col[18]=TOTAL, col[67]=RECAUDADO, col[68]=X RECAUDAR
-    if (!r||!r[1]||!r[6]) continue;
-    let ep = String(r[7]||'').trim().toUpperCase();
+    if (!r||!r[1]||!r[7]) continue;
+    let ep = String(r[8]||'').trim().toUpperCase();
     if (ep==='EN EJECUCION') ep='EN EJECUCIÓN';
     if (!VALID_ESTADOS.has(ep)) continue;
 
-    const xrec    = xlM(r[68]);  // X RECAUDAR (monto pendiente total)
-    const adic    = xlM(r[14]);  // ADICIONALES/AJUSTES (valor total del adicional)
-    const total   = xlM(r[18]);  // TOTAL CONTRATO (cotización + adic)
-    const recaudado = xlM(r[67]); // RECAUDADO
-    const cotiz   = xlM(r[13]);  // COTIZACIÓN BASE (sin adicional)
+    const xrec    = xlM(r[69]);  // X RECAUDAR (monto pendiente total)
+    const adic    = xlM(r[15]);  // ADICIONALES/AJUSTES (valor total del adicional)
+    const total   = xlM(r[19]);  // TOTAL CONTRATO (cotización + adic)
+    const recaudado = xlM(r[68]); // RECAUDADO
+    const cotiz   = xlM(r[14]);  // COTIZACIÓN BASE (sin adicional)
 
     if (xrec < 100) continue; // pagado completamente (incluyendo adicionales)
 
     const cid    = String(r[1]);           // CODIGO NEGOCIO (ej: "NATURA/T1/1502")
-    const cli    = String(r[6]||'').trim(); // CLIENTE
-    const proy   = String(r[8]||'').trim(); // PROYECTO
+    const cli    = String(r[7]||'').trim(); // CLIENTE
+    const proy   = String(r[9]||'').trim(); // PROYECTO
     const asesor = String(r[2]||'').trim(); // VD
 
     // Cuánto del adicional está pendiente
@@ -742,8 +742,8 @@ function parseBuffer(buf) {
 
     result.push({
       cid, cli, ep, proy, asesor,
-      torre: String(r[9]||'').trim(),   // col[9]=TORRE
-      apto:  String(r[10]||'').trim(),  // col[10]=APTO
+      torre: String(r[10]||'').trim(),  // col[10]=TORRE
+      apto:  String(r[11]||'').trim(),  // col[11]=APTO
       total, recaudado, xrec, adic, pending_adic, cotiz,
       vencAmt, semAmt, proxAmt, diasMora, oldestVenc,
       pct: total>0 ? recaudado/total : 0,
