@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.07.02.03 -->
+<!-- v2026.07.02.04 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -422,6 +422,7 @@ tr:hover td{background:var(--b)}
   <div id="l-kpis" class="kg"></div>
   <div id="l-ver-kpi" class="kg" style="display:none"></div>
   <div id="l-funnel" class="fn-wrap"></div>
+  <div id="l-form-mes"></div>
   <div id="l-ins" class="ins" style="display:none"></div>
   <div id="l-cmp"></div>
   <div class="chg2">
@@ -497,7 +498,7 @@ tr:hover td{background:var(--b)}
 
 <script>
 /* ═══ CONSTANTES ═══ */
-const LS_R='vc3_redes_v1',LS_L='vc3_leads_v1',LS_C='vc3_conf_v2',LS_P='vc3_pasos_v1',LS_XL='vc3_xl_v1',LS_XLA='vc3_xla_v1';
+const LS_R='vc3_redes_v1',LS_L='vc3_leads_v1',LS_LM='vc3_leads_mes_v1',LS_C='vc3_conf_v2',LS_P='vc3_pasos_v1',LS_XL='vc3_xl_v1',LS_XLA='vc3_xla_v1';
 const LS_META='vc3_meta_v2';
 function getMeta(){const m=gLS(LS_META)||{};return{v:parseInt(m.v)||17,val:parseInt(m.val)||595000000,va:parseInt(m.va)||204,vala:parseInt(m.vala)||7200000000};}
 function saveMeta(){const m={v:parseInt(document.getElementById('mt_v')?.value)||17,val:Math.round((parseFloat(document.getElementById('mt_val')?.value)||595)*1e6),va:parseInt(document.getElementById('mt_va')?.value)||204,vala:Math.round((parseFloat(document.getElementById('mt_vala')?.value)||7200)*1e6)};sLS(LS_META,m);renderVentas();renderAlianzas?.();}
@@ -529,7 +530,7 @@ function _idbGet(k){return new Promise(function(res){if(!_idb){res(null);return;
 function _idbSet(k,d){if(!_idb)return;try{var tx=_idb.transaction(_IDB_ST,'readwrite');tx.objectStore(_IDB_ST).put(d,k);}catch(e){}}
 async function initStorage(){
   await _openIDB();
-  var keys=[LS_R,LS_L,LS_C,LS_P,LS_XL,LS_XLA];
+  var keys=[LS_R,LS_L,LS_C,LS_P,LS_XL,LS_XLA,LS_LM];
   for(var i=0;i<keys.length;i++){
     var v=await _idbGet(keys[i]);
     if(v&&typeof v==='object')VC3[keys[i]]=v;
@@ -839,6 +840,51 @@ function calcVigNo(){
   var ctxEl=document.getElementById('l_vig_ctx');
   if(ctxEl)ctxEl.textContent=intPast>0?'Sem. ant.: '+intPast+' interesados':'';
 }
+/* ── CARGA MENSUAL MANUAL ── */
+var showFormMes=false;
+function toggleFormMes(){
+  showFormMes=!showFormMes;
+  var btn=document.getElementById('btn-editar-mes');
+  if(btn)btn.textContent=showFormMes?'✕ Cerrar':'✏️ Editar datos del mes';
+  renderLeadsMensual();
+}
+function calcNIMes(){
+  var ver=parseInt(document.getElementById('lm_ver')?.value||'0')||0;
+  var tot=parseInt(document.getElementById('lm_total')?.value||'0')||0;
+  var cno=parseInt(document.getElementById('lm_cno')?.value||'0')||0;
+  var sr=parseInt(document.getElementById('lm_sr')?.value||'0')||0;
+  var int2=parseInt(document.getElementById('lm_int')?.value||'0')||0;
+  var nver=Math.max(0,tot-ver);
+  var ni=Math.max(0,ver-cno-sr-int2);
+  var e1=document.getElementById('lm_nver');if(e1){e1.value=nver>0?nver:'';}
+  var e2=document.getElementById('lm_ni');if(e2){e2.value=ni>0?ni:'';e2.style.background=ni>0?'#FFF3E6':'';}
+  var ci=parseInt(document.getElementById('lm_ci_org')?.value||'0')||0
+    +parseInt(document.getElementById('lm_ci_ant')?.value||'0')||0
+    +parseInt(document.getElementById('lm_ci_gc')?.value||'0')||0
+    +parseInt(document.getElementById('lm_ci_lag')?.value||'0')||0
+    +parseInt(document.getElementById('lm_ci_cv')?.value||'0')||0
+    +parseInt(document.getElementById('lm_ci_cred')?.value||'0')||0;
+  var ec=document.getElementById('lm_ci');if(ec)ec.value=ci>0?ci:'';
+}
+function saveLeadsMes(mesKey){
+  calcNIMes();
+  var LFM=[['wpp','lm_wpp'],['total','lm_total'],['ver','lm_ver'],['nver','lm_nver'],
+    ['cno','lm_cno'],['sr','lm_sr'],['int','lm_int'],['ni','lm_ni'],
+    ['vig','lm_vig'],['ci','lm_ci'],['ci_org','lm_ci_org'],['ci_ant','lm_ci_ant'],
+    ['ci_gc','lm_ci_gc'],['ci_lag','lm_ci_lag'],['ci_cv','lm_ci_cv'],['ci_cred','lm_ci_cred'],
+    ['gc','lm_gc'],['lag','lm_lag'],['cv','lm_cv'],['cred','lm_cred']];
+  var o={};
+  LFM.forEach(function(p){var el=document.getElementById(p[1]);o[p[0]]=el?Math.max(0,parseInt(el.value)||0):0;});
+  o.manual=true;
+  var store=gLS(LS_LM);store[mesKey]=o;sLS(LS_LM,store);
+  showFormMes=false;
+  renderLeadsMensual();
+}
+function deleteLeadsMes(mesKey){
+  var store=gLS(LS_LM);delete store[mesKey];sLS(LS_LM,store);
+  showFormMes=false;
+  renderLeadsMensual();
+}
 var showMonthlyLeads=false;
 function toggleMesLeads(){
   showMonthlyLeads=!showMonthlyLeads;
@@ -848,14 +894,16 @@ function toggleMesLeads(){
   else renderLeads();
 }
 function renderLeadsMensual(){
-  var allL=gLS(LS_L);
+  var allL=gLS(LS_L),allLM=gLS(LS_LM);
   var off2=typeof off!=='undefined'?off:0;
   var pRef=getPer(off2);
   var refDate=new Date(pRef.sISO);
   var refM=refDate.getMonth(),refY=refDate.getFullYear();
+  var mesKey=refY+'-'+(refM<9?'0':'')+(refM+1);
   /* Mes anterior */
   var prevDate=new Date(refY,refM-1,1);
   var prevM=prevDate.getMonth(),prevY=prevDate.getFullYear();
+  var prevKey=prevY+'-'+(prevM<9?'0':'')+(prevM+1);
   /* Recolectar semanas */
   function weeksOfMonth(m,y){
     var ws=[];
@@ -864,16 +912,17 @@ function renderLeadsMensual(){
   }
   var wkCur=weeksOfMonth(refM,refY);
   var wkPrev=weeksOfMonth(prevM,prevY);
-  /* Agregar mes */
+  /* Agregar mes — si hay datos manuales, usarlos; si no, agregar semanas */
   var ZERO={total:0,wpp:0,ver:0,nver:0,cno:0,sr:0,int:0,ni:0,vig:0,ci:0,ci_org:0,ci_ant:0,ci_gc:0,ci_lag:0,ci_cv:0,ci_cred:0,gc:0,cv:0,lag:0,cred:0};
-  function aggM(weeks){
+  function aggM(weeks,mk){
+    if(allLM[mk]){var a=Object.assign({},ZERO,allLM[mk]);a.ni=Math.max(0,a.ver-a.cno-a.sr-a.int);a.nver=Math.max(0,a.total-a.ver);a._manual=true;return a;}
     var a=Object.assign({},ZERO);
     weeks.forEach(function(wk){var d=allL[wk.sISO]||{};Object.keys(a).forEach(function(k){a[k]+=(d[k]||0);});});
     a.ni=Math.max(0,a.ver-a.cno-a.sr-a.int);
     a.nver=Math.max(0,a.total-a.ver);
     return a;
   }
-  var cur=aggM(wkCur),prv=aggM(wkPrev);
+  var cur=aggM(wkCur,mesKey),prv=aggM(wkPrev,prevKey);
   /* Label */
   var lPerEl=document.getElementById('l-per');
   if(lPerEl)lPerEl.textContent=MES[refM]+' '+refY;
@@ -1000,6 +1049,78 @@ function renderLeadsMensual(){
     convRow2('% Verif. / Calc.',cur.ver,prv.ver,cur.total,prv.total)+
     convRow2('% Interesados / Verif.',cur.int,prv.int,cur.ver,prv.ver)+
     '</tbody></table></div></div>';
+  /* ── FORMULARIO CARGA MANUAL ── */
+  var fmEl=document.getElementById('l-form-mes');
+  if(!fmEl)return;
+  /* badge de origen de datos */
+  var badgeCur=cur._manual
+    ?'<span style="background:#FEF3C7;color:#92400E;border-radius:4px;padding:2px 8px;font-size:.63rem;font-weight:700">&#9998; carga manual</span>'
+    :'<span style="background:#ECFDF5;color:#166534;border-radius:4px;padding:2px 8px;font-size:.63rem;font-weight:700">&#8721; agregado de semanas</span>';
+  var badgePrv=prv._manual
+    ?'<span style="background:#FEF3C7;color:#92400E;border-radius:4px;padding:2px 8px;font-size:.63rem;font-weight:700">&#9998; carga manual</span>'
+    :'<span style="background:#ECFDF5;color:#166534;border-radius:4px;padding:2px 8px;font-size:.63rem;font-weight:700">&#8721; semanas</span>';
+  /* helpers formulario */
+  function iMes(id,val,label,auto,color){
+    return'<div class="fl"><label style="'+(color?'color:'+color:'')+'">'+label+(auto?'<span style="font-size:.62rem;background:#F3F4F6;border-radius:3px;padding:1px 4px;margin-left:4px">auto</span>':'')+'</label>'+
+      '<input type="number" id="'+id+'" min="0" placeholder="0" value="'+(val>0?val:'')+'" '+(auto?'readonly style="background:#F8FAFC;color:#64748B;cursor:default"':'')+' oninput="calcNIMes()"></div>';
+  }
+  var dm=allLM[mesKey]||{};
+  var editBtn='<button id="btn-editar-mes" onclick="toggleFormMes()" style="background:var(--gc);border:1.5px solid var(--brd);border-radius:6px;padding:4px 12px;font-size:.7rem;cursor:pointer;font-family:Syne,sans-serif;font-weight:700;color:var(--n);margin-bottom:10px">'+(showFormMes?'✕ Cerrar':'✏️ Editar datos de '+MES[refM])+'</button>';
+  if(cur._manual){
+    editBtn+=' <button onclick="deleteLeadsMes(''+mesKey+'')" style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:6px;padding:4px 10px;font-size:.68rem;cursor:pointer;font-family:Syne,sans-serif;font-weight:600;color:#DC2626;margin-left:6px">🗑 Borrar manual</button>';
+  }
+  var formHTML='';
+  if(showFormMes){
+    formHTML='<div class="card" style="border-top:3px solid var(--o);margin-top:4px">'+
+      '<div class="card-hd">&#9998; Carga manual &#8212; '+MES[refM]+' '+refY+'</div>'+
+      '<div style="background:#FFFBF0;border:1px solid #FED7AA;border-radius:10px;padding:12px 14px;margin-bottom:10px">'+
+        '<div style="font-size:.65rem;font-weight:700;color:#92400E;margin-bottom:8px;text-transform:uppercase">&#128241; Captaci&#243;n WPP &#8594; Calculadora</div>'+
+        '<div class="fg" style="margin-bottom:0">'+
+          iMes('lm_wpp',dm.wpp||0,'&#128172; WPP del mes',false,'#16A34A')+
+          iMes('lm_total',dm.total||0,'&#129518; Hicieron Calculadora',false,'var(--o)')+
+          iMes('lm_ver',dm.ver||0,'&#9989; Verificados (aptos)',false,'#0891B2')+
+          iMes('lm_nver',dm.nver||0,'&#10060; No verificados',true,'#64748B')+
+        '</div></div>'+
+      '<div class="sec" style="font-size:.72rem;color:#0891B2">&#9989; De los verificados</div>'+
+      '<div class="fg" style="margin-bottom:10px">'+
+        iMes('lm_cno',dm.cno||0,'&#128203; Calc. incompletas')+
+        iMes('lm_sr',dm.sr||0,'&#128172; Sin respuesta')+
+        iMes('lm_int',dm.int||0,'&#11088; Interesados')+
+        iMes('lm_ni',dm.ni||0,'&#128078; No interesados',true)+
+      '</div>'+
+      '<div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:10px 14px;margin-bottom:10px">'+
+        '<div style="font-size:.65rem;font-weight:700;color:#1E40AF;margin-bottom:6px;text-transform:uppercase">&#128204; Vigentes fin de mes</div>'+
+        iMes('lm_vig',dm.vig||0,'&#9989; Siguen vigentes')+
+      '</div>'+
+      '<div style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:10px;padding:10px 14px;margin-bottom:10px">'+
+        '<div style="font-size:.65rem;font-weight:700;color:#166534;margin-bottom:6px;text-transform:uppercase">&#127942; Cierres del mes (total auto)</div>'+
+        '<div class="fg" style="margin-bottom:4px">'+
+          iMes('lm_ci_org',dm.ci_org||0,'&#127758; Org&#225;nicos esta sem.')+
+          iMes('lm_ci_ant',dm.ci_ant||0,'&#127759; Org&#225;nicos sems. ant.')+
+          iMes('lm_ci_gc',dm.ci_gc||0,'&#127960; GC')+
+          iMes('lm_ci_lag',dm.ci_lag||0,'&#128159; Lagom')+
+          iMes('lm_ci_cv',dm.ci_cv||0,'&#127963; Corner View')+
+          iMes('lm_ci_cred',dm.ci_cred||0,'&#128179; Credifamilia')+
+        '</div>'+
+        '<div class="fl"><label>Total cierres</label><input type="number" id="lm_ci" min="0" placeholder="0" value="'+(dm.ci||0>0?dm.ci:'')+'" readonly style="background:#F0FDF4;color:#16A34A;font-weight:700;cursor:default"></div>'+
+      '</div>'+
+      '<div class="sec">Leads por alianza</div>'+
+      '<div class="fg" style="margin-bottom:12px">'+
+        iMes('lm_gc',dm.gc||0,'&#127960; Gran Central',false,'#92400E')+
+        iMes('lm_lag',dm.lag||0,'&#128159; Lagom',false,'#7C3AED')+
+        iMes('lm_cv',dm.cv||0,'&#127963; Corner View',false,'#0891B2')+
+        iMes('lm_cred',dm.cred||0,'&#128179; Credifamilia',false,'#059669')+
+      '</div>'+
+      '<div style="display:flex;gap:8px">'+
+        '<button class="btn btn-s" onclick="saveLeadsMes(''+mesKey+'')" style="background:var(--o);color:#fff;border-color:var(--od)">&#128190; Guardar '+MES[refM]+'</button>'+
+        '<button class="btn btn-s" onclick="toggleFormMes()">&#8617; Cancelar</button>'+
+      '</div>'+
+    '</div>';
+  }
+  fmEl.innerHTML='<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap">'+editBtn+
+    '<span>'+badgeCur+'</span>'+
+    '<span style="font-size:.62rem;color:#9CA3AF">'+MES[prevM]+': </span>'+badgePrv+
+  '</div>'+formHTML;
 }
 function renderLeads(){
   var off2=typeof off!=='undefined'?off:0;
