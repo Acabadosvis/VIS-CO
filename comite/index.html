@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.07.01.20 -->
+<!-- v2026.07.02.01 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -365,26 +365,53 @@ tr:hover td{background:var(--b)}
 <!-- P1 LEADS -->
 <div class="panel" id="p1">
   <div class="card">
-    <div class="card-hd">&#128101; Clasificaci&#243;n de leads <span id="l-per" style="color:var(--o)"></span><span class="card-hd-sub">Referencia: Bitrix24 BI</span></div>
-    <div class="fg">
-      <div class="fl" style="border-left:3px solid #25D366;padding-left:9px"><label style="color:#16A34A">WPP &#9889; <span style="font-size:.68rem;font-weight:400;color:#888">auto desde Redes</span></label><input type="number" id="l_wpp" min="0" placeholder="0" style="border-color:#25D366;background:#F0FDF4"></div>
-      <div class="fl" style="border-left:3px solid var(--o);padding-left:9px"><label style="color:var(--o)">Leads calculadora</label><input type="number" id="l_total" min="0" placeholder="0" oninput="calcNI()"></div>
-      <div class="fl" style="border-left:3px solid #0891B2;padding-left:9px"><label style="color:#0891B2">&#10003; Verificados calc.</label><input type="number" id="l_ver" min="0" placeholder="0" oninput="calcNI()" style="border-color:#0891B2"></div>
-      <div class="fl"><label style="color:#64748B">&#10007; No verificados</label><input type="number" id="l_nver" min="0" placeholder="0"></div>
+    <div class="card-hd">&#128101; Clasificaci&#243;n de leads <span id="l-per" style="color:var(--o)"></span><span class="card-hd-sub">Referencia: Bitrix24 BI</span><button id="btn-mes-leads" onclick="toggleMesLeads()" style="margin-left:auto;background:var(--gc);border:1.5px solid var(--brd);border-radius:6px;padding:3px 11px;font-size:.7rem;cursor:pointer;font-family:Syne,sans-serif;font-weight:700;color:var(--n)">&#128197; Vista mensual</button></div>
+    <!-- CAPTACION WPP -> CALCULADORA -->
+    <div style="background:#FFFBF0;border:1px solid #FED7AA;border-radius:10px;padding:12px 14px;margin-bottom:12px">
+      <div style="font-size:.68rem;font-weight:700;color:#92400E;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">&#128241; Captaci&#243;n WPP &#8594; Calculadora</div>
+      <div class="fg" style="margin-bottom:0">
+        <div class="fl" style="border-left:3px solid #25D366;padding-left:9px"><label style="color:#16A34A">&#128172; Llegaron por WPP &#9889; <span style="font-size:.68rem;font-weight:400;color:#888">auto desde Redes</span></label><input type="number" id="l_wpp" min="0" placeholder="0" style="border-color:#25D366;background:#F0FDF4"></div>
+        <div class="fl" style="border-left:3px solid var(--o);padding-left:9px"><label style="color:var(--o)">&#129518; De esos, hicieron Calculadora</label><input type="number" id="l_total" min="0" placeholder="0" oninput="calcNI()"></div>
+        <div class="fl" style="border-left:3px solid #0891B2;padding-left:9px"><label style="color:#0891B2">&#9989; Verificados (aptos)</label><input type="number" id="l_ver" min="0" placeholder="0" oninput="calcNI()" style="border-color:#0891B2"></div>
+        <div class="fl"><label style="color:#64748B">&#8987; Pendientes verificar</label><input type="number" id="l_nver" min="0" placeholder="0"></div>
+      </div>
     </div>
-    <div class="sec" style="margin-top:10px;font-size:.75rem;color:#64748B">De los verificados →</div>
+    <!-- DE LOS VERIFICADOS -->
+    <div class="sec" style="margin-top:4px;font-size:.75rem;color:#0891B2">&#9989; De los verificados &#8594;</div>
     <div class="fg">
-      <div class="fl"><label>Calc. incompletas</label><input type="number" id="l_cno" min="0" placeholder="0" oninput="calcNI()"></div>
-      <div class="fl"><label>Sin respuesta</label><input type="number" id="l_sr" min="0" placeholder="0" oninput="calcNI()"></div>
-      <div class="fl"><label>Interesados &#11088;</label><input type="number" id="l_int" min="0" placeholder="0" oninput="calcNI()"></div>
-      <div class="fl"><label style="color:#888">No interesados <span style="font-size:.68rem;background:#F3F4F6;border-radius:4px;padding:1px 5px">auto</span></label><input type="number" id="l_ni" min="0" placeholder="0" readonly style="background:#F9F9F9;color:#666;cursor:default"></div>
-      <div class="fl"><label>Vigentes seguimiento</label><input type="number" id="l_vig" min="0" placeholder="0"></div>
-      <div class="fl" style="border-left:3px solid #9CA3AF;padding-left:9px"><label style="color:#6B7280">Cierres semana <span style="font-size:.68rem;font-weight:400">— aparte</span></label><input type="number" id="l_ci" min="0" placeholder="0" style="border-color:#9CA3AF"></div>
+      <div class="fl"><label>&#128203; Calc. incompletas</label><input type="number" id="l_cno" min="0" placeholder="0" oninput="calcNI()"></div>
+      <div class="fl"><label>&#128172; Sin respuesta</label><input type="number" id="l_sr" min="0" placeholder="0" oninput="calcNI()"></div>
+      <div class="fl"><label>&#11088; Interesados</label><input type="number" id="l_int" min="0" placeholder="0" oninput="calcNI()"></div>
+      <div class="fl"><label style="color:#888">&#128078; No interesados <span style="font-size:.68rem;background:#F3F4F6;border-radius:4px;padding:1px 5px">auto</span></label><input type="number" id="l_ni" min="0" placeholder="0" readonly style="background:#FFF3E6;color:#666;cursor:default"></div>
     </div>
-    <div class="sec" style="margin-top:14px">Leads por alianza <span style="font-size:.72rem;color:#888;font-weight:400">— No cuentan en el embudo de calculadora</span></div>
+    <!-- VIGENTES SEGUIMIENTO -->
+    <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:12px 14px;margin-bottom:12px">
+      <div style="font-size:.68rem;font-weight:700;color:#1E40AF;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">&#128204; Vigentes seguimiento <span id="l_vig_ctx" style="font-weight:400;color:#3B82F6;font-size:.7rem;margin-left:6px"></span></div>
+      <div class="fg" style="margin-bottom:0">
+        <div class="fl"><label style="color:#1D4ED8">&#9989; Siguen vigentes (activos)</label><input type="number" id="l_vig" min="0" placeholder="0" oninput="calcVigNo()"></div>
+        <div class="fl"><label style="color:#888">&#128277; Ya no responden <span style="font-size:.68rem;background:#F3F4F6;border-radius:4px;padding:1px 5px">auto</span></label><input type="number" id="l_vig_no" min="0" placeholder="0" readonly style="background:#FEF2F2;color:#DC2626;cursor:default"></div>
+      </div>
+    </div>
+    <!-- CIERRES SEMANA -->
+    <div style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:10px;padding:12px 14px;margin-bottom:12px">
+      <div style="font-size:.68rem;font-weight:700;color:#166534;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">&#127942; Cierres semana &#8212; <span id="l_ci_total_lbl" style="font-size:.85rem;font-weight:800;color:#16A34A">0</span> total <span style="font-weight:400;color:#4B7563">auto</span></div>
+      <input type="number" id="l_ci" style="display:none" min="0" value="0">
+      <div class="fg" style="grid-template-columns:repeat(auto-fill,minmax(145px,1fr));margin-bottom:0">
+        <div class="fl" style="border-left:3px solid #16A34A;padding-left:8px"><label style="color:#16A34A">&#127822; Org&#225;nicos esta sem.</label><input type="number" id="l_ci_org" min="0" placeholder="0" oninput="calcCierres()"></div>
+        <div class="fl" style="border-left:3px solid #65A30D;padding-left:8px"><label style="color:#65A30D">&#128197; Org&#225;nicos sems. ant.</label><input type="number" id="l_ci_ant" min="0" placeholder="0" oninput="calcCierres()"></div>
+        <div class="fl" style="border-left:3px solid #92400E;padding-left:8px"><label style="color:#92400E">&#127968; Alianza Gran Central</label><input type="number" id="l_ci_gc" min="0" placeholder="0" oninput="calcCierres()"></div>
+        <div class="fl" style="border-left:3px solid #7C3AED;padding-left:8px"><label style="color:#7C3AED">&#128156; Alianza Lagom</label><input type="number" id="l_ci_lag" min="0" placeholder="0" oninput="calcCierres()"></div>
+        <div class="fl" style="border-left:3px solid #0891B2;padding-left:8px"><label style="color:#0891B2">&#127774; Alianza Corner View</label><input type="number" id="l_ci_cv" min="0" placeholder="0" oninput="calcCierres()"></div>
+        <div class="fl" style="border-left:3px solid #059669;padding-left:8px"><label style="color:#059669">&#128179; Alianza Credifamilia</label><input type="number" id="l_ci_cred" min="0" placeholder="0" oninput="calcCierres()"></div>
+      </div>
+    </div>
+    <!-- LEADS POR ALIANZA -->
+    <div class="sec" style="margin-top:4px">Leads por alianza <span style="font-size:.72rem;color:#888;font-weight:400">&#8212; No cuentan en el embudo de calculadora</span></div>
     <div class="fg">
       <div class="fl" style="border-left:3px solid #92400E;padding-left:9px"><label style="color:#92400E">&#127968; Gran Central / Convenio</label><input type="number" id="l_gc" min="0" placeholder="0" style="border-color:#92400E"></div>
+      <div class="fl" style="border-left:3px solid #7C3AED;padding-left:9px"><label style="color:#7C3AED">&#128156; Lagom</label><input type="number" id="l_lag" min="0" placeholder="0" style="border-color:#7C3AED"></div>
       <div class="fl" style="border-left:3px solid #0891B2;padding-left:9px"><label style="color:#0891B2">&#127774; Corner View</label><input type="number" id="l_cv" min="0" placeholder="0" style="border-color:#0891B2"></div>
+      <div class="fl" style="border-left:3px solid #059669;padding-left:9px"><label style="color:#059669">&#128179; Credifamilia</label><input type="number" id="l_cred" min="0" placeholder="0" style="border-color:#059669"></div>
     </div>
     <div class="brow">
       <button class="btn btn-o" onclick="saveLeads()">&#128190; Guardar leads</button>
@@ -412,7 +439,7 @@ tr:hover td{background:var(--b)}
   <div id="yo-banner">
     <span style="font-size:.73rem;font-weight:700;color:#3730A3;font-family:'Syne',sans-serif">☁️ Soy:</span>
     <button class="yo-btn" data-yo="KM" onclick="setYo('KM')">KM · Karen</button>
-    <button class="yo-btn" data-yo="AB" onclick="setYo('AB')">AB · Angie</button>
+    <button class="yo-btn" data-yo="AB" onclick="setYo('AB')" style="opacity:.38;text-decoration:line-through" title="Hasta jun 30 · inactiva">AB · Angie</button>
     <button class="yo-btn" data-yo="NM" onclick="setYo('NM')">NM · Nathalia</button>
     <button class="yo-btn" data-yo="ADMIN" onclick="setYo('ADMIN')">👁 Admin</button>
     <span id="yo-status">Selecciona quién eres para guardar en la nube ☁️</span>
@@ -744,7 +771,7 @@ function renderRedes(){
 }
 
 /* ═══ LEADS ═══ */
-const LF=[['total','l_total'],['wpp','l_wpp'],['cno','l_cno'],['sr','l_sr'],['ni','l_ni'],['int','l_int'],['vig','l_vig'],['ci','l_ci'],['ver','l_ver'],['nver','l_nver'],['gc','l_gc'],['cv','l_cv']];
+const LF=[['total','l_total'],['wpp','l_wpp'],['cno','l_cno'],['sr','l_sr'],['ni','l_ni'],['int','l_int'],['vig','l_vig'],['vig_no','l_vig_no'],['ci','l_ci'],['ci_org','l_ci_org'],['ci_ant','l_ci_ant'],['ci_gc','l_ci_gc'],['ci_lag','l_ci_lag'],['ci_cv','l_ci_cv'],['ci_cred','l_ci_cred'],['ver','l_ver'],['nver','l_nver'],['gc','l_gc'],['cv','l_cv'],['lag','l_lag'],['cred','l_cred']];
 function calcNI(){
   var ver=parseInt(document.getElementById('l_ver')?.value||'0')||0;
   var cno=parseInt(document.getElementById('l_cno')?.value||'0')||0;
@@ -784,14 +811,69 @@ async function saveLeads(){
     if(btn){btn.textContent='⚠️ Sin conexión — guardado local';setTimeout(function(){btn.innerHTML='💾 Guardar leads';},2000);}
   }
 }
-function calcNI(){
-  var tot=parseInt(document.getElementById('l_total')?.value)||0;
-  var cno=parseInt(document.getElementById('l_cno')?.value)||0;
-  var sr=parseInt(document.getElementById('l_sr')?.value)||0;
-  var int2=parseInt(document.getElementById('l_int')?.value)||0;
-  var ni=Math.max(0,tot-cno-sr-int2);
-  var el=document.getElementById('l_ni');
-  if(el){el.value=ni>0?ni:'';el.style.background=ni>0?'#FFF3E6':'';}
+function calcCierres(){
+  var org=parseInt(document.getElementById('l_ci_org')?.value)||0;
+  var ant=parseInt(document.getElementById('l_ci_ant')?.value)||0;
+  var gc=parseInt(document.getElementById('l_ci_gc')?.value)||0;
+  var lag=parseInt(document.getElementById('l_ci_lag')?.value)||0;
+  var cv=parseInt(document.getElementById('l_ci_cv')?.value)||0;
+  var cred=parseInt(document.getElementById('l_ci_cred')?.value)||0;
+  var tot=org+ant+gc+lag+cv+cred;
+  var el=document.getElementById('l_ci');if(el)el.value=tot;
+  var lbl=document.getElementById('l_ci_total_lbl');if(lbl)lbl.textContent=tot;
+}
+function calcVigNo(){
+  var allL=gLS(LS_L);
+  var p1=getPer((typeof off!=='undefined'?off:0)-1);
+  var intPast=(allL[p1.sISO]||{}).int||0;
+  var vig=parseInt(document.getElementById('l_vig')?.value||'0')||0;
+  var vno=Math.max(0,intPast-vig);
+  var el=document.getElementById('l_vig_no');
+  if(el){el.value=vno>0?vno:'';el.style.background=vno>0?'#FEF2F2':'';}
+  var ctxEl=document.getElementById('l_vig_ctx');
+  if(ctxEl)ctxEl.textContent=intPast>0?'Sem. ant.: '+intPast+' interesados':'';
+}
+var showMonthlyLeads=false;
+function toggleMesLeads(){
+  showMonthlyLeads=!showMonthlyLeads;
+  var btn=document.getElementById('btn-mes-leads');
+  if(btn)btn.textContent=showMonthlyLeads?'&#128336; Vista semanal':'&#128197; Vista mensual';
+  if(showMonthlyLeads)renderLeadsMensual();
+  else renderLeads();
+}
+function renderLeadsMensual(){
+  var allL=gLS(LS_L);
+  var off2=typeof off!=='undefined'?off:0;
+  var pRef=getPer(off2);
+  var refDate=new Date(pRef.sISO);
+  var refM=refDate.getMonth(),refY=refDate.getFullYear();
+  var weeksThisMonth=[];
+  for(var i=0;i<=12;i++){var wt=getPer(off2-i);var d=new Date(wt.sISO);if(d.getMonth()===refM&&d.getFullYear()===refY){weeksThisMonth.push(wt);}}
+  var agg={total:0,wpp:0,ver:0,nver:0,cno:0,sr:0,int:0,ni:0,vig:0,ci:0,ci_org:0,ci_ant:0,ci_gc:0,ci_lag:0,ci_cv:0,ci_cred:0,gc:0,cv:0,lag:0,cred:0};
+  weeksThisMonth.forEach(function(wk){var d=allL[wk.sISO]||{};Object.keys(agg).forEach(function(k){agg[k]+=(d[k]||0);});});
+  agg.ni=Math.max(0,agg.ver-agg.cno-agg.sr-agg.int);
+  var pVer=agg.total>0?pct(agg.ver,agg.total,1):'0.0';
+  var pInt=agg.ver>0?pct(agg.int,agg.ver,1):'0.0';
+  var pctWpp=agg.wpp>0?pct(agg.total,agg.wpp,1):'0.0';
+  var lPerEl=document.getElementById('l-per');if(lPerEl)lPerEl.textContent=MES[refM]+' '+refY;
+  var kEl=document.getElementById('l-kpis');
+  if(kEl)kEl.innerHTML=
+    '<div class="kp" style="background:#FFF8F0;border-top:3px solid var(--o);grid-column:1/-1"><div class="kl" style="color:var(--o)">&#128202; VISTA MENSUAL &#8212; '+MES[refM]+' '+refY+' ('+weeksThisMonth.length+' semanas)</div></div>'+
+    '<div class="kp" style="background:#F0FDF4;border-top:3px solid #25D366"><div class="kl">&#128172; WPP total</div><div class="kv" style="color:#16A34A">'+agg.wpp+'</div><div class="ks">'+pctWpp+'% &#8594; calc.</div></div>'+
+    '<div class="kp o"><div class="kl">&#129518; Calculadoras</div><div class="kv">'+agg.total+'</div><div class="ks">del mes</div></div>'+
+    '<div class="kp b"><div class="kl">&#9989; Verificados</div><div class="kv">'+agg.ver+'</div><div class="ks">'+pVer+'% de calc.</div></div>'+
+    '<div class="kp g"><div class="kl">&#11088; Interesados</div><div class="kv">'+agg.int+'</div><div class="ks">'+pInt+'% de ver.</div></div>'+
+    '<div class="kp p"><div class="kl">&#128078; No interesados</div><div class="kv">'+agg.ni+'</div></div>'+
+    '<div class="kp a"><div class="kl">&#128172; Sin respuesta</div><div class="kv">'+agg.sr+'</div></div>'+
+    '<div class="kp" style="background:#F0FDF4;border-top:3px solid #16A34A"><div class="kl">&#127942; Cierres mes</div><div class="kv" style="color:#16A34A">'+agg.ci+'</div><div class="ks">'+(agg.ci_org?'Org.'+agg.ci_org+' ':'')+(agg.ci_ant?'Ant.'+agg.ci_ant+' ':'')+(agg.ci_gc?'GC '+agg.ci_gc+' ':'')+(agg.ci_lag?'Lag '+agg.ci_lag+' ':'')+(agg.ci_cv?'CV '+agg.ci_cv+' ':'')+(agg.ci_cred?'Cred '+agg.ci_cred:'')+'</div></div>'+
+    ((agg.gc||agg.lag||agg.cv||agg.cred)?
+      (agg.gc?'<div class="kp" style="border-left:4px solid #92400E"><div class="kl">GC leads</div><div class="kv" style="color:#92400E">'+agg.gc+'</div></div>':'')+
+      (agg.lag?'<div class="kp" style="border-left:4px solid #7C3AED"><div class="kl">Lagom leads</div><div class="kv" style="color:#7C3AED">'+agg.lag+'</div></div>':'')+
+      (agg.cv?'<div class="kp" style="border-left:4px solid #0891B2"><div class="kl">CV leads</div><div class="kv" style="color:#0891B2">'+agg.cv+'</div></div>':'')+
+      (agg.cred?'<div class="kp" style="border-left:4px solid #059669"><div class="kl">Cred. leads</div><div class="kv" style="color:#059669">'+agg.cred+'</div></div>':''):'');
+  var fEl=document.getElementById('l-funnel');
+  if(fEl)fEl.innerHTML='<div style="padding:14px 16px;background:var(--b);border-radius:10px;border:1px solid var(--brd)"><div style="font-size:.72rem;color:#888;font-weight:400">&#128197; Vista mensual activa &#8212; el embudo por semana está disponible al volver a vista semanal.</div></div>';
+  var cmpEl=document.getElementById('l-cmp');if(cmpEl)cmpEl.innerHTML='';
 }
 function renderLeads(){
   var off2=typeof off!=='undefined'?off:0;
@@ -813,6 +895,9 @@ function renderLeads(){
     if(el)el.value=(d2[k]||0)>0?d2[k]:'';
   });
   calcNI();
+  calcCierres();
+  calcVigNo();
+  var _lbl=document.getElementById('l_ci_total_lbl');if(_lbl)_lbl.textContent=d2.ci||0;
   /* KPIs */
   var t2=d2.total||0,t1=d1.total||0,t0=d0.total||0;
   var pCrecT=t1>0?((t2-t1)/t1*100).toFixed(1):null;
@@ -821,6 +906,8 @@ function renderLeads(){
   var kEl=document.getElementById('l-kpis');
   var ver2c=d2.ver||0,nver2c=d2.nver||0,pVer=t2>0?pct(ver2c,t2,1):'0.0',pInt2=ver2c>0?pct(d2.int||0,ver2c,1):'0.0';
   var pctWppCalc=(d2.wpp||0)>0?pct(t2,d2.wpp||1,1):'0.0';
+  var ci2total=d2.ci||0,ci2org=d2.ci_org||0,ci2ant=d2.ci_ant||0,ci2gc=d2.ci_gc||0,ci2lag=d2.ci_lag||0,ci2cv=d2.ci_cv||0,ci2cred=d2.ci_cred||0;
+  var vig2no=d2.vig_no||0,lag2=d2.lag||0,cred2=d2.cred||0;
   if(kEl)kEl.innerHTML=
     '<div class="kp" style="background:#F0FDF4;border-top:3px solid #25D366"><div class="kl">💬 Llegaron WPP</div><div class="kv" style="color:#16A34A">'+(d2.wpp||0)+'</div><div class="ks">'+(pCrecT?(pCrecT>0?'+':'')+pCrecT+'% vs sem ant':'—')+'</div></div>'+
     '<div class="kp o"><div class="kl">🧮 Calculadora</div><div class="kv">'+t2+'</div><div class="ks">'+pctWppCalc+'% del WPP</div></div>'+
@@ -831,15 +918,19 @@ function renderLeads(){
     '<div class="kp p"><div class="kl">No interesados</div><div class="kv">'+(d2.ni||0)+'</div><div class="ks">'+(ver2c>0?pct(d2.ni||0,ver2c,1)+'% de ver.':'—')+'</div></div>'+
     '<div class="kp a"><div class="kl">Sin respuesta</div><div class="kv">'+(d2.sr||0)+'</div><div class="ks">'+(ver2c>0?pct(d2.sr||0,ver2c,1)+'% de ver.':'—')+'</div></div>'+
     '<div class="kp" style="border-left:4px solid #9CA3AF"><div class="kl">Cierres (aparte)</div><div class="kv" style="color:#6B7280">'+(d2.ci||0)+'</div><div class="ks">'+(d2.ci>0?'orgánico/alianza/anterior':'—')+'</div></div>'+
-    ((d2.gc||0)>0?'<div class="kp" style="border-left:4px solid #92400E"><div class="kl">GC leads</div><div class="kv" style="color:#92400E">'+d2.gc+'</div><div class="ks">alianza</div></div>':'')+
-    ((d2.cv||0)>0?'<div class="kp" style="border-left:4px solid #0891B2"><div class="kl">CV leads</div><div class="kv" style="color:#0891B2">'+d2.cv+'</div><div class="ks">alianza</div></div>':'');
-  /* Embudo */
+    (ci2total>0?'<div class="kp" style="background:#F0FDF4;border-top:3px solid #16A34A"><div class="kl">&#127942; Cierres semana</div><div class="kv" style="color:#16A34A">'+ci2total+'</div><div class="ks">'+(ci2org?'Org.est.'+ci2org+' ':'')+(ci2ant?'Ant.'+ci2ant+' ':'')+(ci2gc?'GC '+ci2gc+' ':'')+(ci2lag?'Lag '+ci2lag+' ':'')+(ci2cv?'CV '+ci2cv+' ':'')+(ci2cred?'Cred '+ci2cred:'')+'</div></div>':'<div class="kp" style="border-left:3px solid #D1D5DB"><div class="kl">Cierres</div><div class="kv" style="color:#9CA3AF">0</div></div>')+
+    (vig2no>0?'<div class="kp" style="background:#FEF2F2;border-top:3px solid #DC2626"><div class="kl">&#128277; Ya no resp.</div><div class="kv" style="color:#DC2626">'+vig2no+'</div></div>':'')+
+    ((d2.gc||0)>0?'<div class="kp" style="border-left:4px solid #92400E"><div class="kl">GC leads</div><div class="kv" style="color:#92400E">'+d2.gc+'</div></div>':'')+
+    (lag2>0?'<div class="kp" style="border-left:4px solid #7C3AED"><div class="kl">Lagom leads</div><div class="kv" style="color:#7C3AED">'+lag2+'</div></div>':'')+
+    ((d2.cv||0)>0?'<div class="kp" style="border-left:4px solid #0891B2"><div class="kl">CV leads</div><div class="kv" style="color:#0891B2">'+d2.cv+'</div></div>':'')+
+    (cred2>0?'<div class="kp" style="border-left:4px solid #059669"><div class="kl">Cred. leads</div><div class="kv" style="color:#059669">'+cred2+'</div></div>':'');
+  /* ── EMBUDO REDISEÑADO — 3 FASES ── */
   var wpp2=d2.wpp||0,calc2=d2.total||0,ver2b=d2.ver||0,nver2=Math.max(0,calc2-ver2b),cno2=d2.cno||0,sr2=d2.sr||0,int2=d2.int||0,ni2=d2.ni||0,ci2=d2.ci||0;
-  /* ── EMBUDO REDISEÑADO ── escala correcta sobre el máximo real */
+  var ci2org=d2.ci_org||0,ci2ant=d2.ci_ant||0,ci2gc=d2.ci_gc||0,ci2lag=d2.ci_lag||0,ci2cv=d2.ci_cv||0,ci2cred=d2.ci_cred||0;
   var maxF=Math.max(wpp2,calc2,ver2b,1);
-  function fnBar(val,color,label,conv,note){
+  function fnBar(val,color,label,conv,note,dimmed){
     var pw=Math.max(4,Math.round(val/maxF*100));
-    return'<div class="fn-row"><div class="fn-lbl">'+label+'</div>'+
+    return'<div class="fn-row" style="'+(dimmed?'opacity:.55':'')+'"><div class="fn-lbl">'+label+'</div>'+
       '<div class="fn-bar-wrap"><div class="fn-bar" style="width:'+pw+'%;background:'+color+'"><span style="padding:0 8px;font-weight:700;font-size:.75rem;color:#fff">'+val+'</span></div></div>'+
       '<div class="fn-conv" style="min-width:70px;text-align:right;font-size:.72rem;font-weight:700;color:#555">'+conv+'</div></div>'+
       (note?'<div style="font-size:.65rem;color:#888;margin:-2px 0 4px 110px">'+note+'</div>':'');
@@ -850,19 +941,39 @@ function renderLeads(){
   var pVerSr=ver2b>0?Math.round(sr2/ver2b*100)+'%':'—';
   var pVerNi=ver2b>0?Math.round(ni2/ver2b*100)+'%':'—';
   var pVerCno=ver2b>0?Math.round(cno2/ver2b*100)+'%':'—';
-  var funnelHTML=
-    fnBar(wpp2,'#25D366','💬 WPP','','')+
-    fnBar(calc2,'#F97316','🧮 Calculadora',pWppCalc,wpp2>0?'del WPP':'')+
-    fnBar(ver2b,'#0891B2','✅ Verificados',pCalcVer,'de calculadora')+
-    (nver2>0?fnBar(nver2,'#CBD5E1','⏳ Pendientes por verificar',calc2>0?Math.round(nver2/calc2*100)+'%':'—','sin clasificar aún'):'') +
-    '<div style="font-size:.7rem;font-weight:700;color:#0891B2;padding:8px 0 2px 110px;border-top:2px dashed #0891B200;margin-top:4px">▼ De los '+ver2b+' verificados:</div>'+
-    fnBar(int2,'#16A34A','⭐ Interesados',pVerInt,'de verificados')+
-    fnBar(sr2,'#64748B','💬 Sin respuesta',pVerSr,'de verificados')+
-    fnBar(ni2,'#94A3B8','👎 No interesados',pVerNi,'de verificados')+
-    fnBar(cno2,'#D97706','📋 Incompletas',pVerCno,'de verificados')+
-    (ci2>0?'<div style="margin-top:10px;padding:8px 12px;background:#F0FDF4;border-radius:8px;border:1px solid #86EFAC;font-size:.75rem;color:#166534;font-weight:700">🏆 Cierres semana: '+ci2+' <span style="font-weight:400;color:#4B7563">— orgánicos, alianza o de semanas anteriores</span></div>':'');
+  
+  var fase1='<div style="font-size:.7rem;font-weight:800;color:#92400E;padding:6px 0 4px 0;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #FED7AA;margin-bottom:6px">&#128241; Fase 1 — Captaci&#243;n</div>'+
+    fnBar(wpp2,'#25D366','&#128172; WPP','','')+
+    fnBar(calc2,'#F97316','&#129518; Calculadora',pWppCalc,wpp2>0?'del WPP':'')+
+    (nver2>0?fnBar(nver2,'#CBD5E1','&#8987; Pendientes verificar',calc2>0?Math.round(nver2/calc2*100)+'%':'—','sin clasificar aún',true):'')+
+    fnBar(ver2b,'#0891B2','&#9989; Verificados',pCalcVer,'de calculadora');
+  
+  var fase2='<div style="font-size:.7rem;font-weight:800;color:#0891B2;padding:10px 0 4px 0;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #BFDBFE;margin-bottom:6px">&#9989; Fase 2 — De los '+ver2b+' verificados</div>'+
+    fnBar(int2,'#16A34A','&#11088; Interesados',pVerInt,'de verificados')+
+    fnBar(sr2,'#64748B','&#128172; Sin respuesta',pVerSr,'de verificados')+
+    fnBar(ni2,'#94A3B8','&#128078; No interesados',pVerNi,'de verificados')+
+    fnBar(cno2,'#D97706','&#128203; Incompletas',pVerCno,'de verificados');
+  
+  var ciPartes=[];
+  if(ci2org>0)ciPartes.push('Org.est. '+ci2org);
+  if(ci2ant>0)ciPartes.push('Org.ant. '+ci2ant);
+  if(ci2gc>0)ciPartes.push('GC '+ci2gc);
+  if(ci2lag>0)ciPartes.push('Lagom '+ci2lag);
+  if(ci2cv>0)ciPartes.push('CV '+ci2cv);
+  if(ci2cred>0)ciPartes.push('Cred. '+ci2cred);
+  var fase3=ci2>0
+    ?'<div style="font-size:.7rem;font-weight:800;color:#166534;padding:10px 0 4px 0;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #86EFAC;margin-bottom:6px">&#127942; Fase 3 — Cierres semana</div>'+
+      '<div style="padding:10px 12px;background:#F0FDF4;border-radius:8px;border:1px solid #86EFAC;display:flex;align-items:center;gap:12px;flex-wrap:wrap">'+
+      '<span style="font-size:1.5rem;font-weight:800;color:#16A34A">'+ci2+'</span>'+
+      '<div style="flex:1"><div style="font-size:.72rem;font-weight:700;color:#166534">cierres totales</div>'+
+      (ciPartes.length?'<div style="font-size:.68rem;color:#4B7563;margin-top:2px">'+ciPartes.join(' · ')+'</div>':'')+
+      '</div></div>'
+    :'<div style="font-size:.7rem;font-weight:800;color:#6B7280;padding:10px 0 4px 0;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #E5E7EB;margin-bottom:6px">&#127942; Fase 3 — Cierres semana</div>'+
+      '<div style="padding:8px 12px;background:#F9FAFB;border-radius:8px;border:1px dashed #D1D5DB;font-size:.75rem;color:#9CA3AF">Sin cierres registrados esta semana</div>';
+  
+  var funnelHTML=fase1+fase2+fase3;
   var fEl=document.getElementById('l-funnel');
-  if(fEl)fEl.innerHTML='<div class="fn-title">Embudo de conversión</div>'+funnelHTML;
+  if(fEl)fEl.innerHTML='<div class="fn-title">Embudo de conversi&#243;n</div>'+funnelHTML;
   var vkEl=document.getElementById('l-ver-kpi');if(vkEl)vkEl.style.display='none';
 
   /* ── TABLA: base = VERIFICADOS, comparación semana a semana ── */
@@ -919,7 +1030,7 @@ function renderAlianzas(){
   var MES_NM=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
   var CONV_KEYS=['CONVENIO','BONO GC'];
-  function isConv(r){var p=(r[8]||'').toUpperCase().trim();return CONV_KEYS.some(function(k){return p.includes(k);});}
+  function isConv(r){var p=(r[9]||'').toUpperCase().trim();return CONV_KEYS.some(function(k){return p.includes(k);});}
   var ALIS=[
     {k:'GCN',lbl:'Gran Central',         kw:['GRAN CENTRAL'],  excl:CONV_KEYS,  clr:'#92400E'},
     {k:'GCC',lbl:'Gran Central Convenio',kw:['GRAN CENTRAL'],  only:CONV_KEYS,  clr:'#D97706'},
@@ -941,8 +1052,8 @@ function renderAlianzas(){
 
   /* Filtrar TODAS las filas alianza del Excel (sin límite de mes) */
   var aliRows=(xlR||[]).filter(function(r){
-    var proj=(r[8]||'').toUpperCase().trim();
-    var est=(r[7]||'').toString().toUpperCase().trim();
+    var proj=(r[9]||'').toUpperCase().trim();
+    var est=(r[8]||'').toString().toUpperCase().trim();
     if(est==='CAIDO'||est==='')return false;
     return ALIS.some(function(a){return a.kw.some(function(w){return proj.includes(w);});});
   });
@@ -951,7 +1062,7 @@ function renderAlianzas(){
   var totales={};var detalles={};
   ALIS.forEach(function(a){totales[a.k]={cnt:0,val:0};detalles[a.k]=[];});
   aliRows.forEach(function(r){
-    var proj=(r[8]||'').toUpperCase().trim();
+    var proj=(r[9]||'').toUpperCase().trim();
     ALIS.forEach(function(a){
       var kwMatch=a.kw.some(function(w){return proj.includes(w);});
       if(!kwMatch)return;
@@ -1009,8 +1120,8 @@ function renderAlianzas(){
           var mes=(r[3]||'').toString();var anio=(r[4]||'').toString();
           return'<tr style="border-bottom:1px solid var(--brd);'+bg+'">'+
             '<td style="padding:6px 10px">'+mes+' '+anio+'</td>'+
-            '<td style="padding:6px 10px">'+(r[6]||'—')+'</td>'+
-            '<td style="padding:6px 10px">'+(r[8]||'—')+'</td>'+
+            '<td style="padding:6px 10px">'+(r[7]||'—')+'</td>'+
+            '<td style="padding:6px 10px">'+(r[9]||'—')+'</td>'+
             '<td style="padding:6px 10px"><span style="background:'+a.clr+'22;color:'+a.clr+';border-radius:4px;padding:2px 8px;font-size:.72rem;font-weight:600">'+a.lbl+'</span></td>'+
             '<td style="padding:6px 10px">'+(r[2]||'—')+'</td>'+
             '<td style="padding:6px 10px;text-align:right;font-weight:600">'+fmt(gV(r))+'</td>'+
@@ -1058,7 +1169,8 @@ async function saveConf(){
   if(!d[p.sISO])d[p.sISO]={};
   const w={};
   /* qué comerciales guarda este dispositivo */
-  const toSave=(yo===''||yo==='ADMIN')?['KM','AB','NM']:[yo];
+  /* AB inactiva desde jul/1/2026 — solo ADMIN puede ver sus datos históricos */
+  const toSave=(yo===''||yo==='ADMIN')?['KM','NM']:[yo];
   toSave.forEach(a=>{
     const prog=parseInt(document.getElementById('cp_'+a)?.value||'0')||0;
     const ef=parseInt(document.getElementById('ce_'+a)?.value||'0')||0;
@@ -1119,9 +1231,12 @@ function renderReunionesLocal(){
   const allC=gLS(LS_C);const allL=gLS(LS_L);
   const cur=allC[p2.sISO]||{};
   // Cards
-  document.getElementById('reu-cards').innerHTML=['KM','AB','NM'].map(a=>{const x=cur[a]||{prog:0,ef:0};const pA=x.prog>0?pct(x.ef,x.prog,0):0;return`<div class="rc ${a.toLowerCase()}"><div class="rcn"><span style="width:9px;height:9px;border-radius:50%;background:${VDC[a]};display:inline-block"></span>${a} · ${VDN[a]}</div><div class="rck"><div class="rcm"><div class="rcmv">${x.prog||0}</div><div class="rcml">Prog.</div></div><div class="rcm"><div class="rcmv" style="color:var(--up)">${x.ef||0}</div><div class="rcml">Ef.</div></div><div class="rcm"><div class="rcmv" style="color:var(--o)">${pA}%</div><div class="rcml">Conv.</div></div></div><div class="rcin"><div class="fl" style="margin:0;flex:1"><label>Prog.</label><input type="number" id="cp_${a}" min="0" value="${x.prog||0}" style="padding:5px 7px;font-size:.8rem"></div><div class="fl" style="margin:0;flex:1"><label>Efectivas</label><input type="number" id="ce_${a}" min="0" value="${x.ef||0}" style="padding:5px 7px;font-size:.8rem"></div></div></div>`;}).join('');
+  /* KM y NM activas; AB inactiva desde jul/1 — se muestra solo histórico */
+  var PERS_ACT=['KM','NM'];
+  document.getElementById('reu-cards').innerHTML=PERS_ACT.map(a=>{const x=cur[a]||{prog:0,ef:0};const pA=x.prog>0?pct(x.ef,x.prog,0):0;return`<div class="rc ${a.toLowerCase()}"><div class="rcn"><span style="width:9px;height:9px;border-radius:50%;background:${VDC[a]};display:inline-block"></span>${a} · ${VDN[a]}</div><div class="rck"><div class="rcm"><div class="rcmv">${x.prog||0}</div><div class="rcml">Prog.</div></div><div class="rcm"><div class="rcmv" style="color:var(--up)">${x.ef||0}</div><div class="rcml">Ef.</div></div><div class="rcm"><div class="rcmv" style="color:var(--o)">${pA}%</div><div class="rcml">Conv.</div></div></div><div class="rcin"><div class="fl" style="margin:0;flex:1"><label>Prog.</label><input type="number" id="cp_${a}" min="0" value="${x.prog||0}" style="padding:5px 7px;font-size:.8rem"></div><div class="fl" style="margin:0;flex:1"><label>Efectivas</label><input type="number" id="ce_${a}" min="0" value="${x.ef||0}" style="padding:5px 7px;font-size:.8rem"></div></div></div>`;}).join('')+
+    `<div class="rc ab" style="opacity:.38;filter:grayscale(.8)"><div class="rcn"><span style="width:9px;height:9px;border-radius:50%;background:${VDC.AB};display:inline-block"></span>AB · Angie Bustos <span style="font-size:.65rem;background:#FEF2F2;color:#DC2626;border-radius:4px;padding:1px 5px;margin-left:4px">inactiva jul/26</span></div><div class="rck"><div class="rcm"><div class="rcmv">${cur.AB?.prog||0}</div><div class="rcml">Prog.</div></div><div class="rcm"><div class="rcmv" style="color:var(--up)">${cur.AB?.ef||0}</div><div class="rcml">Ef.</div></div></div><div style="font-size:.68rem;color:#9CA3AF;padding:4px 0">Datos históricos — no editable</div></div>`;
   /* Tarjetas de alianzas por asesora */
-  document.getElementById('reu-proj-cards').innerHTML=['KM','AB','NM'].map(a=>{
+  document.getElementById('reu-proj-cards').innerHTML=['KM','NM'].map(a=>{
     const aliData=cur['ali_'+a]||{};
     const aliList=ALI_PER[a];
     const aliRows=aliList.map(({k,lbl,clr})=>{
@@ -1143,8 +1258,8 @@ function renderReunionesLocal(){
     </div>`;
   }).join('');
   // KPIs semana + totales
-  const totP=['KM','AB','NM'].reduce((s,a)=>s+(cur[a]?.prog||0),0);
-  const totE=['KM','AB','NM'].reduce((s,a)=>s+(cur[a]?.ef||0),0);
+  const totP=['KM','NM'].reduce((s,a)=>s+(cur[a]?.prog||0),0);
+  const totE=['KM','NM'].reduce((s,a)=>s+(cur[a]?.ef||0),0);
   // Leads base AUTO desde módulo Leads
   const lb2=allL[p2.sISO]?.total||0,lb1=allL[p1.sISO]?.total||0,lb0=allL[p0.sISO]?.total||0;
   const conv2=lb2>0?pct(totP,lb2,2):0,conv1=lb1>0?pct((allC[p1.sISO]?.KM?.prog||0)+(allC[p1.sISO]?.AB?.prog||0)+(allC[p1.sISO]?.NM?.prog||0),lb1,2):0;
@@ -1153,17 +1268,17 @@ function renderReunionesLocal(){
     <div class="kp b"><div class="kl">Agendadas total</div><div class="kv">${totP}</div><div class="ks">${conv2}% de leads</div></div>
     <div class="kp g"><div class="kl">Efectivas total</div><div class="kv">${totE}</div><div class="ks">${lb2>0?pct(totE,lb2,2):0}% de leads</div></div>
     <div class="kp p"><div class="kl">KM</div><div class="kv">${cur.KM?.ef||0}/${cur.KM?.prog||0}</div><div class="ks">${cur.KM?.prog>0?pct(cur.KM.ef,cur.KM.prog,0):0}% conv</div></div>
-    <div class="kp n"><div class="kl">AB</div><div class="kv">${cur.AB?.ef||0}/${cur.AB?.prog||0}</div><div class="ks">${cur.AB?.prog>0?pct(cur.AB.ef,cur.AB.prog,0):0}% conv</div></div>
-    <div class="kp a"><div class="kl">NM</div><div class="kv">${cur.NM?.ef||0}/${cur.NM?.prog||0}</div><div class="ks">${cur.NM?.prog>0?pct(cur.NM.ef,cur.NM.prog,0):0}% conv</div></div>`;
+    <div class="kp a"><div class="kl">NM</div><div class="kv">${cur.NM?.ef||0}/${cur.NM?.prog||0}</div><div class="ks">${cur.NM?.prog>0?pct(cur.NM.ef,cur.NM.prog,0):0}% conv</div></div>
+    ${(cur.AB?.ef||cur.AB?.prog)?`<div class="kp" style="opacity:.45"><div class="kl">AB (hist.)</div><div class="kv">${cur.AB?.ef||0}/${cur.AB?.prog||0}</div></div>`:''}` ;
   // Tabla estilo PDF (Leads base / Agendadas / Atendidas) — 3 semanas
   function reuRow(lbl,v0,v1,v2,lb0,lb1,lb2,inv){
     const ps0=lb0>0?`(${pct(v0,lb0,2)}%)`:'';const ps1=lb1>0?`(${pct(v1,lb1,2)}%)`:'';const ps2=lb2>0?`(${pct(v2,lb2,2)}%)`:'';
     return`<tr><td class="mc">${lbl}</td><td class="tr">${v0} <span class="pval">${ps0}</span></td><td class="tr">${v1} <span class="pval">${ps1}</span></td><td class="tr"><strong>${v2}</strong> <span class="pval">${ps2}</span></td><td class="tr">${dH(v1,v0,inv)}</td><td class="tr">${dH(v2,v1,inv)}</td></tr>`;
   }
-  const ag0=(allC[p0.sISO]?.KM?.prog||0)+(allC[p0.sISO]?.AB?.prog||0)+(allC[p0.sISO]?.NM?.prog||0);
-  const ag1=(allC[p1.sISO]?.KM?.prog||0)+(allC[p1.sISO]?.AB?.prog||0)+(allC[p1.sISO]?.NM?.prog||0);
-  const ef0=(allC[p0.sISO]?.KM?.ef||0)+(allC[p0.sISO]?.AB?.ef||0)+(allC[p0.sISO]?.NM?.ef||0);
-  const ef1=(allC[p1.sISO]?.KM?.ef||0)+(allC[p1.sISO]?.AB?.ef||0)+(allC[p1.sISO]?.NM?.ef||0);
+  const ag0=(allC[p0.sISO]?.KM?.prog||0)+(allC[p0.sISO]?.NM?.prog||0);
+  const ag1=(allC[p1.sISO]?.KM?.prog||0)+(allC[p1.sISO]?.NM?.prog||0);
+  const ef0=(allC[p0.sISO]?.KM?.ef||0)+(allC[p0.sISO]?.NM?.ef||0);
+  const ef1=(allC[p1.sISO]?.KM?.ef||0)+(allC[p1.sISO]?.NM?.ef||0);
   document.getElementById('reu-tabla').innerHTML=`
   <div class="card lct">
     <div class="card-hd">Evoluci&#243;n reuniones comerciales <span class="card-hd-sub">Base = leads calculadora (GC / Corner View se miden aparte)</span></div>
@@ -1185,35 +1300,35 @@ function renderReunionesLocal(){
     
     mkLine('rc_trend',wlbls,[
       {label:'Karen',data:tKM,borderColor:VDC.KM,backgroundColor:'rgba(124,58,237,.07)',fill:true},
-      {label:'Angie',data:tAB,borderColor:VDC.AB,backgroundColor:'rgba(146,64,14,.07)',fill:true},
-      {label:'Nathalia',data:tNM,borderColor:VDC.NM,backgroundColor:'rgba(228,114,27,.07)',fill:true}
+      {label:'Nathalia',data:tNM,borderColor:VDC.NM,backgroundColor:'rgba(228,114,27,.07)',fill:true},
+      {label:'Angie (hist.)',data:tAB,borderColor:VDC.AB,backgroundColor:'rgba(146,64,14,.04)',fill:false,borderDash:[4,3]}
     ]);
   },80);
 }
 
 /* ═══ VENTAS ═══ */
 let vFVD='Todas';
-const eAli=r=>{const p=(r[8]||'').toUpperCase().trim();return ALIANZA.some(a=>p.includes(a))||CONV_KW.some(k=>p.includes(k));};
-const eConv=r=>CONV_KW.some(k=>(r[8]||'').toUpperCase().trim().includes(k));
-const eOrg=r=>!eAli(r)&&((r[12]||'').toLowerCase().includes('rgán')||(r[12]||'').toLowerCase().includes('organ'));
-const gV=r=>{const v=fv(r[18]);return v>0?v:fv(r[13])+fv(r[15]);};
-const gAIU=r=>fv(r[15]);
-/* Origen: para alianza usa nombre del partner (r[8]), para otros usa r[12] */
+const eAli=r=>{const p=(r[9]||'').toUpperCase().trim();return ALIANZA.some(a=>p.includes(a))||CONV_KW.some(k=>p.includes(k));};
+const eConv=r=>CONV_KW.some(k=>(r[9]||'').toUpperCase().trim().includes(k));
+const eOrg=r=>!eAli(r)&&((r[13]||'').toLowerCase().includes('rgán')||(r[13]||'').toLowerCase().includes('organ'));
+const gV=r=>{const v=fv(r[19]);return v>0?v:fv(r[14])+fv(r[16]);};
+const gAIU=r=>fv(r[16]);
+/* Origen: para alianza usa nombre del partner (r[9]), para otros usa r[13] */
 function getOrigen(r){
   if(eAli(r)){
-    const proj=(r[8]||'').toUpperCase().trim();
+    const proj=(r[9]||'').toUpperCase().trim();
     for(const a of ALIANZA){if(proj.includes(a))return a;}
     return 'Alianza';
   }
-  return(r[12]||'Sin origen').toString().trim()||'Sin origen';
+  return(r[13]||'Sin origen').toString().trim()||'Sin origen';
 }
-function getVM(mi,yr,filt){const rows=(xlR||[]).filter(r=>{const raw=(r[3]||'').toString().toLowerCase().trim();const m=MN[raw];const est=(r[7]||'').toString().toUpperCase().trim();return m===mi&&(parseInt(r[4])||0)===yr&&est!=='CAIDO'&&est!=='';});return filt?rows.filter(r=>filt==='Todas'||(r[2]||'').toUpperCase()===filt):rows;}
+function getVM(mi,yr,filt){const rows=(xlR||[]).filter(r=>{const raw=(r[3]||'').toString().toLowerCase().trim();const m=MN[raw];const est=(r[8]||'').toString().toUpperCase().trim();return m===mi&&(parseInt(r[4])||0)===yr&&est!=='CAIDO'&&est!=='';});return filt?rows.filter(r=>filt==='Todas'||(r[2]||'').toUpperCase()===filt):rows;}
 function renderVentas(){
   const el=document.getElementById('v-out');if(!xlR){el.innerHTML='';document.getElementById('v-noex').style.display='block';return;}
   document.getElementById('v-noex').style.display='none';
   const p=getPer();
   /* Semana */
-  const semR=(xlR||[]).filter(r=>{const d=parseD(r[11]);if(!d)return false;const est=(r[7]||'').toString().toUpperCase().trim();return d>=p.s&&d<=p.e&&est!=='CAIDO';});
+  const semR=(xlR||[]).filter(r=>{const d=parseD(r[12]);if(!d)return false;const est=(r[8]||'').toString().toUpperCase().trim();return d>=p.s&&d<=p.e&&est!=='CAIDO';});
   const sFilt=semR.filter(r=>vFVD==='Todas'||(r[2]||'').toUpperCase()===vFVD);
   const semV=sFilt.length,semVal=sFilt.reduce((s,r)=>s+gV(r),0);
   /* Mes actual */
@@ -1224,7 +1339,7 @@ function renderVentas(){
   const aliAIU=aliR.reduce((s,r)=>s+gAIU(r),0),orgAIU=orgR.reduce((s,r)=>s+gAIU(r),0),remAIU=remR.reduce((s,r)=>s+gAIU(r),0);
   /* Meta automática: valor mismo mes año anterior × 1.5 ÷ ticket promedio $37M */
   const TICKET_PROM=37000000;
-  const vmPrevYr=(xlR||[]).filter(r=>{const raw=(r[3]||'').toString().toLowerCase().trim();const m=MN[raw];const est=(r[7]||'').toString().toUpperCase().trim();return m===p.mi&&(parseInt(r[4])||0)===(p.yr-1)&&est!=='CAIDO'&&est!=='';});
+  const vmPrevYr=(xlR||[]).filter(r=>{const raw=(r[3]||'').toString().toLowerCase().trim();const m=MN[raw];const est=(r[8]||'').toString().toUpperCase().trim();return m===p.mi&&(parseInt(r[4])||0)===(p.yr-1)&&est!=='CAIDO'&&est!=='';});
   const vmPrevYrVal=vmPrevYr.reduce((s,r)=>s+gV(r),0);
   const metaValorTarget=vmPrevYrVal>0?vmPrevYrVal*1.5:0;
   const autoMetaV=metaValorTarget>0?Math.ceil(metaValorTarget/TICKET_PROM):null;
@@ -1249,7 +1364,7 @@ function renderVentas(){
   const pv=vmp.length,pvVal=vmp.reduce((s,r)=>s+gV(r),0);
   const pAliR=vmp.filter(r=>eAli(r)),pOrgR=vmp.filter(r=>eOrg(r));
   /* Año */
-  const vA=(xlR||[]).filter(r=>(parseInt(r[4])||0)===p.yr&&(r[7]||'').toString().toUpperCase().trim()!=='CAIDO');
+  const vA=(xlR||[]).filter(r=>(parseInt(r[4])||0)===p.yr&&(r[8]||'').toString().toUpperCase().trim()!=='CAIDO');
   const tvA=vA.length,tvAVal=vA.reduce((s,r)=>s+gV(r),0);
   const byMes=Array(12).fill(0);vA.forEach(r=>{const m=MN[(r[3]||'').toString().toLowerCase().trim()];if(m>=0&&m<12)byMes[m]++;});
   /* Insights */
@@ -1323,18 +1438,18 @@ function renderVentas(){
               {k:'VANTI',lbl:'Vanti'},
             ];
             // Separate GC Convenio vs Gran Central (sin convenio)
-            const gcConv=vm.filter(r=>eConv(r)&&(r[8]||'').toUpperCase().includes('GRAN CENTRAL'));
-            const gcSolo=vm.filter(r=>!eConv(r)&&(r[8]||'').toUpperCase().includes('GRAN CENTRAL')&&eAli(r));
+            const gcConv=vm.filter(r=>eConv(r)&&(r[9]||'').toUpperCase().includes('GRAN CENTRAL'));
+            const gcSolo=vm.filter(r=>!eConv(r)&&(r[9]||'').toUpperCase().includes('GRAN CENTRAL')&&eAli(r));
             const orgTotal=orgR.length;
             const counts={
               'Gran Central':gcSolo.length,
               'GC Convenio':gcConv.length,
-              'Well':vm.filter(r=>!eConv(r)&&(r[8]||'').toUpperCase().includes('WELL')&&eAli(r)).length,
-              'Klik':vm.filter(r=>(r[8]||'').toUpperCase().includes('KLIK')&&eAli(r)).length,
-              'Corner View':vm.filter(r=>(r[8]||'').toUpperCase().includes('CORNER VIEW')&&eAli(r)).length,
-              'Corner V':vm.filter(r=>(r[8]||'').toUpperCase().includes('CORNER V')&&!(r[8]||'').toUpperCase().includes('CORNER VIEW')&&eAli(r)).length,
-              'Coninsa':vm.filter(r=>(r[8]||'').toUpperCase().includes('CONINSA')&&eAli(r)).length,
-              'Vanti':vm.filter(r=>(r[8]||'').toUpperCase().includes('VANTI')&&eAli(r)).length,
+              'Well':vm.filter(r=>!eConv(r)&&(r[9]||'').toUpperCase().includes('WELL')&&eAli(r)).length,
+              'Klik':vm.filter(r=>(r[9]||'').toUpperCase().includes('KLIK')&&eAli(r)).length,
+              'Corner View':vm.filter(r=>(r[9]||'').toUpperCase().includes('CORNER VIEW')&&eAli(r)).length,
+              'Corner V':vm.filter(r=>(r[9]||'').toUpperCase().includes('CORNER V')&&!(r[9]||'').toUpperCase().includes('CORNER VIEW')&&eAli(r)).length,
+              'Coninsa':vm.filter(r=>(r[9]||'').toUpperCase().includes('CONINSA')&&eAli(r)).length,
+              'Vanti':vm.filter(r=>(r[9]||'').toUpperCase().includes('VANTI')&&eAli(r)).length,
               'Orgánico':orgTotal,
             };
             return Object.entries(counts).map(([lbl,n])=>`<div class="vi-org-row"><span class="vi-tipodot" style="background:${n>0?'var(--y)':'rgba(255,255,255,.2)'}"></span>${lbl}<span class="val ${n===0?'zero':''}">${n}</span></div>`).join('');
@@ -1403,7 +1518,7 @@ function renderVentas(){
   <!-- 6. TABLA DETALLADA MES -->
   <div class="card">
     <div class="card-hd">Detalle completo ${p.mes} ${p.yr} <span class="card-hd-sub">${tv} registros</span></div>
-    ${tv===0?`<div class="msg msg-a">Sin ventas en ${p.mes} ${p.yr}.</div>`:`<div class="tw"><table><thead><tr><th>Cliente</th><th>Proyecto</th><th>T/A</th><th>Asesora</th><th>Origen</th><th class="tr">Valor</th><th class="tr">AIU</th><th>Tipo</th></tr></thead><tbody>${vm.map(r=>`<tr><td>${r[6]||'—'}</td><td>${r[8]||'—'}</td><td>${[r[9],r[10]].filter(Boolean).join('/')}</td><td>${VDN[(r[2]||'').toUpperCase()]||r[2]||'—'}</td><td>${getOrigen(r)}</td><td class="tr"><strong>${fmt(gV(r))}</strong></td><td class="tr">${fmt(gAIU(r))}</td><td><span class="badge ${eAli(r)?'ba':eOrg(r)?'bp':'bc'}">${eAli(r)?'Ali':eOrg(r)?'Org':'Com'}</span>${eConv(r)?`<span class="badge bconv" style="margin-left:2px">Conv</span>`:''}</td></tr>`).join('')}</tbody></table></div>`}
+    ${tv===0?`<div class="msg msg-a">Sin ventas en ${p.mes} ${p.yr}.</div>`:`<div class="tw"><table><thead><tr><th>Cliente</th><th>Proyecto</th><th>T/A</th><th>Asesora</th><th>Origen</th><th class="tr">Valor</th><th class="tr">AIU</th><th>Tipo</th></tr></thead><tbody>${vm.map(r=>`<tr><td>${r[7]||'—'}</td><td>${r[9]||'—'}</td><td>${[r[10],r[11]].filter(Boolean).join('/')}</td><td>${VDN[(r[2]||'').toUpperCase()]||r[2]||'—'}</td><td>${getOrigen(r)}</td><td class="tr"><strong>${fmt(gV(r))}</strong></td><td class="tr">${fmt(gAIU(r))}</td><td><span class="badge ${eAli(r)?'ba':eOrg(r)?'bp':'bc'}">${eAli(r)?'Ali':eOrg(r)?'Org':'Com'}</span>${eConv(r)?`<span class="badge bconv" style="margin-left:2px">Conv</span>`:''}</td></tr>`).join('')}</tbody></table></div>`}
   </div>
 
   <!-- 4. COMPARATIVO -->
@@ -1496,10 +1611,10 @@ function renderAptos(){
   /* ── Datos de xlR (VENTAS): X RECIBIR + GC Convenio en ejecucion ── */
   var xrR=[],gcConvEj=[];
   if(xlR){
-    xrR=xlR.filter(function(r){return norm(r[7])==='X RECIBIR';});
+    xrR=xlR.filter(function(r){return norm(r[8])==='X RECIBIR';});
     gcConvEj=xlR.filter(function(r){
-      var est=norm(r[7]);
-      return (est==='EN EJECUCION'||est==='X RECIBIR'||est.includes('EJECUCI'))&&eConv(r)&&(r[8]||'').toString().toUpperCase().includes('GRAN CENTRAL');
+      var est=norm(r[8]);
+      return (est==='EN EJECUCION'||est==='X RECIBIR'||est.includes('EJECUCI'))&&eConv(r)&&(r[9]||'').toString().toUpperCase().includes('GRAN CENTRAL');
     });
   }
 
@@ -1614,7 +1729,7 @@ function genInforme(){
   document.getElementById('inf-gen').textContent='Generado el '+new Date().toLocaleString('es-CO',{dateStyle:'long',timeStyle:'short'});
   document.getElementById('c-period').textContent=wLbl(p);
   let vMes=0,valMes=0,ejCnt=0,xrCnt=0;
-  if(xlR){const vm=getVM(p.mi,p.yr,'Todas');vMes=vm.length;valMes=vm.reduce((s,r)=>s+gV(r),0);ejCnt=xlR.filter(r=>(r[7]||'').toString().toUpperCase().trim()==='EN EJECUCIÓN').length;xrCnt=xlR.filter(r=>(r[7]||'').toString().toUpperCase().trim()==='X RECIBIR').length;}
+  if(xlR){const vm=getVM(p.mi,p.yr,'Todas');vMes=vm.length;valMes=vm.reduce((s,r)=>s+gV(r),0);ejCnt=xlR.filter(r=>(r[8]||'').toString().toUpperCase().trim()==='EN EJECUCIÓN').length;xrCnt=xlR.filter(r=>(r[8]||'').toString().toUpperCase().trim()==='X RECIBIR').length;}
   const totCP=['KM','AB','NM'].reduce((s,a)=>s+(cc[a]?.prog||0),0);
   const totCE=['KM','AB','NM'].reduce((s,a)=>s+(cc[a]?.ef||0),0);
   const pVM=pct(vMes,META_V);
