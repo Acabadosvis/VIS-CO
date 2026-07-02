@@ -124,6 +124,13 @@ header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;displa
 .btn-marcar:hover{background:var(--ok);color:#fff;}
 .btn-deshacer{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:6px 12px;border-radius:8px;border:1.5px solid var(--brd);background:var(--w);color:var(--g);cursor:pointer;transition:.15s;}
 .btn-deshacer:hover{border-color:var(--mora);color:var(--mora);}
+.btn-aprobar{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:6px 12px;border-radius:8px;border:1.5px solid #059669;background:#ECFDF5;color:#059669;cursor:pointer;transition:.15s;white-space:nowrap;width:100%;}
+.btn-aprobar:hover{background:#059669;color:#fff;}
+.btn-reescribir{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:6px 12px;border-radius:8px;border:1.5px solid #D97706;background:#FFFBEB;color:#D97706;cursor:pointer;transition:.15s;white-space:nowrap;width:100%;}
+.btn-reescribir:hover{background:#D97706;color:#fff;}
+.be-revision{background:#FFFBEB;color:#D97706;border-color:#FDE68A;}
+.tr-revision{background:#FFFDE7 !important;}
+.btns-revision{display:flex;flex-direction:column;gap:4px;min-width:110px;}
 
 /* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;z-index:500;background:var(--n);color:#fff;padding:12px 18px;border-radius:10px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.3);transform:translateY(80px);opacity:0;transition:.3s;max-width:340px;}
@@ -178,6 +185,86 @@ header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;displa
   .kpi-strip{grid-template-columns:repeat(2,1fr);}
   .main-table th:nth-child(5),.main-table td:nth-child(5){display:none;}
 }
+
+/* ── COMISIONES VIEW ── */
+.com-kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:16px 20px 0;}
+.k-com-tot::before{background:var(--pur);}
+.k-com-pend::before{background:var(--r);}
+.k-com-sinc::before{background:var(--yel);}
+.k-com-sins::before{background:var(--cian);}
+.k-com-tot  .ktag{background:var(--pur-bg);color:var(--pur);border-color:var(--pur-brd);}
+.k-com-pend .ktag{background:var(--mora-bg);color:var(--mora);border-color:var(--mora-brd);}
+.k-com-sinc .ktag{background:var(--yel-bg);color:var(--yel);border-color:var(--yel-brd);}
+.k-com-sins .ktag{background:var(--cian-bg);color:var(--cian);border-color:var(--cian-brd);}
+.com-toolbar{display:flex;align-items:center;gap:10px;padding:14px 20px;flex-wrap:wrap;}
+.com-sub-tabs{display:flex;background:var(--gc);border-radius:10px;padding:3px;border:1.5px solid var(--brd);}
+
+/* Rol banner */
+.com-rol-banner{margin:12px 20px 0;padding:9px 14px;border-radius:10px;font-size:12px;font-weight:600;display:none;align-items:center;gap:8px;border:1.5px solid;}
+.com-rol-banner.show{display:flex;}
+.com-rb-km{background:#FFF5F5;color:#BE123C;border-color:#FECDD3;}
+.com-rb-ab{background:var(--pur-bg);color:var(--pur);border-color:var(--pur-brd);}
+
+/* Rol selector */
+.com-rol-wrap{display:flex;align-items:center;gap:7px;padding:5px 11px;border:1.5px solid var(--brd);border-radius:9px;background:var(--gc);}
+.com-rol-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--g);}
+.com-rol-sel{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;border:none;background:transparent;color:var(--n);cursor:pointer;outline:none;}
+
+/* VD pill */
+.vd-pill{display:inline-block;font-family:'Syne',sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;border:1px solid;letter-spacing:.04em;}
+.vd-km{background:#FFF5F5;color:#BE123C;border-color:#FECDD3;}
+.vd-ab{background:var(--pur-bg);color:var(--pur);border-color:var(--pur-brd);}
+
+/* Number display */
+.num{font-family:'DM Sans',sans-serif;font-feature-settings:"tnum";font-variant-numeric:tabular-nums;font-weight:600;}
+.num-lg{font-size:16px;}
+.num-md{font-size:13px;}
+.num-pur{color:var(--pur);}
+.num-ok{color:var(--ok);}
+.num-err{color:var(--mora);}
+.num-note{font-size:10px;color:var(--g);margin-top:2px;line-height:1.4;}
+
+/* Estado badges */
+.est-badge{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:20px;border:1px solid;}
+.e-ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-brd);}
+.e-ej{background:var(--sem-bg);color:var(--sem);border-color:var(--sem-brd);}
+.e-rc{background:var(--cian-bg);color:var(--cian);border-color:var(--cian-brd);}
+.e-xx{background:var(--gc);color:var(--g);border-color:var(--brd);}
+
+/* Doc badges */
+.doc-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:6px;border:1px solid;margin-bottom:3px;}
+.doc-ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-brd);}
+.doc-no{background:#FEF2F2;color:#DC2626;border-color:#FECACA;}
+
+/* Payment cells */
+.pcell{display:flex;flex-direction:column;gap:6px;align-items:flex-start;}
+.pcell-na{color:var(--g);font-size:12px;}
+.apb{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:.04em;padding:4px 9px;border-radius:6px;border:none;cursor:pointer;transition:.12s;white-space:nowrap;}
+.apb-pag{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-brd);cursor:default;}
+.apb-ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-brd);}
+.apb-ok:hover{background:#DCFCE7;}
+.apb-pend{background:var(--r);color:#fff;}
+.apb-pend:hover{background:var(--ro);}
+.apb-blq{background:var(--gc);color:var(--g);border:1px solid var(--brd);cursor:default;}
+.apb-rol{background:var(--yel-bg);color:var(--yel);border:1px solid var(--yel-brd);cursor:default;}
+
+/* Totals row */
+.tr-tot td{background:var(--gc);border-top:2px solid var(--brd);font-family:'Syne',sans-serif;font-weight:700;font-size:11px;}
+
+/* Aprobados view */
+.apr-bloque{background:var(--w);border:1.5px solid var(--brd);border-radius:14px;overflow:hidden;box-shadow:var(--sh);}
+.apr-blq-head{padding:14px 18px;border-bottom:1px solid var(--brd);font-family:'Syne',sans-serif;font-size:13px;font-weight:800;background:var(--gc);display:flex;align-items:center;gap:8px;}
+.apr-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-brd);margin-right:4px;}
+.apr-tag small{color:var(--g);}
+.apr-btn{background:var(--r);color:#fff;border:none;border-radius:10px;padding:11px 18px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;cursor:pointer;width:100%;margin-top:12px;}
+.apr-btn:hover{background:var(--ro);}
+
+/* Gerencia lock badge */
+.ger-lock{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:8px;background:var(--ok-bg);color:var(--ok);border:1.5px solid var(--ok-brd);font-size:10px;font-weight:700;font-family:'Syne',sans-serif;letter-spacing:.04em;}
+
+@media(max-width:768px){
+  .com-kpi-strip{grid-template-columns:repeat(2,1fr);}
+}
 </style>
 </head>
 <body>
@@ -186,15 +273,15 @@ header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;displa
 
 <header>
   <div class="logo">VIS<span>·</span>CO</div>
-  <div class="hbadge">M4 · Cierres y Pagos</div>
+  <div class="hbadge">M4 · Cierres, Pagos y Comisiones</div>
   <div class="hright">
     <div class="sync-status off" id="syncStatus" onclick="toggleSetup()">OneDrive: no conectado</div>
     <button class="hbtn" onclick="toggleSetup()">⚙ Configurar</button>
     <button class="hbtn" style="display:none;background:var(--sem-bg);border-color:var(--sem-brd);color:var(--sem)" id="btnSyncM2" onclick="abrirModalM2()">↓ Sync Cartera</button>
-    <button class="hbtn" style="position:relative">
+    <label class="hbtn" style="cursor:pointer">
       📂 Cargar Excel
       <input type="file" accept=".xlsx,.xls" onchange="loadFile(this)">
-    </button>
+    </label>
   </div>
 </header>
 
@@ -223,13 +310,13 @@ header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;displa
 <!-- First Screen -->
 <div class="first-screen" id="firstScreen">
   <div class="fs-icon">💳</div>
-  <div class="fs-title">Cierres y Pagos</div>
-  <div class="fs-sub">Carga el Excel de ventas. Los pagos aprobados por contabilidad en Cartera aparecen aquí automáticamente listos para facturar.</div>
+  <div class="fs-title">Cierres, Pagos y Comisiones</div>
+  <div class="fs-sub">Carga el Excel de ventas para gestionar cierres, pagos y comisiones de Karen. Los pagos aprobados en Cartera aparecen aquí listos para facturar.</div>
   <div class="fs-btns">
-    <button class="fs-btn">
+    <label class="fs-btn" style="cursor:pointer">
       📂 Cargar Excel de ventas
       <input type="file" accept=".xlsx,.xls" onchange="loadFile(this)">
-    </button>
+    </label>
     <button class="fs-btn outline" onclick="connectOneDrive()">🔗 Conectar OneDrive</button>
   </div>
 </div>
@@ -259,9 +346,10 @@ header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;displa
   <!-- Toolbar -->
   <div class="toolbar">
     <div class="tabs">
-      <div class="tab active" id="tabPorFacturar" onclick="showTab('porFacturar')">Por Facturar</div>
-      <div class="tab"        id="tabFacturado"   onclick="showTab('facturado')">Facturado</div>
-      <div class="tab"        id="tabHistorial"   onclick="showTab('historial')">Historial</div>
+      <div class="tab active" id="tabPorFacturar"  onclick="showTab('porFacturar')">Por Facturar</div>
+      <div class="tab"        id="tabFacturado"    onclick="showTab('facturado')">Facturado</div>
+      <div class="tab"        id="tabHistorial"    onclick="showTab('historial')">Historial</div>
+      <div class="tab"        id="tabComisiones"   onclick="showTab('comisiones')" style="color:var(--pur)">💰 Comisiones</div>
     </div>
     <select class="filter-sel" id="filterProy" onchange="renderCurrentTab()">
       <option value="">Todos los proyectos</option>
@@ -287,6 +375,67 @@ header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;displa
   <!-- Historial -->
   <div class="view-wrap" id="historialView" style="display:none">
     <div id="histContent"></div>
+  </div>
+
+  <!-- ═══ COMISIONES ═══ -->
+  <div id="comisionesView" style="display:none">
+
+    <!-- Role banner -->
+    <div class="com-rol-banner" id="comRolBanner"></div>
+
+    <!-- KPIs -->
+    <div class="com-kpi-strip">
+      <div class="kpi k-com-tot">
+        <div class="ktag">Total comisiones</div>
+        <div class="kamt" id="ckTot" style="color:var(--pur)">$0</div>
+        <div class="ksub" id="ckTotSub">0 negocios</div>
+      </div>
+      <div class="kpi k-com-pend">
+        <div class="ktag">Por aprobar</div>
+        <div class="kamt" id="ckPend" style="color:var(--r)">$0</div>
+        <div class="ksub">cliente pagó · pendiente autorizar</div>
+      </div>
+      <div class="kpi k-com-sinc">
+        <div class="ktag">Sin contrato</div>
+        <div class="kamt" id="ckSinC" style="color:var(--yel)">0</div>
+        <div class="ksub">pendiente firma</div>
+      </div>
+      <div class="kpi k-com-sins">
+        <div class="ktag">Sin especificaciones</div>
+        <div class="kamt" id="ckSinS" style="color:var(--cian)">0</div>
+        <div class="ksub">pendiente actualizar</div>
+      </div>
+    </div>
+
+    <!-- Sub-toolbar -->
+    <div class="com-toolbar">
+      <div class="com-rol-wrap" id="comRolWrap">
+        <span class="com-rol-lbl">Vista</span>
+        <select class="com-rol-sel" id="comRolSel" onchange="comCambiarRol()">
+          <option value="GERENCIA">Gerencia</option>
+          <option value="KM">KM — Karen</option>
+        </select>
+      </div>
+      <div class="com-sub-tabs">
+        <div class="tab"        id="cTComp" onclick="comSetTab('comp')">📁 Historial</div>
+        <div class="tab active" id="cTPend" onclick="comSetTab('pend')">⚡ Por aprobar</div>
+        <div class="tab"        id="cTAprs" onclick="comSetTab('aprs')">✓ Aprobados</div>
+      </div>
+      <select class="filter-sel" id="comFVD" onchange="comRender()">
+        <option value="KM">KM — Karen</option>
+      </select>
+      <input class="search-box" id="comSearch" placeholder="🔍 Buscar negocio..." oninput="comRender()">
+      <div style="margin-left:auto">
+        <button class="hbtn" onclick="comExportCSV()">↓ CSV</button>
+      </div>
+    </div>
+
+    <div class="view-count" id="comViewCount" style="padding:8px 20px;font-size:12px;color:var(--g)"></div>
+    <div style="padding:0 20px 20px" id="comTableWrap">
+      <div class="empty" style="padding:60px 20px;text-align:center;color:var(--g)">
+        Carga el Excel de ventas para ver las comisiones.
+      </div>
+    </div>
   </div>
 
 </div>
@@ -323,7 +472,7 @@ const CFG = {
   DRIVE_ID:  'b!D251vSxdK0-WPxaL8adTxn6fr9AE5qVIiVLnRNP5r6fFtdHyi3bpTagdzJcffXBJ',
   FILE_ID:   '01HE3BNJIL2QQJEDPZXZBLWAVZVMNTAUL3',
   SHEET:     'REPORTE VENTAS',
-  DATA_START: 4
+  DATA_START: 5
 };
 
 // =====================================================================
@@ -453,14 +602,18 @@ const HEADER_ALIASES = {
   'TORRE':'torre','APTO':'apto','TOTAL':'total',
   'FACTURACION':'facturacion','FACTURACIÓN':'facturacion',
   'VD':'vd','ASESOR':'vd','X RECAUDAR':'x_recaudar','× RECAUDAR':'x_recaudar',
+  'SEPARACION':'sep_monto','SEPARACIÓN':'sep_monto','SEP':'sep_monto',
+  'CODIGO':'codigo','CÓDIGO':'codigo',
 };
 function parseHeaders(raw) {
   let hRow = -1;
-  for (let i = 0; i < Math.min(4, raw.length); i++) {
+  for (let i = 0; i < Math.min(6, raw.length); i++) {
     if (raw[i] && raw[i].some(c => typeof c==='string' && c.toUpperCase().includes('CLIENTE'))) { hRow=i; break; }
   }
   if (hRow === -1) { console.log('[M4] Headers NO detectados — mapa estático'); return null; }
-  console.log('[M4] Headers detectados en fila', hRow+1);
+  // Actualizar DATA_START dinámicamente según dónde estén los encabezados
+  CFG.DATA_START = hRow + 2; // hRow es 0-indexed; datos empiezan en la fila siguiente
+  console.log('[M4] Headers detectados en fila', hRow+1, '→ DATA_START =', CFG.DATA_START);
   const map = {};
   raw[hRow].forEach((h,idx) => {
     if (!h) return;
@@ -543,6 +696,26 @@ async function loadFromOneDrive() {
   } catch(e) { toast(e.message,'err'); }
   finally     { loading(false); }
 }
+async function updateExcelCellsSheet(sheet, excelRow, updates) {
+  if (!msalAccount) return;
+  const token = await getToken();
+  for (const u of updates) {
+    const addr = `${colLetter(u.col)}${excelRow}`;
+    const url  = `https://graph.microsoft.com/v1.0/drives/${CFG.DRIVE_ID}/items/${CFG.FILE_ID}/workbook/worksheets/${encodeURIComponent(sheet)}/range(address='${addr}')`;
+    const val  = u.value instanceof Date ? u.value.toLocaleDateString('en-US') : u.value;
+    const resp = await fetch(url, {
+      method:'PATCH',
+      headers:{ Authorization:`Bearer ${token}`, 'Content-Type':'application/json' },
+      body: JSON.stringify({ values:[[val]] })
+    });
+    if (!resp.ok) {
+      const err = await resp.text();
+      console.error('[COM] Error:', resp.status, sheet, addr, err.slice(0,200));
+      throw new Error(`Graph API ${resp.status}: ${err.slice(0,120)}`);
+    }
+    console.log(`[COM] Escrito: ${sheet} col ${u.col} fila ${excelRow} → ${val}`);
+  }
+}
 async function updateExcelCells(excelRow, updates) {
   if (!msalAccount) return;
   const token = await getToken();
@@ -595,16 +768,26 @@ function processWorkbook(buf) {
     allData.push({ _row:row, _excelRow:i+1, _idx:allData.length });
   }
   console.log('[M4] Registros leídos:', allData.length);
+  // ── COMISIONES sheet ──
+  comParseWorkbook(workbook);
   loadAllIDB().then(async () => {
-    await loadSopsFromAPI();   // ← carga cloud antes de renderizar
-    await autoSyncM2();
+    try {
+      await loadSopsFromAPI();
+    } catch(e) { console.warn('[M4] loadSopsFromAPI:', e); }
+    try {
+      await autoSyncM2();
+    } catch(e) { console.warn('[M4] autoSyncM2:', e); }
     populateFilters();
     document.getElementById('firstScreen').style.display = 'none';
     document.getElementById('dash').classList.add('show');
     document.getElementById('btnSyncM2').style.display = 'inline-flex';
     document.getElementById('btnCSV').style.display = 'inline-flex';
-    renderKPIs();
-    renderCurrentTab();
+    try { renderKPIs(); } catch(e) { console.error('[M4] renderKPIs:', e); }
+    try { renderCurrentTab(); } catch(e) { console.error('[M4] renderCurrentTab:', e); }
+  }).catch(e => {
+    console.error('[M4] Error cargando archivo:', e);
+    toast('Error cargando el archivo: ' + e.message, 'err');
+    loading(false);
   });
 }
 function getVal(r, col) {
@@ -664,11 +847,12 @@ function getPagosAprobados() {
         proyecto:  row ? row._row[C.proyecto] : (v.proy  || '—'),
         torre:     row ? row._row[C.torre]    : (v.torre || '—'),
         apto:      row ? row._row[C.apto]     : (v.apto  || '—'),
-        monto:     v.monto || 0,
-        fecha:     v.fecha_entro || '',
-        banco:     v.banco || '',
-        obs:       v.obs_contab || '',
-        facturado: ESTADOS[facId] === 'facturado',
+        monto:      v.monto || 0,
+        fecha:      v.fecha_entro || '',
+        banco:      v.banco || '',
+        obs:        v.obs_contab || '',
+        facturado:  ESTADOS[facId] === 'facturado',
+        enRevision: ESTADOS[facId] === 'en_revision',
         row,
       };
     })
@@ -711,14 +895,26 @@ function tablaHTML(pagos, modo) {
   if (!pagos.length) return `<div class="empty"><div class="empty-icon">${modo==='pf'?'🔔':'✅'}</div><div class="empty-text">${modo==='pf'?'Sin pagos por facturar. Los pagos aprobados en Cartera aparecen aquí.':'Sin pagos facturados aún.'}</div></div>`;
   const totalGrupo = pagos.reduce((s,p) => s+p.monto, 0);
   const filas = pagos.map(p => {
-    const accion = modo === 'pf'
-      ? `<button class="btn-marcar" onclick="marcarFacturado('${p.key}')">✓ Marcar facturado</button>`
-      : `<button class="btn-deshacer" onclick="desmarcarFacturado('${p.key}')">↩ Deshacer</button>`;
+    let accion;
+    if (modo === 'fac') {
+      accion = `<button class="btn-deshacer" onclick="desmarcarFacturado('${p.key}')">↩ Deshacer</button>`;
+    } else if (p.enRevision) {
+      accion = `<div class="btns-revision">
+        <button class="btn-reescribir" onclick="reescribirConsolidado('${p.key}')">🔄 Reescribir</button>
+        <button class="btn-aprobar"    onclick="aprobarFacturado('${p.key}')">✅ Aprobar</button>
+      </div>`;
+    } else {
+      accion = `<button class="btn-marcar" onclick="marcarFacturado('${p.key}')">📤 Enviar a Consolidado</button>`;
+    }
     const excelBadge = p.row
       ? `<span class="badge-estado be-excel">✓ En Excel</span>`
       : `<span class="badge-estado" style="background:#FEF2F2;color:#DC2626;border-color:#FECACA">Sin fila Excel</span>`;
-    return `<tr>
-      <td class="td-cliente">${p.cliente}</td>
+    const estadoBadge = p.enRevision
+      ? `<br><span class="badge-estado be-revision" style="margin-top:4px;display:inline-block">⏳ Pendiente aprobación</span>`
+      : '';
+    const trClass = p.enRevision ? ' class="tr-revision"' : '';
+    return `<tr${trClass}>
+      <td class="td-cliente">${p.cliente}${estadoBadge}</td>
       <td class="td-proy">${p.proyecto}<br>T${p.torre} / A${p.apto}</td>
       <td><span class="badge-etapa">${ETAPA_LABELS[p.etapa]||p.etapa}</span></td>
       <td class="td-monto">${fmt(p.monto)}</td>
@@ -748,6 +944,7 @@ function tablaHTML(pagos, modo) {
 // RENDER TABS
 // =====================================================================
 function renderCurrentTab() {
+  if (currentTab === 'comisiones') { comRender(); return; }
   if (currentTab === 'porFacturar') renderPorFacturar();
   else if (currentTab === 'facturado') renderFacturado();
   else renderHistorial();
@@ -764,29 +961,238 @@ function renderFacturado() {
 }
 function showTab(tab) {
   currentTab = tab;
-  ['porFacturar','facturado','historial'].forEach(t => {
+  ['porFacturar','facturado','historial','comisiones'].forEach(t => {
     const btn = document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1));
     if (btn) btn.classList.toggle('active', t===tab);
   });
   document.getElementById('porFacturarView').style.display = tab==='porFacturar' ? 'block' : 'none';
   document.getElementById('facturadoView').style.display   = tab==='facturado'   ? 'block' : 'none';
   document.getElementById('historialView').style.display   = tab==='historial'   ? 'block' : 'none';
+  document.getElementById('comisionesView').style.display  = tab==='comisiones'  ? 'block' : 'none';
+  // hide main filters when in comisiones (they don't apply)
+  const mainFilters = document.getElementById('filterProy');
+  const mainSearch  = document.getElementById('searchBox');
+  if (mainFilters) mainFilters.style.display = tab==='comisiones' ? 'none' : '';
+  if (mainSearch)  mainSearch.style.display  = tab==='comisiones' ? 'none' : '';
   renderCurrentTab();
 }
 
 // =====================================================================
 // MARCAR FACTURADO / DESMARCAR
 // =====================================================================
+
+// ── Escribe una fila en el Consolidado de Facturación en OneDrive ──
+async function appendToConsolidado(cid, etapa) {
+  if (!msalAccount) return;  // sin OneDrive conectado → silencioso
+  try {
+    const token   = await getToken();
+    const sops    = getSops();
+    const sopData = sops[`${cid}_${etapa}`] || {};
+    const row     = allData.find(r => String(r._row[C.c]) === cid);
+
+    const concepto  = ETAPA_LABELS[etapa] || etapa;
+    const cliente   = row ? row._row[C.cliente]  : (sopData.cli   || cid);
+    const proyecto  = row ? row._row[C.proyecto] : (sopData.proy  || '—');
+    const torre     = row ? row._row[C.torre]    : (sopData.torre || '—');
+    const apto      = row ? row._row[C.apto]     : (sopData.apto  || '—');
+    const monto     = sopData.monto    || 0;
+    const obs       = sopData.obs_contab || '';
+    const hoy       = new Date().toLocaleDateString('es-CO');  // dd/mm/aaaa
+
+    // 1. Buscar el archivo — prueba OneDrive personal y luego el drive configurado
+    let fileData = null;
+
+    // Intento A: OneDrive personal
+    try {
+      const sA = await fetch(
+        `https://graph.microsoft.com/v1.0/me/drive/search(q='Consolidado')`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (sA.ok) {
+        const dA = await sA.json();
+        console.log('[FAC] Búsqueda OneDrive personal:', dA.value?.map(f => f.name));
+        fileData = (dA.value || []).find(f =>
+          f.name.toLowerCase().includes('consolidado') && f.name.endsWith('.xlsx')
+        );
+      }
+    } catch(e) { console.warn('[FAC] Error búsqueda personal:', e.message); }
+
+    // Intento B: Drive SharePoint/corporativo (mismo que el reporte de ventas)
+    if (!fileData) {
+      try {
+        const sB = await fetch(
+          `https://graph.microsoft.com/v1.0/drives/${CFG.DRIVE_ID}/root/search(q='Consolidado')`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (sB.ok) {
+          const dB = await sB.json();
+          console.log('[FAC] Búsqueda drive corporativo:', dB.value?.map(f => f.name));
+          fileData = (dB.value || []).find(f =>
+            f.name.toLowerCase().includes('consolidado') && f.name.endsWith('.xlsx')
+          );
+        }
+      } catch(e) { console.warn('[FAC] Error búsqueda corporativo:', e.message); }
+    }
+
+    if (!fileData) {
+      console.warn('[FAC] Archivo Consolidado no encontrado en ningún drive');
+      toast('⚠️ Facturado local — Consolidado no encontrado en OneDrive');
+      return;
+    }
+    console.log('[FAC] Archivo encontrado:', fileData.name, '| drive:', fileData.parentReference?.driveId);
+    const fId = fileData.id;
+    const dId = fileData.parentReference?.driveId;
+    const sheetName = 'CONSOLIDADO FACTURACION ';  // trailing space
+
+    // 2. Leer A26:S3000 — todas las columnas para duplicados, posición y datos previos del cliente
+    // Índices (A=0, B=1, C=2, D=3, E=4, F=5, G=6, H=7, I=8, J=9, K=10, L=11, M=12..R=17, S=18)
+    const dataResp = await fetch(
+      `https://graph.microsoft.com/v1.0/drives/${dId}/items/${fId}/workbook/worksheets/${encodeURIComponent(sheetName)}/range(address='A26:S3000')`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!dataResp.ok) throw new Error(`read data ${dataResp.status}`);
+    const dataRows = (await dataResp.json()).values || [];
+
+    // "Fila real" = col E (NOMBRE CLIENTE, índice 4) tiene texto distinto de vacío y "-"
+    const esReal = r => { const v = String(r[4]||'').trim(); return v && v !== '-' && v !== '0'; };
+
+    // Detectar duplicado: mismo apto + concepto en col S (nuevas) O mismo apto + monto (antiguas)
+    const dupeIdx = dataRows.findIndex(r => {
+      if (!esReal(r)) return false;
+      const sameApto =
+        String(r[1]||'').trim().toLowerCase() === String(proyecto).trim().toLowerCase()
+        && String(r[2]||'').trim()            === String(torre).trim()
+        && String(r[3]||'').trim()            === String(apto).trim();
+      if (!sameApto) return false;
+      // Entradas nuevas: concepto escrito en col S (índice 18)
+      const sCol = String(r[18]||'').trim().toLowerCase();
+      if (sCol) return sCol.startsWith(String(concepto).toLowerCase());
+      // Fallback entradas antiguas: mismo monto en col J (índice 9)
+      const jVal = parseFloat(String(r[9]||'0').replace(/[^0-9.-]/g,''));
+      return jVal > 0 && Math.abs(jVal - monto) < 1;
+    });
+    if (dupeIdx !== -1) {
+      console.log(`[FAC] Ya existe en fila ${26 + dupeIdx} — concepto: ${concepto} | monto: ${monto}`);
+      toast(`Ya existe en Consolidado (fila ${26 + dupeIdx}) ✓`);
+      return;
+    }
+
+    // Buscar factura anterior del MISMO APTO (proyecto+torre+apto) para copiar datos de facturación
+    // Mismo apartamento = mismo propietario = mismos datos fiscales (CC, correo, AIU, etc.)
+    const prevRow = dataRows.find(r =>
+      esReal(r)
+      && String(r[1]||'').trim().toLowerCase() === String(proyecto).trim().toLowerCase()  // B=proyecto
+      && String(r[2]||'').trim()               === String(torre).trim()                    // C=torre
+      && String(r[3]||'').trim()               === String(apto).trim()                    // D=apto
+    );
+    const prev = prevRow || [];
+    if (prevRow) console.log(`[FAC] Factura anterior encontrada para ${proyecto} T${torre}/A${apto} → copiando datos de facturación`);
+
+    // Última fila real → escribir en la siguiente
+    let lastReal = 25;
+    dataRows.forEach((r, i) => { if (esReal(r)) lastReal = 26 + i; });
+    const nextRow = lastReal + 1;
+    console.log(`[FAC] Último dato real: fila ${lastReal} → escribiendo en fila ${nextRow}`);
+
+    // 3. Escribir solo A–L y S — las columnas M,N,O,P,Q,R tienen fórmulas propias del archivo
+    // prev índices (en rango A26:S2000): A=0,B=1,C=2,D=3,E=4,F=5,G=6,H=7,I=8,J=9,K=10,L=11,S=18
+    const writeRange = async (addr, values) => {
+      const r = await fetch(
+        `https://graph.microsoft.com/v1.0/drives/${dId}/items/${fId}/workbook/worksheets/${encodeURIComponent(sheetName)}/range(address='${addr}')`,
+        { method:'PATCH', headers:{ Authorization:`Bearer ${token}`, 'Content-Type':'application/json' },
+          body: JSON.stringify({ values }) }
+      );
+      if (!r.ok) throw new Error(`Write ${addr} → ${r.status}: ${(await r.text()).slice(0,100)}`);
+    };
+
+    // A:J — fecha, proyecto, datos cliente, cotización
+    // K (VALOR SIN AIU) → se deja intacto (no aplica)
+    // L (ADMINISTRACIÓN) → monto del pago
+    // M–R → fórmulas propias del archivo, no se tocan
+    await writeRange(`A${nextRow}:J${nextRow}`, [[
+      hoy,                   // A  FECHA FACTURACION
+      proyecto,              // B  PROYECTO
+      torre,                 // C  TORRE
+      apto,                  // D  APTO
+      prev[4] || cliente,    // E  NOMBRE CLIENTE
+      prev[5] || '',         // F  C.C / NIT
+      prev[6] || '',         // G  CORREO ELECTRONICO
+      prev[7] || '',         // H  CEL
+      prev[8] || '',         // I  DIRECCION CASA
+      monto,                 // J  VALOR COTIZACIÓN
+    ]]);
+    await writeRange(`L${nextRow}`, [[monto]]);  // L  ADMINISTRACIÓN = valor del pago
+
+    // S — concepto (etapa) + observación: necesario para detección de duplicados futura
+    const sVal = concepto + (obs ? ' | ' + obs : '');
+    await writeRange(`S${nextRow}`, [[sVal]]);
+
+    console.log(`[FAC] Fila ${nextRow} escrita → ${prev[4]||cliente} | ${concepto} | ${monto}`);
+    toast(`Escrito en Consolidado ✓ (fila ${nextRow})`);
+  } catch (e) {
+    console.error('[FAC] Error Consolidado:', e);
+    toast('⚠️ Facturado local — error escribiendo Consolidado');
+  }
+}
+
 async function marcarFacturado(sopKey) {
+  // Envía al Consolidado y queda en estado "en_revision" (pendiente de aprobación)
+  const lastU = sopKey.lastIndexOf('_');
+  const cid   = sopKey.slice(0, lastU);
+  const etapa = sopKey.slice(lastU+1);
+  const id    = `${cid}_${etapa}`;
+  ESTADOS[id] = 'en_revision';
+  await idbPut('estados', { id, estado:'en_revision' });
+  toast('Enviado a Consolidado — pendiente de aprobación ⏳');
+  renderKPIs();
+  renderPorFacturar();
+  // Escribir en Consolidado de Facturación (OneDrive) — async, no bloquea UI
+  appendToConsolidado(cid, etapa);
+}
+async function reescribirConsolidado(sopKey) {
+  // Vuelve a escribir la fila en el Consolidado (por si hubo un error o cambio)
+  const lastU = sopKey.lastIndexOf('_');
+  const cid   = sopKey.slice(0, lastU);
+  const etapa = sopKey.slice(lastU+1);
+  toast('Reescribiendo en Consolidado…');
+  await appendToConsolidado(cid, etapa);
+}
+async function aprobarFacturado(sopKey) {
+  // Confirma la factura — mueve al tab "Facturado" y escribe en REPORTE VENTAS
   const lastU = sopKey.lastIndexOf('_');
   const cid   = sopKey.slice(0, lastU);
   const etapa = sopKey.slice(lastU+1);
   const id    = `${cid}_${etapa}`;
   ESTADOS[id] = 'facturado';
   await idbPut('estados', { id, estado:'facturado' });
-  toast('Marcado como facturado ✓');
   renderKPIs();
   renderPorFacturar();
+
+  // Escribir monto + fecha en la columna correcta del REPORTE VENTAS
+  if (msalAccount) {
+    const etapaKey = ETAPA_M2[etapa];                              // 'sep','ant','p1'…
+    const pagoDef  = PAGOS_DEF.find(p => p.key === etapaKey);
+    const row      = allData.find(r => String(r._row[C.c]) === cid);
+    const sops     = getSops();
+    const monto    = (sops[`${cid}_${etapa}`] || {}).monto || 0;
+    if (pagoDef && row && monto > 0) {
+      try {
+        await updateExcelCells(row._excelRow, [
+          { col: pagoDef.rMonto, value: monto },
+          { col: pagoDef.rFecha, value: new Date() },
+        ]);
+        console.log(`[M4] Aprobado: ${etapa} col ${pagoDef.rMonto} fila ${row._excelRow} → ${monto}`);
+        toast('Aprobado + escrito en REPORTE VENTAS ✅');
+      } catch(e) {
+        console.error('[M4] Error escribiendo en REPORTE VENTAS:', e);
+        toast('Aprobado local — error REPORTE VENTAS: ' + e.message, 'err');
+      }
+    } else {
+      toast('Aprobado — movido a Facturado ✅');
+    }
+  } else {
+    toast('Aprobado — movido a Facturado ✅');
+  }
 }
 async function desmarcarFacturado(sopKey) {
   const lastU = sopKey.lastIndexOf('_');
@@ -914,26 +1320,33 @@ function exportHistorialCSV() {
     .filter(([,v]) => v.estado==='entro')
     .map(([key,v]) => {
       const lastU = key.lastIndexOf('_');
-      const cid   = key.slice(0,lastU);
+      const cid   = key.slice(0, lastU);
       const etapa = key.slice(lastU+1);
-      const row   = allData.find(r => String(r._row[C.c])===cid);
-      return [v.fecha_entro||'', row?row._row[C.cliente]:v.cli||cid,
-        row?row._row[C.proyecto]:v.proy||'', row?row._row[C.torre]:v.torre||'', row?row._row[C.apto]:v.apto||'',
-        ETAPA_LABELS[etapa]||etapa, v.monto||0, v.banco||'', v.referencia||'', v.obs_contab||'', v.filename||'', v.fecha_soporte||''];
-    })
-    .sort((a,b) => b[0].localeCompare(a[0]));
+      const d     = allData.find(r => String(r._row[C.c]) === cid) || {};
+      return [
+        v.fecha_entro||'',
+        d._row ? d._row[C.cliente]  : (v.cli  ||cid),
+        d._row ? d._row[C.proyecto] : (v.proy  ||'—'),
+        d._row ? d._row[C.torre]    : (v.torre ||'—'),
+        d._row ? d._row[C.apto]     : (v.apto  ||'—'),
+        ETAPA_LABELS[etapa]||etapa,
+        v.monto||0, v.banco||'', v.ref||'', v.obs_contab||'',
+        v.soporte||'', v.fecha_sop||''
+      ];
+    });
   const BOM = '﻿';
-  const csv = BOM+[cols,...rows].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const csv = BOM + [cols,...rows].map(r => r.map(c => '"'+String(c||'').replace(/"/g,'""')+'"').join(',')).join('\n');
   const a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-  a.download = 'historial-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'historial-soportes-' + new Date().toISOString().slice(0,10) + '.csv';
   a.click();
   toast('CSV exportado ✓');
 }
 
 // =====================================================================
-// M2 SYNC
+// MODAL / M2
 // =====================================================================
+function closeModal(id){ document.getElementById(id).style.display='none'; }
 function leerPagosM2() {
   const sops = getSops();
   return Object.entries(sops)
@@ -946,6 +1359,7 @@ function leerPagosM2() {
 
 async function autoSyncM2() {
   // Escribe automáticamente en Excel los pagos aprobados que aún no están escritos
+  try { await loadSopsFromAPI(); } catch(e){ console.warn('[M4] loadSops:', e); }
   const confirmados = leerPagosM2();
   let escritos = 0;
   for (const sop of confirmados) {
@@ -986,7 +1400,7 @@ async function autoSyncM2() {
 function abrirModalM2() {
   if (!allData.length) { toast('Carga el Excel primero','err'); return; }
   const confirmados = leerPagosM2();
-  if (!confirmados.length) { toast('No hay pagos confirmados en M2','err'); return; }
+  if (!confirmados.length) { toast('No hay pagos confirmados en Cartera','err'); return; }
   let nuevos=0, existen=0, sinFila=0, rowsHTML='';
   confirmados.forEach(sop => {
     const pagoKey = ETAPA_M2[sop.etapa];
@@ -1018,7 +1432,7 @@ function abrirModalM2() {
     <tbody>${rowsHTML||'<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--g)">Sin datos</td></tr>'}</tbody></table>`;
   document.getElementById('m2ModalSub').textContent =
     `${confirmados.length} confirmados · ${nuevos} nuevos · ${msalAccount?'Se escribirán en OneDrive ✓':'Solo local'}`;
-  document.getElementById('modalM2').classList.add('show');
+  document.getElementById('modalM2').style.display='flex';
 }
 
 async function sincronizarM2() {
@@ -1035,7 +1449,7 @@ async function sincronizarM2() {
       if (!pagoDef) continue;
       const row = allData.find(r => String(r._row[C.c])===sop.cid);
       if (!row) continue;
-      if (+row._row[pagoDef.rMonto] > 0) continue;
+      if (+row._row[pagoDef.rMonto] > 0) continue; // ya existe
       const monto=sop.monto||0, fecha=sop.fecha_entro||new Date().toISOString().slice(0,10);
       const pct=monto/(+row._row[C.total]||1), codigo=row._row[C.codigo], excelRow=row._excelRow;
       await idbPut('pagos', {id:`${codigo}_col${pagoDef.rMonto}`,value:monto});
@@ -1056,25 +1470,433 @@ async function sincronizarM2() {
     closeModal('modalM2');
     renderKPIs(); renderCurrentTab();
     toast(actualizados>0
-      ? `${actualizados} pago${actualizados!==1?'s':''} sincronizado${actualizados!==1?'s':''}${msalAccount?' · Excel actualizado':' · exporta Excel para guardar'}`
+      ? `${actualizados} pago${actualizados!==1?'s':''} escrito${actualizados!==1?'s':''}${msalAccount?' en REPORTE VENTAS ✓':' · solo local'}`
       : 'Sin pagos nuevos');
-  } catch(e) { toast('Error: '+e.message,'err'); console.error('[M4] Error:',e); }
+  } catch(e) { toast('Error: '+e.message,'err'); console.error('[M4] Error sincronizarM2:',e); }
   finally { loading(false); btn.disabled=false; btn.textContent='Sincronizar'; }
 }
 
 // =====================================================================
-// MODAL HELPERS
+// ── COMISIONES — INTEGRACIÓN M4 ──
 // =====================================================================
-function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-document.querySelectorAll('.modal-bg').forEach(m => {
-  m.addEventListener('click', e => { if (e.target===m) m.classList.remove('show'); });
-});
+const COM_TOKEN = 'vis2026';
+const _comParams = new URLSearchParams(window.location.search);
+const COM_ES_GERENCIA = _comParams.get('g') === COM_TOKEN;
+
+const COM_VDS   = ['KM'];
+const COM_MES_N = {january:1,february:2,march:3,april:4,may:5,june:6,
+                   july:7,august:8,september:9,october:10,november:11,december:12};
+const COM_MES_E = {january:'Ene',february:'Feb',march:'Mar',april:'Abr',may:'May',june:'Jun',
+                   july:'Jul',august:'Ago',september:'Sep',october:'Oct',november:'Nov',december:'Dic'};
+const COM_ASESORES = {
+  KM:{ nombre:'Karen Mendivelso', cc:'1.000.150.006', ciudad:'Bogotá D.C.' }
+};
+
+let comDatos = [];
+const COM_APR = {};
+let comTab = 'pend';
+let comRol = COM_ES_GERENCIA ? 'GERENCIA' : 'KM';
+
+function comFmt(n){ return fmt(n); }
+function comIsAutorizado(v){
+  if(!v && v!==0) return false;
+  if(v instanceof Date) return true;
+  const s=String(v).trim().toUpperCase();
+  return s!==''&&s!=='NO'&&s!=='0'&&s!=='FALSE';
+}
+
+// ── IDB comisiones ──
+let comIdb = null;
+function comOpenIDB(){
+  return new Promise(r=>{
+    const req=indexedDB.open('VISCO_COM_V4',1);
+    req.onupgradeneeded=e=>{ if(!e.target.result.objectStoreNames.contains('apr')) e.target.result.createObjectStore('apr',{keyPath:'id'}); };
+    req.onsuccess=e=>{ comIdb=e.target.result; r(); };
+    req.onerror=()=>r();
+  });
+}
+function comIdbPut(obj){
+  if(!comIdb) return;
+  comIdb.transaction('apr','readwrite').objectStore('apr').put(obj);
+}
+function comIdbGetAll(){
+  if(!comIdb) return Promise.resolve([]);
+  return new Promise(r=>{ comIdb.transaction('apr','readonly').objectStore('apr').getAll().onsuccess=e=>r(e.target.result); });
+}
+
+// ── Rol ──
+function comInitRol(){
+  if(!COM_ES_GERENCIA){
+    const sel=document.getElementById('comRolSel');
+    if(sel){ for(let i=sel.options.length-1;i>=0;i--){ if(sel.options[i].value==='GERENCIA') sel.remove(i); } sel.value='KM'; }
+    comRol='KM';
+  }
+  comCambiarRol();
+}
+function comCambiarRol(){
+  comRol=document.getElementById('comRolSel').value;
+  const fvd=document.getElementById('comFVD');
+  if(comRol==='KM'){ fvd.value='KM'; fvd.disabled=true; }
+  else { fvd.disabled=false; }
+  const b=document.getElementById('comRolBanner');
+  if(comRol==='KM'){ b.className='com-rol-banner show rol-km'; b.innerHTML='👤 Mostrando solo tus negocios — Karen Mendivelso. Solo Gerencia puede aprobar.'; }
+  else { b.className='com-rol-banner'; b.innerHTML=''; }
+  comRenderKPIs();
+  comRender();
+}
+
+// ── Parser (toma workbook ya parseado) ──
+function comParseWorkbook(workbook){
+  const wsC=workbook.Sheets['COMISIONES'];
+  const wsR=workbook.Sheets['REPORTE VENTAS'];
+  if(!wsC){ console.warn('[COM] No se encontró la hoja COMISIONES'); return; }
+  if(!wsR){ console.warn('[COM] No se encontró la hoja REPORTE VENTAS'); return; }
+
+  // Mapa de separación desde REPORTE VENTAS
+  const sepMap={};
+  const rawR=XLSX.utils.sheet_to_json(wsR,{header:1,defval:null});
+  // Detectar fila de encabezados para no leer la fila de títulos como datos
+  let rvDataStart = CFG.DATA_START - 1; // usa el valor ya detectado por parseHeaders
+  // Fallback: buscar encabezado si DATA_START aún es el default
+  if(rvDataStart<1){
+    for(let i=0;i<Math.min(6,rawR.length);i++){
+      if(rawR[i]&&rawR[i].some(c=>typeof c==='string'&&String(c).toUpperCase().includes('CLIENTE'))){ rvDataStart=i+1; break; }
+    }
+    if(rvDataStart<1) rvDataStart=3;
+  }
+  for(let i=rvDataStart;i<rawR.length;i++){
+    const r=rawR[i]; if(!r||!r[C.codigo]) continue;
+    const cod=String(r[C.codigo]).trim();
+    if(!cod||cod.toUpperCase()==='CÓDIGO'||cod.toUpperCase()==='CODIGO') continue; // saltar si es header
+    const sep=+r[C.sep_monto]||0, tot=+r[C.total]||0;
+    if((sep>0||tot>0)&&!sepMap[cod]) sepMap[cod]={sep,tot}; // primera ocurrencia gana
+  }
+
+  const rawC=XLSX.utils.sheet_to_json(wsC,{header:1,defval:null,cellDates:true});
+  comDatos=[];
+
+  for(let i=3;i<rawC.length;i++){
+    const r=rawC[i]; if(!r||!r[0]) continue;
+    const vd=String(r[1]||'').trim();
+    if(!COM_VDS.includes(vd)) continue;
+    const mes=String(r[2]||'').toLowerCase().trim();
+    const ano=+r[3]||0;
+    const mesN=COM_MES_N[mes]||0;
+    if(!(ano>2025||(ano===2025&&mesN>=11))) continue;
+    const cod=String(r[0]).trim();
+    const estado=String(r[4]||'').trim();
+    if(['CAIDO','CAÍDA','CAIDA'].includes(estado.toUpperCase())) continue;
+
+    const pct=+r[15]||0, aiu=+r[9]||0, cotiz=+r[7]||0, adics=+r[8]||0;
+    const totalC=+r[12]||cotiz;
+    let com_tot=+r[16]||0, com_ant=+r[18]||0, com_fin=+r[22]||0;
+    if(com_tot===0&&pct>0&&aiu>0) com_tot=Math.round(pct*aiu);
+    if(com_tot===0) continue;
+    if(com_ant===0) com_ant=Math.round(com_tot*0.5);
+
+    const com_adic=adics>0?Math.round(pct*0.21*adics):0;
+    if(com_fin===0) com_fin=Math.max(0,com_tot-com_ant-com_adic);
+    if(Math.abs(com_ant+com_fin+com_adic-com_tot)>5) com_fin=Math.max(0,com_tot-com_ant-com_adic);
+
+    const aut_ant=comIsAutorizado(r[19]), aut_fin=comIsAutorizado(r[23]), aut_adic=comIsAutorizado(r[24]);
+    const pago_ant=String(r[17]||'').toUpperCase().trim()==='OK';
+    const pago_fin=String(r[21]||'').toUpperCase().trim()==='OK';
+
+    const rvInfo=sepMap[cod]||{};
+    const sep_monto=rvInfo.sep||0, rv_total=rvInfo.tot||totalC||cotiz;
+    const com_cong=(sep_monto>0&&rv_total>0)?Math.round((sep_monto/rv_total)*(com_tot-com_adic)):0;
+
+    const contrato=String(r[13]||'').toUpperCase().trim()==='OK';
+    const especif=String(r[14]||'').toUpperCase().trim()==='OK';
+    const fecha_ant=r[20] instanceof Date?r[20]:null;
+    const fecha_adic=r[24] instanceof Date?r[24]:null;
+
+    comDatos.push({
+      cod,vd,mes,ano,mesN,estado,contrato,especif,pct,aiu,cotiz,adics,totalC,
+      com_tot,com_ant,com_fin,com_cong,com_adic,sep_monto,rv_total,
+      pago_ant,pago_fin,aut_ant,aut_fin,aut_adic,fecha_ant,fecha_adic,
+      _comRow:i+1
+    });
+  }
+
+  // Pre-poblar COM_APR desde valores estáticos del Excel
+  comDatos.forEach(d=>{
+    if(d.aut_ant){
+      if(!COM_APR.hasOwnProperty(d.cod+'_cong')){ COM_APR[d.cod+'_cong']=true; comIdbPut({id:d.cod+'_cong',v:true}); }
+      if(!COM_APR.hasOwnProperty(d.cod+'_ant')) { COM_APR[d.cod+'_ant']=true;  comIdbPut({id:d.cod+'_ant', v:true}); }
+    }
+    if(d.aut_fin  && !COM_APR.hasOwnProperty(d.cod+'_fin')) { COM_APR[d.cod+'_fin']=true;  comIdbPut({id:d.cod+'_fin', v:true}); }
+    if(d.aut_adic && !COM_APR.hasOwnProperty(d.cod+'_adic')){ COM_APR[d.cod+'_adic']=true; comIdbPut({id:d.cod+'_adic',v:true}); }
+  });
+
+  // Cargar overrides IDB y luego inicializar rol
+  comIdbGetAll().then(overrides=>{
+    overrides.forEach(o=>{ COM_APR[o.id]=!!o.v; });
+    comInitRol();
+    toast(`${comDatos.length} negocios de comisiones cargados ✓`,'ok');
+  });
+}
+
+// ── Cálculo dinámico ──
+function comFinDyn(d){
+  const base=d.com_ant+d.com_fin;
+  const antPaid=COM_APR[d.cod+'_ant']?d.com_ant:COM_APR[d.cod+'_cong']?d.com_cong:0;
+  return Math.max(0,base-antPaid);
+}
+function comTotalAprobado(d){
+  const antAmt=COM_APR[d.cod+'_ant']?d.com_ant:COM_APR[d.cod+'_cong']?d.com_cong:0;
+  const finAmt=COM_APR[d.cod+'_fin']?comFinDyn(d):0;
+  const adic=COM_APR[d.cod+'_adic']?d.com_adic:0;
+  return antAmt+finAmt+adic;
+}
+function comEstaCompleto(d){
+  if(!COM_APR[d.cod+'_fin']) return false;
+  if(d.com_adic>0&&!COM_APR[d.cod+'_adic']) return false;
+  return true;
+}
+function comTienePorAprobar(d){
+  if(comEstaCompleto(d)) return false;
+  if(d.sep_monto>0&&!COM_APR[d.cod+'_cong']&&!COM_APR[d.cod+'_ant']&&d.com_cong>0) return true;
+  if(d.pago_ant&&!COM_APR[d.cod+'_ant']&&d.com_ant>0) return true;
+  const fin=comFinDyn(d);
+  if(d.pago_fin&&!COM_APR[d.cod+'_fin']&&fin>0) return true;
+  if(d.adics>0&&!COM_APR[d.cod+'_adic']&&d.com_adic>0) return true;
+  return false;
+}
+function comTieneAprobManual(d){
+  if(COM_APR[d.cod+'_cong']&&!d.aut_ant)  return true;
+  if(COM_APR[d.cod+'_ant'] &&!d.aut_ant)  return true;
+  if(COM_APR[d.cod+'_fin'] &&!d.aut_fin)  return true;
+  if(COM_APR[d.cod+'_adic']&&!d.aut_adic) return true;
+  return false;
+}
+function comReversarAprobacion(cod, tipo){
+  if(!COM_ES_GERENCIA){ toast('Solo Gerencia puede reversar aprobaciones','err'); return; }
+  delete COM_APR[cod+'_'+tipo];
+  comIdbPut({id:cod+'_'+tipo, v:false});
+  toast(`Aprobación ${tipo} reversada — vuelve a Por Aprobar`);
+  comRenderKPIs();
+  comRender();
+}
+
+// ── KPIs ──
+function comRenderKPIs(){
+  const vista=comDatos.filter(d=>comRol==='GERENCIA'||d.vd===comRol);
+  const totCom=vista.reduce((s,d)=>s+d.com_tot,0);
+  let porApr=0;
+  vista.forEach(d=>{
+    if(COM_APR[d.cod+'_ant']){} 
+    else if(d.pago_ant&&d.com_ant>0) porApr+=d.com_ant;
+    else if(!COM_APR[d.cod+'_cong']&&d.com_cong>0) porApr+=d.com_cong;
+    const fin=comFinDyn(d);
+    if(fin>0&&d.pago_fin&&!COM_APR[d.cod+'_fin']) porApr+=fin;
+  });
+  const sinC=vista.filter(d=>!d.contrato).length;
+  const sinS=vista.filter(d=>!d.especif).length;
+  const ckTot=document.getElementById('ckTot'); if(ckTot) ckTot.textContent=comFmt(totCom);
+  const ckTotSub=document.getElementById('ckTotSub'); if(ckTotSub) ckTotSub.textContent=`${vista.length} negocios`;
+  const ckPend=document.getElementById('ckPend'); if(ckPend) ckPend.textContent=comFmt(porApr);
+  const ckSinC=document.getElementById('ckSinC'); if(ckSinC) ckSinC.textContent=sinC;
+  const ckSinS=document.getElementById('ckSinS'); if(ckSinS) ckSinS.textContent=sinS;
+}
+
+// ── Sub-tabs ──
+function comSetTab(t){
+  comTab=t;
+  [{k:'comp',id:'cTComp'},{k:'pend',id:'cTPend'},{k:'aprs',id:'cTAprs'}].forEach(x=>{
+    const el=document.getElementById(x.id);
+    if(el) el.classList.toggle('active',x.k===t);
+  });
+  comRender();
+}
+
+// ── Filtros ──
+function comGetFiltered(){
+  const vd=(document.getElementById('comFVD')||{}).value||'';
+  const srch=(document.getElementById('comSearch')||{}).value.toLowerCase()||'';
+  return comDatos.filter(d=>{
+    if(comRol==='KM'&&d.vd!=='KM') return false;
+    if(vd&&d.vd!==vd) return false;
+    if(srch&&!(d.cod+' '+d.vd+' '+d.estado).toLowerCase().includes(srch)) return false;
+    if(comTab==='pend'&&!comTienePorAprobar(d)) return false;
+    if(comTab==='aprs'&&(comEstaCompleto(d)||comTotalAprobado(d)===0)) return false;
+    if(comTab==='comp'&&!comEstaCompleto(d)) return false;
+    return true;
+  });
+}
+
+// ── Render helpers ──
+function comFmtFecha(d){ if(!d||!(d instanceof Date)) return ''; return d.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+
+function comPceldaHTML(cod,tipo,monto,clientePago,isPaid,bg,nota,fechaApr){
+  if(monto<=0) return `<td style="${bg}"><span class="pcell-na">—</span></td>`;
+  const key=cod.replace(/\\'/g,"'")+'_'+tipo, aprobado=!!COM_APR[key], yaExcel=!!isPaid, puedeApr=comRol==='GERENCIA';
+  let cls,txt,clk='';
+  if(yaExcel){cls='apb-pag';txt='✓ Pagado';}
+  else if(aprobado){cls='apb-ok';txt='✓ Aprobado';if(puedeApr) clk=`onclick="comToggle('${cod}','${tipo}')"` ;}
+  else if(!clientePago){cls='apb-blq';txt='⏳ Cliente pendiente';}
+  else if(!puedeApr){cls='apb-rol';txt='🔒 Solo gerencia';}
+  else{cls='apb-pend';txt='Aprobar pago';clk=`onclick="comToggle('${cod}','${tipo}')"` ;}
+  const fechaStr=(aprobado||yaExcel)&&fechaApr?`<div class="num-note" style="color:var(--ok)">📅 ${comFmtFecha(fechaApr)}</div>`:'';
+  return `<td style="${bg}"><div class="pcell"><div><div class="num num-md">${comFmt(monto)}</div>${nota?`<div class="num-note">${nota}</div>`:''}${fechaStr}</div><button class="apb ${cls}" ${clk}>${txt}</button></div></td>`;
+}
+
+async function comToggle(cod,tipo){
+  if(comRol!=='GERENCIA'){ toast('Solo la gerencia puede aprobar','err'); return; }
+  const key=cod+'_'+tipo, nuevo=!COM_APR[key];
+  COM_APR[key]=nuevo; comIdbPut({id:key,v:nuevo});
+  comRenderKPIs(); comRender();
+  toast(nuevo?'Aprobado ✓':'Desmarcado','info');
+  if(nuevo&&msalAccount){
+    const d=comDatos.find(x=>x.cod===cod);
+    if(d&&d._comRow){
+      try{
+        const hoy=new Date(), updates=[];
+        if(tipo==='cong'||tipo==='ant'){ updates.push({col:19,value:'PAGADO'}); updates.push({col:20,value:hoy}); }
+        else if(tipo==='fin'){ updates.push({col:23,value:'PAGADO'}); }
+        else if(tipo==='adic'){ updates.push({col:24,value:hoy}); }
+        await updateExcelCellsSheet('COMISIONES',d._comRow,updates);
+        toast('Guardado en Excel ✓','ok');
+      }catch(e){ toast('Aprobado local — error Excel: '+e.message,'err'); }
+    }
+  }
+}
+
+function comEstCls(e){ if(!e) return 'e-xx'; const s=e.toUpperCase(); if(s==='ENTREGADO') return 'e-ok'; if(s.includes('EJEC')) return 'e-ej'; if(s.includes('RECIB')) return 'e-rc'; return 'e-xx'; }
+
+function comRowHTML(d){
+  const com_fin=comFinDyn(d), yaPag=comTotalAprobado(d);
+  const antSaldo=Math.max(0,d.com_ant-d.com_cong);
+  let pendiente=0;
+  if(!COM_APR[d.cod+'_cong']&&!COM_APR[d.cod+'_ant']&&d.com_cong>0) pendiente+=d.com_cong;
+  if(!COM_APR[d.cod+'_ant']&&antSaldo>0) pendiente+=antSaldo;
+  if(!COM_APR[d.cod+'_fin']&&com_fin>0) pendiente+=com_fin;
+  if(!COM_APR[d.cod+'_adic']&&d.com_adic>0) pendiente+=d.com_adic;
+  const bgRow=comEstaCompleto(d)?'background:#F0FDF4;':'', codE=d.cod.replace(/'/g,"\\'");
+  const vdPill=d.vd==='KM'?`<span class="vd-pill vd-km">KM</span>`:`<span class="vd-pill vd-ab">AB</span>`;
+  const totalCol=`<div><div class="num num-lg num-pur">${comFmt(d.com_tot)}</div><div class="num-note">${(d.pct*100).toFixed(2)}% · AIU ${comFmt(d.aiu)}</div><div class="num-note">${COM_MES_E[d.mes]||d.mes} ${d.ano}</div>${yaPag>0?`<div class="num-note num-ok">↑ ${comFmt(yaPag)}</div>`:''}${pendiente>0?`<div class="num-note num-err">↓ ${comFmt(pendiente)}</div>`:''}</div>`;
+  return `<tr style="${bgRow}">
+    <td style="${bgRow}font-weight:600;font-size:11px;max-width:180px;word-break:break-word;line-height:1.5">${d.cod}</td>
+    <td style="${bgRow}">${vdPill}</td>
+    <td style="${bgRow}"><span class="est-badge ${comEstCls(d.estado)}">${d.estado||'—'}</span></td>
+    <td style="${bgRow}"><div class="doc-badge ${d.contrato?'doc-ok':'doc-no'}">${d.contrato?'✓':'✗'} Contrato</div><div class="doc-badge ${d.especif?'doc-ok':'doc-no'}">${d.especif?'✓':'✗'} Especificaciones</div></td>
+    <td style="${bgRow}">${totalCol}</td>
+    ${comPceldaHTML(codE,'cong',d.com_cong,d.sep_monto>0,d.aut_ant,bgRow,d.sep_monto>0?'sep: '+comFmt(d.sep_monto):'',d.fecha_ant)}
+    ${(()=>{ const as=Math.max(0,d.com_ant-d.com_cong); if(as<=0) return `<td style="${bgRow}"><span class="pcell-na" title="Cubierto por congelación">—</span></td>`; return comPceldaHTML(codE,'ant',as,d.pago_ant,d.aut_ant,bgRow,'',d.fecha_ant); })()}
+    ${comPceldaHTML(codE,'fin',com_fin,d.pago_fin,d.aut_fin,bgRow,'',null)}
+    ${comPceldaHTML(codE,'adic',d.com_adic,d.adics>0,d.aut_adic,bgRow,d.adics>0?'adic: '+comFmt(d.adics):'',d.fecha_adic)}
+  </tr>`;
+}
+
+function comRenderAprobados(){
+  const vdsVista=comRol==='GERENCIA'?COM_VDS:[comRol];
+  document.getElementById('comViewCount').textContent='';
+  const bloques=vdsVista.map(vd=>{
+    const a=COM_ASESORES[vd];
+    const pill=vd==='KM'?'<span class="vd-pill vd-km">KM</span>':'<span class="vd-pill vd-ab">AB</span>';
+    const aprs=comDatos.filter(d=>d.vd===vd&&!comEstaCompleto(d)&&comTieneAprobManual(d));
+    if(!aprs.length) return `<div class="apr-bloque"><div class="apr-blq-head">${pill} ${a.nombre}</div><div style="padding:24px;text-align:center;color:var(--g)">Sin aprobaciones pendientes de cobro</div></div>`;
+    const filas=aprs.map(d=>{
+      const cs=[];
+      const codE=d.cod.replace(/'/g,"\\'");
+      const revBtn=(tipo)=>COM_ES_GERENCIA?`<button onclick="comReversarAprobacion('${codE}','${tipo}')" style="margin-left:4px;font-size:9px;padding:1px 5px;border:1px solid #fca5a5;background:#fef2f2;color:#dc2626;border-radius:4px;cursor:pointer" title="Reversar">✕</button>`:'';
+      if(COM_APR[d.cod+'_cong']&&d.com_cong>0) cs.push(`<span class="apr-tag">Congelación ${comFmt(d.com_cong)}${d.fecha_ant?' <small>'+comFmtFecha(d.fecha_ant)+'</small>':''}${revBtn('cong')}</span>`);
+      const as=Math.max(0,d.com_ant-d.com_cong);
+      if(COM_APR[d.cod+'_ant']&&as>0) cs.push(`<span class="apr-tag">Anticipo ${comFmt(as)}${d.fecha_ant?' <small>'+comFmtFecha(d.fecha_ant)+'</small>':''}${revBtn('ant')}</span>`);
+      if(COM_APR[d.cod+'_fin']&&comFinDyn(d)>0) cs.push(`<span class="apr-tag">Final ${comFmt(comFinDyn(d))}${revBtn('fin')}</span>`);
+      if(COM_APR[d.cod+'_adic']&&d.com_adic>0) cs.push(`<span class="apr-tag">Adicionales ${comFmt(d.com_adic)}${d.fecha_adic?' <small>'+comFmtFecha(d.fecha_adic)+'</small>':''}${revBtn('adic')}</span>`);
+      if(!cs.length) return '';
+      return `<tr><td style="font-weight:600;font-size:11px">${d.cod}</td><td>${cs.join(' ')}</td><td style="text-align:right"><span class="num num-md num-ok">${comFmt(comTotalAprobado(d))}</span></td></tr>`;
+    }).filter(Boolean).join('');
+    if(!filas) return '';
+    const total=aprs.reduce((s,d)=>s+comTotalAprobado(d),0);
+    return `<div class="apr-bloque"><div class="apr-blq-head">${pill} ${a.nombre}</div>
+      <table class="main-table" style="margin-bottom:0"><thead><tr><th style="width:220px">Negocio</th><th>Concepto aprobado</th><th style="text-align:right;width:130px">Monto</th></tr></thead>
+      <tbody>${filas}</tbody><tfoot><tr class="tr-tot"><td colspan="2" style="padding:12px">TOTAL — ${aprs.length} negocio${aprs.length!==1?'s':''}</td><td style="padding:12px;text-align:right"><span class="num num-lg num-ok">${comFmt(total)}</span></td></tr></tfoot></table>
+      <div style="padding:16px"><button class="apr-btn" style="width:auto;padding:10px 22px" onclick="comGenerarCuentaCobro('${vd}')">📄 Generar cuenta de cobro — ${a.nombre.split(' ')[0]}</button></div></div>`;
+  }).filter(Boolean).join('');
+  document.getElementById('comTableWrap').innerHTML=`<div style="display:flex;flex-direction:column;gap:20px">${bloques||'<div style="padding:40px;text-align:center;color:var(--g)">Sin aprobaciones manuales activas</div>'}</div>`;
+}
+
+function comRender(){
+  if(!comDatos.length) return;
+  if(comTab==='aprs'){ comRenderAprobados(); return; }
+  const filas=comGetFiltered();
+  document.getElementById('comViewCount').textContent=`${filas.length} negocio${filas.length!==1?'s':''}`;
+  if(!filas.length){ document.getElementById('comTableWrap').innerHTML='<div style="padding:40px;text-align:center;color:var(--g)">🔍 Sin resultados.</div>'; return; }
+  const totVis=filas.reduce((s,d)=>s+d.com_tot,0);
+  document.getElementById('comTableWrap').innerHTML=`
+    <table class="main-table">
+      <thead><tr><th>Negocio</th><th>Asesor</th><th>Estado</th><th>Documentos</th><th>Total comisión</th><th>Congelación</th><th>Anticipo</th><th>Final</th><th>Adicionales</th></tr></thead>
+      <tbody>${filas.map(comRowHTML).join('')}</tbody>
+      <tfoot><tr class="tr-tot"><td colspan="4" style="padding:12px">Total — ${filas.length} negocios</td><td style="padding:12px"><span class="num num-lg num-pur">${comFmt(totVis)}</span></td><td colspan="4"></td></tr></tfoot>
+    </table>`;
+}
+
+function comExportCSV(){
+  const vista=comDatos.filter(d=>comRol==='GERENCIA'||d.vd===comRol);
+  const cab=['Código','Asesor','Mes','Año','Estado','Contrato','Especificaciones','% Comisión','AIU','Total','Ya pagado','Pendiente','Congelación','Sep cliente','Aprobada cong.','Anticipo','Cliente pago ant.','Aprobada ant.','Final','Cliente pago fin.','Aprobada fin.','Adicionales','Aprobada adic.','Fila Excel'];
+  const csv='﻿'+[cab,...vista.map(d=>{const fin=comFinDyn(d),yap=comTotalAprobado(d);return[d.cod,d.vd,COM_MES_E[d.mes]||d.mes,d.ano,d.estado,d.contrato?'OK':'',d.especif?'OK':'',(d.pct*100).toFixed(2)+'%',d.aiu,d.com_tot,yap,Math.max(0,d.com_tot-yap),d.com_cong||'',d.sep_monto||'',COM_APR[d.cod+'_cong']?'Sí':'No',d.com_ant||'',d.pago_ant?'Sí':'No',COM_APR[d.cod+'_ant']?'Sí':'No',fin||'',d.pago_fin?'Sí':'No',COM_APR[d.cod+'_fin']?'Sí':'No',d.com_adic||'',COM_APR[d.cod+'_adic']?'Sí':'No',d._comRow];})].map(r=>r.map(c=>`"${String(c==null?'':c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download=`comisiones-${new Date().toISOString().slice(0,10)}.csv`; a.click(); toast('CSV exportado ✓');
+}
+
+function comNumEnPalabras(n){
+  n=Math.round(n); if(n===0) return 'CERO PESOS';
+  const U=['','UN','DOS','TRES','CUATRO','CINCO','SEIS','SIETE','OCHO','NUEVE','DIEZ','ONCE','DOCE','TRECE','CATORCE','QUINCE','DIECISÉIS','DIECISIETE','DIECIOCHO','DIECINUEVE'];
+  const D=['','','VEINTE','TREINTA','CUARENTA','CINCUENTA','SESENTA','SETENTA','OCHENTA','NOVENTA'];
+  const Cv=['','CIENTO','DOSCIENTOS','TRESCIENTOS','CUATROCIENTOS','QUINIENTOS','SEISCIENTOS','SETECIENTOS','OCHOCIENTOS','NOVECIENTOS'];
+  function c3(x){ if(x===100) return 'CIEN'; const h=Math.floor(x/100),r=x%100,t=Math.floor(r/10),u=r%10; return[h?Cv[h]:'',r<20?U[r]||'':(t?D[t]+((u&&r>=20)?' Y '+U[u]:''):U[u])].filter(Boolean).join(' '); }
+  const miles=Math.floor(n/1000),resto=n%1000,partes=[];
+  if(miles){ if(miles===1) partes.push('MIL'); else partes.push(c3(miles).trim()+' MIL'); }
+  if(resto) partes.push(c3(resto).trim());
+  return partes.join(' ').trim()+' PESOS M/CTE';
+}
+
+function comGenerarCuentaCobro(vd){
+  const a=COM_ASESORES[vd];
+  // Mismo filtro que comRenderAprobados: aprobados manualmente, no completados
+  const aprs=comDatos.filter(d=>d.vd===vd&&comTieneAprobManual(d));
+  if(!aprs.length){ toast('No hay comisiones aprobadas para '+a.nombre,'err'); return; }
+  // Construir filas por CONCEPTO separado (como aparece en la vista)
+  const filasData=[];
+  aprs.forEach(d=>{
+    const as=Math.max(0,d.com_ant-d.com_cong);
+    if(COM_APR[d.cod+'_cong']&&d.com_cong>0)   filasData.push({cod:d.cod,mes:d.mes,ano:d.ano,concepto:'Congelación',monto:d.com_cong});
+    if(COM_APR[d.cod+'_ant'] &&as>0)            filasData.push({cod:d.cod,mes:d.mes,ano:d.ano,concepto:'Anticipo',   monto:as});
+    if(COM_APR[d.cod+'_fin'] &&comFinDyn(d)>0)  filasData.push({cod:d.cod,mes:d.mes,ano:d.ano,concepto:'Final',      monto:comFinDyn(d)});
+    if(COM_APR[d.cod+'_adic']&&d.com_adic>0)    filasData.push({cod:d.cod,mes:d.mes,ano:d.ano,concepto:'Adicionales',monto:d.com_adic});
+  });
+  if(!filasData.length){ toast('No hay conceptos aprobados para '+a.nombre,'err'); return; }
+  const total=filasData.reduce((s,r)=>s+r.monto,0);
+  const hoy=new Date(), meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const fecha=`${hoy.getDate()} de ${meses[hoy.getMonth()]} de ${hoy.getFullYear()}`;
+  const filas=filasData.map(r=>`<tr><td>${r.cod}</td><td style="text-align:center">${r.concepto} · ${COM_MES_E[r.mes]||r.mes} ${r.ano}</td><td style="text-align:right">${comFmt(r.monto)}</td></tr>`).join('');
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Cuenta de Cobro — ${a.nombre}</title>
+<style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Arial,sans-serif;font-size:11pt;color:#000;padding:40px 60px;max-width:800px;margin:auto;}h1{text-align:center;font-size:15pt;font-weight:900;letter-spacing:.08em;margin:22px 0 28px;}.fecha{text-align:right;font-weight:700;font-size:10pt;margin-bottom:18px;}.empresa{font-weight:700;margin-top:18px;}.nit{font-size:10pt;color:#333;margin-bottom:4px;}.debe{font-weight:700;margin:18px 0 4px;}.nombre{font-weight:700;font-size:12pt;}.suma-label{font-weight:700;margin:20px 0 4px;}.suma-val{font-weight:700;font-size:12pt;}.concepto-label{font-weight:700;margin:20px 0 4px;}table{border-collapse:collapse;width:100%;margin:12px 0;}th,td{border:1px solid #ccc;padding:5px 10px;font-size:10pt;}th{background:#f5f5f5;font-weight:700;text-align:left;}tfoot td{font-weight:700;background:#f0f0f0;}.cert{margin:28px 0 0;font-size:9.5pt;line-height:1.65;text-align:justify;border-top:1.5px solid #ccc;padding-top:16px;}.firma{margin-top:50px;}.firma-linea{border-top:1.5px solid #000;width:220px;margin-bottom:4px;}.firma-nombre{font-weight:700;font-size:11pt;}.firma-cc{font-size:10pt;}.btn-impr{position:fixed;bottom:24px;right:24px;padding:10px 22px;background:#E04A26;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:11pt;}@media print{.btn-impr{display:none;}body{padding:15mm 20mm;}}</style></head><body>
+<button class="btn-impr" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+<p class="fecha">Bogotá D.C., ${fecha}</p><h1>CUENTA DE COBRO</h1>
+<p class="empresa">GRUPO VISUALIZZA S.A.S.</p><p class="nit">NIT: 901.426.973-3</p>
+<p class="debe">DEBE A:</p><p class="nombre">${a.nombre}</p>${a.cc?`<p>C.C ${a.cc}${a.ciudad?' de '+a.ciudad:''}</p>`:'<p>C.C __________ de __________</p>'}
+<p class="suma-label">LA SUMA DE:</p><p class="suma-val">$ ${Math.round(total).toLocaleString('es-CO')}</p>
+<p style="font-size:10pt;margin-top:4px">(${comNumEnPalabras(total)})</p>
+<p class="concepto-label">POR CONCEPTO DE:</p>
+<table><thead><tr><th>Negocio</th><th>Período</th><th style="text-align:right">Valor</th></tr></thead><tbody>${filas}</tbody>
+<tfoot><tr><td colspan="2" style="text-align:right">TOTAL</td><td style="text-align:right">$ ${Math.round(total).toLocaleString('es-CO')}</td></tr></tfoot></table>
+<div class="cert"><p style="font-weight:700;margin-bottom:8px;">CERTIFICACIÓN</p><p>Manifiesto bajo la gravedad de juramento que en el año en curso no he sobrepasado el tope de ingresos que me obligue a declarar renta. Además, que la actividad que genera estos honorarios no tiene relación con mi actividad principal que me genera salario. Autorizo el descuento de retención en la fuente si aplica.</p></div>
+<div class="firma"><div class="firma-linea"></div><div class="firma-nombre">${a.nombre}</div>${a.cc?`<div class="firma-cc">C.C. ${a.cc}${a.ciudad?' de '+a.ciudad:''}</div>`:''}</div>
+</body></html>`);
+  w.document.close();
+}
+
+async function comInit(){ await comOpenIDB(); }
 
 // =====================================================================
 // INIT
 // =====================================================================
 (async function init() {
   await openIDB();
+  await comInit();
   sessionStorage.removeItem('msal.interaction.status');
   document.getElementById('cfgClientId').value = CFG.CLIENT_ID;
   document.getElementById('cfgTenant').value   = CFG.TENANT;
