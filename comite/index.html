@@ -1720,16 +1720,6 @@ function renderVentas(){
         <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.6rem;text-transform:uppercase;letter-spacing:.5px;color:#fff;margin-bottom:6px">Por origen / alianza</div>
         <div class="vi-org-grid">
           ${(function(){
-            const FIXED=[
-              {k:'GRAN CENTRAL',lbl:'Gran Central'},
-              {k:'GRAN CENTRAL CONVENIO',lbl:'GC Convenio'},
-              {k:'WELL',lbl:'Well'},
-              {k:'KLIK',lbl:'Klik'},
-              {k:'CORNER VIEW',lbl:'Corner View'},
-              {k:'CORNER V',lbl:'Corner V'},
-              {k:'CONINSA',lbl:'Coninsa'},
-              {k:'VANTI',lbl:'Vanti'},
-            ];
             // Separate GC Convenio vs Gran Central (sin convenio)
             const gcConv=vm.filter(r=>eConv(r)&&(r[9]||'').toUpperCase().includes('GRAN CENTRAL'));
             const gcSolo=vm.filter(r=>!eConv(r)&&(r[9]||'').toUpperCase().includes('GRAN CENTRAL')&&eAli(r));
@@ -1737,13 +1727,12 @@ function renderVentas(){
             const counts={
               'Gran Central':gcSolo.length,
               'GC Convenio':gcConv.length,
-              'Well':vm.filter(r=>!eConv(r)&&(r[9]||'').toUpperCase().includes('WELL')&&eAli(r)).length,
               'Klik':vm.filter(r=>(r[9]||'').toUpperCase().includes('KLIK')&&eAli(r)).length,
-              'Corner View':vm.filter(r=>(r[9]||'').toUpperCase().includes('CORNER VIEW')&&eAli(r)).length,
-              'Corner V':vm.filter(r=>(r[9]||'').toUpperCase().includes('CORNER V')&&!(r[9]||'').toUpperCase().includes('CORNER VIEW')&&eAli(r)).length,
-              'Coninsa':vm.filter(r=>(r[9]||'').toUpperCase().includes('CONINSA')&&eAli(r)).length,
+              'Corner View':vm.filter(r=>(r[9]||'').toUpperCase().includes('CORNER')&&eAli(r)).length,
+              'Lagom':vm.filter(r=>(r[9]||'').toUpperCase().includes('LAGOM')).length,
               'Vanti':vm.filter(r=>(r[9]||'').toUpperCase().includes('VANTI')&&eAli(r)).length,
               'Orgánico':orgTotal,
+              'Credifamilia':vm.filter(r=>(r[9]||'').toUpperCase().includes('CREDIFAMILIA')&&eAli(r)).length,
             };
             return Object.entries(counts).map(([lbl,n])=>`<div class="vi-org-row"><span class="vi-tipodot" style="background:${n>0?'var(--y)':'rgba(255,255,255,.2)'}"></span>${lbl}<span class="val ${n===0?'zero':''}">${n}</span></div>`).join('');
           })()}
