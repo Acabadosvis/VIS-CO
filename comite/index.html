@@ -935,6 +935,9 @@ function renderLeadsMensual(){
   /* Limpiar KPIs y funnel — vista mensual no usa el embudo semanal */
   if(kEl)kEl.innerHTML='';
   if(funnelEl)funnelEl.innerHTML='';
+  /* Ocultar gráficas semanales en vista mensual */
+  var chartsElM=document.querySelector('#p1 .chg2');
+  if(chartsElM)chartsElM.style.display='none';
   /* ── TABLA ── */
   if(!mesKeys.length){
     if(cmpEl)cmpEl.innerHTML='<div class="card" style="text-align:center;padding:28px;color:#9CA3AF;font-size:.8rem">Sin datos mensuales aún.<br>Usa el botón <strong>＋ Agregar mes</strong> para ingresar los datos de cada mes.</div>';
@@ -1043,6 +1046,9 @@ function renderLeadsMensual(){
 }
 
 function renderLeads(){
+  /* Restaurar gráficas semanales */
+  var chartsElW=document.querySelector('#p1 .chg2');
+  if(chartsElW)chartsElW.style.display='';
   var off2=typeof off!=='undefined'?off:0;
   var p2=getPer(off2),p1=getPer(off2-1),p0=getPer(off2-2),pm1=getPer(off2-3),pm2=getPer(off2-4),pm3=getPer(off2-5);
   var lPerEl=document.getElementById('l-per');
