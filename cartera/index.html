@@ -697,16 +697,14 @@ function parseBuffer(buf) {
       const mr = b.mr!==null ? xlM(r[b.mr]) : 0; // monto real pagado en este bloque
       const fr = b.fr!==null ? xlDate(r[b.fr]) : null;
 
-      // Saldo: si el bloque tiene columna mr propia, usar mc-mr directamente.
-      // Para SEP (sin mr), usar el recaudado global restante como fallback.
-      let saldo;
-      if (b.mr !== null) {
-        saldo = Math.max(0, mc - mr); // fuente autoritativa: Real del Excel
-      } else {
-        const applied = Math.min(mc, Math.max(0, remPagado));
-        remPagado = Math.max(0, remPagado - mc);
-        saldo = Math.max(0, mc - applied);
-      }
+      // Distribución global (aplica a todos para mantener remPagado actualizado)
+      const applied = Math.min(mc, Math.max(0, remPagado));
+      remPagado = Math.max(0, remPagado - mc);
+      // Crédito: el mayor entre el Real del Excel (mr) y la redistribución global.
+      // Así un pago registrado solo en RECAUDADO O solo en la columna Real
+      // siempre cancela el bloque correctamente.
+      const credit = Math.max(mr, applied);
+      const saldo = Math.max(0, mc - credit);
       if (saldo < 1) continue; // bloque cubierto — omitir
 
       // Si contabilidad confirmó este bloque como 'entró', tratarlo como pagado
@@ -727,7 +725,7 @@ function parseBuffer(buf) {
           proxAmt += saldo;
         }
       }
-      blocks.push({etapa:b.n,label:ETAPA_LABELS[b.n],mc,mr,saldo,fc,fr,bst});
+      blocks.push({etapa:b.n,label:ETAPA_LABELS[b.n],mc,mr:credit,saldo,fc,fr,bst});
     }
 
     // Determine días en mora (from oldest overdue block)
@@ -961,7 +959,7 @@ function render() {
     </div>`;
 
     const reasonSel = showReason ? `<td onclick="event.stopPropagation()">
-      <select class="reason-sel ${savedReason?'set':''}" onchange="saveReason('${c.cid}',this.value)">
+      <select class="reason-sel ${savedReason?'set':''}" data-cid="${c.cid.replace(/"/g,'&quot;')}" onchange="saveReason(this.dataset.cid,this.value)">
         <option value="" ${!savedReason?'selected':''}>Sin clasificar</option>
         <option value="cliente" ${savedReason==='cliente'?'selected':''}>Cliente</option>
         <option value="obra"    ${savedReason==='obra'?'selected':''}>Atraso de Obra</option>
@@ -999,6 +997,7 @@ function saveReason(cid,val){
   const r=JSON.parse(localStorage.getItem(LS_REASONS)||'{}');
   if(val)r[cid]=val;else delete r[cid];
   localStorage.setItem(LS_REASONS,JSON.stringify(r));
+  render(); // actualizar clase .set inmediatamente
 }
 
 // ── MODAL DETALLE ─────────────────────────────────────────────
