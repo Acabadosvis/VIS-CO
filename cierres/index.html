@@ -1367,7 +1367,7 @@ async function autoSyncM2() {
     if (!pagoKey) continue;
     const pagoDef = PAGOS_DEF.find(p => p.key===pagoKey);
     if (!pagoDef) continue;
-    const row = allData.find(r => String(r._row[C.c])===sop.cid);
+    const row = allData.find(r => String(r._row[C.codigo]||r._row[C.c]||'').trim()===sop.cid);
     if (!row) continue;
     const existingMonto = +row._row[pagoDef.rMonto] || 0;
     if (existingMonto > 0) continue; // ya está en Excel
@@ -1405,7 +1405,7 @@ function abrirModalM2() {
   confirmados.forEach(sop => {
     const pagoKey = ETAPA_M2[sop.etapa];
     const pagoDef = pagoKey ? PAGOS_DEF.find(p=>p.key===pagoKey) : null;
-    const row = allData.find(r => String(r._row[C.c])===sop.cid);
+    const row = allData.find(r => String(r._row[C.codigo]||r._row[C.c]||'').trim()===sop.cid);
     if (!row || !pagoDef) {
       sinFila++;
       rowsHTML += `<tr><td style="color:var(--g)">${sop.cli||sop.cid}</td><td style="font-size:11px;color:var(--g)">${sop.proy||'—'}</td><td>${ETAPA_LABELS[sop.etapa]||sop.etapa}</td><td style="font-family:'Syne',sans-serif;font-weight:700">${fmt(sop.monto||0)}</td><td style="font-size:11px">${sop.fecha_entro||'—'}</td><td><span class="m2-badge-skip">Sin fila Excel</span></td></tr>`;
@@ -1447,7 +1447,7 @@ async function sincronizarM2() {
       const pagoKey = ETAPA_M2[sop.etapa];
       const pagoDef = pagoKey ? PAGOS_DEF.find(p=>p.key===pagoKey) : null;
       if (!pagoDef) continue;
-      const row = allData.find(r => String(r._row[C.c])===sop.cid);
+      const row = allData.find(r => String(r._row[C.codigo]||r._row[C.c]||'').trim()===sop.cid);
       if (!row) continue;
       if (+row._row[pagoDef.rMonto] > 0) continue; // ya existe
       const monto=sop.monto||0, fecha=sop.fecha_entro||new Date().toISOString().slice(0,10);
@@ -1575,7 +1575,7 @@ function comParseWorkbook(workbook){
   const rawC=XLSX.utils.sheet_to_json(wsC,{header:1,defval:null,cellDates:true});
   comDatos=[];
 
-  for(let i=3;i<rawC.length;i++){
+  for(let i=CFG.DATA_START-1;i<rawC.length;i++){
     const r=rawC[i]; if(!r||!r[0]) continue;
     const vd=String(r[1]||'').trim();
     if(!COM_VDS.includes(vd)) continue;
