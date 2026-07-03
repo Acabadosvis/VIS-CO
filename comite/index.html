@@ -1935,7 +1935,28 @@ function renderAptos(){
   var byXR={};
   xrR.forEach(function(r){
     var l='Sin fecha';
-    try{var raw=r[11];if(raw){var d=new Date(raw);if(!isNaN(d.getTime()))l=MES[d.getMonth()]+' '+d.getFullYear();}}catch(e){}
+    try{
+      var raw=r[6]; /* FECHA_ENTREGA col 6 */
+      if(raw){
+        var rawS=raw.toString().trim();
+        var d=new Date(rawS);
+        if(!isNaN(d.getTime())&&d.getFullYear()>1970){
+          l=MES[d.getMonth()]+' '+d.getFullYear();
+        } else {
+          /* parseo texto español: "Diciembre 2025", "dic-25", etc. */
+          var parts=rawS.toLowerCase().split(/[\s\-\/,]+/);
+          var mIdx=-1,yr=0;
+          parts.forEach(function(p){
+            if(MN[p]!==undefined)mIdx=MN[p];
+            var n=parseInt(p);
+            if(!isNaN(n)&&n>2000&&n<2100)yr=n;
+            else if(!isNaN(n)&&n>=24&&n<=35)yr=2000+n;
+          });
+          if(mIdx>=0)l=MES[mIdx]+(yr?' '+yr:'');
+          else if(rawS.length>1)l=rawS.slice(0,20);
+        }
+      }
+    }catch(e){}
     byXR[l]=(byXR[l]||0)+1;
   });
   var xrK=Object.keys(byXR).sort();
