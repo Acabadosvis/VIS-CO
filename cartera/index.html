@@ -663,13 +663,18 @@ function parseBuffer(buf) {
     if (ep==='EN EJECUCION') ep='EN EJECUCIÓN';
     if (!VALID_ESTADOS.has(ep)) continue;
 
-    const xrec    = xlM(r[69]);  // X RECAUDAR (monto pendiente total)
     const adic    = xlM(r[15]);  // ADICIONALES/AJUSTES (valor total del adicional)
     const total   = xlM(r[19]);  // TOTAL CONTRATO (cotización + adic)
-    const recaudado = xlM(r[68]); // RECAUDADO
     const cotiz   = xlM(r[14]);  // COTIZACIÓN BASE (sin adicional)
 
-    if (xrec < 100) continue; // pagado completamente (incluyendo adicionales)
+    // RECAUDADO: suma de los MR por bloque (fuente autoritativa).
+    // Usar max vs columna global por si algún pago es lump-sum sin asignar a bloque.
+    const xlRecaudado = xlM(r[68]); // columna global RECAUDADO
+    const mrSum = BLOCKS.reduce((s,b)=>s+(b.mr!==null?xlM(r[b.mr]):0), 0);
+    const recaudado = Math.max(xlRecaudado, mrSum);
+    const xrec = Math.max(0, total - recaudado);
+
+    if (xrec < 100) continue; // pagado completamente
 
     const cid    = String(r[1]);           // CODIGO NEGOCIO (ej: "NATURA/T1/1502")
     const cli    = String(r[7]||'').trim(); // CLIENTE
@@ -1372,19 +1377,20 @@ function verSoporte(key){
 
 // ── COLA DE SOPORTES ──────────────────────────────────────────
 function renderCola(){
+  WEEK = calcWeek(new Date()); // siempre usar la semana real de hoy
+  setWeekInputs();
   const sops=getSoportes();
   const all=Object.entries(sops).filter(([k,v])=>v.estado&&v.estado!=='');
-  const pending   =all.filter(([k,v])=>v.estado==='pendiente');
-  const entrado   =all.filter(([k,v])=>v.estado==='entro');
-  const rechazados=all.filter(([k,v])=>v.estado==='rechazado');
-  // Filter to active week for entrados, all pending shown
-  const pendMonto=pending.reduce((a,[k,v])=>a+(v.monto||0),0);
-  const entroMonto=entrado.filter(([k,v])=>v.fecha_entro&&v.fecha_entro>=WEEK.ss&&v.fecha_entro<=WEEK.es)
-    .reduce((a,[k,v])=>a+(v.monto||0),0);
+  const pending      =all.filter(([k,v])=>v.estado==='pendiente');
+  const entrado      =all.filter(([k,v])=>v.estado==='entro');
+  const rechazados   =all.filter(([k,v])=>v.estado==='rechazado');
+  const entradoSemana=entrado.filter(([k,v])=>v.fecha_entro&&v.fecha_entro>=WEEK.ss&&v.fecha_entro<=WEEK.es);
+  const pendMonto   =pending.reduce((a,[k,v])=>a+(v.monto||0),0);
+  const entroMonto  =entradoSemana.reduce((a,[k,v])=>a+(v.monto||0),0);
 
   document.getElementById('ptitle').textContent='💳 Cola de Pagos';
   document.getElementById('phint').textContent='Soportes enviados + confirmaciones de contabilidad';
-  document.getElementById('fcnt').innerHTML=`<strong>${pending.length}</strong> pendientes · <strong>${entrado.length}</strong> confirmados
+  document.getElementById('fcnt').innerHTML=`<strong>${pending.length}</strong> pendientes · <strong>${entradoSemana.length}</strong> confirmados esta semana
     <button onclick="limpiarSoportes()" style="margin-left:12px;font-size:10px;padding:3px 9px;border-radius:6px;border:1px solid var(--brd);background:var(--gc);color:var(--g);cursor:pointer;font-family:inherit">🗑 Limpiar todo</button>`;
 
   const mkTbl=(rows,title,color,btnFn)=>{
@@ -1451,10 +1457,10 @@ function renderCola(){
         <div class="mst" style="margin-bottom:8px">📤 PENDIENTES DE CONFIRMAR (${pending.length})</div>
         ${mkTbl(pending,'',  '#D97706',pendBtns)}
       </div>
-      <!-- CONFIRMED TABLE -->
+      <!-- CONFIRMED TABLE — solo semana actual -->
       <div style="padding:14px 16px">
-        <div class="mst" style="margin-bottom:8px">✅ CONFIRMADOS — ENTRÓ (${entrado.length})</div>
-        ${mkTbl(entrado,'','#059669',entroBtns)}
+        <div class="mst" style="margin-bottom:8px">✅ CONFIRMADOS ESTA SEMANA (${entradoSemana.length}) <span style="font-weight:400;font-size:10px;color:var(--g)">· ${WEEK.ss} → ${WEEK.es}</span></div>
+        ${mkTbl(entradoSemana,'','#059669',entroBtns)}
       </div>
       <!-- RECHAZADOS TABLE -->
       ${rechazados.length>0?`<div style="padding:0 16px 14px">
