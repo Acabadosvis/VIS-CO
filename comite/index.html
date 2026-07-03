@@ -903,7 +903,38 @@ function navMes(dir){
   renderLeadsMensual();
 }
 function renderLeadsMensual(){
-  var allLM=gLS(LS_LM);
+  /* ── Auto-agrega semanas por mes ── */
+  var allLManual=gLS(LS_LM);
+  var allLW=gLS(LS_L);
+  var allLM={};
+  /* 1. Suma cada semana en su mes */
+  Object.keys(allLW).forEach(function(wk){
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(wk))return;
+    var mk=wk.substr(0,7);
+    if(!allLM[mk])allLM[mk]={wpp:0,total:0,ver:0,cno:0,sr:0,int:0,ci_org:0,ci_ali:0,ci:0,gc:0,lag:0,cv:0,cred:0,nver:0,ni:0,_auto:true};
+    var w=allLW[wk]||{};
+    allLM[mk].wpp+=(w.wpp||0);
+    allLM[mk].total+=(w.total||0);
+    allLM[mk].ver+=(w.ver||0);
+    allLM[mk].cno+=(w.cno||0);
+    allLM[mk].sr+=(w.sr||0);
+    allLM[mk].int+=(w.int||0);
+    allLM[mk].ci_org+=(w.ci_org||0)+(w.ci_ant||0);
+    allLM[mk].ci_ali+=(w.ci_gc||0)+(w.ci_lag||0)+(w.ci_cv||0)+(w.ci_cred||0);
+    allLM[mk].gc+=(w.gc||0);allLM[mk].lag+=(w.lag||0);
+    allLM[mk].cv+=(w.cv||0);allLM[mk].cred+=(w.cred||0);
+  });
+  /* 2. Deriva campos calculados en meses auto */
+  Object.keys(allLM).forEach(function(mk){
+    if(!allLM[mk]._auto)return;
+    allLM[mk].ci=allLM[mk].ci_org+allLM[mk].ci_ali;
+    allLM[mk].nver=Math.max(0,allLM[mk].total-allLM[mk].ver);
+    allLM[mk].ni=Math.max(0,allLM[mk].ver-allLM[mk].cno-allLM[mk].sr-allLM[mk].int);
+  });
+  /* 3. Datos manuales siempre ganan sobre auto */
+  Object.keys(allLManual).forEach(function(mk){
+    if(/^\d{4}-\d{2}$/.test(mk))allLM[mk]=allLManual[mk];
+  });
   var mesKeys=Object.keys(allLM).filter(function(k){return /^\d{4}-\d{2}$/.test(k);}).sort();
   var lPerEl=document.getElementById('l-per');
   if(lPerEl)lPerEl.textContent='Vista mensual';
@@ -991,7 +1022,7 @@ function renderLeadsMensual(){
   var d2=Object.assign({},allLM[mk2]||{});
   var d1=mk1?Object.assign({},allLM[mk1]||{}):{};
   var d0=mk0?Object.assign({},allLM[mk0]||{}):{};
-  function mesLbl(mk){var p=mk.split('-');return MES[parseInt(p[1])-1]+' '+p[0];}
+  function mesLbl(mk,full){var p=mk.split('-');var n=MES[parseInt(p[1])-1]+' '+p[0];if(!full&&allLM[mk]&&allLM[mk]._auto)n+='<span style="font-size:.55rem;background:#EFF6FF;color:#0891B2;border-radius:3px;padding:1px 4px;margin-left:3px;font-weight:600">auto</span>';return n;}
   /* Nav mes en l-per */
   var prevBtnH=idx>0?'<button onclick="navMes(-1)" style="font-size:.65rem;background:var(--gc);border:1px solid var(--brd);border-radius:5px;padding:2px 9px;cursor:pointer;font-family:Syne,sans-serif;font-weight:700;color:var(--n)">&#9664; '+mesLbl(mesKeys[idx-1])+'</button> ':'';
   var nextBtnH=idx<mesKeys.length-1?' <button onclick="navMes(1)" style="font-size:.65rem;background:var(--gc);border:1px solid var(--brd);border-radius:5px;padding:2px 9px;cursor:pointer;font-family:Syne,sans-serif;font-weight:700;color:var(--n)">'+mesLbl(mesKeys[idx+1])+' &#9654;</button>':'';
