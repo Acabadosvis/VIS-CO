@@ -1123,28 +1123,36 @@ function renderLeadsMensual(){
   if(cmpEl)cmpEl.innerHTML='<div class="card lct"><div class="card-hd">&#128202; Comparativo mensual <span class="card-hd-sub" style="color:#0891B2">&#250;ltimos 3 meses</span></div><div class="tw"><table><thead><tr><th>M&#233;trica</th>'+h0+h1+'<th class="tr" style="color:var(--o)">'+mesLbl(mk2)+'</th><th class="tr">Var ant</th><th class="tr">Var act</th></tr></thead><tbody>'+rows3+convRows+'</tbody></table></div></div>';
   /* GR&#193;FICAS &#8212; evoluci&#243;n mensual */
   var allMks=mesKeys;
-  var mLbls=allMks.map(function(mk){var p=mk.split('-');return MES[parseInt(p[1])-1].substr(0,3)+' '+p[0].substr(2);});
-  var totArr=allMks.map(function(mk){return(allLM[mk]||{}).total||0;});
-  var intArr=allMks.map(function(mk){return(allLM[mk]||{}).int||0;});
-  var verArr=allMks.map(function(mk){return(allLM[mk]||{}).ver||0;});
+  var cmpMks=[mk0,mk1,mk2].filter(Boolean);
+  var cmpLbls=cmpMks.map(function(mk){var p=mk.split('-');return MES[parseInt(p[1])-1].substr(0,3)+' '+p[0].substr(2);});
+  var clrM=['rgba(249,115,22,.75)','rgba(8,145,178,.75)','rgba(22,163,74,.75)'];
+  var brdM=['#F97316','#0891B2','#16A34A'];
+  function gM(mk,k){return(allLM[mk]||{})[k]||0;}
   var chartsEl2=document.querySelector('#p1 .chg2');
   if(chartsEl2){
     chartsEl2.style.display='';
     var chTitles=chartsEl2.querySelectorAll('.chl');
-    if(chTitles[0])chTitles[0].textContent='Evolución mensual de leads';
-    if(chTitles[1])chTitles[1].textContent='Distribución — '+mesLbl(mk2);
-    if(chTitles[2])chTitles[2].textContent='Tendencia mensual';
+    var lbl3=cmpLbls.join(' / ');
+    if(chTitles[0])chTitles[0].textContent='Evolución — '+lbl3;
+    if(chTitles[1])chTitles[1].textContent='Clasificación comparativa — '+lbl3;
+    if(chTitles[2])chTitles[2].textContent='Tendencia — '+lbl3;
   }
   setTimeout(function(){
-    mkBarG('lc_evo',mLbls,[
-      {label:'Total calculadoras',data:totArr,backgroundColor:'#FDBA74',borderColor:'#F97316',borderWidth:1.5,borderRadius:5,type:'bar'},
-      {label:'Interesados ★',data:intArr,backgroundColor:'#16A34A',borderRadius:5,type:'bar'}
+    mkBarG('lc_evo',cmpLbls,[
+      {label:'Calculadoras',data:cmpMks.map(function(mk){return gM(mk,'total');}),backgroundColor:'#FDBA74',borderColor:'#F97316',borderWidth:1.5},
+      {label:'Verificados',data:cmpMks.map(function(mk){return gM(mk,'ver');}),backgroundColor:'#BAE6FD',borderColor:'#0891B2',borderWidth:1},
+      {label:'Interesados ★',data:cmpMks.map(function(mk){return gM(mk,'int');}),backgroundColor:'#86EFAC',borderColor:'#16A34A',borderWidth:1}
     ]);
-    mkDona('lc_pie',['Incompletas','Sin respuesta','No interesados','Interesados ★'],[cnoM,srM,niM,intM],['#F97316','#64748B','#94A3B8','#16A34A']);
-    mkLine('lc_trend',mLbls,[
-      {label:'Total calculadoras',data:totArr,borderColor:'#F97316',backgroundColor:'rgba(249,115,22,.08)',fill:true,tension:.3},
-      {label:'Verificados',data:verArr,borderColor:'#0891B2',backgroundColor:'rgba(8,145,178,.05)',fill:false,tension:.3},
-      {label:'Interesados ★',data:intArr,borderColor:'#16A34A',backgroundColor:'rgba(22,163,74,.05)',fill:false,tension:.3}
+    var catLbls=['Interesados ★','Sin respuesta','No interesados','Incompletas','Cierres'];
+    var catKeys=['int','sr','ni','cno','ci'];
+    mkBarG('lc_pie',catLbls,cmpMks.map(function(mk,i){
+      return{label:cmpLbls[i],data:catKeys.map(function(k){return gM(mk,k);}),backgroundColor:clrM[i],borderColor:brdM[i],borderWidth:1};
+    }));
+    mkLine('lc_trend',cmpLbls,[
+      {label:'Calculadoras',data:cmpMks.map(function(mk){return gM(mk,'total');}),borderColor:'#F97316',backgroundColor:'rgba(249,115,22,.08)',fill:true,tension:.3},
+      {label:'Verificados',data:cmpMks.map(function(mk){return gM(mk,'ver');}),borderColor:'#0891B2',fill:false,tension:.3},
+      {label:'Interesados ★',data:cmpMks.map(function(mk){return gM(mk,'int');}),borderColor:'#16A34A',fill:false,tension:.3},
+      {label:'Cierres',data:cmpMks.map(function(mk){return gM(mk,'ci');}),borderColor:'#059669',fill:false,tension:.3}
     ]);
   },80);
 }
