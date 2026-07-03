@@ -1548,8 +1548,9 @@ function renderReunionesLocal(){
     </div>`;
   }).join('');
   // KPIs semana + totales
-  const totP=['KM','NM'].reduce((s,a)=>s+(cur[a]?.prog||0),0);
-  const totE=['KM','NM'].reduce((s,a)=>s+(cur[a]?.ef||0),0);
+  const actReu=abActiva?['KM','NM','AB']:['KM','NM'];
+  const totP=actReu.reduce((s,a)=>s+(cur[a]?.prog||0),0);
+  const totE=actReu.reduce((s,a)=>s+(cur[a]?.ef||0),0);
   // Leads base AUTO desde módulo Leads
   const lb2=allL[p2.sISO]?.total||0,lb1=allL[p1.sISO]?.total||0,lb0=allL[p0.sISO]?.total||0;
   const conv2=lb2>0?pct(totP,lb2,2):0,conv1=lb1>0?pct((allC[p1.sISO]?.KM?.prog||0)+(allC[p1.sISO]?.AB?.prog||0)+(allC[p1.sISO]?.NM?.prog||0),lb1,2):0;
@@ -1559,16 +1560,16 @@ function renderReunionesLocal(){
     <div class="kp g"><div class="kl">Efectivas total</div><div class="kv">${totE}</div><div class="ks">${lb2>0?pct(totE,lb2,2):0}% de leads</div></div>
     <div class="kp p"><div class="kl">KM</div><div class="kv">${cur.KM?.ef||0}/${cur.KM?.prog||0}</div><div class="ks">${cur.KM?.prog>0?pct(cur.KM.ef,cur.KM.prog,0):0}% conv</div></div>
     <div class="kp a"><div class="kl">NM</div><div class="kv">${cur.NM?.ef||0}/${cur.NM?.prog||0}</div><div class="ks">${cur.NM?.prog>0?pct(cur.NM.ef,cur.NM.prog,0):0}% conv</div></div>
-    ${(cur.AB?.ef||cur.AB?.prog)?`<div class="kp" style="opacity:.45"><div class="kl">AB (hist.)</div><div class="kv">${cur.AB?.ef||0}/${cur.AB?.prog||0}</div></div>`:''}` ;
+    ${abActiva?`<div class="kp" style="border-left:3px solid ${VDC.AB}"><div class="kl">AB</div><div class="kv">${cur.AB?.ef||0}/${cur.AB?.prog||0}</div><div class="ks">${cur.AB?.prog>0?pct(cur.AB.ef,cur.AB.prog,0):0}% conv</div></div>`:(cur.AB?.ef||cur.AB?.prog)?`<div class="kp" style="opacity:.45"><div class="kl">AB (hist.)</div><div class="kv">${cur.AB?.ef||0}/${cur.AB?.prog||0}</div></div>`:''}` ;
   // Tabla estilo PDF (Leads base / Agendadas / Atendidas) — 3 semanas
   function reuRow(lbl,v0,v1,v2,lb0,lb1,lb2,inv){
     const ps0=lb0>0?`(${pct(v0,lb0,2)}%)`:'';const ps1=lb1>0?`(${pct(v1,lb1,2)}%)`:'';const ps2=lb2>0?`(${pct(v2,lb2,2)}%)`:'';
     return`<tr><td class="mc">${lbl}</td><td class="tr">${v0} <span class="pval">${ps0}</span></td><td class="tr">${v1} <span class="pval">${ps1}</span></td><td class="tr"><strong>${v2}</strong> <span class="pval">${ps2}</span></td><td class="tr">${dH(v1,v0,inv)}</td><td class="tr">${dH(v2,v1,inv)}</td></tr>`;
   }
-  const ag0=(allC[p0.sISO]?.KM?.prog||0)+(allC[p0.sISO]?.NM?.prog||0);
-  const ag1=(allC[p1.sISO]?.KM?.prog||0)+(allC[p1.sISO]?.NM?.prog||0);
-  const ef0=(allC[p0.sISO]?.KM?.ef||0)+(allC[p0.sISO]?.NM?.ef||0);
-  const ef1=(allC[p1.sISO]?.KM?.ef||0)+(allC[p1.sISO]?.NM?.ef||0);
+  const ag0=['KM','AB','NM'].reduce((s,a)=>s+(allC[p0.sISO]?.[a]?.prog||0),0);
+  const ag1=['KM','AB','NM'].reduce((s,a)=>s+(allC[p1.sISO]?.[a]?.prog||0),0);
+  const ef0=['KM','AB','NM'].reduce((s,a)=>s+(allC[p0.sISO]?.[a]?.ef||0),0);
+  const ef1=['KM','AB','NM'].reduce((s,a)=>s+(allC[p1.sISO]?.[a]?.ef||0),0);
   document.getElementById('reu-tabla').innerHTML=`
   <div class="card lct">
     <div class="card-hd">Evoluci&#243;n reuniones comerciales <span class="card-hd-sub">Base = leads calculadora (GC / Corner View se miden aparte)</span></div>
@@ -1584,14 +1585,16 @@ function renderReunionesLocal(){
   </div>`;
   // Charts
   const ws=[p0,p1,p2];const wlbls=ws.map(w=>wShort(w));
-  const tKM=ws.map(w=>allC[w.sISO]?.KM?.ef||0);const tAB=ws.map(w=>allC[w.sISO]?.AB?.ef||0);const tNM=ws.map(w=>allC[w.sISO]?.NM?.ef||0);
-  const totEf4=['KM','AB','NM'].map(a=>ws.reduce((s,w)=>s+(allC[w.sISO]?.[a]?.ef||0),0));
+  const chTitleEl=document.querySelector('#p2 .chl');
+  if(chTitleEl)chTitleEl.textContent='Comparativo últimas 3 semanas — Calculadoras · Verificadas · Reuniones ef.';
   setTimeout(()=>{
-    
-    mkLine('rc_trend',wlbls,[
-      {label:'Karen',data:tKM,borderColor:VDC.KM,backgroundColor:'rgba(124,58,237,.07)',fill:true},
-      {label:'Nathalia',data:tNM,borderColor:VDC.NM,backgroundColor:'rgba(228,114,27,.07)',fill:true},
-      {label:'Angie (hist.)',data:tAB,borderColor:VDC.AB,backgroundColor:'rgba(146,64,14,.04)',fill:false,borderDash:[4,3]}
+    const lbTot=ws.map(w=>allL[w.sISO]?.total||0);
+    const lbVer=ws.map(w=>allL[w.sISO]?.ver||0);
+    const lbEf=ws.map(w=>actReu.reduce((s,a)=>s+(allC[w.sISO]?.[a]?.ef||0),0));
+    mkBarG('rc_trend',wlbls,[
+      {label:'Calculadoras',data:lbTot,backgroundColor:'rgba(249,115,22,.7)',borderColor:'#F97316',borderWidth:1.5},
+      {label:'Verificadas',data:lbVer,backgroundColor:'rgba(8,145,178,.7)',borderColor:'#0891B2',borderWidth:1.5},
+      {label:'Reuniones ef.',data:lbEf,backgroundColor:'rgba(22,163,74,.7)',borderColor:'#16A34A',borderWidth:1.5}
     ]);
   },80);
 }
