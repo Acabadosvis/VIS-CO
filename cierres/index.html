@@ -714,6 +714,31 @@ async function updateExcelCellsSheet(sheet, excelRow, updates) {
     console.log(`[COM] Escrito: ${sheet} col ${u.col} fila ${excelRow} → ${val}`);
   }
 }
+// Consulta OneDrive en vivo para obtener el mapa código→fila actual
+// Evita escribir en la fila equivocada cuando el Excel fue modificado localmente
+let _liveRowCache = null;
+async function getLiveRow(codigo) {
+  if (!msalAccount) return null;
+  if (!_liveRowCache) {
+    try {
+      const token = await getToken();
+      const url = `https://graph.microsoft.com/v1.0/drives/${CFG.DRIVE_ID}/items/${CFG.FILE_ID}/workbook/worksheets/${encodeURIComponent(CFG.SHEET)}/range(address='B${CFG.DATA_START}:B3000')`;
+      const resp = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+      if (resp.ok) {
+        const data = await resp.json();
+        _liveRowCache = {};
+        (data.values || []).forEach((row, i) => {
+          const cod = String(row[0] || '').trim();
+          if (cod) _liveRowCache[cod] = CFG.DATA_START + i;
+        });
+        console.log('[M4] LiveRowMap cargado:', Object.keys(_liveRowCache).length, 'filas');
+      }
+    } catch(e) { console.warn('[M4] getLiveRow error:', e.message); }
+  }
+  return _liveRowCache ? _liveRowCache[codigo] : null;
+}
+function invalidateLiveRowCache() { _liveRowCache = null; }
+
 async function updateExcelCells(excelRow, updates) {
   if (!msalAccount) return;
   const token = await getToken();
@@ -1372,7 +1397,6 @@ async function autoSyncM2() {
     const total  = +row._row[C.total] || 1;
     const pct    = monto / total;
     const codigo = row._row[C.codigo];
-    const excelRow = row._excelRow;
     await idbPut('pagos', { id:`${codigo}_col${pagoDef.rMonto}`, value:monto });
     await idbPut('pagos', { id:`${codigo}_col${pagoDef.rFecha}`, value:fecha });
     await idbPut('pagos', { id:`${codigo}_col${pagoDef.rPct}`,   value:pct  });
@@ -1381,6 +1405,8 @@ async function autoSyncM2() {
     VC4[`${codigo}_col${pagoDef.rPct}`]   = { value:pct  };
     if (msalAccount) {
       try {
+        const liveRow = await getLiveRow(codigo);
+        const excelRow = liveRow || row._excelRow;
         await updateExcelCells(excelRow, [
           { col:pagoDef.rMonto, value:monto },
           { col:pagoDef.rFecha, value:new Date(fecha+'T12:00:00') },
@@ -1447,7 +1473,7 @@ async function sincronizarM2() {
       if (!row) continue;
       if (+getVal(row, pagoDef.rMonto) > 0) continue; // ya existe en Excel o en cache local
       const monto=sop.monto||0, fecha=sop.fecha_entro||new Date().toISOString().slice(0,10);
-      const pct=monto/(+row._row[C.total]||1), codigo=row._row[C.codigo], excelRow=row._excelRow;
+      const pct=monto/(+row._row[C.total]||1), codigo=row._row[C.codigo];
       await idbPut('pagos', {id:`${codigo}_col${pagoDef.rMonto}`,value:monto});
       await idbPut('pagos', {id:`${codigo}_col${pagoDef.rFecha}`,value:fecha});
       await idbPut('pagos', {id:`${codigo}_col${pagoDef.rPct}`,  value:pct });
@@ -1455,6 +1481,10 @@ async function sincronizarM2() {
       VC4[`${codigo}_col${pagoDef.rFecha}`]={value:fecha};
       VC4[`${codigo}_col${pagoDef.rPct}`]  ={value:pct};
       if (msalAccount) {
+        // Usar fila en vivo de OneDrive para evitar desfase si el Excel fue modificado
+        const liveRow = await getLiveRow(codigo);
+        const excelRow = liveRow || row._excelRow;
+        if (!liveRow) console.warn('[M4] Sin fila live para', codigo, '— usando _excelRow', row._excelRow);
         await updateExcelCells(excelRow,[
           {col:pagoDef.rMonto,value:monto},
           {col:pagoDef.rFecha,value:new Date(fecha+'T12:00:00')},
