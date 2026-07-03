@@ -700,7 +700,7 @@ async function updateExcelCellsSheet(sheet, excelRow, updates) {
   for (const u of updates) {
     const addr = `${colLetter(u.col)}${excelRow}`;
     const url  = `https://graph.microsoft.com/v1.0/drives/${CFG.DRIVE_ID}/items/${CFG.FILE_ID}/workbook/worksheets/${encodeURIComponent(sheet)}/range(address='${addr}')`;
-    const val  = u.value instanceof Date ? u.value.toLocaleDateString('en-US') : u.value;
+    const val  = u.value instanceof Date ? u.value.toISOString().slice(0,10) : u.value;
     const resp = await fetch(url, {
       method:'PATCH',
       headers:{ Authorization:`Bearer ${token}`, 'Content-Type':'application/json' },
@@ -720,7 +720,7 @@ async function updateExcelCells(excelRow, updates) {
   for (const u of updates) {
     const addr = `${colLetter(u.col)}${excelRow}`;
     const url  = `https://graph.microsoft.com/v1.0/drives/${CFG.DRIVE_ID}/items/${CFG.FILE_ID}/workbook/worksheets/${encodeURIComponent(CFG.SHEET)}/range(address='${addr}')`;
-    const val  = u.value instanceof Date ? u.value.toLocaleDateString('en-US') : u.value;
+    const val  = u.value instanceof Date ? u.value.toISOString().slice(0,10) : u.value;
     const resp = await fetch(url, {
       method:'PATCH',
       headers:{ Authorization:`Bearer ${token}`, 'Content-Type':'application/json' },
@@ -772,9 +772,6 @@ function processWorkbook(buf) {
     try {
       await loadSopsFromAPI();
     } catch(e) { console.warn('[M4] loadSopsFromAPI:', e); }
-    try {
-      await autoSyncM2();
-    } catch(e) { console.warn('[M4] autoSyncM2:', e); }
     populateFilters();
     document.getElementById('firstScreen').style.display = 'none';
     document.getElementById('dash').classList.add('show');
@@ -782,6 +779,8 @@ function processWorkbook(buf) {
     document.getElementById('btnCSV').style.display = 'inline-flex';
     try { renderKPIs(); } catch(e) { console.error('[M4] renderKPIs:', e); }
     try { renderCurrentTab(); } catch(e) { console.error('[M4] renderCurrentTab:', e); }
+    // Sync en segundo plano — no bloquea la UI
+    autoSyncM2().catch(e => console.warn('[M4] autoSyncM2 bg:', e));
   }).catch(e => {
     console.error('[M4] Error cargando archivo:', e);
     toast('Error cargando el archivo: ' + e.message, 'err');
@@ -1357,7 +1356,6 @@ function leerPagosM2() {
 
 async function autoSyncM2() {
   // Escribe automáticamente en Excel los pagos aprobados que aún no están escritos
-  try { await loadSopsFromAPI(); } catch(e){ console.warn('[M4] loadSops:', e); }
   const confirmados = leerPagosM2();
   let escritos = 0;
   for (const sop of confirmados) {
@@ -1367,8 +1365,8 @@ async function autoSyncM2() {
     if (!pagoDef) continue;
     const row = allData.find(r => String(r._row[C.codigo]||r._row[C.c]||'').trim()===sop.cid);
     if (!row) continue;
-    const existingMonto = +row._row[pagoDef.rMonto] || 0;
-    if (existingMonto > 0) continue; // ya está en Excel
+    const existingMonto = +getVal(row, pagoDef.rMonto) || 0;
+    if (existingMonto > 0) continue; // ya está en Excel o en cache local
     const monto  = sop.monto || 0;
     const fecha  = sop.fecha_entro || new Date().toISOString().slice(0,10);
     const total  = +row._row[C.total] || 1;
@@ -1409,7 +1407,7 @@ function abrirModalM2() {
       rowsHTML += `<tr><td style="color:var(--g)">${sop.cli||sop.cid}</td><td style="font-size:11px;color:var(--g)">${sop.proy||'—'}</td><td>${ETAPA_LABELS[sop.etapa]||sop.etapa}</td><td style="font-family:'Syne',sans-serif;font-weight:700">${fmt(sop.monto||0)}</td><td style="font-size:11px">${sop.fecha_entro||'—'}</td><td><span class="m2-badge-skip">Sin fila Excel</span></td></tr>`;
       return;
     }
-    const existingMonto = +row._row[pagoDef.rMonto] || 0;
+    const existingMonto = +getVal(row, pagoDef.rMonto) || 0;
     const yaExiste = existingMonto > 0;
     if (yaExiste) existen++; else nuevos++;
     const badge = yaExiste
@@ -1447,7 +1445,7 @@ async function sincronizarM2() {
       if (!pagoDef) continue;
       const row = allData.find(r => String(r._row[C.codigo]||r._row[C.c]||'').trim()===sop.cid);
       if (!row) continue;
-      if (+row._row[pagoDef.rMonto] > 0) continue; // ya existe
+      if (+getVal(row, pagoDef.rMonto) > 0) continue; // ya existe en Excel o en cache local
       const monto=sop.monto||0, fecha=sop.fecha_entro||new Date().toISOString().slice(0,10);
       const pct=monto/(+row._row[C.total]||1), codigo=row._row[C.codigo], excelRow=row._excelRow;
       await idbPut('pagos', {id:`${codigo}_col${pagoDef.rMonto}`,value:monto});
