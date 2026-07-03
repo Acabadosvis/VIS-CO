@@ -633,7 +633,7 @@ function mkBarH(id,lbl,data){return mkC(id,{type:'bar',data:{labels:lbl,datasets
 function circle(p){const r=40,c=2*Math.PI*r,d=Math.min(100,p)/100*c;return`<div class="vi-svgw"><svg width="88" height="88" viewBox="0 0 88 88"><circle cx="44" cy="44" r="${r}" stroke="#2a2a2a" stroke-width="8" fill="none"/><circle cx="44" cy="44" r="${r}" stroke="var(--o)" stroke-width="8" fill="none" stroke-dasharray="${d.toFixed(1)} ${c.toFixed(1)}" stroke-linecap="round"/></svg><div class="vi-svgpct">${Math.round(p)}%</div></div>`;}
 
 /* ═══ EXCEL ═══ */
-function onFiles(inp){const files=Array.from(inp.files);inp.value='';files.forEach(file=>{const st=document.getElementById('xlst');if(typeof XLSX==='undefined'){st.textContent='❌ SheetJS no cargó';return;}st.textContent='⏳ Leyendo '+file.name.slice(0,14)+'...';const rd=new FileReader();rd.onload=e=>{try{const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});const wsV=wb.SheetNames.find(n=>n==='REPORTE VENTAS')||wb.SheetNames.find(n=>n.toUpperCase().includes('VENTAS'));if(wsV)xlR=XLSX.utils.sheet_to_json(wb.Sheets[wsV],{header:1,defval:null,raw:false}).slice(3).filter(r=>r&&r[0]);const wsO=wb.SheetNames.find(n=>n.includes('EJECUCION'))||wb.SheetNames.find(n=>n.toUpperCase().includes('OPERACIONES'));if(wsO)opR=XLSX.utils.sheet_to_json(wb.Sheets[wsO],{header:1,defval:null,raw:false}).slice(2).filter(r=>r&&r[8]);st.textContent='✅ '+file.name.slice(0,16)+' ('+xlR.length+'v)';
+function onFiles(inp){const files=Array.from(inp.files);inp.value='';files.forEach(file=>{const st=document.getElementById('xlst');if(typeof XLSX==='undefined'){st.textContent='❌ SheetJS no cargó';return;}st.textContent='⏳ Leyendo '+file.name.slice(0,14)+'...';const rd=new FileReader();rd.onload=e=>{try{const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});const wsV=wb.SheetNames.find(n=>n==='REPORTE VENTAS')||wb.SheetNames.find(n=>n.toUpperCase().includes('VENTAS'));if(wsV)xlR=XLSX.utils.sheet_to_json(wb.Sheets[wsV],{header:1,defval:null,raw:false}).slice(4).filter(r=>r&&r[0]);const wsO=wb.SheetNames.find(n=>n.includes('EJECUCION'))||wb.SheetNames.find(n=>n.toUpperCase().includes('OPERACIONES'));if(wsO)opR=XLSX.utils.sheet_to_json(wb.Sheets[wsO],{header:1,defval:null,raw:false}).slice(2).filter(r=>r&&r[8]);st.textContent='✅ '+file.name.slice(0,16)+' ('+xlR.length+'v)';
       try{localStorage.setItem(LS_XL,JSON.stringify(xlR));}catch(e){console.warn('localStorage lleno',e);}document.getElementById('v-noex').style.display='none';document.getElementById('a-noex').style.display='none';renderVentas();renderAptos();renderAlianzas();sLS(LS_XL,xlR);}catch(err){st.textContent='❌ '+err.message.slice(0,28);}};rd.readAsArrayBuffer(file);});}
 
 function onFilesAptos(inp){
@@ -1936,7 +1936,7 @@ function renderAptos(){
   xrR.forEach(function(r){
     var l='Sin fecha';
     try{
-      var raw=r[6]; /* FECHA_ENTREGA col 6 */
+      var raw=r[12]; /* FECHA DE RECIBIDO col 12 */
       if(raw){
         var rawS=raw.toString().trim();
         var d=new Date(rawS);
