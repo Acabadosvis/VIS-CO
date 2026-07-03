@@ -366,6 +366,7 @@ tr:hover td{background:var(--b)}
 <div class="panel" id="p1">
   <div class="card">
     <div class="card-hd">&#128101; Clasificaci&#243;n de leads <span id="l-per" style="color:var(--o)"></span><span class="card-hd-sub">Referencia: Bitrix24 BI</span><button id="btn-mes-leads" onclick="toggleMesLeads()" style="margin-left:auto;background:var(--gc);border:1.5px solid var(--brd);border-radius:6px;padding:3px 11px;font-size:.7rem;cursor:pointer;font-family:Syne,sans-serif;font-weight:700;color:var(--n)">&#128197; Vista mensual</button></div>
+  <div id="l-form-semanal">
     <!-- CAPTACION WPP -> CALCULADORA -->
     <div style="background:#FFFBF0;border:1px solid #FED7AA;border-radius:10px;padding:12px 14px;margin-bottom:12px">
       <div style="font-size:.68rem;font-weight:700;color:#92400E;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">&#128241; Captaci&#243;n WPP &#8594; Calculadora</div>
@@ -418,6 +419,7 @@ tr:hover td{background:var(--b)}
       <button class="btn btn-s" onclick="renderLeads()">&#8617; Cancelar</button>
     </div>
   </div>
+  </div><!-- /l-form-semanal -->
   <div id="l-dbg" style="display:none;background:#1E293B;color:#94A3B8;font-size:.72rem;padding:8px 12px;border-radius:6px;margin:6px 0;font-family:monospace;line-height:1.6"></div>
   <div id="l-kpis" class="kg"></div>
   <div id="l-ver-kpi" class="kg" style="display:none"></div>
@@ -938,6 +940,8 @@ function renderLeadsMensual(){
   /* Ocultar gráficas semanales en vista mensual */
   var chartsElM=document.querySelector('#p1 .chg2');
   if(chartsElM)chartsElM.style.display='none';
+  var formSemM=document.getElementById('l-form-semanal');
+  if(formSemM)formSemM.style.display='none';
   /* ── TABLA ── */
   if(!mesKeys.length){
     if(cmpEl)cmpEl.innerHTML='<div class="card" style="text-align:center;padding:28px;color:#9CA3AF;font-size:.8rem">Sin datos mensuales aún.<br>Usa el botón <strong>＋ Agregar mes</strong> para ingresar los datos de cada mes.</div>';
@@ -1049,6 +1053,8 @@ function renderLeads(){
   /* Restaurar gráficas semanales */
   var chartsElW=document.querySelector('#p1 .chg2');
   if(chartsElW)chartsElW.style.display='';
+  var formSemW=document.getElementById('l-form-semanal');
+  if(formSemW)formSemW.style.display='';
   var off2=typeof off!=='undefined'?off:0;
   var p2=getPer(off2),p1=getPer(off2-1),p0=getPer(off2-2),pm1=getPer(off2-3),pm2=getPer(off2-4),pm3=getPer(off2-5);
   var lPerEl=document.getElementById('l-per');
