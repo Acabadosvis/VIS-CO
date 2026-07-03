@@ -1067,7 +1067,7 @@ function renderLeadsMensual(){
   var dm=allLM[mesKey]||{};
   var editBtn='<button id="btn-editar-mes" onclick="toggleFormMes()" style="background:var(--gc);border:1.5px solid var(--brd);border-radius:6px;padding:4px 12px;font-size:.7rem;cursor:pointer;font-family:Syne,sans-serif;font-weight:700;color:var(--n);margin-bottom:10px">'+(showFormMes?'✕ Cerrar':'✏️ Editar datos de '+MES[refM])+'</button>';
   if(cur._manual){
-    editBtn+=' <button onclick="deleteLeadsMes(''+mesKey+'')" style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:6px;padding:4px 10px;font-size:.68rem;cursor:pointer;font-family:Syne,sans-serif;font-weight:600;color:#DC2626;margin-left:6px">🗑 Borrar manual</button>';
+    editBtn+=' <button onclick="deleteLeadsMes(\''+mesKey+'\')" style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:6px;padding:4px 10px;font-size:.68rem;cursor:pointer;font-family:Syne,sans-serif;font-weight:600;color:#DC2626;margin-left:6px">🗑 Borrar manual</button>';
   }
   var formHTML='';
   if(showFormMes){
@@ -1112,7 +1112,7 @@ function renderLeadsMensual(){
         iMes('lm_cred',dm.cred||0,'&#128179; Credifamilia',false,'#059669')+
       '</div>'+
       '<div style="display:flex;gap:8px">'+
-        '<button class="btn btn-s" onclick="saveLeadsMes(''+mesKey+'')" style="background:var(--o);color:#fff;border-color:var(--od)">&#128190; Guardar '+MES[refM]+'</button>'+
+        '<button class="btn btn-s" onclick="saveLeadsMes(\''+mesKey+'\')" style="background:var(--o);color:#fff;border-color:var(--od)">&#128190; Guardar '+MES[refM]+'</button>'+
         '<button class="btn btn-s" onclick="toggleFormMes()">&#8617; Cancelar</button>'+
       '</div>'+
     '</div>';
