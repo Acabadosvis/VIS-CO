@@ -694,13 +694,21 @@ function parseBuffer(buf) {
       const mc = xlM(r[b.mc]);
       if (mc <= 0) continue;
       const fc = xlDate(r[b.fc]);
-      const mr = b.mr!==null ? xlM(r[b.mr]) : 0; // original Excel (para mostrar en detalle)
+      const mr = b.mr!==null ? xlM(r[b.mr]) : 0; // monto real pagado en este bloque
       const fr = b.fr!==null ? xlDate(r[b.fr]) : null;
-      // Cuánto del recaudado total cubre este bloque
-      const applied = Math.min(mc, Math.max(0, remPagado));
-      remPagado = Math.max(0, remPagado - mc);
-      const saldo = Math.max(0, mc - applied);
-      if (saldo < 1) continue; // cubierto por recaudado
+
+      // Saldo: si el bloque tiene columna mr propia, usar mc-mr directamente.
+      // Para SEP (sin mr), usar el recaudado global restante como fallback.
+      let saldo;
+      if (b.mr !== null) {
+        saldo = Math.max(0, mc - mr); // fuente autoritativa: Real del Excel
+      } else {
+        const applied = Math.min(mc, Math.max(0, remPagado));
+        remPagado = Math.max(0, remPagado - mc);
+        saldo = Math.max(0, mc - applied);
+      }
+      if (saldo < 1) continue; // bloque cubierto — omitir
+
       // Si contabilidad confirmó este bloque como 'entró', tratarlo como pagado
       const _pk = cid+'_'+b.n;
       if (_sops[_pk]?.estado === 'entro') continue;
@@ -719,9 +727,7 @@ function parseBuffer(buf) {
           proxAmt += saldo;
         }
       }
-      // mr_display: el mayor entre lo que el Excel registra y lo que se aplicó
-      const mr_display = Math.max(mr, applied);
-      blocks.push({etapa:b.n,label:ETAPA_LABELS[b.n],mc,mr:mr_display,saldo,fc,fr,bst});
+      blocks.push({etapa:b.n,label:ETAPA_LABELS[b.n],mc,mr,saldo,fc,fr,bst});
     }
 
     // Determine días en mora (from oldest overdue block)
