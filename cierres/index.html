@@ -607,13 +607,11 @@ const HEADER_ALIASES = {
 };
 function parseHeaders(raw) {
   let hRow = -1;
-  for (let i = 0; i < Math.min(6, raw.length); i++) {
+  for (let i = 0; i < Math.min(4, raw.length); i++) {
     if (raw[i] && raw[i].some(c => typeof c==='string' && c.toUpperCase().includes('CLIENTE'))) { hRow=i; break; }
   }
   if (hRow === -1) { console.log('[M4] Headers NO detectados — mapa estático'); return null; }
-  // Actualizar DATA_START dinámicamente según dónde estén los encabezados
-  CFG.DATA_START = hRow + 2; // hRow es 0-indexed; datos empiezan en la fila siguiente
-  console.log('[M4] Headers detectados en fila', hRow+1, '→ DATA_START =', CFG.DATA_START);
+  console.log('[M4] Headers detectados en fila', hRow+1);
   const map = {};
   raw[hRow].forEach((h,idx) => {
     if (!h) return;
@@ -1555,21 +1553,11 @@ function comParseWorkbook(workbook){
   // Mapa de separación desde REPORTE VENTAS
   const sepMap={};
   const rawR=XLSX.utils.sheet_to_json(wsR,{header:1,defval:null});
-  // Detectar fila de encabezados para no leer la fila de títulos como datos
-  let rvDataStart = CFG.DATA_START - 1; // usa el valor ya detectado por parseHeaders
-  // Fallback: buscar encabezado si DATA_START aún es el default
-  if(rvDataStart<1){
-    for(let i=0;i<Math.min(6,rawR.length);i++){
-      if(rawR[i]&&rawR[i].some(c=>typeof c==='string'&&String(c).toUpperCase().includes('CLIENTE'))){ rvDataStart=i+1; break; }
-    }
-    if(rvDataStart<1) rvDataStart=3;
-  }
-  for(let i=rvDataStart;i<rawR.length;i++){
-    const r=rawR[i]; if(!r||!r[C.codigo]) continue;
-    const cod=String(r[C.codigo]).trim();
-    if(!cod||cod.toUpperCase()==='CÓDIGO'||cod.toUpperCase()==='CODIGO') continue; // saltar si es header
-    const sep=+r[C.sep_monto]||0, tot=+r[C.total]||0;
-    if((sep>0||tot>0)&&!sepMap[cod]) sepMap[cod]={sep,tot}; // primera ocurrencia gana
+  for(let i=CFG.DATA_START-1;i<rawR.length;i++){
+    const r=rawR[i]; if(!r||!r[1]) continue;
+    const cod=String(r[1]).trim();
+    const sep=+r[22]||0, tot=+r[18]||0;
+    if((sep>0||tot>0)&&!sepMap[cod]) sepMap[cod]={sep,tot};
   }
 
   const rawC=XLSX.utils.sheet_to_json(wsC,{header:1,defval:null,cellDates:true});
