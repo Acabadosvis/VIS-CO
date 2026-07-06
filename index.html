@@ -127,12 +127,31 @@ header{background:var(--w);border-bottom:1px solid var(--brd);padding:0 24px;hei
 .cl-ok p{color:var(--g);font-size:13px;line-height:1.7;max-width:300px;margin:0 auto;}
 .res-env{margin-top:16px;background:var(--gc);border-radius:10px;padding:13px 15px;text-align:left;font-size:12px;border:1px solid var(--brd);}
 .res-env strong{display:block;margin-bottom:7px;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g);}
+/* ── Notification center ── */
+.bell-btn{position:relative;display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1.5px solid var(--brd);background:var(--w);cursor:pointer;font-size:16px;transition:all .15s;}
+.bell-btn:hover{border-color:var(--r);}
+.bell-badge{position:absolute;top:-5px;right:-5px;background:var(--r);color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-family:'Syne',sans-serif;font-weight:800;display:none;align-items:center;justify-content:center;border:2px solid #fff;}
+.notif-panel{position:fixed;top:0;right:-320px;width:300px;height:100vh;background:var(--w);border-left:1.5px solid var(--brd);z-index:300;box-shadow:-4px 0 20px rgba(0,0,0,.1);transition:right .3s ease;display:flex;flex-direction:column;overflow:hidden;}
+.notif-panel.open{right:0;}
+.np-header{padding:16px 18px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.np-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;}
+.np-close{border:none;background:none;font-size:18px;cursor:pointer;color:var(--g);line-height:1;padding:2px 6px;}
+.np-body{flex:1;overflow-y:auto;padding:12px;}
+.np-empty{text-align:center;padding:40px 20px;color:#AAA;font-size:12px;line-height:1.8;}
+.np-item{background:var(--b);border:1.5px solid var(--brd);border-radius:10px;padding:13px 14px;margin-bottom:10px;}
+.np-item .ni-name{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;margin-bottom:3px;}
+.np-item .ni-sub{font-size:11px;color:var(--g);margin-bottom:8px;line-height:1.4;}
+.np-item .ni-time{font-size:10px;color:#AAA;margin-bottom:8px;}
+.np-item .ni-btn{padding:5px 12px;background:var(--r);color:#fff;border:none;border-radius:6px;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;}
+.notif-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:299;}
+.notif-overlay.open{display:block;}
 @media(max-width:560px){
   .fg{grid-template-columns:1fr;}.fg .full{grid-column:1;}
   .tipo-grid{grid-template-columns:1fr 1fr;}
   header{padding:0 12px;}.wrap{padding:22px 12px;}
   .pr{grid-template-columns:18px 1fr;}.ppct,.pi{display:none;}
   .rg{grid-template-columns:1fr;}.hbadge,.hnum{display:none;}
+  .notif-panel{width:100%;right:-100%;}
 }
 </style>
 </head>
@@ -179,9 +198,24 @@ header{background:var(--w);border-bottom:1px solid var(--brd);padding:0 24px;hei
 <!-- VISTA COMERCIAL -->
 <div id="vista-comercial" style="display:none;">
 
+<!-- Panel lateral de notificaciones -->
+<div class="notif-overlay" id="notif-overlay" onclick="cerrarNotifPanel()"></div>
+<div class="notif-panel" id="notif-panel">
+  <div class="np-header">
+    <span class="np-title">🔔 Clientes pendientes</span>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <button onclick="limpiarTodasNotifs()" style="border:none;background:none;font-size:10px;color:#AAA;cursor:pointer;padding:3px 6px;border-radius:4px;border:1px solid var(--brd);" title="Limpiar todas">Limpiar todo</button>
+      <button class="np-close" onclick="cerrarNotifPanel()">×</button>
+    </div>
+  </div>
+  <div class="np-body" id="np-body">
+    <div class="np-empty" id="np-empty">Sin notificaciones aún.<br><br>Cuando un cliente llene<br>el formulario aparecerá aquí.</div>
+  </div>
+</div>
+
 <div class="alerta-cliente" id="alerta-cliente">
   <span>📋 <strong>Cliente pendiente:</strong> <span id="alerta-nc"></span> llenó el formulario.</span>
-  <button class="btn-mini" onclick="irPaso3()">Ver datos →</button>
+  <button class="btn-mini" onclick="abrirNotifPanel()">Ver datos →</button>
 </div>
 
 <header>
@@ -189,6 +223,9 @@ header{background:var(--w);border-bottom:1px solid var(--brd);padding:0 24px;hei
   <div class="logo">VIS<span>-CO</span></div>
   <span class="hbadge">Módulo Contratos</span>
   <span class="hnum" id="hdr-num">Nuevo</span>
+  <button class="bell-btn" onclick="abrirNotifPanel()" title="Centro de notificaciones">
+    🔔<span class="bell-badge" id="bell-badge"></span>
+  </button>
   <button class="od-btn" onclick="configurarOneDrive()" title="Conectar carpeta OneDrive para guardar contratos automáticamente">
     <div class="od-dot" id="od-dot"></div>
     <span id="od-label">Conectar OneDrive</span>
@@ -214,7 +251,7 @@ header{background:var(--w);border-bottom:1px solid var(--brd);padding:0 24px;hei
   </div>
   <div class="fg" style="margin-bottom:16px;">
     <div class="field"><label>N° Cotización (CO-XXXX-2026) *</label><input id="cotizacion" type="text" placeholder="CO-00456-2026"/></div>
-    <div class="field"><label>Tu correo comercial</label><input id="correo-comercial" type="email" value="contacto@acabadosvis.com"/></div>
+    <div class="field full" style="background:var(--gc);border:1.5px solid var(--brd);border-radius:8px;padding:10px 13px;"><div style="font-family:'Syne',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;color:var(--g);letter-spacing:.06em;margin-bottom:2px;">🔔 Notificaciones</div><div id="canal-info" style="font-size:11px;color:var(--n);">Activando canal automático…</div></div>
     <div class="field"><label>Fecha de firma</label><input type="date" id="fecha-firma"/></div>
     <div class="field"><label>Vigencia cotización (hasta)</label><input type="date" id="fecha-cong"/><div class="fhint">Fecha hasta la que se mantiene el precio</div></div>
   </div>
@@ -229,8 +266,9 @@ header{background:var(--w);border-bottom:1px solid var(--brd);padding:0 24px;hei
     <div class="wt">✅ Mensaje para WhatsApp</div>
     <div class="wa-preview" id="wa-preview"></div>
     <button class="btn-wa" onclick="abrirWA()">📱 Abrir WhatsApp</button>
+    <button class="btn-copy" onclick="copiarMensaje()" id="btn-copy-wa" style="margin-top:8px;width:100%;background:#25D366;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;cursor:pointer;font-weight:600;">📋 Copiar mensaje</button>
   </div>
-  <div class="info-box"><div class="it">Notificación</div><div class="ib">Cuando el cliente envíe datos, recibirás correo en <strong id="correo-display"></strong>.</div></div>
+  <div class="info-box"><div class="it">🔔 Notificación automática</div><div class="ib">Cuando el cliente envíe sus datos, aparecerá una notificación en esta app. No necesitas hacer nada más.</div></div>
   <div class="info-box-green" id="info-datos-ok" style="display:none;"><div class="it">✓ Cliente ya diligenció</div><div class="ib">Datos guardados. Continúa para cargarlos.</div></div>
   <div class="actions">
     <button class="btn btn-s" onclick="irPaso1()">← Volver</button>
@@ -432,6 +470,144 @@ async function guardarOD(blob, filename){
 }
 
 // ─────────────────────────────────────────────────────────────
+//  CANAL DE NOTIFICACIONES (ntfy.sh)
+// ─────────────────────────────────────────────────────────────
+function getCanal(){
+  let c=localStorage.getItem('visco_canal');
+  if(!c){c='visco-'+Math.random().toString(36).substr(2,8);localStorage.setItem('visco_canal',c);}
+  return c;
+}
+
+let _ntfySince=parseInt(localStorage.getItem('visco_ntfy_since')||'0');
+let _notifs=[];try{_notifs=JSON.parse(localStorage.getItem('visco_notifs')||'[]');}catch(e){}
+
+async function pollNtfy(){
+  const canal=getCanal();
+  const since=_ntfySince>0?_ntfySince:Math.floor(Date.now()/1000-86400);
+  try{
+    const r=await fetch('https://ntfy.sh/'+canal+'/json?poll=1&since='+since);
+    if(!r.ok)return;
+    const txt=await r.text();
+    let newData=false;
+    for(const line of txt.trim().split('\n')){
+      if(!line.trim())continue;
+      try{
+        const msg=JSON.parse(line);
+        if(msg.event==='message'&&msg.time>_ntfySince){
+          _ntfySince=msg.time;
+          try{const d=JSON.parse(msg.message);_notifs.unshift({...d,_ts:msg.time});newData=true;}catch(e){}
+        }
+      }catch(e){}
+    }
+    if(newData){
+      _notifs=_notifs.slice(0,20);
+      localStorage.setItem('visco_ntfy_since',_ntfySince);
+      localStorage.setItem('visco_notifs',JSON.stringify(_notifs));
+      renderNotifUI();
+    }
+  }catch(e){}
+}
+
+function renderNotifUI(){
+  // Combinar notifs locales (localStorage) + ntfy
+  const localD=JSON.parse(localStorage.getItem('visco_c')||'{}');
+  const all=[..._notifs];
+  if(localD.nombre&&!all.find(n=>n.nombre===localD.nombre))all.unshift({...localD,_local:true});
+
+  const badge=document.getElementById('bell-badge');
+  const count=all.length;
+  if(badge){badge.textContent=count>9?'9+':count;badge.style.display=count>0?'flex':'none';}
+
+  if(count>0){
+    const el=document.getElementById('alerta-cliente');
+    const nc=document.getElementById('alerta-nc');
+    if(el&&nc){nc.textContent=all[0].nombre;el.classList.add('show');}
+  }
+
+  const body=document.getElementById('np-body');
+  const empty=document.getElementById('np-empty');
+  if(!body)return;
+  if(count===0){body.innerHTML='';if(empty)empty.style.display='block';return;}
+  if(empty)empty.style.display='none';
+
+  const cards=all.map((d,i)=>{
+    const ago=d._ts?_timeAgo(d._ts):'Ahora';
+    return `<div class="np-item" id="np-item-${i}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div class="ni-name">${escHtml(d.nombre||'?')}</div>
+        <button onclick="dismissNotif(${i})" style="border:none;background:none;color:#AAA;font-size:16px;cursor:pointer;padding:0 0 0 8px;line-height:1;" title="Quitar">×</button>
+      </div>
+      <div class="ni-sub">${escHtml((d.proyecto||'')+(d.torre?' T'+d.torre:'')+(d.apto?' Apto '+d.apto:''))}${d.cel?'<br>📱 '+escHtml(d.cel):''}</div>
+      <div class="ni-time">⏱ ${ago}</div>
+      <button class="ni-btn" onclick="cargarNotif(${i})">Cargar datos →</button>
+    </div>`;
+  }).join('');
+  body.innerHTML=cards;
+}
+
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function _timeAgo(ts){
+  const d=Math.floor(Date.now()/1000-ts);
+  if(d<60)return 'hace '+d+'s';
+  if(d<3600)return 'hace '+Math.floor(d/60)+'min';
+  if(d<86400)return 'hace '+Math.floor(d/3600)+'h';
+  return 'hace '+Math.floor(d/86400)+'d';
+}
+
+function cargarNotif(i){
+  const all=[..._notifs];
+  const localD=JSON.parse(localStorage.getItem('visco_c')||'{}');
+  if(localD.nombre&&!all.find(n=>n.nombre===localD.nombre))all.unshift({...localD,_local:true});
+  const d=all[i];
+  if(!d)return;
+  localStorage.setItem('visco_c',JSON.stringify(d));
+  // Guardar qué cliente está activo para quitarlo al generar
+  localStorage.setItem('visco_notif_activa',d.nombre||'');
+  cerrarNotifPanel();
+  irPaso3();
+}
+
+function dismissNotif(i){
+  const localD=JSON.parse(localStorage.getItem('visco_c')||'{}');
+  const all=[..._notifs];
+  if(localD.nombre&&!all.find(n=>n.nombre===localD.nombre))all.unshift({...localD,_local:true});
+  const d=all[i];
+  if(!d)return;
+  if(d._local){
+    // Es la notif local (localStorage)
+    localStorage.removeItem('visco_c');
+  } else {
+    // Es notif de ntfy — quitar del array
+    _notifs=_notifs.filter(n=>n!==d&&n.nombre!==d.nombre);
+    localStorage.setItem('visco_notifs',JSON.stringify(_notifs));
+  }
+  renderNotifUI();
+  // Si no quedan notifs, ocultar banner
+  const totalLeft=[..._notifs];
+  const ld=JSON.parse(localStorage.getItem('visco_c')||'{}');
+  if(!ld.nombre&&!totalLeft.find(n=>n.nombre))document.getElementById('alerta-cliente').classList.remove('show');
+}
+
+function limpiarTodasNotifs(){
+  _notifs=[];
+  localStorage.removeItem('visco_notifs');
+  localStorage.removeItem('visco_c');
+  localStorage.removeItem('visco_notif_activa');
+  document.getElementById('alerta-cliente').classList.remove('show');
+  renderNotifUI();
+}
+
+function abrirNotifPanel(){
+  document.getElementById('notif-panel').classList.add('open');
+  document.getElementById('notif-overlay').classList.add('open');
+  renderNotifUI();
+}
+function cerrarNotifPanel(){
+  document.getElementById('notif-panel').classList.remove('open');
+  document.getElementById('notif-overlay').classList.remove('open');
+}
+
+// ─────────────────────────────────────────────────────────────
 //  INIT
 // ─────────────────────────────────────────────────────────────
 (function(){
@@ -441,7 +617,15 @@ async function guardarOD(blob, filename){
   }else{
     document.getElementById('vista-comercial').style.display='block';
     document.getElementById('fecha-firma').value=new Date().toISOString().split('T')[0];
+    // Mostrar canal de notificaciones
+    const canal=getCanal();
+    const ci=document.getElementById('canal-info');
+    if(ci)ci.textContent='Canal activo: '+canal+' · Las notificaciones llegan aquí 🔔';
+    // Polling cada 20 segundos
+    pollNtfy();
+    setInterval(pollNtfy,20000);
     checkClientePendiente();
+    renderNotifUI();
     initOneDrive();
   }
 })();
@@ -483,14 +667,30 @@ function irPaso1(){setView(1);}
 function irPaso2(){
   if(!g('cotizacion')){notif('Ingresa el número de cotización');return;}
   if(!document.getElementById('fecha-cong').value){notif('Ingresa la fecha de vigencia de la cotización');return;}
-  const link=window.location.href.split('?')[0]+'?modo=cliente';
+  const canal=getCanal();
+  const link=window.location.href.split('?')[0]+'?modo=cliente&ntfy='+encodeURIComponent(canal);
   const msg='Hola! Soy tu asesor de AcabadosVIS.com.\n\nPara tu proyecto (cotización '+g('cotizacion')+'), diligencie sus datos para el contrato de obra:\n\n⏱️ Solo toma 2 minutos:\n'+link+'\n\nCualquier duda estoy a tu disposición.';
   document.getElementById('wa-preview').textContent=msg;
-  document.getElementById('correo-display').textContent=g('correo-comercial');
   setView(2);
 }
 
-function abrirWA(){window.open('https://wa.me/?text='+encodeURIComponent(document.getElementById('wa-preview').textContent),'_blank');}
+function abrirWA(){
+  const txt=document.getElementById('wa-preview').textContent;
+  // api.whatsapp.com/send funciona universalmente en móvil, tablet y desktop
+  window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(txt),'_blank');
+}
+function copiarMensaje(){
+  const txt=document.getElementById('wa-preview').textContent;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>notif('✅ Mensaje copiado al portapapeles')).catch(()=>_copiarFallback(txt));
+  }else{_copiarFallback(txt);}
+}
+function _copiarFallback(txt){
+  const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');notif('✅ Mensaje copiado al portapapeles');}catch(e){notif('No se pudo copiar');}
+  document.body.removeChild(ta);
+}
 
 function irPaso3(){
   const esGCB=tipo==='gran_central_con_bono';
@@ -553,9 +753,16 @@ function enviarCliente(){
     apto:document.getElementById('c-apto').value.trim(),
   };
   try{localStorage.setItem('visco_c',JSON.stringify(d));}catch(e){}
-  const asunto=encodeURIComponent('VIS-CO: Datos de '+d.nombre+' listos');
-  const cuerpo=encodeURIComponent('Nuevo cliente:\n\nNombre: '+d.nombre+'\nCédula: '+d.cedula+' ('+d.lugar+')\nDirección: '+d.dir+'\nCorreo: '+d.email+'\nCelular: '+d.cel+'\nProyecto: '+d.proyecto+' Torre '+d.torre+' Apto '+d.apto);
-  const a=document.createElement('a');a.href='mailto:contacto@acabadosvis.com?subject='+asunto+'&body='+cuerpo;a.style.display='none';document.body.appendChild(a);a.click();document.body.removeChild(a);
+  // Enviar datos al canal ntfy del comercial
+  const _urlP2=new URLSearchParams(window.location.search);
+  const ntfyCanal=_urlP2.get('ntfy')||'';
+  if(ntfyCanal){
+    fetch('https://ntfy.sh/'+ntfyCanal,{
+      method:'POST',
+      headers:{'Title':d.nombre+' llenó el formulario','Content-Type':'application/json'},
+      body:JSON.stringify(d)
+    }).catch(()=>{});
+  }
   document.getElementById('cl-form').style.display='none';
   document.getElementById('cl-ok').style.display='block';
   document.getElementById('cl-resumen').innerHTML=[['Nombre',d.nombre],['Cédula',d.cedula+' · '+d.lugar],['Dirección',d.dir],['Correo',d.email],['Celular',d.cel],['Proyecto',d.proyecto+' T'+d.torre+' Apto '+d.apto]].map(x=>'<div style="display:flex;gap:8px;margin-bottom:3px;"><span style="color:#999;min-width:68px;font-size:11px;">'+x[0]+':</span><span style="font-size:11px;">'+x[1]+'</span></div>').join('');
@@ -581,8 +788,8 @@ function calcPagos(){
   if(tipo==='gran_central_con_bono'){
     vals=[40247135,Math.max(0,vt-40247135)];
   }else if(TIPOS[tipo].congelacion){
-    const cong=pv('valor-cong')||5000000,resto=vt-cong;
-    const p2=Math.round(resto*.50),p3=Math.round(resto*.20),p4=Math.round(resto*.20),p5=vt-cong-p2-p3-p4;
+    const cong=pv('valor-cong')||5000000;
+    const p3=Math.round(vt*.20),p4=Math.round(vt*.20),p5=Math.round(vt*.10),p2=vt-cong-p3-p4-p5;
     vals=[cong,p2,p3,p4,p5];
   }else{
     const p1=Math.round(vt*.50),p2=Math.round(vt*.20),p3=Math.round(vt*.20),p4=vt-p1-p2-p3;
@@ -659,6 +866,16 @@ async function generarContrato(){
 
     document.getElementById('overlay').classList.remove('show');
     document.getElementById('sv-titulo').textContent='¡Contrato '+conNum+' generado!';
+
+    // Quitar notificación del cliente que acaba de generar contrato
+    const notifActiva=localStorage.getItem('visco_notif_activa')||'';
+    if(notifActiva){
+      _notifs=_notifs.filter(n=>n.nombre!==notifActiva);
+      localStorage.setItem('visco_notifs',JSON.stringify(_notifs));
+      localStorage.removeItem('visco_notif_activa');
+      localStorage.removeItem('visco_c');
+      renderNotifUI();
+    }
 
     // Intentar "Guardar como" con diálogo nativo (Chrome/Edge)
     const saved = await guardarOD(blob, filename);
