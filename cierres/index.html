@@ -2014,7 +2014,7 @@ async function comInit(){ await comOpenIDB(); }
 // =====================================================================
 // INIT
 // =====================================================================
-(async function init() {
+async function init() {
   await openIDB();
   await comInit();
   sessionStorage.removeItem('msal.interaction.status');
