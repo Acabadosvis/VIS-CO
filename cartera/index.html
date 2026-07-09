@@ -547,9 +547,9 @@ const MODO_CONTAB = new URLSearchParams(location.search).get('modo')==='contabil
 // ── FECHA ─────────────────────────────────────────────────────
 function calcWeek(ref) {
   const d = new Date(ref); d.setHours(12,0,0,0);
-  const wd = d.getDay(); // 0=Sun … 5=Fri … 6=Sat
-  const dsFri = (wd - 5 + 7) % 7;   // días desde el viernes más reciente
-  const ws = new Date(d); ws.setDate(ws.getDate() - dsFri); ws.setHours(0,0,0,0);
+  const wd = d.getDay(); // 0=Dom … 6=Sáb
+  const dsSat = (wd - 6 + 7) % 7;   // días desde el sábado más reciente
+  const ws = new Date(d); ws.setDate(ws.getDate() - dsSat); ws.setHours(0,0,0,0);
   const we = new Date(ws); we.setDate(we.getDate() + 6); we.setHours(23,59,59,0);
   return {start:ws, end:we, ss:ws.toISOString().slice(0,10), es:we.toISOString().slice(0,10)};
 }
@@ -867,7 +867,7 @@ function switchCartera(mode){
 }
 function isConvenio(proy){
   const p=(proy||'').toUpperCase().trim();
-  return [...CONVENIO_PROYECTOS].some(cp=>p===cp.toUpperCase()||p.includes(cp.toUpperCase())||cp.toUpperCase().includes(p));
+  return [...CONVENIO_PROYECTOS].some(cp=>p===cp.toUpperCase().trim());
 }
 function getActiveData(){
   return DATA.filter(c=>carteraMode==='convenios'?isConvenio(c.proy):!isConvenio(c.proy));
