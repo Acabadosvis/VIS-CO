@@ -1693,15 +1693,8 @@ function comParseWorkbook(workbook){
     });
   }
 
-  // Pre-poblar COM_APR desde valores estáticos del Excel — guardar montos reales
-  comDatos.forEach(d=>{
-    if(d.aut_ant){
-      if(!COM_APR.hasOwnProperty(d.cod+'_cong')){ const v=d.com_cong||true; COM_APR[d.cod+'_cong']=v; comIdbPut({id:d.cod+'_cong',v}); }
-      if(!COM_APR.hasOwnProperty(d.cod+'_ant')) { const v=Math.max(0,d.com_ant-d.com_cong)||true; COM_APR[d.cod+'_ant']=v;  comIdbPut({id:d.cod+'_ant', v}); }
-    }
-    if(d.aut_fin  && !COM_APR.hasOwnProperty(d.cod+'_fin')) { const v=comFinDyn(d)||true;  COM_APR[d.cod+'_fin']=v;  comIdbPut({id:d.cod+'_fin', v}); }
-    if(d.aut_adic && !COM_APR.hasOwnProperty(d.cod+'_adic')){ const v=d.com_adic||true; COM_APR[d.cod+'_adic']=v; comIdbPut({id:d.cod+'_adic',v}); }
-  });
+  // Pre-poblar COM_APR: SOLO desde IDB (aprobaciones manuales de gerencia)
+  // NO auto-poblar desde Excel para evitar que entradas aparezcan como "completas"
 
   // Cargar overrides IDB — preservar montos numéricos congelados
   comIdbGetAll().then(overrides=>{
