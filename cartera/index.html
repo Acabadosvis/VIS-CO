@@ -663,16 +663,11 @@ function parseBuffer(buf) {
     if (ep==='EN EJECUCION') ep='EN EJECUCIÓN';
     if (!VALID_ESTADOS.has(ep)) continue;
 
-    const adic    = xlM(r[15]);  // ADICIONALES/AJUSTES (valor total del adicional)
-    const total   = xlM(r[19]);  // TOTAL CONTRATO (cotización + adic)
-    const cotiz   = xlM(r[14]);  // COTIZACIÓN BASE (sin adicional)
-
-    // RECAUDADO: suma de los MR por bloque (fuente autoritativa).
-    // Usar max vs columna global por si algún pago es lump-sum sin asignar a bloque.
-    const xlRecaudado = xlM(r[68]); // columna global RECAUDADO
-    const mrSum = BLOCKS.reduce((s,b)=>s+(b.mr!==null?xlM(r[b.mr]):0), 0);
-    const recaudado = Math.max(xlRecaudado, mrSum);
-    const xrec = Math.max(0, total - recaudado);
+    const adic      = xlM(r[15]);  // ADICIONALES/AJUSTES (valor total del adicional)
+    const total     = xlM(r[19]);  // TOTAL CONTRATO (cotización + adic)
+    const cotiz     = xlM(r[14]);  // COTIZACIÓN BASE (sin adicional)
+    const recaudado = xlM(r[68]);  // RECAUDADO (columna global del Excel)
+    const xrec      = xlM(r[69]);  // X RECAUDAR (columna global del Excel)
 
     if (xrec < 100) continue; // pagado completamente
 
