@@ -426,7 +426,8 @@ header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;displa
         <option value="KM">KM — Karen</option>
       </select>
       <input class="search-box" id="comSearch" placeholder="🔍 Buscar negocio..." oninput="comRender()">
-      <div style="margin-left:auto">
+      <div style="margin-left:auto;display:flex;gap:6px">
+        <button class="hbtn" id="btnEnlaceGer" onclick="comCopiarEnlaceGerencia()" style="display:none;background:#f0fdf4;border-color:#86efac;color:#15803d;font-size:11px" title="Copiar enlace de acceso Gerencia">🔗 Enlace Gerencia</button>
         <button class="hbtn" onclick="comExportCSV()">↓ CSV</button>
       </div>
     </div>
@@ -1565,7 +1566,9 @@ async function sincronizarM2() {
 // =====================================================================
 const COM_TOKEN = 'vis2026';
 const _comParams = new URLSearchParams(window.location.search);
-const COM_ES_GERENCIA = _comParams.get('g') === COM_TOKEN;
+// Persistir acceso gerencia en sessionStorage para sobrevivir redirect MSAL
+if (_comParams.get('g') === COM_TOKEN) sessionStorage.setItem('visco_ger','1');
+const COM_ES_GERENCIA = _comParams.get('g') === COM_TOKEN || sessionStorage.getItem('visco_ger') === '1';
 
 const COM_VDS   = ['KM'];
 const COM_MES_N = {january:1,february:2,march:3,april:4,may:5,june:6,
@@ -1614,8 +1617,20 @@ function comInitRol(){
     const sel=document.getElementById('comRolSel');
     if(sel){ for(let i=sel.options.length-1;i>=0;i--){ if(sel.options[i].value==='GERENCIA') sel.remove(i); } sel.value='KM'; }
     comRol='KM';
+  } else {
+    // Mostrar botón copiar enlace solo cuando es gerencia
+    const btn=document.getElementById('btnEnlaceGer');
+    if(btn) btn.style.display='';
   }
   comCambiarRol();
+}
+function comCopiarEnlaceGerencia(){
+  const url=window.location.origin+window.location.pathname+'?g='+COM_TOKEN;
+  navigator.clipboard.writeText(url).then(()=>{
+    toast('Enlace Gerencia copiado ✓','ok');
+  }).catch(()=>{
+    prompt('Copia este enlace de acceso Gerencia:',url);
+  });
 }
 function comCambiarRol(){
   comRol=document.getElementById('comRolSel').value;
@@ -2022,12 +2037,20 @@ async function comInit(){ await comOpenIDB(); }
         if (accounts.length > 0) {
           msalAccount = accounts[0];
           updateSyncStatus(true);
-          toast('OneDrive reconectado ✓');
+          await loadFromOneDrive();
         }
       }
     } catch(e) {
-      Object.keys(localStorage).filter(k=>k.startsWith('msal.')).forEach(k=>localStorage.removeItem(k));
-      sessionStorage.clear();
+      console.error('[MSAL init]', e);
+      toast('Error MSAL: '+e.message,'err');
+    }
+  }
+}
+init();
+</script>
+</body>
+</html>
+rage.clear();
       console.warn('[M4] MSAL init reset:', e);
     }
   }
