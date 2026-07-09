@@ -741,22 +741,28 @@ async function getLiveRow(codigo) {
 function invalidateLiveRowCache() { _liveRowCache = null; }
 
 async function limpiarCacheIDB() {
-  // Borra el store 'pagos' en IDB y limpia VC4 en memoria
-  await new Promise((res, rej) => {
-    const req = indexedDB.open('VISCO_M4', 2);
+  // Borra pagos (M4) y aprobaciones de comisiones (COM)
+  const clearStore = (dbName, version, storeName) => new Promise((res, rej) => {
+    const req = indexedDB.open(dbName, version);
     req.onsuccess = e => {
       const db = e.target.result;
-      const tx = db.transaction('pagos', 'readwrite');
-      tx.objectStore('pagos').clear();
+      if (!db.objectStoreNames.contains(storeName)) { db.close(); return res(); }
+      const tx = db.transaction(storeName, 'readwrite');
+      tx.objectStore(storeName).clear();
       tx.oncomplete = () => { db.close(); res(); };
-      tx.onerror = () => { db.close(); rej(tx.error); };
+      tx.onerror   = () => { db.close(); rej(tx.error); };
     };
     req.onerror = () => rej(req.error);
   });
-  // Limpiar caché en memoria
+  await clearStore('VISCO_M4',      2, 'pagos');
+  await clearStore('VISCO_COM_V4',  1, 'apr');
+  // Limpiar cachés en memoria
   Object.keys(VC4).forEach(k => delete VC4[k]);
+  Object.keys(COM_APR).forEach(k => delete COM_APR[k]);
   invalidateLiveRowCache();
-  toast('Caché limpiada ✓ — recarga el Excel para ver los valores reales', 'ok');
+  // Re-render comisiones sin aprobaciones viejas
+  if (comDatos.length) { comRenderKPIs(); comRender(); }
+  toast('Caché limpiada ✓ — los datos se recargarán del Excel', 'ok');
 }
 
 async function updateExcelCells(excelRow, updates) {
