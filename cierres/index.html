@@ -278,6 +278,7 @@ header{background:var(--w);border-bottom:1px solid var(--brd);height:56px;displa
     <div class="sync-status off" id="syncStatus" onclick="toggleSetup()">OneDrive: no conectado</div>
     <button class="hbtn" onclick="toggleSetup()">⚙ Configurar</button>
     <button class="hbtn" style="display:none;background:var(--sem-bg);border-color:var(--sem-brd);color:var(--sem)" id="btnSyncM2" onclick="abrirModalM2()">↓ Sync Cartera</button>
+    <button class="hbtn" style="display:none;background:#fff5f5;border-color:#fca5a5;color:#dc2626;font-size:11px" id="btnLimpiarCache" onclick="limpiarCacheIDB()" title="Borra la caché local de pagos escritos. Úsalo si el Excel fue editado manualmente y los pagos no aparecen como nuevos.">🗑 Limpiar caché</button>
     <label class="hbtn" style="cursor:pointer">
       📂 Cargar Excel
       <input type="file" accept=".xlsx,.xls" onchange="loadFile(this)">
@@ -739,6 +740,25 @@ async function getLiveRow(codigo) {
 }
 function invalidateLiveRowCache() { _liveRowCache = null; }
 
+async function limpiarCacheIDB() {
+  // Borra el store 'pagos' en IDB y limpia VC4 en memoria
+  await new Promise((res, rej) => {
+    const req = indexedDB.open('VISCO_M4', 2);
+    req.onsuccess = e => {
+      const db = e.target.result;
+      const tx = db.transaction('pagos', 'readwrite');
+      tx.objectStore('pagos').clear();
+      tx.oncomplete = () => { db.close(); res(); };
+      tx.onerror = () => { db.close(); rej(tx.error); };
+    };
+    req.onerror = () => rej(req.error);
+  });
+  // Limpiar caché en memoria
+  Object.keys(VC4).forEach(k => delete VC4[k]);
+  invalidateLiveRowCache();
+  toast('Caché limpiada ✓ — recarga el Excel para ver los valores reales', 'ok');
+}
+
 async function updateExcelCells(excelRow, updates) {
   if (!msalAccount) return;
   const token = await getToken();
@@ -801,6 +821,7 @@ function processWorkbook(buf) {
     document.getElementById('firstScreen').style.display = 'none';
     document.getElementById('dash').classList.add('show');
     document.getElementById('btnSyncM2').style.display = 'inline-flex';
+    document.getElementById('btnLimpiarCache').style.display = 'inline-flex';
     document.getElementById('btnCSV').style.display = 'inline-flex';
     try { renderKPIs(); } catch(e) { console.error('[M4] renderKPIs:', e); }
     try { renderCurrentTab(); } catch(e) { console.error('[M4] renderCurrentTab:', e); }
@@ -1462,7 +1483,8 @@ function abrirModalM2() {
       rowsHTML += `<tr><td style="color:var(--g)">${sop.cli||sop.cid}</td><td style="font-size:11px;color:var(--g)">${sop.proy||'—'}</td><td>${ETAPA_LABELS[sop.etapa]||sop.etapa}</td><td style="font-family:'Syne',sans-serif;font-weight:700">${fmt(sop.monto||0)}</td><td style="font-size:11px">${sop.fecha_entro||'—'}</td><td><span class="m2-badge-skip">Sin fila Excel</span></td></tr>`;
       return;
     }
-    const existingMonto = +getVal(row, pagoDef.rMonto) || 0;
+    // Leer del Excel crudo (no IDB) para que caché obsoleto no marque como "Ya en Excel"
+    const existingMonto = +row._row[pagoDef.rMonto] || 0;
     const yaExiste = existingMonto > 0;
     if (yaExiste) existen++; else nuevos++;
     const badge = yaExiste
@@ -1665,34 +1687,45 @@ function comParseWorkbook(workbook){
     });
   }
 
-  // Pre-poblar COM_APR desde valores estáticos del Excel
+  // Pre-poblar COM_APR desde valores estáticos del Excel — guardar montos reales
   comDatos.forEach(d=>{
     if(d.aut_ant){
-      if(!COM_APR.hasOwnProperty(d.cod+'_cong')){ COM_APR[d.cod+'_cong']=true; comIdbPut({id:d.cod+'_cong',v:true}); }
-      if(!COM_APR.hasOwnProperty(d.cod+'_ant')) { COM_APR[d.cod+'_ant']=true;  comIdbPut({id:d.cod+'_ant', v:true}); }
+      if(!COM_APR.hasOwnProperty(d.cod+'_cong')){ const v=d.com_cong||true; COM_APR[d.cod+'_cong']=v; comIdbPut({id:d.cod+'_cong',v}); }
+      if(!COM_APR.hasOwnProperty(d.cod+'_ant')) { const v=Math.max(0,d.com_ant-d.com_cong)||true; COM_APR[d.cod+'_ant']=v;  comIdbPut({id:d.cod+'_ant', v}); }
     }
-    if(d.aut_fin  && !COM_APR.hasOwnProperty(d.cod+'_fin')) { COM_APR[d.cod+'_fin']=true;  comIdbPut({id:d.cod+'_fin', v:true}); }
-    if(d.aut_adic && !COM_APR.hasOwnProperty(d.cod+'_adic')){ COM_APR[d.cod+'_adic']=true; comIdbPut({id:d.cod+'_adic',v:true}); }
+    if(d.aut_fin  && !COM_APR.hasOwnProperty(d.cod+'_fin')) { const v=comFinDyn(d)||true;  COM_APR[d.cod+'_fin']=v;  comIdbPut({id:d.cod+'_fin', v}); }
+    if(d.aut_adic && !COM_APR.hasOwnProperty(d.cod+'_adic')){ const v=d.com_adic||true; COM_APR[d.cod+'_adic']=v; comIdbPut({id:d.cod+'_adic',v}); }
   });
 
-  // Cargar overrides IDB y luego inicializar rol
+  // Cargar overrides IDB — preservar montos numéricos congelados
   comIdbGetAll().then(overrides=>{
-    overrides.forEach(o=>{ COM_APR[o.id]=!!o.v; });
+    overrides.forEach(o=>{
+      if(o.v === false || o.v === null || o.v === undefined) { delete COM_APR[o.id]; }
+      else { COM_APR[o.id] = o.v; } // puede ser number (monto) o true (legado)
+    });
     comInitRol();
     toast(`${comDatos.length} negocios de comisiones cargados ✓`,'ok');
   });
 }
 
 // ── Cálculo dinámico ──
+// Devuelve el monto aprobado almacenado, o el fallback si solo se guardó true/boolean
+function comAprMonto(cod, tipo, fallback) {
+  const v = COM_APR[cod+'_'+tipo];
+  if (!v && v !== 0) return 0;
+  return (typeof v === 'number' && v > 0) ? v : (fallback || 0);
+}
+
 function comFinDyn(d){
   const base=d.com_ant+d.com_fin;
-  const antPaid=COM_APR[d.cod+'_ant']?d.com_ant:COM_APR[d.cod+'_cong']?d.com_cong:0;
+  // Usa el monto congelado al momento de aprobación — protege contra cambios de AIU
+  const antPaid = comAprMonto(d.cod,'ant',d.com_ant) || comAprMonto(d.cod,'cong',d.com_cong);
   return Math.max(0,base-antPaid);
 }
 function comTotalAprobado(d){
-  const antAmt=COM_APR[d.cod+'_ant']?d.com_ant:COM_APR[d.cod+'_cong']?d.com_cong:0;
-  const finAmt=COM_APR[d.cod+'_fin']?comFinDyn(d):0;
-  const adic=COM_APR[d.cod+'_adic']?d.com_adic:0;
+  const antAmt = comAprMonto(d.cod,'ant',d.com_ant) || comAprMonto(d.cod,'cong',d.com_cong);
+  const finAmt = COM_APR[d.cod+'_fin'] ? comAprMonto(d.cod,'fin',comFinDyn(d)) : 0;
+  const adic   = comAprMonto(d.cod,'adic',d.com_adic);
   return antAmt+finAmt+adic;
 }
 function comEstaCompleto(d){
@@ -1702,11 +1735,12 @@ function comEstaCompleto(d){
 }
 function comTienePorAprobar(d){
   if(comEstaCompleto(d)) return false;
-  if(d.sep_monto>0&&!COM_APR[d.cod+'_cong']&&!COM_APR[d.cod+'_ant']&&d.com_cong>0) return true;
-  if(d.pago_ant&&!COM_APR[d.cod+'_ant']&&d.com_ant>0) return true;
+  // Mostrar toda comisión con al menos un concepto sin aprobar
+  if(!COM_APR[d.cod+'_cong']&&d.com_cong>0) return true;
+  if(!COM_APR[d.cod+'_ant']&&d.com_ant>0) return true;
   const fin=comFinDyn(d);
-  if(d.pago_fin&&!COM_APR[d.cod+'_fin']&&fin>0) return true;
-  if(d.adics>0&&!COM_APR[d.cod+'_adic']&&d.com_adic>0) return true;
+  if(!COM_APR[d.cod+'_fin']&&fin>0) return true;
+  if(!COM_APR[d.cod+'_adic']&&d.com_adic>0) return true;
   return false;
 }
 function comTieneAprobManual(d){
@@ -1775,8 +1809,14 @@ function comGetFiltered(){
 function comFmtFecha(d){ if(!d||!(d instanceof Date)) return ''; return d.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'}); }
 
 function comPceldaHTML(cod,tipo,monto,clientePago,isPaid,bg,nota,fechaApr){
-  if(monto<=0) return `<td style="${bg}"><span class="pcell-na">—</span></td>`;
-  const key=cod.replace(/\\'/g,"'")+'_'+tipo, aprobado=!!COM_APR[key], yaExcel=!!isPaid, puedeApr=comRol==='GERENCIA';
+  const codReal=cod.replace(/\\'/g,"'");
+  // Usar monto congelado si ya fue aprobado (protege contra cambios de AIU)
+  const aprMonto=comAprMonto(codReal,tipo,monto);
+  const montoMostrar=aprMonto>0?aprMonto:monto;
+  if(montoMostrar<=0) return `<td style="${bg}"><span class="pcell-na">—</span></td>`;
+  const aprobado=!!COM_APR[codReal+'_'+tipo], yaExcel=!!isPaid, puedeApr=comRol==='GERENCIA';
+  // Indicar si el monto fue ajustado vs congelado
+  const congelado=aprobado&&aprMonto>0&&Math.abs(aprMonto-monto)>5;
   let cls,txt,clk='';
   if(yaExcel){cls='apb-pag';txt='✓ Pagado';}
   else if(aprobado){cls='apb-ok';txt='✓ Aprobado';if(puedeApr) clk=`onclick="comToggle('${cod}','${tipo}')"` ;}
@@ -1784,13 +1824,29 @@ function comPceldaHTML(cod,tipo,monto,clientePago,isPaid,bg,nota,fechaApr){
   else if(!puedeApr){cls='apb-rol';txt='🔒 Solo gerencia';}
   else{cls='apb-pend';txt='Aprobar pago';clk=`onclick="comToggle('${cod}','${tipo}')"` ;}
   const fechaStr=(aprobado||yaExcel)&&fechaApr?`<div class="num-note" style="color:var(--ok)">📅 ${comFmtFecha(fechaApr)}</div>`:'';
-  return `<td style="${bg}"><div class="pcell"><div><div class="num num-md">${comFmt(monto)}</div>${nota?`<div class="num-note">${nota}</div>`:''}${fechaStr}</div><button class="apb ${cls}" ${clk}>${txt}</button></div></td>`;
+  const congeladoNote=congelado?`<div class="num-note" style="color:#9333ea" title="Monto congelado al aprobar — AIU original: ${comFmt(monto)}">🔒 Congelado</div>`:'';
+  return `<td style="${bg}"><div class="pcell"><div><div class="num num-md">${comFmt(montoMostrar)}</div>${nota?`<div class="num-note">${nota}</div>`:''}${fechaStr}${congeladoNote}</div><button class="apb ${cls}" ${clk}>${txt}</button></div></td>`;
 }
 
 async function comToggle(cod,tipo){
   if(comRol!=='GERENCIA'){ toast('Solo la gerencia puede aprobar','err'); return; }
-  const key=cod+'_'+tipo, nuevo=!COM_APR[key];
-  COM_APR[key]=nuevo; comIdbPut({id:key,v:nuevo});
+  const key=cod+'_'+tipo;
+  const yaAprobado=!!COM_APR[key];
+  const nuevo=!yaAprobado;
+  if(nuevo){
+    // Congelar el monto exacto en el momento de aprobación
+    const d=comDatos.find(x=>x.cod===cod);
+    let monto=0;
+    if(d){
+      if(tipo==='cong') monto=d.com_cong;
+      else if(tipo==='ant') monto=Math.max(0,d.com_ant-d.com_cong);
+      else if(tipo==='fin') monto=comFinDyn(d);
+      else if(tipo==='adic') monto=d.com_adic;
+    }
+    COM_APR[key]=monto||true; comIdbPut({id:key,v:monto||true});
+  } else {
+    delete COM_APR[key]; comIdbPut({id:key,v:false});
+  }
   comRenderKPIs(); comRender();
   toast(nuevo?'Aprobado ✓':'Desmarcado','info');
   if(nuevo&&msalAccount){
@@ -1907,10 +1963,11 @@ function comGenerarCuentaCobro(vd){
   const filasData=[];
   aprs.forEach(d=>{
     const as=Math.max(0,d.com_ant-d.com_cong);
-    if(COM_APR[d.cod+'_cong']&&d.com_cong>0)   filasData.push({cod:d.cod,mes:d.mes,ano:d.ano,concepto:'Congelación',monto:d.com_cong});
-    if(COM_APR[d.cod+'_ant'] &&as>0)            filasData.push({cod:d.cod,mes:d.mes,ano:d.ano,concepto:'Anticipo',   monto:as});
-    if(COM_APR[d.cod+'_fin'] &&comFinDyn(d)>0)  filasData.push({cod:d.cod,mes:d.mes,ano:d.ano,concepto:'Final',      monto:comFinDyn(d)});
-    if(COM_APR[d.cod+'_adic']&&d.com_adic>0)    filasData.push({cod:d.cod,mes:d.mes,ano:d.ano,concepto:'Adicionales',monto:d.com_adic});
+    // Usar montos congelados al momento de aprobación — protege si cambia AIU
+    if(COM_APR[d.cod+'_cong']){const m=comAprMonto(d.cod,'cong',d.com_cong);if(m>0)filasData.push({cod:d.cod,mes:d.mes,ano:d.ano,concepto:'Congelación ('+((d.pct||0)*100).toFixed(2)+'%)',monto:m});}
+    if(COM_APR[d.cod+'_ant'] ){const m=comAprMonto(d.cod,'ant',as);if(m>0)filasData.push({cod:d.cod,mes:d.mes,ano:d.ano,concepto:'Anticipo ('+((d.pct||0)*100).toFixed(2)+'%)',monto:m});}
+    if(COM_APR[d.cod+'_fin'] ){const m=comAprMonto(d.cod,'fin',comFinDyn(d));if(m>0)filasData.push({cod:d.cod,mes:d.mes,ano:d.ano,concepto:'Final ('+((d.pct||0)*100).toFixed(2)+'%)',monto:m});}
+    if(COM_APR[d.cod+'_adic']){const m=comAprMonto(d.cod,'adic',d.com_adic);if(m>0)filasData.push({cod:d.cod,mes:d.mes,ano:d.ano,concepto:'Adicionales',monto:m});}
   });
   if(!filasData.length){ toast('No hay conceptos aprobados para '+a.nombre,'err'); return; }
   const total=filasData.reduce((s,r)=>s+r.monto,0);
