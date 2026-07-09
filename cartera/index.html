@@ -847,6 +847,10 @@ function renderTabs() {
 function switchTab(t){
   curTab=t;
   if(t==='cola'){
+    // Refrescar semana si la página lleva abierta desde otro día
+    const hoy=new Date(); hoy.setHours(12,0,0,0);
+    const todayISO=hoy.toISOString().slice(0,10);
+    if(todayISO<WEEK.ss||todayISO>WEEK.es){WEEK=calcWeek(hoy);setWeekInputs();}
     loadSoportesFromAPI().then(function(){render();});
   } else {
     render();
@@ -861,10 +865,12 @@ function switchCartera(mode){
   const fp=document.getElementById('fp'); if(fp) fp.value='';
   render();
 }
+function isConvenio(proy){
+  const p=(proy||'').toUpperCase().trim();
+  return [...CONVENIO_PROYECTOS].some(cp=>p===cp.toUpperCase()||p.includes(cp.toUpperCase())||cp.toUpperCase().includes(p));
+}
 function getActiveData(){
-  return DATA.filter(c=>carteraMode==='convenios'
-    ? CONVENIO_PROYECTOS.has(c.proy)
-    : !CONVENIO_PROYECTOS.has(c.proy));
+  return DATA.filter(c=>carteraMode==='convenios'?isConvenio(c.proy):!isConvenio(c.proy));
 }
 
 // ── MAIN RENDER ───────────────────────────────────────────────
@@ -1372,8 +1378,6 @@ function verSoporte(key){
 
 // ── COLA DE SOPORTES ──────────────────────────────────────────
 function renderCola(){
-  WEEK = calcWeek(new Date()); // siempre usar la semana real de hoy
-  setWeekInputs();
   const sops=getSoportes();
   const all=Object.entries(sops).filter(([k,v])=>v.estado&&v.estado!=='');
   const pending      =all.filter(([k,v])=>v.estado==='pendiente');
