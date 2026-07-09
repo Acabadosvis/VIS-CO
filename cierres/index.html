@@ -1765,11 +1765,14 @@ function comRenderKPIs(){
   const totCom=vista.reduce((s,d)=>s+d.com_tot,0);
   let porApr=0;
   vista.forEach(d=>{
-    if(COM_APR[d.cod+'_ant']){} 
-    else if(d.pago_ant&&d.com_ant>0) porApr+=d.com_ant;
-    else if(!COM_APR[d.cod+'_cong']&&d.com_cong>0) porApr+=d.com_cong;
+    if(comEstaCompleto(d)) return;
+    // Acumular todo lo que tiene comisión y no ha sido aprobado aún
+    if(!COM_APR[d.cod+'_cong']&&d.com_cong>0) porApr+=d.com_cong;
+    const antSaldo=Math.max(0,d.com_ant-d.com_cong);
+    if(!COM_APR[d.cod+'_ant']&&antSaldo>0) porApr+=antSaldo;
     const fin=comFinDyn(d);
-    if(fin>0&&d.pago_fin&&!COM_APR[d.cod+'_fin']) porApr+=fin;
+    if(!COM_APR[d.cod+'_fin']&&fin>0) porApr+=fin;
+    if(!COM_APR[d.cod+'_adic']&&d.com_adic>0) porApr+=d.com_adic;
   });
   const sinC=vista.filter(d=>!d.contrato).length;
   const sinS=vista.filter(d=>!d.especif).length;
