@@ -1386,12 +1386,12 @@ async function autoSyncM2() {
   for (const sop of confirmados) {
     const pagoKey = ETAPA_M2[sop.etapa];
     if (!pagoKey) continue;
-    const pagoDef = PAGOS_DEF.find(p => p.key===pagoKey);
-    if (!pagoDef) continue;
-    const row = allData.find(r => String(r._row[C.codigo]||r._row[C.c]||'').trim()===sop.cid);
+    const baseSlot = PAGOS_DEF.find(p => p.key===pagoKey);
+    if (!baseSlot) continue;
+    const row = findRowByCid(sop);
     if (!row) continue;
-    const existingMonto = +getVal(row, pagoDef.rMonto) || 0;
-    if (existingMonto > 0) continue; // ya está en Excel o en cache local
+    const pagoDef = findNextSlot(row, baseSlot);
+    if (!pagoDef) continue; // todos los slots llenos
     const monto  = sop.monto || 0;
     const fecha  = sop.fecha_entro || new Date().toISOString().slice(0,10);
     const total  = +row._row[C.total] || 1;
@@ -1419,6 +1419,34 @@ async function autoSyncM2() {
   if (escritos > 0) console.log(`[M4] autoSyncM2: ${escritos} pagos escritos en Excel`);
 }
 
+// Busca la fila del cliente: primero por código, luego por nombre+proyecto
+function findRowByCid(sop) {
+  // 1. Por código (columna B o A)
+  let row = allData.find(r => String(r._row[C.codigo]||r._row[C.c]||'').trim() === sop.cid);
+  if (row) return row;
+  // 2. Fallback: nombre de cliente + proyecto (primer token)
+  if (sop.cli) {
+    const cliN = sop.cli.toLowerCase().trim();
+    const proyN = (sop.proy||'').toLowerCase().split(/[\s\/,]/)[0];
+    row = allData.find(r => {
+      const rCli = String(r._row[C.cliente]||'').toLowerCase().trim();
+      const rProy = String(r._row[C.proyecto]||'').toLowerCase();
+      return rCli === cliN && (!proyN || rProy.includes(proyN));
+    });
+  }
+  return row || null;
+}
+
+// Encuentra el siguiente slot vacío a partir del pagoDef dado
+function findNextSlot(row, pagoDef) {
+  const idx = PAGOS_DEF.indexOf(pagoDef);
+  if (idx < 0) return pagoDef;
+  for (let i = idx; i < PAGOS_DEF.length; i++) {
+    if (!+getVal(row, PAGOS_DEF[i].rMonto)) return PAGOS_DEF[i];
+  }
+  return null; // todos llenos
+}
+
 function abrirModalM2() {
   if (!allData.length) { toast('Carga el Excel primero','err'); return; }
   const confirmados = leerPagosM2();
@@ -1426,8 +1454,9 @@ function abrirModalM2() {
   let nuevos=0, existen=0, sinFila=0, rowsHTML='';
   confirmados.forEach(sop => {
     const pagoKey = ETAPA_M2[sop.etapa];
-    const pagoDef = pagoKey ? PAGOS_DEF.find(p=>p.key===pagoKey) : null;
-    const row = allData.find(r => String(r._row[C.codigo]||r._row[C.c]||'').trim()===sop.cid);
+    const baseSlot = pagoKey ? PAGOS_DEF.find(p=>p.key===pagoKey) : null;
+    const row = findRowByCid(sop);
+    const pagoDef = row && baseSlot ? findNextSlot(row, baseSlot) : baseSlot;
     if (!row || !pagoDef) {
       sinFila++;
       rowsHTML += `<tr><td style="color:var(--g)">${sop.cli||sop.cid}</td><td style="font-size:11px;color:var(--g)">${sop.proy||'—'}</td><td>${ETAPA_LABELS[sop.etapa]||sop.etapa}</td><td style="font-family:'Syne',sans-serif;font-weight:700">${fmt(sop.monto||0)}</td><td style="font-size:11px">${sop.fecha_entro||'—'}</td><td><span class="m2-badge-skip">Sin fila Excel</span></td></tr>`;
@@ -1467,11 +1496,12 @@ async function sincronizarM2() {
   try {
     for (const sop of confirmados) {
       const pagoKey = ETAPA_M2[sop.etapa];
-      const pagoDef = pagoKey ? PAGOS_DEF.find(p=>p.key===pagoKey) : null;
-      if (!pagoDef) continue;
-      const row = allData.find(r => String(r._row[C.codigo]||r._row[C.c]||'').trim()===sop.cid);
+      const baseSlot = pagoKey ? PAGOS_DEF.find(p=>p.key===pagoKey) : null;
+      if (!baseSlot) continue;
+      const row = findRowByCid(sop);
       if (!row) continue;
-      if (+getVal(row, pagoDef.rMonto) > 0) continue; // ya existe en Excel o en cache local
+      const pagoDef = findNextSlot(row, baseSlot);
+      if (!pagoDef) continue; // todos los slots llenos
       const monto=sop.monto||0, fecha=sop.fecha_entro||new Date().toISOString().slice(0,10);
       const pct=monto/(+row._row[C.total]||1), codigo=row._row[C.codigo];
       await idbPut('pagos', {id:`${codigo}_col${pagoDef.rMonto}`,value:monto});
@@ -1591,7 +1621,7 @@ function comParseWorkbook(workbook){
   const rawC=XLSX.utils.sheet_to_json(wsC,{header:1,defval:null,cellDates:true});
   comDatos=[];
 
-  for(let i=CFG.DATA_START-1;i<rawC.length;i++){
+  for(let i=3;i<rawC.length;i++){
     const r=rawC[i]; if(!r||!r[0]) continue;
     const vd=String(r[1]||'').trim();
     if(!COM_VDS.includes(vd)) continue;
