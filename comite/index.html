@@ -310,8 +310,12 @@ tr:hover td{background:var(--b)}
         <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:6px">💬 Llegaron por WPP ⚡</label>
         <input type="number" id="r_wpp" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#16A34A;background:#fff;outline:none">
       </div>
+      <div style="background:#FFF0F6;border:1.5px solid #F9A8D4;border-radius:10px;padding:12px 14px">
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#DB2777;display:block;margin-bottom:6px">💬→🧮 WPP que hicieron calc.</label>
+        <input type="number" id="r_wpp_calc" min="0" placeholder="0" style="width:100%;border:1.5px solid #F9A8D4;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#DB2777;background:#fff;outline:none">
+      </div>
       <div style="background:#FFF8F0;border:1.5px solid #ECCDB0;border-radius:10px;padding:12px 14px">
-        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--o);display:block;margin-bottom:6px">🧮 Hicieron la Calculadora</label>
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--o);display:block;margin-bottom:6px">🧮 Calc. Bitrix (todas fuentes)</label>
         <input type="number" id="r_cli_calc" min="0" placeholder="0" style="width:100%;border:1.5px solid #ECCDB0;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:var(--o);background:#fff;outline:none">
       </div>
       <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:10px;padding:12px 14px">
@@ -682,7 +686,7 @@ function onFilesAptos(inp){
 }
 
 /* ═══ REDES ═══ */
-const RF=[['wpp','r_wpp'],['cli_calc','r_cli_calc'],['cli_ver','r_cli_ver'],['msg_redes','r_msg_redes'],['cierres_org','r_cierres_org'],['ig_alc','r_ig_alc'],['ig_imp','r_ig_imp'],['ig_int','r_ig_int'],['fb_alc','r_fb_alc'],['fb_imp','r_fb_imp'],['fb_int','r_fb_int'],['tk_alc','r_tk_alc'],['tk_imp','r_tk_imp'],['tk_int','r_tk_int']];
+const RF=[['wpp','r_wpp'],['wpp_calc','r_wpp_calc'],['cli_calc','r_cli_calc'],['cli_ver','r_cli_ver'],['msg_redes','r_msg_redes'],['cierres_org','r_cierres_org'],['ig_alc','r_ig_alc'],['ig_imp','r_ig_imp'],['ig_int','r_ig_int'],['fb_alc','r_fb_alc'],['fb_imp','r_fb_imp'],['fb_int','r_fb_int'],['tk_alc','r_tk_alc'],['tk_imp','r_tk_imp'],['tk_int','r_tk_int']];
 async function saveRedes(){
   const p=getPer();const d=gLS(LS_R);const o={};
   RF.forEach(([k,id])=>{o[k]=parseInt(document.getElementById(id)?.value||'0')||0;});
@@ -690,7 +694,7 @@ async function saveRedes(){
   // ⚡ Sincronizar WPP leads → módulo Leads
   const ld=gLS(LS_L);const lw=ld[p.sISO]||{};
   lw.wpp=o.wpp;
-  if(!lw.total||lw.total<o.wpp)lw.total=o.wpp;
+  if(o.wpp_calc>0)lw.total=o.wpp_calc;
   ld[p.sISO]=lw;sLS(LS_L,ld);
   renderRedes();renderLeads();
   const lf=document.getElementById('l_wpp');if(lf)lf.value=o.wpp||'';
@@ -715,13 +719,15 @@ function renderRedes(){
   // KPIs ejecutivos
   const pCrecWPP=d1.wpp>0?((((d2.wpp||0)-(d1.wpp||0))/(d1.wpp||1))*100).toFixed(1):null;
   const pCrecAlc=d1.alc>0?((((d2.alc||0)-(d1.alc||0))/(d1.alc||1))*100).toFixed(1):null;
-  const wpp2=d2.wpp||0,calc2=d2.cli_calc||0;
-  const pctCalc=wpp2>0?((calc2/wpp2)*100).toFixed(1):0;
+  const wpp2=d2.wpp||0,wppCalc2=d2.wpp_calc||0,calc2=d2.cli_calc||0;
+  const pctCalc=wpp2>0?((wppCalc2/wpp2)*100).toFixed(1):0;
   const pCrecCalc=d1.cli_calc>0?((((d2.cli_calc||0)-(d1.cli_calc||0))/(d1.cli_calc||1))*100).toFixed(1):null;
+  const pCrecWppCalc=d1.wpp_calc>0?((((d2.wpp_calc||0)-(d1.wpp_calc||0))/(d1.wpp_calc||1))*100).toFixed(1):null;
   document.getElementById('r0-kpis').innerHTML=`
     <div class="kp" style="background:#F0FDF4;border-top:3px solid #25D366"><div class="kl">💬 Llegaron WPP</div><div class="kv" style="color:#16A34A">${wpp2}</div><div class="ks">${pCrecWPP?`${pCrecWPP>0?'+':''}${pCrecWPP}% vs sem ant`:'—'}</div></div>
-    <div class="kp o"><div class="kl">🧮 Calculadora</div><div class="kv">${calc2}</div><div class="ks">${pCrecCalc?`${pCrecCalc>0?'+':''}${pCrecCalc}% vs sem ant`:'—'}</div></div>
-    <div class="kp" style="background:#FFFBF0;border-top:3px solid var(--y)"><div class="kl">% WPP → Calc.</div><div class="kv" style="color:var(--am)">${pctCalc}%</div><div class="ks">conversión clave</div></div>
+    <div class="kp" style="background:#FFF0F6;border-top:3px solid #DB2777"><div class="kl">💬→🧮 WPP hicieron calc.</div><div class="kv" style="color:#DB2777">${wppCalc2}</div><div class="ks">${pCrecWppCalc?`${pCrecWppCalc>0?'+':''}${pCrecWppCalc}% vs sem ant`:'—'}</div></div>
+    <div class="kp" style="background:#FFFBF0;border-top:3px solid var(--y)"><div class="kl">% WPP → Calc.</div><div class="kv" style="color:var(--am)">${pctCalc}%</div><div class="ks">de WPP, pasaron a calc</div></div>
+    <div class="kp o"><div class="kl">🧮 Calc. Bitrix (total)</div><div class="kv">${calc2}</div><div class="ks">${pCrecCalc?`${pCrecCalc>0?'+':''}${pCrecCalc}% vs sem ant`:'—'}</div></div>
     <div class="kp a"><div class="kl">IG Interacciones</div><div class="kv md">${fmtn(d2.ig_int||0)}</div><div class="ks">${d1.ig_int?dH(d2.ig_int||0,d1.ig_int):''}</div></div>
     <div class="kp b"><div class="kl">FB Interacciones</div><div class="kv md">${fmtn(d2.fb_int||0)}</div><div class="ks">${d1.fb_int?dH(d2.fb_int||0,d1.fb_int):''}</div></div>
     <div class="kp g"><div class="kl">🏆 Cierres org.</div><div class="kv">${d2.cierres_org||0}</div><div class="ks">conversión directa</div></div>`;
@@ -750,10 +756,11 @@ function renderRedes(){
   const tblRows=
     secRow('📱 WhatsApp & Calculadora')+
     metRow('Llegaron por WhatsApp',d0.wpp||0,d1.wpp||0,d2.wpp||0,'💬')+
-    metRow('Hicieron la calculadora',d0.cli_calc||0,d1.cli_calc||0,d2.cli_calc||0,'🧮')+
+    metRow('WPP que hicieron calc.',d0.wpp_calc||0,d1.wpp_calc||0,d2.wpp_calc||0,'💬→🧮')+
+    calcRow('conversión WPP → Calculadora',d0.wpp_calc||0,d0.wpp||0,d1.wpp_calc||0,d1.wpp||0,d2.wpp_calc||0,d2.wpp||0)+
+    metRow('Calc. Bitrix (todas fuentes)',d0.cli_calc||0,d1.cli_calc||0,d2.cli_calc||0,'🧮')+
     metRow('Calculadoras verificadas',d0.cli_ver||0,d1.cli_ver||0,d2.cli_ver||0,'✅')+
-    calcRow('conversión WPP → Calculadora',d0.cli_calc||0,d0.wpp||0,d1.cli_calc||0,d1.wpp||0,d2.cli_calc||0,d2.wpp||0)+
-    calcRow('% verificadas / calculadora',d0.cli_ver||0,d0.cli_calc||0,d1.cli_ver||0,d1.cli_calc||0,d2.cli_ver||0,d2.cli_calc||0)+
+    calcRow('% verificadas / calculadora',d0.cli_ver||0,d0.wpp_calc||0,d1.cli_ver||0,d1.wpp_calc||0,d2.cli_ver||0,d2.wpp_calc||0)+
     metRow('Cierres orgánicos',d0.cierres_org||0,d1.cierres_org||0,d2.cierres_org||0,'🏆')+
     secRow('📸 Instagram')+
     metRow('Alcance',d0.ig_alc||0,d1.ig_alc||0,d2.ig_alc||0)+
