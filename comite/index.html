@@ -565,7 +565,7 @@ function upWLbl(){document.getElementById('wlbl').textContent=wLbl(getPer());}
 function chW(d){off+=d;upWLbl();const el=document.getElementById('wlbl');if(el){el.style.opacity='.4';setTimeout(()=>{el.style.opacity='1';},250);}renderAll();}
 /* ── syncDatosAPI: descarga datos de la nube y mezcla con local ── */
 async function syncDatosAPI(tipo,weeks){
-  var storeKey=tipo==='redes'?LS_R:LS_L;
+  var storeKey=tipo==='redes'?LS_R:tipo==='reuniones'?LS_C:LS_L;
   var all=gLS(storeKey);var changed=false;
   await Promise.all(weeks.map(async function(w){
     try{
@@ -1479,12 +1479,12 @@ async function saveConf(){
   const apiCom=yo||'ADMIN';
   if(st)st.textContent='Guardando ☁️…';
   try{
-    const r=await fetch('/api/reuniones?week='+p.sISO+'&comercial='+apiCom,{
+    const r=await fetch('/api/datos?tipo=reuniones&week='+p.sISO,{
       method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(w)
     });
     const j=await r.json();
     if(j.ok){
-      if(st)st.textContent='✅ Guardado '+new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+      if(st)st.textContent='✅ Guardado ☁️ '+new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
     } else {
       if(st)st.textContent='⚠️ Solo local: '+j.error;
     }
@@ -1495,23 +1495,13 @@ async function saveConf(){
 }
 /* ── Carga datos de la API y mezcla con local, luego renderiza ── */
 function renderReuniones(){
-  const p2=getPer(off);
+  const p2=getPer(off),p1=getPer(off-1),p0=getPer(off-2);
   /* render inmediato con datos locales */
   renderReunionesLocal();
-  /* fetch API en background — actualiza si hay datos nuevos */
-  fetch('/api/reuniones?week='+p2.sISO)
-    .then(r=>r.json())
-    .then(j=>{
-      if(!j.ok||!j.data||Object.keys(j.data).length===0)return;
-      const d=gLS(LS_C);
-      if(!d[p2.sISO])d[p2.sISO]={};
-      let changed=false;
-      Object.entries(j.data).forEach(([k,v])=>{
-        if(JSON.stringify(d[p2.sISO][k])!==JSON.stringify(v)){d[p2.sISO][k]=v;changed=true;}
-      });
-      if(changed){sLS(LS_C,d);renderReunionesLocal();}
-    })
-    .catch(()=>{/* sin conexión, quedan los datos locales */});
+  /* sync API en background para las 3 semanas visibles */
+  syncDatosAPI('reuniones',[p0.sISO,p1.sISO,p2.sISO])
+    .then(changed=>{if(changed)renderReunionesLocal();})
+    .catch(()=>{});
 }
 function renderReunionesLocal(){
   const p2=getPer(off),p1=getPer(off-1),p0=getPer(off-2);
@@ -1551,11 +1541,11 @@ function renderReunionesLocal(){
   const actReu=abActiva?['KM','NM','AB']:['KM','NM'];
   const totP=actReu.reduce((s,a)=>s+(cur[a]?.prog||0),0);
   const totE=actReu.reduce((s,a)=>s+(cur[a]?.ef||0),0);
-  // Leads base AUTO desde módulo Leads
-  const lb2=allL[p2.sISO]?.total||0,lb1=allL[p1.sISO]?.total||0,lb0=allL[p0.sISO]?.total||0;
+  // Base: calculadoras VERIFICADAS desde módulo Leads
+  const lb2=allL[p2.sISO]?.ver||0,lb1=allL[p1.sISO]?.ver||0,lb0=allL[p0.sISO]?.ver||0;
   const conv2=lb2>0?pct(totP,lb2,2):0,conv1=lb1>0?pct((allC[p1.sISO]?.KM?.prog||0)+(allC[p1.sISO]?.AB?.prog||0)+(allC[p1.sISO]?.NM?.prog||0),lb1,2):0;
   document.getElementById('reu-kpis').innerHTML=`
-    <div class="kp o"><div class="kl">Leads calculadora</div><div class="kv">${lb2}</div><div class="ks">Base para % de reuniones</div></div>
+    <div class="kp o"><div class="kl">✅ Calc. verificadas</div><div class="kv">${lb2}</div><div class="ks">Base para % de reuniones</div></div>
     <div class="kp b"><div class="kl">Agendadas total</div><div class="kv">${totP}</div><div class="ks">${conv2}% de leads</div></div>
     <div class="kp g"><div class="kl">Efectivas total</div><div class="kv">${totE}</div><div class="ks">${lb2>0?pct(totE,lb2,2):0}% de leads</div></div>
     <div class="kp p"><div class="kl">KM</div><div class="kv">${cur.KM?.ef||0}/${cur.KM?.prog||0}</div><div class="ks">${cur.KM?.prog>0?pct(cur.KM.ef,cur.KM.prog,0):0}% conv</div></div>
@@ -1572,16 +1562,16 @@ function renderReunionesLocal(){
   const ef1=['KM','AB','NM'].reduce((s,a)=>s+(allC[p1.sISO]?.[a]?.ef||0),0);
   document.getElementById('reu-tabla').innerHTML=`
   <div class="card lct">
-    <div class="card-hd">Evoluci&#243;n reuniones comerciales <span class="card-hd-sub">Base = leads calculadora (GC / Corner View se miden aparte)</span></div>
+    <div class="card-hd">Evoluci&#243;n reuniones comerciales <span class="card-hd-sub">Base = calculadoras verificadas ✅ (GC / Corner View se miden aparte)</span></div>
     <div class="tw"><table>
       <thead><tr><th>Concepto</th><th class="tr">${wShort(p0)}</th><th class="tr">${wShort(p1)}</th><th class="tr">${wShort(p2)}</th><th class="tr">Var. ant→pre</th><th class="tr">Var. pre→act</th></tr></thead>
       <tbody>
-        ${reuRow('Leads calculadora',lb0,lb1,lb2,lb0,lb1,lb2,false)}
+        ${reuRow('✅ Calc. verificadas',lb0,lb1,lb2,lb0,lb1,lb2,false)}
         ${reuRow('Agendadas (K+A+N)',ag0,ag1,totP,lb0,lb1,lb2,false)}
         ${reuRow('Atendidas (K+A+N)',ef0,ef1,totE,lb0,lb1,lb2,false)}
       </tbody>
     </table></div>
-    ${lb2===0?`<div class="msg msg-a" style="margin-top:8px;margin-bottom:0">Leads calculadora en 0 — guarda datos en la pestaña Leads (no incluye GC ni Corner View).</div>`:''}
+    ${lb2===0?`<div class="msg msg-a" style="margin-top:8px;margin-bottom:0">Calculadoras verificadas en 0 — guarda el número de verificadas en la pestaña Leads (campo ✅ Verificados).</div>`:''}
   </div>`;
   // Charts
   const ws=[p0,p1,p2];const wlbls=ws.map(w=>wShort(w));
@@ -2088,9 +2078,8 @@ function renderAll(){try{renderRedes();}catch(e){console.error('Redes:',e);}try{
   syncDatosAPI('redes',w6).then(function(ch){if(ch)renderRedes();});
   var w3=[ getPer(off-2),getPer(off-1),getPer(off) ].map(function(w){return w.sISO;});
   syncDatosAPI('leads',w3).then(function(ch){if(ch)renderLeads();});
-  /* Auto-refresh reuniones desde la nube cada 45s */
-  setInterval(()=>{try{renderReuniones();}catch(e){}},45000);
-  /* Auto-refresh redes y leads desde la nube cada 60s */
+  syncDatosAPI('reuniones',w3).then(function(ch){if(ch)renderReunionesLocal();});
+  /* Auto-refresh redes, leads y reuniones cada 60s */
   setInterval(function(){
     syncDatosAPI('redes',w6).then(function(ch){
       if(ch){renderRedes();toastNube('☁️ Redes actualizado');}
@@ -2099,7 +2088,8 @@ function renderAll(){try{renderRedes();}catch(e){console.error('Redes:',e);}try{
       if(ts)ts.textContent='sync '+now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
     });
     syncDatosAPI('leads',w3).then(function(ch){if(ch)renderLeads();});
-  },15000);
+    syncDatosAPI('reuniones',w3).then(function(ch){if(ch)renderReunionesLocal();});
+  },60000);
   // Restaurar Excel desde localStorage al refrescar
   try{
     var saved=VC3[LS_XL];
