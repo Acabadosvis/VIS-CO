@@ -1,8 +1,6 @@
-// api/datos.js — VIS-CO M3 · Sync de Redes y Leads multi-dispositivo via Vercel KV
-// GET  /api/datos?tipo=redes&week=2026-W26  → datos de esa semana
-// GET  /api/datos?tipo=leads&week=2026-W26  → datos de esa semana
-// POST /api/datos?tipo=redes&week=2026-W26  → guarda/mergea datos
-// POST /api/datos?tipo=leads&week=2026-W26  → guarda/mergea datos
+// api/datos.js — VIS-CO M3 · Sync de Redes, Leads y Reuniones via Vercel KV
+// GET  /api/datos?tipo=redes|leads|reuniones&week=2026-W26  → datos de esa semana
+// POST /api/datos?tipo=redes|leads|reuniones&week=2026-W26  → guarda/mergea datos
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -23,8 +21,8 @@ module.exports = async function handler(req, res) {
   const tipo = (req.query.tipo || '').replace(/[^a-z]/g, '');
   const week = (req.query.week || '').replace(/[^0-9W\-]/g, '') || 'noweek';
 
-  if (!['redes', 'leads'].includes(tipo)) {
-    return res.status(400).json({ ok: false, error: 'tipo debe ser redes|leads' });
+  if (!['redes', 'leads', 'reuniones'].includes(tipo)) {
+    return res.status(400).json({ ok: false, error: 'tipo debe ser redes|leads|reuniones' });
   }
 
   const key = `vc3_${tipo}_${week}`;
