@@ -563,6 +563,18 @@ function wLbl(p){return`${dS(p.s)} ✦ ${dS(p.e)} ${p.e.getFullYear()}`;}
 function wShort(p){return`${dS(p.s)}–${dS(p.e)}`;}
 function upWLbl(){document.getElementById('wlbl').textContent=wLbl(getPer());}
 function chW(d){off+=d;upWLbl();const el=document.getElementById('wlbl');if(el){el.style.opacity='.4';setTimeout(()=>{el.style.opacity='1';},250);}renderAll();}
+/* ── maxMergeReuniones: fusión profunda tomando el máximo por campo numérico ── */
+function _maxMergeR(local,cloud){
+  var m=Object.assign({},cloud);
+  for(var k in local){if(!local.hasOwnProperty(k))continue;
+    var lv=local[k],cv=m[k];
+    if(lv&&cv&&typeof lv==='object'&&lv.prog!==undefined&&cv.prog!==undefined){
+      m[k]={prog:Math.max(lv.prog||0,cv.prog||0),ef:Math.max(lv.ef||0,cv.ef||0)};
+    }else if(lv&&cv&&typeof lv==='object'&&typeof cv==='object'){
+      m[k]=_maxMergeR(lv,cv);
+    }else{m[k]=lv;}
+  }return m;
+}
 /* ── syncDatosAPI: descarga datos de la nube y mezcla con local ── */
 async function syncDatosAPI(tipo,weeks){
   var storeKey=tipo==='redes'?LS_R:tipo==='reuniones'?LS_C:LS_L;
@@ -572,7 +584,8 @@ async function syncDatosAPI(tipo,weeks){
       var r=await fetch('/api/datos?tipo='+tipo+'&week='+w);
       var j=await r.json();
       if(j.ok&&j.data&&Object.keys(j.data).length>0){
-        var merged=Object.assign({},all[w]||{},j.data);
+        // reuniones: max-merge (local y cloud compiten campo a campo, gana el mayor)
+        var merged=tipo==='reuniones'?_maxMergeR(all[w]||{},j.data):Object.assign({},all[w]||{},j.data);
         if(JSON.stringify(all[w])!==JSON.stringify(merged)){all[w]=merged;changed=true;}
       }
     }catch(e){}
@@ -1458,7 +1471,9 @@ async function saveConf(){
   /* AB editable solo semana 2026-06-27 */
   const abUlt='2026-06-27';
   const actBase=p.sISO===abUlt?['KM','NM','AB']:['KM','NM'];
-  const toSave=(yo===''||yo==='ADMIN')?actBase:[yo];
+  // Si AB está seleccionada pero no tiene campos editables esta semana → guardar todos los activos
+  const yoEfectivo=(yo==='AB'&&p.sISO!==abUlt)?'':yo;
+  const toSave=(yoEfectivo===''||yoEfectivo==='ADMIN')?actBase:[yoEfectivo];
   toSave.forEach(a=>{
     const prog=parseInt(document.getElementById('cp_'+a)?.value||'0')||0;
     const ef=parseInt(document.getElementById('ce_'+a)?.value||'0')||0;
