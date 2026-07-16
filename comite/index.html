@@ -376,7 +376,7 @@ tr:hover td{background:var(--b)}
       <div style="font-size:.68rem;font-weight:700;color:#92400E;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">&#128241; Captaci&#243;n WPP &#8594; Calculadora</div>
       <div class="fg" style="margin-bottom:0">
         <div class="fl" style="border-left:3px solid #25D366;padding-left:9px"><label style="color:#16A34A">&#128172; Llegaron por WPP &#9889; <span style="font-size:.68rem;font-weight:400;color:#888">auto desde Redes</span></label><input type="number" id="l_wpp" min="0" placeholder="0" style="border-color:#25D366;background:#F0FDF4"></div>
-        <div class="fl" style="border-left:3px solid #DB2777;padding-left:9px"><label style="color:#DB2777">&#128172;&#8594;&#129518; WPP hicieron calc. <span style="font-size:.68rem;font-weight:400;color:#888">&#9889; auto desde Redes</span></label><input type="number" id="l_total" min="0" placeholder="0" readonly style="background:#FFF0F6;color:#DB2777;cursor:default;border-color:#F9A8D4"></div>
+        <div class="fl"><label>&#129518; De esos, hicieron calculadora</label><input type="number" id="l_total" min="0" placeholder="0" oninput="calcNI()"></div>
         <div class="fl" style="border-left:3px solid #0891B2;padding-left:9px"><label style="color:#0891B2">&#9989; Verificados (aptos) <span style="font-size:.68rem;font-weight:400;color:#888">&#9889; auto desde Redes</span></label><input type="number" id="l_ver" min="0" placeholder="0" readonly style="background:#EFF6FF;color:#0891B2;cursor:default;border-color:#93C5FD"></div>
         <div class="fl"><label style="color:#64748B">&#10060; No verificados <span style="font-size:.68rem;background:#F3F4F6;border-radius:4px;padding:1px 5px">auto</span></label><input type="number" id="l_nver" min="0" placeholder="0" readonly style="background:#F8FAFC;color:#64748B;cursor:default"></div>
       </div>
@@ -694,12 +694,10 @@ async function saveRedes(){
   // ⚡ Sincronizar WPP leads → módulo Leads
   const ld=gLS(LS_L);const lw=ld[p.sISO]||{};
   lw.wpp=o.wpp;
-  if(o.wpp_calc>0)lw.total=o.wpp_calc;
   if(o.cli_ver>0)lw.ver=o.cli_ver;
   ld[p.sISO]=lw;sLS(LS_L,ld);
   renderRedes();renderLeads();
   const lf=document.getElementById('l_wpp');if(lf)lf.value=o.wpp||'';
-  const lt=document.getElementById('l_total');if(lt)lt.value=o.wpp_calc||'';
   const lv=document.getElementById('l_ver');if(lv)lv.value=o.cli_ver||'';
   // ☁️ Subir a la nube para sincronizar con otros dispositivos
   const btn=document.querySelector('[onclick="saveRedes()"]');
