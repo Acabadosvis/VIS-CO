@@ -383,23 +383,48 @@ body.modo-comite .brow{display:none!important}
     <div class="card-hd">&#128101; Clasificaci&#243;n de leads <span id="l-per" style="color:var(--o)"></span><span class="card-hd-sub">Referencia: Bitrix24 BI</span><button id="btn-mes-leads" onclick="toggleMesLeads()" style="margin-left:auto;background:var(--gc);border:1.5px solid var(--brd);border-radius:6px;padding:3px 11px;font-size:.7rem;cursor:pointer;font-family:Syne,sans-serif;font-weight:700;color:var(--n)">&#128197; Vista mensual</button></div>
   <div id="l-form-semanal">
     <!-- CAPTACION WPP -> CALCULADORA -->
-    <div style="background:#FFFBF0;border:1px solid #FED7AA;border-radius:10px;padding:12px 14px;margin-bottom:12px">
-      <div style="font-size:.68rem;font-weight:700;color:#92400E;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">&#128241; Captaci&#243;n WPP &#8594; Calculadora</div>
-      <div class="fg" style="margin-bottom:0">
-        <div class="fl" style="border-left:3px solid #25D366;padding-left:9px"><label style="color:#16A34A">&#128172; Llegaron por WPP &#9889; <span style="font-size:.68rem;font-weight:400;color:#888">auto desde Redes</span></label><input type="number" id="l_wpp" min="0" placeholder="0" style="border-color:#25D366;background:#F0FDF4"></div>
-        <div class="fl"><label>&#129518; De esos, hicieron calculadora</label><input type="number" id="l_total" min="0" placeholder="0" oninput="calcNI()"></div>
-        <div class="fl" style="border-left:3px solid #0891B2;padding-left:9px"><label style="color:#0891B2">&#9989; Verificados (aptos) <span style="font-size:.68rem;font-weight:400;color:#888">&#9889; auto desde Redes</span></label><input type="number" id="l_ver" min="0" placeholder="0" readonly style="background:#EFF6FF;color:#0891B2;cursor:default;border-color:#93C5FD"></div>
-        <div class="fl"><label style="color:#64748B">&#10060; No verificados <span style="font-size:.68rem;background:#F3F4F6;border-radius:4px;padding:1px 5px">auto</span></label><input type="number" id="l_nver" min="0" placeholder="0" readonly style="background:#F8FAFC;color:#64748B;cursor:default"></div>
+    <div class="sec" style="margin-bottom:8px;color:#92400E">&#128241; Captaci&#243;n WPP &#8594; Calculadora</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px;margin-bottom:14px">
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:10px;padding:12px 14px">
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:6px">&#128172; Llegaron WPP &#9889; <span style="font-size:.6rem;font-weight:400;color:#888">auto Redes</span></label>
+        <input type="number" id="l_wpp" min="0" placeholder="0" readonly style="width:100%;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#16A34A;background:#DCFCE7;outline:none;cursor:default">
+      </div>
+      <div style="background:#FFF8F0;border:1.5px solid #ECCDB0;border-radius:10px;padding:12px 14px">
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--o);display:block;margin-bottom:6px">&#129518; Hicieron calculadora</label>
+        <input type="number" id="l_total" min="0" placeholder="0" oninput="calcNI()" style="width:100%;border:1.5px solid #ECCDB0;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:var(--o);background:#fff;outline:none">
+      </div>
+      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:10px;padding:12px 14px">
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#0891B2;display:block;margin-bottom:6px">&#9989; Verificados &#9889; <span style="font-size:.6rem;font-weight:400;color:#888">auto</span></label>
+        <input type="number" id="l_ver" min="0" placeholder="0" readonly style="width:100%;border:1.5px solid #93C5FD;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#0891B2;background:#DBEAFE;outline:none;cursor:default">
+      </div>
+      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:10px;padding:12px 14px">
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:6px">&#10060; No verificados <span style="font-size:.6rem;background:#F3F4F6;border-radius:4px;padding:1px 4px">auto</span></label>
+        <input type="number" id="l_nver" min="0" placeholder="0" readonly style="width:100%;border:1.5px solid #CBD5E1;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#64748B;background:#F1F5F9;outline:none;cursor:default">
       </div>
     </div>
     <!-- DE LOS VERIFICADOS -->
     <div class="sec" style="margin-top:4px;font-size:.75rem;color:#0891B2">&#9989; De los verificados &#8594;</div>
-    <div class="fg">
-      <div class="fl"><label>&#128203; Calc. incompletas</label><input type="number" id="l_cno" min="0" placeholder="0" oninput="calcNI()"></div>
-      <div class="fl"><label style="color:#4F46E5">&#128228; Mensajes en proceso</label><input type="number" id="l_sr" min="0" placeholder="0" oninput="calcNI()" style="border-color:#A5B4FC"></div>
-      <div class="fl"><label>&#128172; Sin respuesta</label><input type="number" id="l_sr2" min="0" placeholder="0"></div>
-      <div class="fl"><label>&#11088; Interesados</label><input type="number" id="l_int" min="0" placeholder="0" oninput="calcNI()"></div>
-      <div class="fl"><label style="color:#888">&#128078; No interesados <span style="font-size:.68rem;background:#F3F4F6;border-radius:4px;padding:1px 5px">auto</span></label><input type="number" id="l_ni" min="0" placeholder="0" readonly style="background:#FFF3E6;color:#666;cursor:default"></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px;margin-bottom:14px">
+      <div style="background:#FFF8F0;border:1.5px solid #ECCDB0;border-radius:10px;padding:12px 14px">
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--o);display:block;margin-bottom:6px">&#128203; Calc. incompletas</label>
+        <input type="number" id="l_cno" min="0" placeholder="0" oninput="calcNI()" style="width:100%;border:1.5px solid #ECCDB0;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:var(--o);background:#fff;outline:none">
+      </div>
+      <div style="background:#EEECFF;border:1.5px solid #A5B4FC;border-radius:10px;padding:12px 14px">
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#4F46E5;display:block;margin-bottom:6px">&#128228; Mensajes en proceso</label>
+        <input type="number" id="l_sr" min="0" placeholder="0" oninput="calcNI()" style="width:100%;border:1.5px solid #A5B4FC;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#4F46E5;background:#fff;outline:none">
+      </div>
+      <div style="background:#F8FAFC;border:1.5px solid #94A3B8;border-radius:10px;padding:12px 14px">
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:6px">&#128172; Sin respuesta</label>
+        <input type="number" id="l_sr2" min="0" placeholder="0" style="width:100%;border:1.5px solid #94A3B8;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#64748B;background:#fff;outline:none">
+      </div>
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:10px;padding:12px 14px">
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:6px">&#11088; Interesados</label>
+        <input type="number" id="l_int" min="0" placeholder="0" oninput="calcNI()" style="width:100%;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#16A34A;background:#fff;outline:none">
+      </div>
+      <div style="background:#FFF3E6;border:1.5px solid #FDBA74;border-radius:10px;padding:12px 14px">
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#888;display:block;margin-bottom:6px">&#128078; No interesados <span style="font-size:.6rem;background:#F3F4F6;border-radius:4px;padding:1px 4px">auto</span></label>
+        <input type="number" id="l_ni" min="0" placeholder="0" readonly style="width:100%;border:1.5px solid #FDBA74;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#666;background:#FFF3E6;outline:none;cursor:default">
+      </div>
     </div>
     <!-- VIGENTES SEGUIMIENTO -->
     <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:12px 14px;margin-bottom:12px">
