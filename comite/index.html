@@ -1712,8 +1712,10 @@ function renderVentas(){
   /* Mes actual */
   const vm=getVM(p.mi,p.yr,vFVD);
   const aliR=vm.filter(r=>eAli(r)),orgR=vm.filter(r=>eOrg(r)),remR=vm.filter(r=>!eAli(r)&&!eOrg(r));
+  const refR=vm.filter(r=>[(r[9]||''),(r[13]||'')].some(v=>v.toUpperCase().includes('REFERIDO')));
   const tv=vm.length,tVal=vm.reduce((s,r)=>s+gV(r),0),tAIU=vm.reduce((s,r)=>s+gAIU(r),0);
   const aliV=aliR.reduce((s,r)=>s+gV(r),0),orgV=orgR.reduce((s,r)=>s+gV(r),0),remV=remR.reduce((s,r)=>s+gV(r),0);
+  const refV=refR.reduce((s,r)=>s+gV(r),0);
   const aliAIU=aliR.reduce((s,r)=>s+gAIU(r),0),orgAIU=orgR.reduce((s,r)=>s+gAIU(r),0),remAIU=remR.reduce((s,r)=>s+gAIU(r),0);
   /* Meta automática: valor mismo mes año anterior × 1.5 ÷ ticket promedio $37M */
   const TICKET_PROM=37000000;
@@ -1731,7 +1733,8 @@ function renderVentas(){
   const _mtva=document.getElementById('mt_va');if(_mtva&&!_mtva._init){_mtva.value=META_VA;_mtva._init=true;}
   const _mtvala=document.getElementById('mt_vala');if(_mtvala&&!_mtvala._init){_mtvala.value=Math.round(META_VALA/1e6);_mtvala._init=true;}
   const pV=pct(tv,META_V),pVal=pct(tVal,META_VAL);
-  const tkAli=aliR.length?aliV/aliR.length:0,tkOrg=orgR.length?orgV/orgR.length:0,tkRem=remR.length?remV/remR.length:0,tkTot=tv?tVal/tv:0;
+  const tkAli=aliR.length?aliV/aliR.length:0,tkOrg=orgR.length?orgV/orgR.length:0,tkRem=remR.length?remV/remR.length:0,tkRef=refR.length?refV/refR.length:0,tkTot=tv?tVal/tv:0;
+  const refAIU=refR.reduce((s,r)=>s+gAIU(r),0);
   /* Por origen: alianza=partner name, otros=r[12] */
   const byOrg={};vm.forEach(r=>{const k=getOrigen(r);byOrg[k]=(byOrg[k]||0)+1;});
   const orgSort=Object.entries(byOrg).sort((a,b)=>b[1]-a[1]);
@@ -1755,7 +1758,7 @@ function renderVentas(){
   if(orgR.length>0)vIns.push({ic:'🌱',t:`Orgánicos: <strong>${orgR.length} ventas</strong>. Ticket promedio: ${fmt(tkOrg)}.`});
 
   /* colores por origen para gráfica */
-  const ORG_CLR={'GRAN CENTRAL':'#92400E','GC CONVENIO':'#B45309','GRAN CENTRAL CONVENIO':'#B45309','WELL':'#0891B2','KLIK':'#7C3AED','CORNER VIEW':'#0369A1','CORNER V':'#0369A1','CONINSA':'#64748B','VANTI':'#16A34A','LAGOM':'#9333EA','ORGÁNICO':'#16A34A','ORGÁNICO ':'#16A34A'};
+  const ORG_CLR={'GRAN CENTRAL':'#92400E','GC CONVENIO':'#B45309','GRAN CENTRAL CONVENIO':'#B45309','WELL':'#0891B2','KLIK':'#7C3AED','CORNER VIEW':'#0369A1','CORNER V':'#0369A1','CONINSA':'#64748B','VANTI':'#16A34A','LAGOM':'#9333EA','ORGÁNICO':'#16A34A','ORGÁNICO ':'#16A34A','REFERIDOS':'#6D28D9','COMPENSAR':'#0284C7'};
   const fpVal=parseFloat(pVal);
   const pVColor=parseFloat(pV)>=100?'#16A34A':parseFloat(pV)>=70?'#E4721B':'#DC2626';
   const pValColor=fpVal>=100?'#16A34A':fpVal>=70?'#E4721B':'#DC2626';
@@ -1798,6 +1801,7 @@ function renderVentas(){
         <div style="margin-top:4px">
           <div class="vi-tipo"><span class="vi-tipodot" style="background:#888"></span>Presupuestos <span class="vi-tipon">${remR.length} &nbsp;·&nbsp; ${fmt(remV)}</span></div>
           <div class="vi-tipo"><span class="vi-tipodot" style="background:var(--o)"></span>Orgánicos <span class="vi-tipon">${orgR.length} &nbsp;·&nbsp; ${fmt(orgV)}</span></div>
+          <div class="vi-tipo"><span class="vi-tipodot" style="background:#6D28D9"></span>Referidos <span class="vi-tipon">${refR.length} &nbsp;·&nbsp; ${fmt(refV)}</span></div>
           <div class="vi-tipo"><span class="vi-tipodot" style="background:var(--y)"></span>Alianza <span class="vi-tipon">${aliR.length} &nbsp;·&nbsp; ${fmt(aliV)}</span></div>
         </div>
       </div>
@@ -1818,6 +1822,8 @@ function renderVentas(){
               'Vanti':vm.filter(r=>(r[9]||'').toUpperCase().includes('VANTI')&&eAli(r)).length,
               'Orgánico':orgTotal,
               'Credifamilia':vm.filter(r=>(r[9]||'').toUpperCase().includes('CREDIFAMILIA')&&eAli(r)).length,
+              'Referidos':vm.filter(r=>[(r[9]||''),(r[13]||'')].some(v=>v.toUpperCase().includes('REFERIDO'))).length,
+              'Compensar':vm.filter(r=>[(r[9]||''),(r[13]||'')].some(v=>v.toUpperCase().includes('COMPENSAR'))).length,
             };
             return Object.entries(counts).map(([lbl,n])=>`<div class="vi-org-row"><span class="vi-tipodot" style="background:${n>0?'var(--y)':'rgba(255,255,255,.2)'}"></span>${lbl}<span class="val ${n===0?'zero':''}">${n}</span></div>`).join('');
           })()}
@@ -1841,21 +1847,28 @@ function renderVentas(){
           </div>
         </div>
       </div>
-      <div class="vi-det">
-        <div class="vi-slbl">Ticket promedio</div>
-        <div class="vi-r3">
-          <div class="vi-c3"><div class="vi-c3l">Presupuest.</div><div class="vi-c3v">${fmtC(tkRem)}</div></div>
-          <div class="vi-c3"><div class="vi-c3l" style="color:var(--o)">Orgánicos</div><div class="vi-c3v" style="color:var(--o)">${fmtC(tkOrg)}</div></div>
-          <div class="vi-c3"><div class="vi-c3l" style="color:var(--y)">Alianza</div><div class="vi-c3v" style="color:var(--y)">${fmtC(tkAli)}</div></div>
+      <div class="vi-det" style="padding:14px 16px">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.6rem;text-transform:uppercase;letter-spacing:.6px;color:var(--g);margin-bottom:10px">Ticket promedio &amp; AIU por tipo</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:10px">
+          ${[
+            {lbl:'Presupuestos',tk:tkRem,aiu:remAIU,n:remR.length,col:'#64748B'},
+            {lbl:'Orgánicos',   tk:tkOrg,aiu:orgAIU,n:orgR.length,col:'#E4721B'},
+            {lbl:'Referidos',   tk:tkRef,aiu:refAIU,n:refR.length,col:'#6D28D9'},
+            {lbl:'Alianza',     tk:tkAli,aiu:aliAIU,n:aliR.length,col:'#F5B800'},
+          ].map(({lbl,tk,aiu,n,col})=>`
+            <div style="background:var(--gc);border:1px solid var(--brd);border-top:3px solid ${col};border-radius:8px;padding:10px 11px">
+              <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:${col};margin-bottom:6px">${lbl} <span style="color:var(--g);font-weight:400">(${n})</span></div>
+              <div style="margin-bottom:4px">
+                <div style="font-size:.55rem;color:var(--g);font-weight:600;text-transform:uppercase;margin-bottom:2px">Ticket prom.</div>
+                <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;color:${col}">${tk>0?fmtC(tk):'—'}</div>
+              </div>
+              <div style="border-top:1px solid var(--brd);padding-top:5px;margin-top:5px">
+                <div style="font-size:.55rem;color:var(--g);font-weight:600;text-transform:uppercase;margin-bottom:2px">AIU total</div>
+                <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;color:var(--n)">${aiu>0?fmtC(aiu):'—'}</div>
+              </div>
+            </div>`).join('')}
         </div>
-        <div class="vi-slbl">AIU</div>
-        <div class="vi-r3">
-          <div class="vi-c3"><div class="vi-c3l">Presupuest.</div><div class="vi-c3v">${fmtC(remAIU)}</div></div>
-          <div class="vi-c3"><div class="vi-c3l" style="color:var(--o)">Orgánicos</div><div class="vi-c3v" style="color:var(--o)">${fmtC(orgAIU)}</div></div>
-          <div class="vi-c3"><div class="vi-c3l" style="color:var(--y)">Alianza</div><div class="vi-c3v" style="color:var(--y)">${fmtC(aliAIU)}</div></div>
-        </div>
-
-        ${orgSort.length>6?`<div class="vi-slbl">Todos los orígenes</div><div class="vi-ogg">${orgSort.map(([k,c])=>`<div class="vi-ogc"><div class="vi-ogl">${k}</div><div class="vi-ogv">${c}</div></div>`).join('')}</div>`:''}
+        ${orgSort.length>4?`<div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.6rem;text-transform:uppercase;letter-spacing:.6px;color:var(--g);margin-bottom:6px">Todos los orígenes</div><div class="vi-ogg">${orgSort.map(([k,c])=>`<div class="vi-ogc"><div class="vi-ogl">${k}</div><div class="vi-ogv">${c}</div></div>`).join('')}</div>`:''}
       </div>
     </div>
   </div>
