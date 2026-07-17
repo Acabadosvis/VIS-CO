@@ -1711,8 +1711,11 @@ function renderVentas(){
   const semV=sFilt.length,semVal=sFilt.reduce((s,r)=>s+gV(r),0);
   /* Mes actual */
   const vm=getVM(p.mi,p.yr,vFVD);
-  const aliR=vm.filter(r=>eAli(r)),orgR=vm.filter(r=>eOrg(r)),remR=vm.filter(r=>!eAli(r)&&!eOrg(r));
-  const refR=vm.filter(r=>[(r[9]||''),(r[13]||'')].some(v=>v.toUpperCase().includes('REFERIDO')));
+  const isRef=r=>[(r[9]||''),(r[13]||'')].some(v=>v.toUpperCase().includes('REFERIDO'));
+  const aliR=vm.filter(r=>eAli(r));
+  const orgR=vm.filter(r=>eOrg(r));
+  const refR=vm.filter(r=>isRef(r));
+  const remR=vm.filter(r=>!eAli(r)&&!eOrg(r)&&!isRef(r));
   const tv=vm.length,tVal=vm.reduce((s,r)=>s+gV(r),0),tAIU=vm.reduce((s,r)=>s+gAIU(r),0);
   const aliV=aliR.reduce((s,r)=>s+gV(r),0),orgV=orgR.reduce((s,r)=>s+gV(r),0),remV=remR.reduce((s,r)=>s+gV(r),0);
   const refV=refR.reduce((s,r)=>s+gV(r),0);
@@ -1765,7 +1768,7 @@ function renderVentas(){
 
   el.innerHTML=`<!-- FILTROS -->
   <div class="fb">
-    <span>Asesora:</span>${['Todas','KM','AB','NM'].map(v=>`<button class="fbtn ${vFVD===v?'on':''}" onclick="vFVD='${v}';renderVentas()">${v==='Todas'?'Todas':VDN[v]}</button>`).join('')}
+    <span>Asesora:</span>${['Todas','KM','NM'].map(v=>`<button class="fbtn ${vFVD===v?'on':''}" onclick="vFVD='${v}';renderVentas()">${v==='Todas'?'Todas':VDN[v]}</button>`).join('')}
   </div>
 
   <!-- HERO % CUMPLIMIENTO -->
@@ -1822,7 +1825,7 @@ function renderVentas(){
               'Orgánico':orgTotal,
               'Presupuestos':remR.length,
               'Credifamilia':vm.filter(r=>(r[9]||'').toUpperCase().includes('CREDIFAMILIA')&&eAli(r)).length,
-              'Referidos':vm.filter(r=>[(r[9]||''),(r[13]||'')].some(v=>v.toUpperCase().includes('REFERIDO'))).length,
+              'Referidos':refR.length,
               'Compensar':vm.filter(r=>[(r[9]||''),(r[13]||'')].some(v=>v.toUpperCase().includes('COMPENSAR'))).length,
             };
             return Object.entries(counts).map(([lbl,n])=>`<div class="vi-org-row"><span class="vi-tipodot" style="background:${n>0?'var(--y)':'rgba(255,255,255,.2)'}"></span>${lbl}<span class="val ${n===0?'zero':''}">${n}</span></div>`).join('');
