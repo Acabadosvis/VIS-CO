@@ -210,6 +210,13 @@ tr:hover td{background:var(--b)}
   header{gap:5px;padding:0 10px}.tab{font-size:.67rem;padding:9px 9px}
 }
 @media print{header,.tabnav,.fb,.brow,.hacts,.rcin,.btn{display:none!important}.panel{display:block!important;padding:0}.inf-s{break-inside:avoid}}
+/* Modo comité — colapsa inputs, muestra solo KPIs/funnels/tablas */
+body.modo-comite #r0-form,
+body.modo-comite #l-form-semanal,
+body.modo-comite #yo-banner,
+body.modo-comite .rcin,
+body.modo-comite .brow{display:none!important}
+#btn-comite-toggle{font-size:1.1rem;font-weight:800;padding:4px 12px;line-height:1}
 .apt-header{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 14px 4px}
 .apt-kpg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px}
 .apt-kp{border-radius:12px;padding:20px 22px}
@@ -288,6 +295,7 @@ tr:hover td{background:var(--b)}
     <a href="../reporte/index.html" target="_blank" class="hbtn">&#128196; Reporte</a>
     <a href="https://acabadosvis.bitrix24.co/bi/dashboard/detail/12/" target="_blank" class="hbtn">Deal Analíticas vis</a>
     <button class="hbtn" onclick="window.print()">&#128424;</button>
+    <button id="btn-comite-toggle" class="hbtn" onclick="toggleModoComite()" title="Colapsar para presentación en comité">－</button>
   </div>
 </header>
 <nav class="tabnav">
@@ -303,6 +311,7 @@ tr:hover td{background:var(--b)}
 <div class="panel on" id="p0">
   <div class="card">
     <div class="card-hd" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">&#128241; M&#233;tricas digitales <span id="r0-per" style="color:var(--o)"></span><span class="card-hd-sub">&#193;ngela · ⚡WPP &#8594; Leads autom&#225;tico</span><button onclick="syncRedesAhora()" style="margin-left:auto;background:var(--gc);border:1.5px solid var(--brd);border-radius:6px;padding:3px 11px;font-size:.7rem;cursor:pointer;font-family:Syne,sans-serif;font-weight:700;color:var(--n)">🔄 <span id="sync-redes-lbl">Actualizar</span></button><span id="sync-redes-ts" style="font-size:.6rem;color:var(--g);font-weight:400;min-width:80px"></span></div>
+    <div id="r0-form">
     <!-- WHATSAPP & CALCULADORA -->
     <div class="sec">💬 WhatsApp &amp; Calculadora</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px">
@@ -360,8 +369,10 @@ tr:hover td{background:var(--b)}
       <button class="btn btn-o" onclick="saveRedes()">&#128190; Guardar + sincronizar leads</button>
       <button class="btn btn-s" onclick="renderRedes()">&#8617; Cancelar</button>
     </div>
+    </div><!-- /r0-form -->
   </div>
   <div id="r0-kpis" class="kg"></div>
+  <div id="r0-funnel" class="fn-wrap" style="margin-top:8px;display:none"></div>
   <div id="r0-ins" class="ins" style="display:none"></div>
   <div id="r0-cmp"></div>
 </div>
@@ -385,7 +396,8 @@ tr:hover td{background:var(--b)}
     <div class="sec" style="margin-top:4px;font-size:.75rem;color:#0891B2">&#9989; De los verificados &#8594;</div>
     <div class="fg">
       <div class="fl"><label>&#128203; Calc. incompletas</label><input type="number" id="l_cno" min="0" placeholder="0" oninput="calcNI()"></div>
-      <div class="fl"><label>&#128172; Sin respuesta</label><input type="number" id="l_sr" min="0" placeholder="0" oninput="calcNI()"></div>
+      <div class="fl"><label style="color:#4F46E5">&#128228; Mensajes en proceso</label><input type="number" id="l_sr" min="0" placeholder="0" oninput="calcNI()" style="border-color:#A5B4FC"></div>
+      <div class="fl"><label>&#128172; Sin respuesta</label><input type="number" id="l_sr2" min="0" placeholder="0"></div>
       <div class="fl"><label>&#11088; Interesados</label><input type="number" id="l_int" min="0" placeholder="0" oninput="calcNI()"></div>
       <div class="fl"><label style="color:#888">&#128078; No interesados <span style="font-size:.68rem;background:#F3F4F6;border-radius:4px;padding:1px 5px">auto</span></label><input type="number" id="l_ni" min="0" placeholder="0" readonly style="background:#FFF3E6;color:#666;cursor:default"></div>
     </div>
@@ -446,7 +458,6 @@ tr:hover td{background:var(--b)}
   <div id="yo-banner">
     <span style="font-size:.73rem;font-weight:700;color:#3730A3;font-family:'Syne',sans-serif">☁️ Soy:</span>
     <button class="yo-btn" data-yo="KM" onclick="setYo('KM')">KM · Karen</button>
-    <button class="yo-btn" data-yo="AB" onclick="setYo('AB')" style="opacity:.38;text-decoration:line-through" title="Hasta jun 30 · inactiva">AB · Angie</button>
     <button class="yo-btn" data-yo="NM" onclick="setYo('NM')">NM · Nathalia</button>
     <button class="yo-btn" data-yo="ADMIN" onclick="setYo('ADMIN')">👁 Admin</button>
     <span id="yo-status">Selecciona quién eres para guardar en la nube ☁️</span>
@@ -732,6 +743,26 @@ function renderRedes(){
     <div class="kp a"><div class="kl">IG Interacciones</div><div class="kv md">${fmtn(d2.ig_int||0)}</div><div class="ks">${d1.ig_int?dH(d2.ig_int||0,d1.ig_int):''}</div></div>
     <div class="kp b"><div class="kl">FB Interacciones</div><div class="kv md">${fmtn(d2.fb_int||0)}</div><div class="ks">${d1.fb_int?dH(d2.fb_int||0,d1.fb_int):''}</div></div>
     <div class="kp g"><div class="kl">🏆 Cierres org.</div><div class="kv">${d2.cierres_org||0}</div><div class="ks">conversión directa</div></div>`;
+  // Mini-funnel pipeline WPP → Calc → Verificados
+  const rFunEl=document.getElementById('r0-funnel');
+  if(rFunEl){
+    const ver2r=d2.cli_ver||0;
+    if(wpp2||wppCalc2||calc2||ver2r){
+      rFunEl.style.display='';
+      const maxR=Math.max(wpp2,wppCalc2,calc2,ver2r,1);
+      const rfBar=(val,col,lbl,sub)=>{
+        const pw=Math.max(4,Math.round(val/maxR*100));
+        return`<div class="fn-row"><div class="fn-lbl">${lbl}</div><div class="fn-bar-wrap"><div class="fn-bar" style="width:${pw}%;background:${col}"><span style="padding:0 6px;font-weight:700;font-size:.72rem;color:#fff">${val}</span></div></div><div class="fn-conv" style="font-size:.7rem;font-weight:700;color:#555">${sub}</div></div>`;
+      };
+      rFunEl.innerHTML='<div class="fn-title">&#128241; Pipeline WPP &#8594; Calculadora &#8594; Verificados</div>'+
+        rfBar(wpp2,'#25D366','&#128172; WPP','llegaron')+
+        rfBar(wppCalc2,'#DB2777','&#128172;&#8594;&#129518; WPP→Calc',wpp2>0?Math.round(wppCalc2/wpp2*100)+'%':'—')+
+        rfBar(calc2,'#F97316','&#129518; Calc. Bitrix',wppCalc2>0?Math.round(calc2/wppCalc2*100)+'% de WPP calc':'todas fuentes')+
+        rfBar(ver2r,'#0891B2','&#9989; Verificados',calc2>0?Math.round(ver2r/calc2*100)+'% de calc':'—');
+    } else {
+      rFunEl.style.display='none';
+    }
+  }
   // Insights automáticos
   const ins=[];
   if(d2.wpp&&d1.wpp){const v=((d2.wpp-d1.wpp)/d1.wpp*100).toFixed(1);ins.push(v>0?{ic:'📈',t:`Los leads WPP crecieron <strong>${v}%</strong> (${d1.wpp}→${d2.wpp}). Estrategia de campañas funcionando.`}:{ic:'📉',t:`Los leads WPP bajaron <strong>${Math.abs(v)}%</strong> (${d1.wpp}→${d2.wpp}). Revisar campañas activas.`});}
@@ -795,7 +826,7 @@ function renderRedes(){
 }
 
 /* ═══ LEADS ═══ */
-const LF=[['total','l_total'],['wpp','l_wpp'],['cno','l_cno'],['sr','l_sr'],['ni','l_ni'],['int','l_int'],['vig','l_vig'],['vig_no','l_vig_no'],['ci','l_ci'],['ci_org','l_ci_org'],['ci_ant','l_ci_ant'],['ci_gc','l_ci_gc'],['ci_lag','l_ci_lag'],['ci_cv','l_ci_cv'],['ci_cred','l_ci_cred'],['ver','l_ver'],['nver','l_nver'],['gc','l_gc'],['cv','l_cv'],['lag','l_lag'],['cred','l_cred']];
+const LF=[['total','l_total'],['wpp','l_wpp'],['cno','l_cno'],['sr','l_sr'],['sr2','l_sr2'],['ni','l_ni'],['int','l_int'],['vig','l_vig'],['vig_no','l_vig_no'],['ci','l_ci'],['ci_org','l_ci_org'],['ci_ant','l_ci_ant'],['ci_gc','l_ci_gc'],['ci_lag','l_ci_lag'],['ci_cv','l_ci_cv'],['ci_cred','l_ci_cred'],['ver','l_ver'],['nver','l_nver'],['gc','l_gc'],['cv','l_cv'],['lag','l_lag'],['cred','l_cred']];
 function calcNI(){
   var tot=parseInt(document.getElementById('l_total')?.value||'0')||0;
   var ver=parseInt(document.getElementById('l_ver')?.value||'0')||0;
@@ -889,7 +920,7 @@ function saveLeadsMes(){
   var mk=document.getElementById('lm_mes_sel')?.value;
   if(!mk)return;
   var LFM=[['wpp','lm_wpp'],['total','lm_total'],['ver','lm_ver'],['nver','lm_nver'],
-    ['cno','lm_cno'],['sr','lm_sr'],['int','lm_int'],['ni','lm_ni'],
+    ['cno','lm_cno'],['sr','lm_sr'],['sr2','lm_sr2'],['int','lm_int'],['ni','lm_ni'],
     ['ci','lm_ci'],['ci_org','lm_ci_org'],['ci_ali','lm_ci_ali'],
     ['gc','lm_gc'],['lag','lm_lag'],['cv','lm_cv'],['cred','lm_cred']];
   var o={};
@@ -932,13 +963,14 @@ function renderLeadsMensual(){
   Object.keys(allLW).forEach(function(wk){
     if(!/^\d{4}-\d{2}-\d{2}$/.test(wk))return;
     var mk=wk.substr(0,7);
-    if(!allLM[mk])allLM[mk]={wpp:0,total:0,ver:0,cno:0,sr:0,int:0,ci_org:0,ci_ali:0,ci:0,gc:0,lag:0,cv:0,cred:0,nver:0,ni:0,_auto:true};
+    if(!allLM[mk])allLM[mk]={wpp:0,total:0,ver:0,cno:0,sr:0,sr2:0,int:0,ci_org:0,ci_ali:0,ci:0,gc:0,lag:0,cv:0,cred:0,nver:0,ni:0,_auto:true};
     var w=allLW[wk]||{};
     allLM[mk].wpp+=(w.wpp||0);
     allLM[mk].total+=(w.total||0);
     allLM[mk].ver+=(w.ver||0);
     allLM[mk].cno+=(w.cno||0);
     allLM[mk].sr+=(w.sr||0);
+    allLM[mk].sr2+=(w.sr2||0);
     allLM[mk].int+=(w.int||0);
     allLM[mk].ci_org+=(w.ci_org||0)+(w.ci_ant||0);
     allLM[mk].ci_ali+=(w.ci_gc||0)+(w.ci_lag||0)+(w.ci_cv||0)+(w.ci_cred||0);
@@ -999,7 +1031,8 @@ function renderLeadsMensual(){
       '<div class="sec" style="font-size:.72rem;color:#0891B2">&#9989; De los verificados</div>'+
       '<div class="fg" style="margin-bottom:10px">'+
         iM('lm_cno',dm.cno||0,'&#128203; Incompletas')+
-        iM('lm_sr',dm.sr||0,'&#128172; Sin respuesta')+
+        iM('lm_sr',dm.sr||0,'&#128228; Mensajes en proceso')+
+        iM('lm_sr2',dm.sr2||0,'&#128172; Sin respuesta')+
         iM('lm_int',dm.int||0,'&#11088; Interesados')+
         iM('lm_ni',dm.ni||0,'&#128078; No interesados',true)+
       '</div>'+
@@ -1068,7 +1101,8 @@ function renderLeadsMensual(){
     '<div class="kp" style="background:#F8FAFC;border-left:4px solid #94A3B8"><div class="kl">&#10060; No verificados</div><div class="kv" style="color:#64748B">'+nverM+'</div><div class="ks">'+(totalM>0?pct(nverM,totalM,1)+'%':'—')+'</div></div>'+
     '<div class="kp g"><div class="kl">Interesados &#9733;</div><div class="kv">'+intM+'</div><div class="ks">'+pVerIntM+'% de ver.</div></div>'+
     '<div class="kp p"><div class="kl">No interesados</div><div class="kv">'+niM+'</div><div class="ks">'+(verM>0?pct(niM,verM,1)+'% de ver.':'—')+'</div></div>'+
-    '<div class="kp a"><div class="kl">Sin respuesta</div><div class="kv">'+srM+'</div><div class="ks">'+(verM>0?pct(srM,verM,1)+'% de ver.':'—')+'</div></div>'+
+    '<div class="kp" style="background:#F0F0FF;border-top:3px solid #6366F1"><div class="kl">&#128228; Mensajes en proceso</div><div class="kv" style="color:#4F46E5">'+srM+'</div><div class="ks">'+(verM>0?pct(srM,verM,1)+'% de ver.':'—')+'</div></div>'+
+    '<div class="kp" style="border-left:3px solid #64748B"><div class="kl">&#128172; Sin respuesta</div><div class="kv" style="color:#64748B">'+(d2.sr2||0)+'</div><div class="ks">'+(srM>0?pct(d2.sr2||0,srM,1)+'% de msg':'—')+'</div></div>'+
     (ciM>0?'<div class="kp" style="background:#F0FDF4;border-top:3px solid #16A34A"><div class="kl">&#127942; Cierres del mes</div><div class="kv" style="color:#16A34A">'+ciM+'</div><div class="ks">'+(ciOrgM?'Org. '+ciOrgM+' ':'')+(ciAliM?'Ali. '+ciAliM:'')+'</div></div>':'<div class="kp" style="border-left:3px solid #D1D5DB"><div class="kl">Cierres</div><div class="kv" style="color:#9CA3AF">0</div></div>')+
     (gcM>0?'<div class="kp" style="border-left:4px solid #92400E"><div class="kl">GC leads</div><div class="kv" style="color:#92400E">'+gcM+'</div></div>':'')+
     (lagM>0?'<div class="kp" style="border-left:4px solid #7C3AED"><div class="kl">Lagom leads</div><div class="kv" style="color:#7C3AED">'+lagM+'</div></div>':'')+
@@ -1092,7 +1126,8 @@ function renderLeadsMensual(){
     fnBar(verM,'#0891B2','&#9989; Verificados',pCV,'de calculadora');
   var fase2M='<div style="font-size:.7rem;font-weight:800;color:#0891B2;padding:10px 0 4px 0;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #BFDBFE;margin-bottom:6px">&#9989; Fase 2 &#8212; De los '+verM+' verificados</div>'+
     fnBar(intM,'#16A34A','&#11088; Interesados',verM>0?Math.round(intM/verM*100)+'%':'&#8212;','de verificados')+
-    fnBar(srM,'#64748B','&#128172; Sin respuesta',verM>0?Math.round(srM/verM*100)+'%':'&#8212;','de verificados')+
+    fnBar(srM,'#6366F1','&#128228; Mensajes en proceso',verM>0?Math.round(srM/verM*100)+'%':'&#8212;','de verificados')+
+    (d2.sr2>0?fnBar(d2.sr2||0,'#64748B','&#128172; Sin respuesta',srM>0?Math.round((d2.sr2||0)/srM*100)+'%':'&#8212;','de mensajes en proceso',true):'')+
     fnBar(niM,'#94A3B8','&#128078; No interesados',verM>0?Math.round(niM/verM*100)+'%':'&#8212;','de verificados')+
     fnBar(cnoM,'#D97706','&#128203; Incompletas',verM>0?Math.round(cnoM/verM*100)+'%':'&#8212;','de verificados');
   var ciPartes=[];
@@ -1115,7 +1150,8 @@ function renderLeadsMensual(){
     {k:'total',lbl:'&#129518; Calculadoras',b:false},
     {k:'wpp',lbl:'&#128172; WPP',b:false},
     {k:'int',lbl:'&#11088; Interesados',b:false,base0:ver0,base1:ver1,base2:verM},
-    {k:'sr', lbl:'&#128172; Sin respuesta',b:false,base0:ver0,base1:ver1,base2:verM},
+    {k:'sr', lbl:'&#128228; Mensajes en proceso',b:false,base0:ver0,base1:ver1,base2:verM},
+    {k:'sr2',lbl:'&#128172; Sin respuesta',b:false,base0:null,base1:null,base2:null},
     {k:'ni', lbl:'&#128078; No interesados',b:false,base0:ver0,base1:ver1,base2:verM},
     {k:'cno',lbl:'&#128203; Incompletas',b:false,base0:ver0,base1:ver1,base2:verM},
     {k:'ci', lbl:'&#127942; Cierres',b:true}
@@ -1164,8 +1200,8 @@ function renderLeadsMensual(){
       {label:'Verificados',data:cmpMks.map(function(mk){return gM(mk,'ver');}),backgroundColor:'#BAE6FD',borderColor:'#0891B2',borderWidth:1},
       {label:'Interesados ★',data:cmpMks.map(function(mk){return gM(mk,'int');}),backgroundColor:'#86EFAC',borderColor:'#16A34A',borderWidth:1}
     ]);
-    var catLbls=['Interesados ★','Sin respuesta','No interesados','Incompletas','Cierres'];
-    var catKeys=['int','sr','ni','cno','ci'];
+    var catLbls=['Interesados ★','Msg proceso','Sin resp.','No interesados','Incompletas','Cierres'];
+    var catKeys=['int','sr','sr2','ni','cno','ci'];
     mkBarG('lc_pie',catLbls,cmpMks.map(function(mk,i){
       return{label:cmpLbls[i],data:catKeys.map(function(k){return gM(mk,k);}),backgroundColor:clrM[i],borderColor:brdM[i],borderWidth:1};
     }));
@@ -1223,7 +1259,8 @@ function renderLeads(){
     '<div class="kp" style="background:#F8FAFC;border-left:4px solid #94A3B8"><div class="kl">✗ No verificados</div><div class="kv" style="color:#64748B">'+nver2c+'</div><div class="ks">'+(t2>0?pct(nver2c,t2,1)+'%':'—')+'</div></div>'+
     '<div class="kp g"><div class="kl">Interesados ★</div><div class="kv">'+(d2.int||0)+'</div><div class="ks">'+pInt2+'% de ver.</div></div>'+
     '<div class="kp p"><div class="kl">No interesados</div><div class="kv">'+(d2.ni||0)+'</div><div class="ks">'+(ver2c>0?pct(d2.ni||0,ver2c,1)+'% de ver.':'—')+'</div></div>'+
-    '<div class="kp a"><div class="kl">Sin respuesta</div><div class="kv">'+(d2.sr||0)+'</div><div class="ks">'+(ver2c>0?pct(d2.sr||0,ver2c,1)+'% de ver.':'—')+'</div></div>'+
+    '<div class="kp" style="background:#F0F0FF;border-top:3px solid #6366F1"><div class="kl">&#128228; Mensajes en proceso</div><div class="kv" style="color:#4F46E5">'+(d2.sr||0)+'</div><div class="ks">'+(ver2c>0?pct(d2.sr||0,ver2c,1)+'% de ver.':'—')+'</div></div>'+
+    '<div class="kp" style="border-left:3px solid #64748B"><div class="kl">&#128172; Sin respuesta</div><div class="kv" style="color:#64748B">'+(d2.sr2||0)+'</div><div class="ks">'+(d2.sr>0?pct(d2.sr2||0,d2.sr,1)+'% de msg':'—')+'</div></div>'+
     '<div class="kp" style="border-left:4px solid #9CA3AF"><div class="kl">Cierres (aparte)</div><div class="kv" style="color:#6B7280">'+(d2.ci||0)+'</div><div class="ks">'+(d2.ci>0?'orgánico/alianza/anterior':'—')+'</div></div>'+
     (ci2total>0?'<div class="kp" style="background:#F0FDF4;border-top:3px solid #16A34A"><div class="kl">&#127942; Cierres semana</div><div class="kv" style="color:#16A34A">'+ci2total+'</div><div class="ks">'+(ci2org?'Org.est.'+ci2org+' ':'')+(ci2ant?'Ant.'+ci2ant+' ':'')+(ci2gc?'GC '+ci2gc+' ':'')+(ci2lag?'Lag '+ci2lag+' ':'')+(ci2cv?'CV '+ci2cv+' ':'')+(ci2cred?'Cred '+ci2cred:'')+'</div></div>':'<div class="kp" style="border-left:3px solid #D1D5DB"><div class="kl">Cierres</div><div class="kv" style="color:#9CA3AF">0</div></div>')+
     (vig2no>0?'<div class="kp" style="background:#FEF2F2;border-top:3px solid #DC2626"><div class="kl">&#128277; Ya no resp.</div><div class="kv" style="color:#DC2626">'+vig2no+'</div></div>':'')+
@@ -1232,7 +1269,7 @@ function renderLeads(){
     ((d2.cv||0)>0?'<div class="kp" style="border-left:4px solid #0891B2"><div class="kl">CV leads</div><div class="kv" style="color:#0891B2">'+d2.cv+'</div></div>':'')+
     (cred2>0?'<div class="kp" style="border-left:4px solid #059669"><div class="kl">Cred. leads</div><div class="kv" style="color:#059669">'+cred2+'</div></div>':'');
   /* ── EMBUDO REDISEÑADO — 3 FASES ── */
-  var wpp2=d2.wpp||0,calc2=d2.total||0,ver2b=d2.ver||0,nver2=Math.max(0,calc2-ver2b),cno2=d2.cno||0,sr2=d2.sr||0,int2=d2.int||0,ni2=d2.ni||0,ci2=d2.ci||0;
+  var wpp2=d2.wpp||0,calc2=d2.total||0,ver2b=d2.ver||0,nver2=Math.max(0,calc2-ver2b),cno2=d2.cno||0,srVal=d2.sr||0,sr2Val=d2.sr2||0,int2=d2.int||0,ni2=d2.ni||0,ci2=d2.ci||0;
   var ci2org=d2.ci_org||0,ci2ant=d2.ci_ant||0,ci2gc=d2.ci_gc||0,ci2lag=d2.ci_lag||0,ci2cv=d2.ci_cv||0,ci2cred=d2.ci_cred||0;
   var maxF=Math.max(wpp2,calc2,ver2b,1);
   function fnBar(val,color,label,conv,note,dimmed){
@@ -1245,7 +1282,8 @@ function renderLeads(){
   var pWppCalc=wpp2>0?Math.round(calc2/wpp2*100)+'%':'—';
   var pCalcVer=calc2>0?Math.round(ver2b/calc2*100)+'%':'—';
   var pVerInt=ver2b>0?Math.round(int2/ver2b*100)+'%':'—';
-  var pVerSr=ver2b>0?Math.round(sr2/ver2b*100)+'%':'—';
+  var pVerSr=ver2b>0?Math.round(srVal/ver2b*100)+'%':'—';
+  var pSr2=srVal>0?Math.round(sr2Val/srVal*100)+'%':'—';
   var pVerNi=ver2b>0?Math.round(ni2/ver2b*100)+'%':'—';
   var pVerCno=ver2b>0?Math.round(cno2/ver2b*100)+'%':'—';
   
@@ -1257,7 +1295,8 @@ function renderLeads(){
   
   var fase2='<div style="font-size:.7rem;font-weight:800;color:#0891B2;padding:10px 0 4px 0;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #BFDBFE;margin-bottom:6px">&#9989; Fase 2 — De los '+ver2b+' verificados</div>'+
     fnBar(int2,'#16A34A','&#11088; Interesados',pVerInt,'de verificados')+
-    fnBar(sr2,'#64748B','&#128172; Sin respuesta',pVerSr,'de verificados')+
+    fnBar(srVal,'#6366F1','&#128228; Mensajes en proceso',pVerSr,'de verificados')+
+    (sr2Val>0?fnBar(sr2Val,'#64748B','&#128172; Sin respuesta',pSr2,'de mensajes en proceso',true):'')+
     fnBar(ni2,'#94A3B8','&#128078; No interesados',pVerNi,'de verificados')+
     fnBar(cno2,'#D97706','&#128203; Incompletas',pVerCno,'de verificados');
   
@@ -1288,7 +1327,8 @@ function renderLeads(){
   var cats2=[
     {k:'ver',lbl:'✅ Base: Verificados',base0:null,base1:null,base2:null,bold:true},
     {k:'int',lbl:'⭐ Interesados',base0:ver0,base1:ver1,base2:ver2b},
-    {k:'sr', lbl:'💬 Sin respuesta',  base0:ver0,base1:ver1,base2:ver2b},
+    {k:'sr', lbl:'📨 Mensajes en proceso',base0:ver0,base1:ver1,base2:ver2b},
+    {k:'sr2',lbl:'💬 Sin respuesta',base0:null,base1:null,base2:null},
     {k:'ni', lbl:'👎 No interesados', base0:ver0,base1:ver1,base2:ver2b},
     {k:'cno',lbl:'📋 Incompletas',    base0:ver0,base1:ver1,base2:ver2b}
   ];
@@ -1321,9 +1361,9 @@ function renderLeads(){
       {label:'Interesados ★',data:int6,backgroundColor:'#16A34A',borderRadius:5,type:'bar'}
     ]);
     mkDona('lc_pie',
-      ['Incompletas','Sin respuesta','No interesados','Interesados ★'],
-      [d2.cno||0,d2.sr||0,d2.ni||0,d2.int||0],
-      ['#F97316','#64748B','#94A3B8','#16A34A']);
+      ['Incompletas','Msg proceso','Sin respuesta','No interesados','Interesados ★'],
+      [d2.cno||0,d2.sr||0,d2.sr2||0,d2.ni||0,d2.int||0],
+      ['#F97316','#6366F1','#64748B','#94A3B8','#16A34A']);
     mkLine('lc_trend',wlbls6,[
       {label:'Total leads',data:tot6,borderColor:'#F97316',backgroundColor:'rgba(249,115,22,.08)',fill:true,tension:.3},
       {label:'Interesados',data:int6,borderColor:'#16A34A',backgroundColor:'rgba(22,163,74,.08)',fill:true}
@@ -1448,11 +1488,11 @@ function renderAlianzas(){
 }
 
 /* ═══ REUNIONES ═══ */
-/* Alianzas por asesora: KM y AB → gc+cv; NM → gc+cv+gomm */
+/* Alianzas por asesora: KM y AB → gc+cv; NM → gc+cv+gomm+remo */
 const ALI_PER={
   KM:[{k:'gc',lbl:'Gran Central',clr:'#92400E'},{k:'cv',lbl:'Corner View',clr:'#0891B2'}],
   AB:[{k:'gc',lbl:'Gran Central',clr:'#92400E'},{k:'cv',lbl:'Corner View',clr:'#0891B2'}],
-  NM:[{k:'gc',lbl:'Gran Central',clr:'#92400E'},{k:'cv',lbl:'Corner View',clr:'#0891B2'},{k:'gomm',lbl:'LAGOM',clr:'#7C3AED'}]
+  NM:[{k:'gc',lbl:'Gran Central',clr:'#92400E'},{k:'cv',lbl:'Corner View',clr:'#0891B2'},{k:'gomm',lbl:'LAGOM',clr:'#7C3AED'},{k:'remo',lbl:'Remodelaciones',clr:'#E4721B'}]
 };
 /* ── Identidad multi-dispositivo ── */
 const YO_LS='vc3_yo';
@@ -2067,7 +2107,7 @@ function genInforme(){
   else if(parseFloat(pVM)<50)ops.push('Meta en '+pVM+'% — se requieren '+META_V-vMes+' ventas más.');
   if((cl.int||0)>0&&!(cl.ci||0))ops.push(''+cl.int+' prospectos interesados sin cierres registrados.');
   if(totCP>0&&totCE<totCP)ops.push(''+totCP-totCE+' confirmaciones pendientes de efectividad.');
-  if((cl.sr||0)>0&&(cl.total||0)>0&&parseFloat(pct(cl.sr||0,cl.total))>15)ops.push('Sin respuesta alta: '+cl.sr+' ('+pct(cl.sr||0,cl.total||1,0)+'%). Revisar gestión de leads.');
+  if((cl.sr||0)>0&&(cl.total||0)>0&&parseFloat(pct(cl.sr||0,cl.total))>15)ops.push('Mensajes en proceso alta: '+cl.sr+' ('+pct(cl.sr||0,cl.total||1,0)+'%). Revisar gestión de leads.');
   document.getElementById('inf-ops').innerHTML=ops.length?ops.map(o=>'<div class="op-item">'+o+'</div>').join(''):`<div style="color:var(--g);font-size:.78rem">Sin alertas — datos completos.</div>`;
   const pd=gLS(LS_P);const tx=document.getElementById('inf-pasos');if(tx)tx.value=pd[p.sISO]||'';
   document.getElementById('informe').scrollIntoView({behavior:'smooth',block:'start'});
@@ -2076,6 +2116,11 @@ function savePasos(){const p=getPer();const d=gLS(LS_P);d[p.sISO]=document.getEl
 function copiar(){const p=getPer();const cl=gLS(LS_L)[p.sISO]||{};let v=0,val=0;if(xlR){const vm=getVM(p.mi,p.yr,'Todas');v=vm.length;val=vm.reduce((s,r)=>s+gV(r),0);}const t=['📋 COMITÉ VIS-CO',`📅 ${wLbl(p)}`,'',`Leads: ${cl.total||0}  Interesados: ${cl.int||0}  Cierres: ${cl.ci||0}`,'',`Ventas ${p.mes}: ${v} (${pct(v,META_V)}%)`,`Ingresos: ${fmt(val)}`,``,`${new Date().toLocaleString('es-CO')}`].join('\n');navigator.clipboard.writeText(t).then(()=>alert('✅ Copiado al portapapeles')).catch(()=>alert('Copia manual el texto'));}
 function exportCSV(){if(!xlR){alert('Carga el Excel primero.');return;}const p=getPer();const rows=getVM(p.mi,p.yr,'Todas');const hdr='VD,Mes,Año,Cliente,Estado,Proyecto,Torre,Apto,Origen,VALOR,AIU,TIPO,CONVENIO\n';const csv=hdr+rows.map(r=>[r[2],r[3],r[4],r[6],r[7],r[8],r[9],r[10],r[12],gV(r),gAIU(r),eAli(r)?'Alianza':eOrg(r)?'Orgánico':'Comercial',eConv(r)?'Sí':'No'].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');const b=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`ventas_${p.mes}_${p.yr}.csv`;a.click();}
 
+function toggleModoComite(){
+  var mc=document.body.classList.toggle('modo-comite');
+  var btn=document.getElementById('btn-comite-toggle');
+  if(btn){btn.textContent=mc?'＋':'－';btn.title=mc?'Expandir para ingresar datos':'Colapsar para comité';}
+}
 function renderAll(){try{renderRedes();}catch(e){console.error('Redes:',e);}try{renderLeads();}catch(e){console.error('Leads:',e);}try{renderReuniones();}catch(e){console.error('Reun:',e);}if(xlR){try{renderVentas();}catch(e){console.error('Ventas:',e);}try{renderAlianzas();}catch(e){console.error('Ali:',e);}try{renderAptos();}catch(e){console.error('Aptos:',e);}}try{document.getElementById('c-period').textContent=wLbl(getPer());}catch(e){}}
 (async function init(){
   await initStorage();
