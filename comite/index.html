@@ -390,8 +390,12 @@ body.modo-comite .brow{display:none!important}
         <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:6px">&#128172; Llegaron WPP &#9889; <span style="font-size:.6rem;font-weight:400;color:#888">auto Redes</span></label>
         <input type="number" id="l_wpp" min="0" placeholder="0" readonly style="width:100%;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#16A34A;background:#DCFCE7;outline:none;cursor:default">
       </div>
+      <div style="background:#FFF0F6;border:1.5px solid #F9A8D4;border-radius:10px;padding:12px 14px">
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#DB2777;display:block;margin-bottom:6px">&#128172;&#8594;&#129518; WPP hicieron calc. &#9889; <span style="font-size:.6rem;font-weight:400;color:#888">auto Redes</span></label>
+        <input type="number" id="l_wpp_calc" min="0" placeholder="0" readonly style="width:100%;border:1.5px solid #F9A8D4;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#DB2777;background:#FFF0F6;outline:none;cursor:default">
+      </div>
       <div style="background:#FFF8F0;border:1.5px solid #ECCDB0;border-radius:10px;padding:12px 14px">
-        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--o);display:block;margin-bottom:6px">&#129518; Hicieron calculadora</label>
+        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--o);display:block;margin-bottom:6px">&#129518; Calc. totales Bitrix</label>
         <input type="number" id="l_total" min="0" placeholder="0" oninput="calcNI()" style="width:100%;border:1.5px solid #ECCDB0;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:var(--o);background:#fff;outline:none">
       </div>
       <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:10px;padding:12px 14px">
@@ -855,7 +859,7 @@ function renderRedes(){
 }
 
 /* ═══ LEADS ═══ */
-const LF=[['total','l_total'],['wpp','l_wpp'],['cno','l_cno'],['sr','l_sr'],['sr2','l_sr2'],['ni','l_ni'],['int','l_int'],['vig','l_vig'],['vig_no','l_vig_no'],['ci','l_ci'],['ci_org','l_ci_org'],['ci_ant','l_ci_ant'],['ci_gc','l_ci_gc'],['ci_lag','l_ci_lag'],['ci_cv','l_ci_cv'],['ci_cred','l_ci_cred'],['ver','l_ver'],['nver','l_nver'],['gc','l_gc'],['cv','l_cv'],['lag','l_lag'],['cred','l_cred']];
+const LF=[['total','l_total'],['wpp','l_wpp'],['wpp_calc','l_wpp_calc'],['cno','l_cno'],['sr','l_sr'],['sr2','l_sr2'],['ni','l_ni'],['int','l_int'],['vig','l_vig'],['vig_no','l_vig_no'],['ci','l_ci'],['ci_org','l_ci_org'],['ci_ant','l_ci_ant'],['ci_gc','l_ci_gc'],['ci_lag','l_ci_lag'],['ci_cv','l_ci_cv'],['ci_cred','l_ci_cred'],['ver','l_ver'],['nver','l_nver'],['gc','l_gc'],['cv','l_cv'],['lag','l_lag'],['cred','l_cred']];
 function calcNI(){
   var tot=parseInt(document.getElementById('l_total')?.value||'0')||0;
   var ver=parseInt(document.getElementById('l_ver')?.value||'0')||0;
@@ -1259,8 +1263,10 @@ function renderLeads(){
   var d2=Object.assign({},allL[p2.sISO]||{});
   var d1=Object.assign({},allL[p1.sISO]||{});
   var d0=Object.assign({},allL[p0.sISO]||{});
-  /* WPP desde Redes si no hay en Leads */
-  if(!d2.wpp){var rw=(allR[p2.sISO]||{}).wpp||0;if(rw){d2.wpp=rw;if(!d2.total)d2.total=rw;}}
+  /* WPP y wpp_calc desde Redes si no hay en Leads */
+  var rD2=allR[p2.sISO]||{};
+  if(!d2.wpp){var rw=rD2.wpp||0;if(rw){d2.wpp=rw;if(!d2.total)d2.total=rw;}}
+  if(!d2.wpp_calc){d2.wpp_calc=rD2.wpp_calc||0;}
   /* ni automático */
   d2.ni=Math.max(0,(d2.ver||0)-(d2.cno||0)-(d2.sr||0)-(d2.int||0));
   /* poblar form */
@@ -1303,9 +1309,8 @@ function renderLeads(){
   /* ── PIPELINE WPP (datos de Redes) ── */
   var wppPipeEl=document.getElementById('l-wpp-pipeline');
   if(wppPipeEl){
-    var rD=allR[p2.sISO]||{};
-    var wpD=d2.wpp||rD.wpp||0;
-    var wppCalcD=rD.wpp_calc||0;
+    var wpD=d2.wpp||0;
+    var wppCalcD=d2.wpp_calc||0;
     var calD=d2.total||0;
     var verD=d2.ver||0;
     var nverD=d2.nver||Math.max(0,calD-verD);
