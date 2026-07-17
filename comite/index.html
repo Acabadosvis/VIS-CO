@@ -1758,7 +1758,7 @@ function renderVentas(){
   if(orgR.length>0)vIns.push({ic:'🌱',t:`Orgánicos: <strong>${orgR.length} ventas</strong>. Ticket promedio: ${fmt(tkOrg)}.`});
 
   /* colores por origen para gráfica */
-  const ORG_CLR={'GRAN CENTRAL':'#92400E','GC CONVENIO':'#B45309','GRAN CENTRAL CONVENIO':'#B45309','WELL':'#0891B2','KLIK':'#7C3AED','CORNER VIEW':'#0369A1','CORNER V':'#0369A1','CONINSA':'#64748B','VANTI':'#16A34A','LAGOM':'#9333EA','ORGÁNICO':'#16A34A','ORGÁNICO ':'#16A34A','REFERIDOS':'#6D28D9','COMPENSAR':'#0284C7'};
+  const ORG_CLR={'GRAN CENTRAL':'#92400E','GC CONVENIO':'#B45309','GRAN CENTRAL CONVENIO':'#B45309','WELL':'#0891B2','KLIK':'#7C3AED','CORNER VIEW':'#0369A1','CORNER V':'#0369A1','CONINSA':'#64748B','VANTI':'#16A34A','ORGÁNICO':'#16A34A','ORGÁNICO ':'#16A34A','PRESUPUESTOS':'#64748B','REFERIDOS':'#6D28D9','COMPENSAR':'#0284C7'};
   const fpVal=parseFloat(pVal);
   const pVColor=parseFloat(pV)>=100?'#16A34A':parseFloat(pV)>=70?'#E4721B':'#DC2626';
   const pValColor=fpVal>=100?'#16A34A':fpVal>=70?'#E4721B':'#DC2626';
@@ -1818,9 +1818,9 @@ function renderVentas(){
               'GC Convenio':gcConv.length,
               'Klik':vm.filter(r=>(r[9]||'').toUpperCase().includes('KLIK')&&eAli(r)).length,
               'Corner View':vm.filter(r=>(r[9]||'').toUpperCase().includes('CORNER')&&eAli(r)).length,
-              'Lagom':vm.filter(r=>(r[9]||'').toUpperCase().includes('LAGOM')).length,
               'Vanti':vm.filter(r=>(r[9]||'').toUpperCase().includes('VANTI')&&eAli(r)).length,
               'Orgánico':orgTotal,
+              'Presupuestos':remR.length,
               'Credifamilia':vm.filter(r=>(r[9]||'').toUpperCase().includes('CREDIFAMILIA')&&eAli(r)).length,
               'Referidos':vm.filter(r=>[(r[9]||''),(r[13]||'')].some(v=>v.toUpperCase().includes('REFERIDO'))).length,
               'Compensar':vm.filter(r=>[(r[9]||''),(r[13]||'')].some(v=>v.toUpperCase().includes('COMPENSAR'))).length,
