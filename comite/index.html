@@ -1633,7 +1633,7 @@ function renderReunionesLocal(){
     </div>`;
   }).join('');
   // KPIs semana + totales
-  const actReu=abActiva?['KM','NM','AB']:['KM','NM'];
+  const actReu=['KM','NM'];
   const totP=actReu.reduce((s,a)=>s+(cur[a]?.prog||0),0);
   const totE=actReu.reduce((s,a)=>s+(cur[a]?.ef||0),0);
   // Base: calculadoras VERIFICADAS desde módulo Leads
@@ -1645,7 +1645,7 @@ function renderReunionesLocal(){
     <div class="kp g"><div class="kl">Efectivas total</div><div class="kv">${totE}</div><div class="ks">${lb2>0?pct(totE,lb2,2):0}% de leads</div></div>
     <div class="kp p"><div class="kl">KM</div><div class="kv">${cur.KM?.ef||0}/${cur.KM?.prog||0}</div><div class="ks">${cur.KM?.prog>0?pct(cur.KM.ef,cur.KM.prog,0):0}% conv</div></div>
     <div class="kp a"><div class="kl">NM</div><div class="kv">${cur.NM?.ef||0}/${cur.NM?.prog||0}</div><div class="ks">${cur.NM?.prog>0?pct(cur.NM.ef,cur.NM.prog,0):0}% conv</div></div>
-    ${abActiva?`<div class="kp" style="border-left:3px solid ${VDC.AB}"><div class="kl">AB</div><div class="kv">${cur.AB?.ef||0}/${cur.AB?.prog||0}</div><div class="ks">${cur.AB?.prog>0?pct(cur.AB.ef,cur.AB.prog,0):0}% conv</div></div>`:(cur.AB?.ef||cur.AB?.prog)?`<div class="kp" style="opacity:.45"><div class="kl">AB (hist.)</div><div class="kv">${cur.AB?.ef||0}/${cur.AB?.prog||0}</div></div>`:''}` ;
+    ` ;
   // Tabla estilo PDF (Leads base / Agendadas / Atendidas) — 3 semanas
   function reuRow(lbl,v0,v1,v2,lb0,lb1,lb2,inv){
     const ps0=lb0>0?`(${pct(v0,lb0,2)}%)`:'';const ps1=lb1>0?`(${pct(v1,lb1,2)}%)`:'';const ps2=lb2>0?`(${pct(v2,lb2,2)}%)`:'';
