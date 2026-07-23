@@ -1702,6 +1702,20 @@ function getOrigen(r){
   return(r[13]||'Sin origen').toString().trim()||'Sin origen';
 }
 function getVM(mi,yr,filt){const rows=(xlR||[]).filter(r=>{const raw=(r[3]||'').toString().toLowerCase().trim();const m=MN[raw];const est=(r[8]||'').toString().toUpperCase().trim();return m===mi&&(parseInt(r[4])||0)===yr&&est!=='CAIDO'&&est!=='';});return filt?rows.filter(r=>filt==='Todas'||(r[2]||'').toUpperCase()===filt):rows;}
+/* ── Helper: deduplicar Lagom 2 fases (TORRE+APTO), suma valores ── */
+function getLagDedup(rows){
+  var isL=function(r){return(r[9]||"").toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().includes("LAGOM");};
+  var lagR=rows.filter(isL),noL=rows.filter(function(r){return !isL(r);});
+  var byApt={};lagR.forEach(function(r){var k=(r[10]||"")+"||"+(r[11]||"");(byApt[k]=byApt[k]||[]).push(r);});
+  var groups=Object.values(byApt);
+  return{
+    rows:noL.concat(groups.map(function(g){return g[0];})),
+    count:noL.length+groups.length,
+    val:noL.reduce(function(s,r){return s+gV(r);},0)+groups.reduce(function(s,g){return s+g.reduce(function(sv,r){return sv+gV(r);},0);},0),
+    aiu:noL.reduce(function(s,r){return s+gAIU(r);},0)+groups.reduce(function(s,g){return s+g.reduce(function(sv,r){return sv+gAIU(r);},0);},0),
+    multi:groups.filter(function(g){return g.length>1;})
+  };
+}
 function renderVentas(){
   const el=document.getElementById('v-out');if(!xlR){el.innerHTML='';document.getElementById('v-noex').style.display='block';return;}
   document.getElementById('v-noex').style.display='none';
@@ -1714,7 +1728,7 @@ function renderVentas(){
   const vm=getVM(p.mi,p.yr,vFVD);
   const isRef=r=>[(r[9]||''),(r[13]||'')].some(v=>v.toUpperCase().includes('REFERIDO'));
   /* ── Lagom 2-fases: deduplicar por cliente+torre+apto ── */
-  const isLag=r=>(r[9]||"").toUpperCase().includes("LAGOM");
+  const isLag=r=>(r[9]||"").toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().includes("LAGOM");
   const lagR=vm.filter(isLag),noLagR=vm.filter(r=>!isLag(r));
   const lagByApt={};
   lagR.forEach(r=>{const k=(r[10]||"")+"||"+(r[11]||"");(lagByApt[k]=lagByApt[k]||[]).push(r);});
@@ -1760,12 +1774,14 @@ function renderVentas(){
   /* Mes anterior */
   const pm=p.mi===0?11:p.mi-1,pyr=p.mi===0?p.yr-1:p.yr;
   const vmp=getVM(pm,pyr,vFVD);
-  const pv=vmp.length,pvVal=vmp.reduce((s,r)=>s+gV(r),0);
-  const pAliR=vmp.filter(r=>eAli(r)),pOrgR=vmp.filter(r=>eOrg(r));
+  const vmpD=getLagDedup(vmp);
+  const pv=vmpD.count,pvVal=vmpD.val;
+  const pAliR=vmpD.rows.filter(r=>eAli(r)),pOrgR=vmpD.rows.filter(r=>eOrg(r));
   /* Año */
   const vA=(xlR||[]).filter(r=>(parseInt(r[4])||0)===p.yr&&(r[8]||'').toString().toUpperCase().trim()!=='CAIDO');
-  const tvA=vA.length,tvAVal=vA.reduce((s,r)=>s+gV(r),0);
-  const byMes=Array(12).fill(0);vA.forEach(r=>{const m=MN[(r[3]||'').toString().toLowerCase().trim()];if(m>=0&&m<12)byMes[m]++;});
+  const vAD=getLagDedup(vA);
+  const tvA=vAD.count,tvAVal=vAD.val;
+  const byMes=Array(12).fill(0);for(var _mi=0;_mi<12;_mi++){var _mr=vA.filter(function(r){return MN[(r[3]||'').toString().toLowerCase().trim()]===_mi;});byMes[_mi]=getLagDedup(_mr).count;}
   /* Insights */
   const vIns=[];
   const fpV=parseFloat(pV);
@@ -2045,7 +2061,7 @@ function renderAptos(){
   }
 
   /* ── Lagom: todos los aptos del proyecto, dedup por cliente+torre+apto ── */
-  var lagomAllR=xlR?xlR.filter(function(r){return(r[9]||'').toString().toUpperCase().includes('LAGOM')&&norm(r[8])!=='CAIDO';}).filter(function(r){var e=norm(r[8]);return e!=='';})  :[];
+  var lagomAllR=xlR?xlR.filter(function(r){returnnorm(r[9]).includes('LAGOM')&&norm(r[8])!=='CAIDO';}).filter(function(r){var e=norm(r[8]);return e!=='';})  :[];
   var lagomByAptP={};lagomAllR.forEach(function(r){var k=(r[10]||'')+'||'+(r[11]||'');(lagomByAptP[k]=lagomByAptP[k]||[]).push(r);});
   var lagomApts=Object.values(lagomByAptP);
 
