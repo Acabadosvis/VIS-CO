@@ -2200,7 +2200,8 @@ function renderAptos(){
         var fecha=r[12]?r[12].toString().trim():'';
         html+='<div style="margin-bottom:'+(i<grp.length-1?'5':'0')+'px;padding-bottom:'+(i<grp.length-1?'5':'0')+'px;border-bottom:'+(i<grp.length-1?'1px solid #EDE9FE':'none')+'">';
         html+='<div style="display:flex;align-items:center;gap:4px;margin-bottom:1px">';
-        if(grp.length>1)html+='<span style="font-size:.58rem;color:#94A3B8;font-weight:600">F'+(i+1)+'</span>';
+        var fLbl=(r[9]||'').toString().toUpperCase().includes('FASE 2')?'Fase 2':(r[9]||'').toString().toUpperCase().includes('FASE 1')?'Fase 1':grp.length>1?'F'+(i+1):null;
+        if(fLbl)html+='<span style="font-size:.58rem;color:#94A3B8;font-weight:600">'+fLbl+'</span>';
         html+='<span style="font-size:.6rem;background:'+estCol+'22;color:'+estCol+';border-radius:3px;padding:0px 4px;font-weight:700">'+estLbl+'</span>';
         html+='<span style="font-size:.62rem;font-weight:700;color:#3B0764;margin-left:auto">'+fmt(gV(r))+'</span>';
         html+='</div>';
