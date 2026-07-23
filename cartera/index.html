@@ -958,13 +958,16 @@ function render() {
   document.getElementById('tbody').innerHTML = items.map(c=>{
     const dias = c.diasMora;
     const diasRestantes = c.oldestVenc ? daysDiff(c.oldestVenc) : null;
-    const fechaVctoColor = diasRestantes===null ? '' :
-      diasRestantes < 0  ? 'red'    : // ya venció
-      diasRestantes <= 7 ? 'orange' : // vence esta semana
-      'blue';                           // próximo
+    const vctoColor = diasRestantes===null ? 'var(--g)' :
+      diasRestantes < 0  ? 'var(--mora)' :
+      diasRestantes <= 7 ? 'var(--venc)' : 'var(--sem)';
+    const vctoSub = diasRestantes===null ? '' :
+      diasRestantes < 0  ? `<br><span style="font-size:9px;color:var(--mora)">hace ${Math.abs(diasRestantes)}d</span>` :
+      diasRestantes === 0 ? `<br><span style="font-size:9px;color:var(--venc)">Hoy</span>` :
+      diasRestantes <= 7  ? `<br><span style="font-size:9px;color:var(--venc)">en ${diasRestantes}d</span>` : '';
     const fechaPagoHtml = c.oldestVenc
-      ? `<span class="dias-mora ${fechaVctoColor}">${fmtD(c.oldestVenc)}${diasRestantes!==null&&diasRestantes<0?` <span style="font-size:9px">(${Math.abs(diasRestantes)}d)</span>`:''}</span>`
-      : '—';
+      ? `<span style="font-size:11px;font-weight:700;color:${vctoColor};white-space:nowrap">${fmtD(c.oldestVenc)}</span>${vctoSub}`
+      : '<span style="color:var(--g)">—</span>';
     const reasonKey = c.cid;
     const savedReason = reasons[reasonKey] || '';
     const obs = notes[c.cid] ? '📝' : '';
