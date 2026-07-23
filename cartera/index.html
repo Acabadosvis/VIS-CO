@@ -1717,15 +1717,15 @@ function renderVentas(){
   const isLag=r=>(r[9]||"").toUpperCase().includes("LAGOM");
   const lagR=vm.filter(isLag),noLagR=vm.filter(r=>!isLag(r));
   const lagByApt={};
-  lagR.forEach(r=>{const k=(r[7]||"")+"||"+(r[10]||"")+"||"+(r[11]||"");(lagByApt[k]=lagByApt[k]||[]).push(r);});
+  lagR.forEach(r=>{const k=(r[10]||"")+"||"+(r[11]||"");(lagByApt[k]=lagByApt[k]||[]).push(r);});
   const lagGroups=Object.values(lagByApt);
   const lagDedup=lagGroups.map(g=>g[0]);
   const lagMulti=lagGroups.filter(g=>g.length>1);
   /* lagValMap / lagAIUMap: valor total (ambas fases) por apto clave */
   const lagValMap={},lagAIUMap={};
-  lagGroups.forEach(g=>{const k=(g[0][7]||"")+"||"+(g[0][10]||"")+"||"+(g[0][11]||"");lagValMap[k]=g.reduce((s,r)=>s+gV(r),0);lagAIUMap[k]=g.reduce((s,r)=>s+gAIU(r),0);});
-  const gVD=r=>{if(isLag(r)){const k=(r[7]||"")+"||"+(r[10]||"")+"||"+(r[11]||"");return lagValMap[k]||gV(r);}return gV(r);};
-  const gAIUD=r=>{if(isLag(r)){const k=(r[7]||"")+"||"+(r[10]||"")+"||"+(r[11]||"");return lagAIUMap[k]||gAIU(r);}return gAIU(r);};
+  lagGroups.forEach(g=>{const k=(g[0][10]||"")+"||"+(g[0][11]||"");lagValMap[k]=g.reduce((s,r)=>s+gV(r),0);lagAIUMap[k]=g.reduce((s,r)=>s+gAIU(r),0);});
+  const gVD=r=>{if(isLag(r)){const k=(r[10]||"")+"||"+(r[11]||"");return lagValMap[k]||gV(r);}return gV(r);};
+  const gAIUD=r=>{if(isLag(r)){const k=(r[10]||"")+"||"+(r[11]||"");return lagAIUMap[k]||gAIU(r);}return gAIU(r);};
   const vmDedup=[...noLagR,...lagDedup];
   const aliR=vmDedup.filter(r=>eAli(r));
   const orgR=vmDedup.filter(r=>eOrg(r));
@@ -2046,7 +2046,7 @@ function renderAptos(){
 
   /* ── Lagom: todos los aptos del proyecto, dedup por cliente+torre+apto ── */
   var lagomAllR=xlR?xlR.filter(function(r){return(r[9]||'').toString().toUpperCase().includes('LAGOM')&&norm(r[8])!=='CAIDO';}).filter(function(r){var e=norm(r[8]);return e!=='';})  :[];
-  var lagomByAptP={};lagomAllR.forEach(function(r){var k=(r[7]||'')+'||'+(r[10]||'')+'||'+(r[11]||'');(lagomByAptP[k]=lagomByAptP[k]||[]).push(r);});
+  var lagomByAptP={};lagomAllR.forEach(function(r){var k=(r[10]||'')+'||'+(r[11]||'');(lagomByAptP[k]=lagomByAptP[k]||[]).push(r);});
   var lagomApts=Object.values(lagomByAptP);
 
   /* ── Donut por RESPONSABLE (residente) ── */
@@ -2151,27 +2151,47 @@ function renderAptos(){
   /* ── Pipeline Lagom ── */
   if(lagomApts.length){
     var lagMultiC=lagomApts.filter(function(g){return g.length>1;}).length;
+    var lagXR=lagomApts.filter(function(g){return g.some(function(r){return norm(r[8])==='X RECIBIR';});});
+    var lagEj=lagomApts.filter(function(g){return g.some(function(r){return norm(r[8]).includes('EJECUCI');});});
     html+='<div style="border:1px solid #7C3AED33;border-top:3px solid #7C3AED;border-radius:10px;padding:14px 16px;margin-bottom:12px">';
-    html+='<div style="font-family:Syne,sans-serif;font-weight:700;font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;color:#7C3AED;margin-bottom:10px">🏠 Lagom Pipeline — '+lagomApts.length+' apto'+(lagomApts.length>1?'s':'')+(lagMultiC?' · '+lagMultiC+' en 2 fases':'')+'</div>';
-    html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:8px">';
+    /* Header con resumen */
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px">';
+    html+='<div style="font-family:Syne,sans-serif;font-weight:700;font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;color:#7C3AED">🏠 Lagom Pipeline</div>';
+    html+='<div style="display:flex;gap:5px;flex-wrap:wrap">';
+    html+='<span style="font-size:.62rem;background:#3B076422;color:#3B0764;border-radius:4px;padding:2px 7px;font-weight:700">'+lagomApts.length+' aptos únicos</span>';
+    if(lagMultiC)html+='<span style="font-size:.62rem;background:#7C3AED22;color:#7C3AED;border-radius:4px;padding:2px 7px;font-weight:700">'+lagMultiC+' en 2 fases</span>';
+    if(lagEj.length)html+='<span style="font-size:.62rem;background:#16A34A22;color:#16A34A;border-radius:4px;padding:2px 7px;font-weight:700">'+lagEj.length+' en ejecución</span>';
+    if(lagXR.length)html+='<span style="font-size:.62rem;background:#7C3AED22;color:#6D28D9;border-radius:4px;padding:2px 7px;font-weight:700">'+lagXR.length+' por recibir</span>';
+    html+='</div></div>';
+    /* Tarjetas por apto */
+    html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px">';
     lagomApts.forEach(function(grp){
-      var r=grp[0];
-      var est=norm(r[8]);
-      var estCol=est==='X RECIBIR'?'#7C3AED':est.includes('EJECUCI')?'#16A34A':'#64748B';
-      var estLbl=est==='X RECIBIR'?'Por Recibir':est.includes('EJECUCI')?'En Ejecución':(r[8]||'—').toString().slice(0,12);
-      var fecha=r[12]?r[12].toString().trim():'';
-      var vd=VDN[(r[2]||'').toUpperCase()]||r[2]||'';
       var totalVal=grp.reduce(function(s,rx){return s+gV(rx);},0);
+      var apto=(grp[0][10]?'T'+grp[0][10]+' ':'')+('A'+(grp[0][11]||'—'));
+      var cliente=grp[0][7]||'—';
       html+='<div style="background:#F5F3FF;border:1px solid #DDD6FE;border-radius:8px;padding:10px 12px">';
-      html+='<div style="font-weight:700;font-size:.72rem;color:#3B0764;margin-bottom:2px">'+(r[7]||'—')+'</div>';
-      html+='<div style="font-size:.63rem;color:#6D28D9;margin-bottom:5px">'+(r[9]||'—')+(r[10]?' · T'+r[10]:'')+(r[11]?'/'+r[11]:'')+'</div>';
-      html+='<div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">';
-      html+='<span style="font-size:.6rem;background:'+estCol+'22;color:'+estCol+';border:1px solid '+estCol+'44;border-radius:4px;padding:1px 5px;font-weight:700">'+estLbl+'</span>';
-      if(grp.length>1)html+='<span style="font-size:.6rem;background:#7C3AED22;color:#7C3AED;border:1px solid #7C3AED44;border-radius:4px;padding:1px 5px;font-weight:700">2 Fases</span>';
-      if(vd)html+='<span style="font-size:.6rem;color:#94A3B8">'+vd+'</span>';
+      /* Header apto */
+      html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">';
+      html+='<div style="font-weight:800;font-size:.78rem;color:#3B0764">'+apto+'</div>';
+      if(grp.length>1)html+='<span style="font-size:.58rem;background:#7C3AED;color:#fff;border-radius:3px;padding:1px 5px;font-weight:700">2F</span>';
       html+='</div>';
-      if(fecha)html+='<div style="font-size:.6rem;color:#94A3B8;margin-top:3px">📅 '+fecha+'</div>';
-      if(totalVal>0)html+='<div style="font-size:.68rem;font-weight:700;color:#3B0764;margin-top:4px;border-top:1px solid #DDD6FE;padding-top:4px">'+(grp.length>1?'Total 2F: ':'')+fmt(totalVal)+'</div>';
+      html+='<div style="font-size:.63rem;color:#6D28D9;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+cliente+'</div>';
+      /* Fases */
+      grp.forEach(function(r,i){
+        var est=norm(r[8]);
+        var estCol=est==='X RECIBIR'?'#7C3AED':est.includes('EJECUCI')?'#16A34A':'#64748B';
+        var estLbl=est==='X RECIBIR'?'Por Recibir':est.includes('EJECUCI')?'En Ejecución':(r[8]||'').toString().slice(0,10)||'—';
+        var fecha=r[12]?r[12].toString().trim():'';
+        html+='<div style="margin-bottom:'+(i<grp.length-1?'5':'0')+'px;padding-bottom:'+(i<grp.length-1?'5':'0')+'px;border-bottom:'+(i<grp.length-1?'1px solid #EDE9FE':'none')+'">';
+        html+='<div style="display:flex;align-items:center;gap:4px;margin-bottom:1px">';
+        if(grp.length>1)html+='<span style="font-size:.58rem;color:#94A3B8;font-weight:600">F'+(i+1)+'</span>';
+        html+='<span style="font-size:.6rem;background:'+estCol+'22;color:'+estCol+';border-radius:3px;padding:0px 4px;font-weight:700">'+estLbl+'</span>';
+        html+='<span style="font-size:.62rem;font-weight:700;color:#3B0764;margin-left:auto">'+fmt(gV(r))+'</span>';
+        html+='</div>';
+        if(fecha)html+='<div style="font-size:.57rem;color:#94A3B8">📅 '+fecha+'</div>';
+        html+='</div>';
+      });
+      if(grp.length>1)html+='<div style="margin-top:5px;padding-top:5px;border-top:1px solid #DDD6FE;font-size:.65rem;font-weight:700;color:#3B0764;text-align:right">Total: '+fmt(totalVal)+'</div>';
       html+='</div>';
     });
     html+='</div></div>';
