@@ -920,7 +920,7 @@ function render() {
   // HEADERS
   const showVencAmt  = curTab==='vencido';
   const showSemAmt   = curTab==='semana';
-  const showDias     = curTab==='mora'||curTab==='vencido';
+  const showDias     = curTab!=='adicionales'&&curTab!=='cola'; // fecha vcto en todos los tabs
   const showReason   = curTab==='vencido';
   const showPagoBtn  = curTab==='vencido'||curTab==='semana'||curTab==='mora'||curTab==='recibir'||curTab==='aldia';
 
@@ -933,7 +933,7 @@ function render() {
     ${showVencAmt?'<th style="text-align:right">Vencido</th>':''}
     ${showSemAmt?'<th style="text-align:right">Esta Semana</th>':''}
     <th>Recaudo %</th>
-    ${showDias?'<th>Fecha pago</th>':''}
+    ${showDias?'<th onclick="doSort(\'oldestVenc\')">Fecha Vcto.</th>':''}
     ${showReason?'<th>Razón atraso</th>':''}
     ${showPagoBtn?'<th>Soporte</th>':''}
     <th>Obs.</th>
@@ -957,8 +957,13 @@ function render() {
 
   document.getElementById('tbody').innerHTML = items.map(c=>{
     const dias = c.diasMora;
+    const diasRestantes = c.oldestVenc ? daysDiff(c.oldestVenc) : null;
+    const fechaVctoColor = diasRestantes===null ? '' :
+      diasRestantes < 0  ? 'red'    : // ya venció
+      diasRestantes <= 7 ? 'orange' : // vence esta semana
+      'blue';                           // próximo
     const fechaPagoHtml = c.oldestVenc
-      ? `<span class="dias-mora ${dias>60?'red':dias>30?'orange':'blue'}">${fmtD(c.oldestVenc)}</span>`
+      ? `<span class="dias-mora ${fechaVctoColor}">${fmtD(c.oldestVenc)}${diasRestantes!==null&&diasRestantes<0?` <span style="font-size:9px">(${Math.abs(diasRestantes)}d)</span>`:''}</span>`
       : '—';
     const reasonKey = c.cid;
     const savedReason = reasons[reasonKey] || '';
