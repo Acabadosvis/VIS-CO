@@ -2064,8 +2064,8 @@ function renderAptos(){
   }
 
   /* ── Lagom: todos los aptos del proyecto, dedup por cliente+torre+apto ── */
-  var lagomAllR=xlR?xlR.filter(function(r){returnnorm(r[9]).includes('LAGOM')&&norm(r[8])!=='CAIDO';}).filter(function(r){var e=norm(r[8]);return e!=='';})  :[];
-  var lagK3=function(r){var a=(r[11]||'').toString().trim();if(a)return(r[10]||'')+'||'+a;var m3=(r[1]||'').toString().match(/(\d{3,})$/);return(r[10]||'')+'||'+(m3?m3[1]:(r[1]||'').toString().slice(-6));};var lagomByAptP={};lagomAllR.forEach(function(r){var k=lagK3(r);(lagomByAptP[k]=lagomByAptP[k]||[]).push(r);});
+  var lagomAllR=xlR?xlR.filter(function(r){return norm(r[9]).includes('LAGOM')&&norm(r[8])!=='CAIDO';}).filter(function(r){var e=norm(r[8]);return e!=='';})  :[];
+  var lagK3=function(r){return(r[7]||'').toString().trim().toUpperCase();};var lagomByAptP={};lagomAllR.forEach(function(r){var k=lagK3(r);(lagomByAptP[k]=lagomByAptP[k]||[]).push(r);});
   var lagomApts=Object.values(lagomByAptP);
 
   /* ── Donut por RESPONSABLE (residente) ── */
