@@ -1273,26 +1273,22 @@ function saveAdicObs(cid){
 function renderPagoCellRow(c) {
   const sops = getSoportes();
   const activeBlocks = (c.blocks||[]).filter(b=>b.saldo>0);
+  const usaGEN = activeBlocks.length===0;
 
-  // Sin bloques definidos en Excel → botón genérico para cualquier cliente
-  if(!activeBlocks.length) {
-    const pk = pagoKey(c.cid,'GEN');
-    const sop = sops[pk]||{};
-    if(sop.estado==='pendiente') return `<span class="pago-badge pendiente" onclick="openModal('${c.cid}')" style="cursor:pointer">📤 Pend. contab.</span>`;
-    if(sop.estado==='entro')     return `<span class="pago-badge entro" onclick="openModal('${c.cid}')" style="cursor:pointer">✅ Entró</span>`;
-    return `<label class="fbtn upload" style="padding:3px 9px;font-size:10px;display:inline-flex" title="Cargar soporte de pago">
-      📤 Soporte<input type="file" accept="image/*,.pdf" onchange="onSoporteRapido('${c.cid}',this,'GEN')">
-    </label>`;
-  }
+  // Estado de soportes ya registrados
+  const anyPend = usaGEN
+    ? (sops[pagoKey(c.cid,'GEN')]||{}).estado==='pendiente'
+    : activeBlocks.some(b=>{ const s=sops[pagoKey(c.cid,b.etapa)]; return s&&s.estado==='pendiente'; });
+  const anyEntro = usaGEN
+    ? (sops[pagoKey(c.cid,'GEN')]||{}).estado==='entro'
+    : activeBlocks.some(b=>{ const s=sops[pagoKey(c.cid,b.etapa)]; return s&&s.estado==='entro'; });
 
-  // Check any soporte registered for this client
-  const anyPend = activeBlocks.some(b=>{ const s=sops[pagoKey(c.cid,b.etapa)]; return s&&s.estado==='pendiente'; });
-  const anyEntro= activeBlocks.some(b=>{ const s=sops[pagoKey(c.cid,b.etapa)]; return s&&s.estado==='entro'; });
   if(anyPend) return `<span class="pago-badge pendiente" onclick="openModal('${c.cid}')" style="cursor:pointer">📤 Pend. contab.</span>`;
-  if(anyEntro)return `<span class="pago-badge entro" onclick="openModal('${c.cid}')" style="cursor:pointer">✅ Entró</span>`;
-  return `<label class="fbtn upload" style="padding:3px 9px;font-size:10px;display:inline-flex" title="Registrar pago">
-    📤 Soporte<input type="file" accept="image/*,.pdf" onchange="onSoporteRapido('${c.cid}',this)">
-  </label>`;
+  if(anyEntro)return `<span class="pago-badge entro"     onclick="openModal('${c.cid}')" style="cursor:pointer">✅ Entró</span>`;
+
+  // Siempre mostrar botón — nunca "—"
+  return `<label class="fbtn upload" style="padding:3px 9px;font-size:10px;display:inline-flex" title="Cargar soporte de pago">
+    📤 Soporte<input type="file" accept="image/*,.pdf" onchange="onSoporteRapido('${c.cid}',this${usaGEN?`,'GEN'`:''})">\n  </label>`;
 }
 function onSoporteRapido(cid,input,etapaFija){
   const f=input.files[0]; if(!f) return;
