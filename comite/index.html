@@ -653,7 +653,7 @@ async function syncRedesAhora(){
   var results=await Promise.all([syncDatosAPI('redes',wR),syncDatosAPI('leads',wL)]);
   var ch=results[0],chL=results[1];
   if(ch)renderRedes();
-  if(chL)renderLeads();
+  if(ch||chL)renderLeads();
   var now=new Date();
   var hm=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
   if(lbl)lbl.textContent='Actualizar';
@@ -734,6 +734,7 @@ async function saveRedes(){
   // ⚡ Sincronizar WPP leads → módulo Leads
   const ld=gLS(LS_L);const lw=ld[p.sISO]||{};
   lw.wpp=o.wpp;
+  lw.wpp_calc=o.wpp_calc;
   if(o.cli_ver>0)lw.ver=o.cli_ver;
   ld[p.sISO]=lw;sLS(LS_L,ld);
   renderRedes();renderLeads();
@@ -1701,6 +1702,21 @@ function getOrigen(r){
   return(r[13]||'Sin origen').toString().trim()||'Sin origen';
 }
 function getVM(mi,yr,filt){const rows=(xlR||[]).filter(r=>{const raw=(r[3]||'').toString().toLowerCase().trim();const m=MN[raw];const est=(r[8]||'').toString().toUpperCase().trim();return m===mi&&(parseInt(r[4])||0)===yr&&est!=='CAIDO'&&est!=='';});return filt?rows.filter(r=>filt==='Todas'||(r[2]||'').toUpperCase()===filt):rows;}
+/* ── Helper: deduplicar Lagom 2 fases (TORRE+APTO), suma valores ── */
+function getLagDedup(rows){
+  var isL=function(r){return(r[9]||"").toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().includes("LAGOM");};
+  var lagK=function(r){return(r[7]||"").toString().trim().toUpperCase();};
+  var lagR=rows.filter(isL),noL=rows.filter(function(r){return !isL(r);});
+  var byApt={};lagR.forEach(function(r){var k=lagK(r);(byApt[k]=byApt[k]||[]).push(r);});
+  var groups=Object.values(byApt);
+  return{
+    rows:noL.concat(groups.map(function(g){return g[0];})),
+    count:noL.length+groups.length,
+    val:noL.reduce(function(s,r){return s+gV(r);},0)+groups.reduce(function(s,g){return s+g.reduce(function(sv,r){return sv+gV(r);},0);},0),
+    aiu:noL.reduce(function(s,r){return s+gAIU(r);},0)+groups.reduce(function(s,g){return s+g.reduce(function(sv,r){return sv+gAIU(r);},0);},0),
+    multi:groups.filter(function(g){return g.length>1;})
+  };
+}
 function renderVentas(){
   const el=document.getElementById('v-out');if(!xlR){el.innerHTML='';document.getElementById('v-noex').style.display='block';return;}
   document.getElementById('v-noex').style.display='none';
@@ -1712,14 +1728,30 @@ function renderVentas(){
   /* Mes actual */
   const vm=getVM(p.mi,p.yr,vFVD);
   const isRef=r=>[(r[9]||''),(r[13]||'')].some(v=>v.toUpperCase().includes('REFERIDO'));
-  const aliR=vm.filter(r=>eAli(r));
-  const orgR=vm.filter(r=>eOrg(r));
-  const refR=vm.filter(r=>isRef(r));
-  const remR=vm.filter(r=>!eAli(r)&&!eOrg(r)&&!isRef(r));
-  const tv=vm.length,tVal=vm.reduce((s,r)=>s+gV(r),0),tAIU=vm.reduce((s,r)=>s+gAIU(r),0);
-  const aliV=aliR.reduce((s,r)=>s+gV(r),0),orgV=orgR.reduce((s,r)=>s+gV(r),0),remV=remR.reduce((s,r)=>s+gV(r),0);
-  const refV=refR.reduce((s,r)=>s+gV(r),0);
-  const aliAIU=aliR.reduce((s,r)=>s+gAIU(r),0),orgAIU=orgR.reduce((s,r)=>s+gAIU(r),0),remAIU=remR.reduce((s,r)=>s+gAIU(r),0);
+  /* ── Lagom 2-fases: deduplicar por CLIENTE (r[7]) — igual en ambas fases ── */
+  const isLag=r=>(r[9]||"").toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().includes("LAGOM");
+  const lagK2=r=>(r[7]||"").toString().trim().toUpperCase();
+  const lagR=vm.filter(isLag),noLagR=vm.filter(r=>!isLag(r));
+  const lagByApt={};
+  lagR.forEach(r=>{const k=lagK2(r);(lagByApt[k]=lagByApt[k]||[]).push(r);});
+  console.log("LAGOM DEBUG — lagR:",lagR.length,"grupos:",Object.keys(lagByApt).length,"keys:",Object.keys(lagByApt));
+  const lagGroups=Object.values(lagByApt);
+  const lagDedup=lagGroups.map(g=>g[0]);
+  const lagMulti=lagGroups.filter(g=>g.length>1);
+  /* lagValMap / lagAIUMap: valor total (ambas fases) por apto clave */
+  const lagValMap={},lagAIUMap={};
+  lagGroups.forEach(g=>{const k=lagK2(g[0]);lagValMap[k]=g.reduce((s,r)=>s+gV(r),0);lagAIUMap[k]=g.reduce((s,r)=>s+gAIU(r),0);});
+  const gVD=r=>{if(isLag(r)){const k=lagK2(r);return lagValMap[k]||gV(r);}return gV(r);};
+  const gAIUD=r=>{if(isLag(r)){const k=lagK2(r);return lagAIUMap[k]||gAIU(r);}return gAIU(r);};
+  const vmDedup=[...noLagR,...lagDedup];
+  const aliR=vmDedup.filter(r=>eAli(r));
+  const orgR=vmDedup.filter(r=>eOrg(r));
+  const refR=vmDedup.filter(r=>isRef(r));
+  const remR=vmDedup.filter(r=>!eAli(r)&&!eOrg(r)&&!isRef(r));
+  const tv=vmDedup.length,tVal=vmDedup.reduce((s,r)=>s+gVD(r),0),tAIU=vmDedup.reduce((s,r)=>s+gAIUD(r),0);
+  const aliV=aliR.reduce((s,r)=>s+gVD(r),0),orgV=orgR.reduce((s,r)=>s+gVD(r),0),remV=remR.reduce((s,r)=>s+gVD(r),0);
+  const refV=refR.reduce((s,r)=>s+gVD(r),0);
+  const aliAIU=aliR.reduce((s,r)=>s+gAIUD(r),0),orgAIU=orgR.reduce((s,r)=>s+gAIUD(r),0),remAIU=remR.reduce((s,r)=>s+gAIUD(r),0);
   /* Meta automática: valor mismo mes año anterior × 1.5 ÷ ticket promedio $37M */
   const TICKET_PROM=37000000;
   const vmPrevYr=(xlR||[]).filter(r=>{const raw=(r[3]||'').toString().toLowerCase().trim();const m=MN[raw];const est=(r[8]||'').toString().toUpperCase().trim();return m===p.mi&&(parseInt(r[4])||0)===(p.yr-1)&&est!=='CAIDO'&&est!=='';});
@@ -1739,18 +1771,20 @@ function renderVentas(){
   const tkAli=aliR.length?aliV/aliR.length:0,tkOrg=orgR.length?orgV/orgR.length:0,tkRem=remR.length?remV/remR.length:0,tkRef=refR.length?refV/refR.length:0,tkTot=tv?tVal/tv:0;
   const refAIU=refR.reduce((s,r)=>s+gAIU(r),0);
   /* Por origen: alianza=partner name, otros=r[12] */
-  const byOrg={};vm.forEach(r=>{const k=getOrigen(r);byOrg[k]=(byOrg[k]||0)+1;});
+  const byOrg={};vmDedup.forEach(r=>{const k=getOrigen(r);byOrg[k]=(byOrg[k]||0)+1;});
   const orgSort=Object.entries(byOrg).sort((a,b)=>b[1]-a[1]);
-  const byVDM={KM:0,AB:0,NM:0};vm.forEach(r=>{const v=(r[2]||'').toUpperCase();if(byVDM[v]!==undefined)byVDM[v]++;});
+  const byVDM={KM:0,AB:0,NM:0};vmDedup.forEach(r=>{const v=(r[2]||'').toUpperCase();if(byVDM[v]!==undefined)byVDM[v]++;});
   /* Mes anterior */
   const pm=p.mi===0?11:p.mi-1,pyr=p.mi===0?p.yr-1:p.yr;
   const vmp=getVM(pm,pyr,vFVD);
-  const pv=vmp.length,pvVal=vmp.reduce((s,r)=>s+gV(r),0);
-  const pAliR=vmp.filter(r=>eAli(r)),pOrgR=vmp.filter(r=>eOrg(r));
+  const vmpD=getLagDedup(vmp);
+  const pv=vmpD.count,pvVal=vmpD.val;
+  const pAliR=vmpD.rows.filter(r=>eAli(r)),pOrgR=vmpD.rows.filter(r=>eOrg(r));
   /* Año */
   const vA=(xlR||[]).filter(r=>(parseInt(r[4])||0)===p.yr&&(r[8]||'').toString().toUpperCase().trim()!=='CAIDO');
-  const tvA=vA.length,tvAVal=vA.reduce((s,r)=>s+gV(r),0);
-  const byMes=Array(12).fill(0);vA.forEach(r=>{const m=MN[(r[3]||'').toString().toLowerCase().trim()];if(m>=0&&m<12)byMes[m]++;});
+  const vAD=getLagDedup(vA);
+  const tvA=vAD.count,tvAVal=vAD.val;
+  const byMes=Array(12).fill(0);for(var _mi=0;_mi<12;_mi++){var _mr=vA.filter(function(r){return MN[(r[3]||'').toString().toLowerCase().trim()]===_mi;});byMes[_mi]=getLagDedup(_mr).count;}
   /* Insights */
   const vIns=[];
   const fpV=parseFloat(pV);
@@ -1813,20 +1847,20 @@ function renderVentas(){
         <div class="vi-org-grid">
           ${(function(){
             // Separate GC Convenio vs Gran Central (sin convenio)
-            const gcConv=vm.filter(r=>eConv(r)&&(r[9]||'').toUpperCase().includes('GRAN CENTRAL'));
-            const gcSolo=vm.filter(r=>!eConv(r)&&(r[9]||'').toUpperCase().includes('GRAN CENTRAL')&&eAli(r));
+            const gcConv=vmDedup.filter(r=>eConv(r)&&(r[9]||'').toUpperCase().includes('GRAN CENTRAL'));
+            const gcSolo=vmDedup.filter(r=>!eConv(r)&&(r[9]||'').toUpperCase().includes('GRAN CENTRAL')&&eAli(r));
             const orgTotal=orgR.length;
             const counts={
               'Gran Central':gcSolo.length,
               'GC Convenio':gcConv.length,
-              'Klik':vm.filter(r=>(r[9]||'').toUpperCase().includes('KLIK')&&eAli(r)).length,
-              'Corner View':vm.filter(r=>(r[9]||'').toUpperCase().includes('CORNER')&&eAli(r)).length,
-              'Vanti':vm.filter(r=>(r[9]||'').toUpperCase().includes('VANTI')&&eAli(r)).length,
+              'Klik':vmDedup.filter(r=>(r[9]||'').toUpperCase().includes('KLIK')&&eAli(r)).length,
+              'Corner View':vmDedup.filter(r=>(r[9]||'').toUpperCase().includes('CORNER')&&eAli(r)).length,
+              'Vanti':vmDedup.filter(r=>(r[9]||'').toUpperCase().includes('VANTI')&&eAli(r)).length,
               'Orgánico':orgTotal,
               'Presupuestos':remR.length,
-              'Credifamilia':vm.filter(r=>(r[9]||'').toUpperCase().includes('CREDIFAMILIA')&&eAli(r)).length,
+              'Credifamilia':vmDedup.filter(r=>(r[9]||'').toUpperCase().includes('CREDIFAMILIA')&&eAli(r)).length,
               'Referidos':refR.length,
-              'Compensar':vm.filter(r=>[(r[9]||''),(r[13]||'')].some(v=>v.toUpperCase().includes('COMPENSAR'))).length,
+              'Compensar':vmDedup.filter(r=>[(r[9]||''),(r[13]||'')].some(v=>v.toUpperCase().includes('COMPENSAR'))).length,
             };
             return Object.entries(counts).map(([lbl,n])=>`<div class="vi-org-row"><span class="vi-tipodot" style="background:${n>0?'var(--y)':'rgba(255,255,255,.2)'}"></span>${lbl}<span class="val ${n===0?'zero':''}">${n}</span></div>`).join('');
           })()}
@@ -1901,8 +1935,22 @@ function renderVentas(){
   <!-- 6. TABLA DETALLADA MES -->
   <div class="card">
     <div class="card-hd">Detalle completo ${p.mes} ${p.yr} <span class="card-hd-sub">${tv} registros</span></div>
-    ${tv===0?`<div class="msg msg-a">Sin ventas en ${p.mes} ${p.yr}.</div>`:`<div class="tw"><table><thead><tr><th>Cliente</th><th>Proyecto</th><th>T/A</th><th>Asesora</th><th>Origen</th><th class="tr">Valor</th><th class="tr">AIU</th><th>Tipo</th></tr></thead><tbody>${vm.map(r=>`<tr><td>${r[7]||'—'}</td><td>${r[9]||'—'}</td><td>${[r[10],r[11]].filter(Boolean).join('/')}</td><td>${VDN[(r[2]||'').toUpperCase()]||r[2]||'—'}</td><td>${getOrigen(r)}</td><td class="tr"><strong>${fmt(gV(r))}</strong></td><td class="tr">${fmt(gAIU(r))}</td><td><span class="badge ${eAli(r)?'ba':eOrg(r)?'bp':'bc'}">${eAli(r)?'Ali':eOrg(r)?'Org':'Com'}</span>${eConv(r)?`<span class="badge bconv" style="margin-left:2px">Conv</span>`:''}</td></tr>`).join('')}</tbody></table></div>`}
+    ${tv===0?`<div class="msg msg-a">Sin ventas en ${p.mes} ${p.yr}.</div>`:`<div class="tw"><table><thead><tr><th>Cliente</th><th>Proyecto</th><th>T/A</th><th>Asesora</th><th>Origen</th><th class="tr">Valor</th><th class="tr">AIU</th><th>Tipo</th></tr></thead><tbody>${vmDedup.map(r=>`<tr><td>${r[7]||'—'}</td><td>${r[9]||'—'}${isLag(r)&&lagGroups.find(g=>g[0]===r)&&lagGroups.find(g=>g[0]===r).length>1?'<span style="font-size:.58rem;background:#7C3AED22;color:#7C3AED;border-radius:4px;padding:1px 4px;margin-left:3px">2F</span>':''}</td><td>${[r[10],r[11]].filter(Boolean).join('/')}</td><td>${VDN[(r[2]||'').toUpperCase()]||r[2]||'—'}</td><td>${getOrigen(r)}</td><td class="tr"><strong>${fmt(gVD(r))}</strong></td><td class="tr">${fmt(gAIUD(r))}</td><td><span class="badge ${eAli(r)?'ba':eOrg(r)?'bp':'bc'}">${eAli(r)?'Ali':eOrg(r)?'Org':'Com'}</span>${eConv(r)?`<span class="badge bconv" style="margin-left:2px">Conv</span>`:''}</td></tr>`).join('')}</tbody></table></div>`}
   </div>
+
+  <!-- LAGOM 2 FASES: detalle solo si hay aptos con fases múltiples -->
+  ${lagMulti.length>0?`
+  <div class="card" style="border-top:3px solid #7C3AED">
+    <div class="card-hd" style="color:#7C3AED">🏠 Lagom — Apartamentos en 2 Fases <span class="card-hd-sub">${lagMulti.length} apto${lagMulti.length>1?"s":""}</span></div>
+    <div style="font-size:.65rem;color:var(--g);margin-bottom:10px">Cada apartamento tiene 2 registros en Excel (fase 1 + fase 2). Se cuenta como <strong>1 venta</strong>, con el valor total de ambas fases.</div>
+    <div class="tw"><table><thead><tr><th>Cliente</th><th>Proyecto</th><th>T/A</th><th>Fase 1</th><th>Fase 2</th><th class="tr">Total</th></tr></thead><tbody>
+    ${lagMulti.map(g=>{
+      const tot=g.reduce((s,r)=>s+gV(r),0);
+      return `<tr><td>${g[0][7]||"—"}</td><td>${g[0][9]||"—"}</td><td>${[g[0][10],g[0][11]].filter(Boolean).join("/")}</td>${g.map((r,i)=>`<td style="font-size:.7rem">${fmt(gV(r))}<br><span style="font-size:.58rem;color:var(--g)">Fase ${i+1}</span></td>`).join("")}<td class="tr"><strong>${fmt(tot)}</strong></td></tr>`;
+    }).join("")}
+    </tbody></table></div>
+  </div>
+  `:""}  <!-- /LAGOM DETALLE -->
 
   <!-- 4. COMPARATIVO -->
   <div class="card">
@@ -2015,6 +2063,11 @@ function renderAptos(){
     document.getElementById('a-noex').style.display='none';
   }
 
+  /* ── Lagom: todos los aptos del proyecto, dedup por cliente+torre+apto ── */
+  var lagomAllR=xlR?xlR.filter(function(r){returnnorm(r[9]).includes('LAGOM')&&norm(r[8])!=='CAIDO';}).filter(function(r){var e=norm(r[8]);return e!=='';})  :[];
+  var lagK3=function(r){var a=(r[11]||'').toString().trim();if(a)return(r[10]||'')+'||'+a;var m3=(r[1]||'').toString().match(/(\d{3,})$/);return(r[10]||'')+'||'+(m3?m3[1]:(r[1]||'').toString().slice(-6));};var lagomByAptP={};lagomAllR.forEach(function(r){var k=lagK3(r);(lagomByAptP[k]=lagomByAptP[k]||[]).push(r);});
+  var lagomApts=Object.values(lagomByAptP);
+
   /* ── Donut por RESPONSABLE (residente) ── */
   var byRes={};
   ejR.forEach(function(r){var k=(r[7]||'Sin residente').toString().trim().toUpperCase();byRes[k]=(byRes[k]||0)+1;});
@@ -2085,6 +2138,10 @@ function renderAptos(){
   if(convR.length){
     html+='<div class="apt-kp" style="background:#1A1A1A;color:#fff"><div class="apt-kpn" style="color:var(--y)">'+convR.length+'</div><div class="apt-kpl">Convenios activos</div><div class="apt-kps">en ejecucion (obra)</div></div>';
   }
+  if(lagomApts.length){
+    var lagMultiCnt=lagomApts.filter(function(g){return g.length>1;}).length;
+    html+='<div class="apt-kp" style="background:#3B0764;color:#fff"><div class="apt-kpn" style="color:#C4B5FD">'+lagomApts.length+'</div><div class="apt-kpl">Lagom</div><div class="apt-kps">'+(lagMultiCnt?lagMultiCnt+' en 2 fases · ':'')+'aptos únicos</div></div>';
+  }
   html+='</div>';
 
   /* Aviso si falta xlA */
@@ -2110,11 +2167,55 @@ function renderAptos(){
     html+='</div>';
   }
 
-
-
-
-
-
+  /* ── Pipeline Lagom ── */
+  if(lagomApts.length){
+    var lagMultiC=lagomApts.filter(function(g){return g.length>1;}).length;
+    var lagXR=lagomApts.filter(function(g){return g.some(function(r){return norm(r[8])==='X RECIBIR';});});
+    var lagEj=lagomApts.filter(function(g){return g.some(function(r){return norm(r[8]).includes('EJECUCI');});});
+    html+='<div style="border:1px solid #7C3AED33;border-top:3px solid #7C3AED;border-radius:10px;padding:14px 16px;margin-bottom:12px">';
+    /* Header con resumen */
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px">';
+    html+='<div style="font-family:Syne,sans-serif;font-weight:700;font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;color:#7C3AED">🏠 Lagom Pipeline</div>';
+    html+='<div style="display:flex;gap:5px;flex-wrap:wrap">';
+    html+='<span style="font-size:.62rem;background:#3B076422;color:#3B0764;border-radius:4px;padding:2px 7px;font-weight:700">'+lagomApts.length+' aptos únicos</span>';
+    if(lagMultiC)html+='<span style="font-size:.62rem;background:#7C3AED22;color:#7C3AED;border-radius:4px;padding:2px 7px;font-weight:700">'+lagMultiC+' en 2 fases</span>';
+    if(lagEj.length)html+='<span style="font-size:.62rem;background:#16A34A22;color:#16A34A;border-radius:4px;padding:2px 7px;font-weight:700">'+lagEj.length+' en ejecución</span>';
+    if(lagXR.length)html+='<span style="font-size:.62rem;background:#7C3AED22;color:#6D28D9;border-radius:4px;padding:2px 7px;font-weight:700">'+lagXR.length+' por recibir</span>';
+    html+='</div></div>';
+    /* Tarjetas por apto */
+    html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px">';
+    lagomApts.forEach(function(grp){
+      var totalVal=grp.reduce(function(s,rx){return s+gV(rx);},0);
+      var apto=(grp[0][10]?'T'+grp[0][10]+' ':'')+('A'+(grp[0][11]||'—'));
+      var cliente=grp[0][7]||'—';
+      html+='<div style="background:#F5F3FF;border:1px solid #DDD6FE;border-radius:8px;padding:10px 12px">';
+      /* Header apto */
+      html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">';
+      html+='<div style="font-weight:800;font-size:.78rem;color:#3B0764">'+apto+'</div>';
+      if(grp.length>1)html+='<span style="font-size:.58rem;background:#7C3AED;color:#fff;border-radius:3px;padding:1px 5px;font-weight:700">2F</span>';
+      html+='</div>';
+      html+='<div style="font-size:.63rem;color:#6D28D9;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+cliente+'</div>';
+      /* Fases */
+      grp.forEach(function(r,i){
+        var est=norm(r[8]);
+        var estCol=est==='X RECIBIR'?'#7C3AED':est.includes('EJECUCI')?'#16A34A':'#64748B';
+        var estLbl=est==='X RECIBIR'?'Por Recibir':est.includes('EJECUCI')?'En Ejecución':(r[8]||'').toString().slice(0,10)||'—';
+        var fecha=r[12]?r[12].toString().trim():'';
+        html+='<div style="margin-bottom:'+(i<grp.length-1?'5':'0')+'px;padding-bottom:'+(i<grp.length-1?'5':'0')+'px;border-bottom:'+(i<grp.length-1?'1px solid #EDE9FE':'none')+'">';
+        html+='<div style="display:flex;align-items:center;gap:4px;margin-bottom:1px">';
+        var fLbl=(r[9]||'').toString().toUpperCase().includes('FASE 2')?'Fase 2':(r[9]||'').toString().toUpperCase().includes('FASE 1')?'Fase 1':grp.length>1?'F'+(i+1):null;
+        if(fLbl)html+='<span style="font-size:.58rem;color:#94A3B8;font-weight:600">'+fLbl+'</span>';
+        html+='<span style="font-size:.6rem;background:'+estCol+'22;color:'+estCol+';border-radius:3px;padding:0px 4px;font-weight:700">'+estLbl+'</span>';
+        html+='<span style="font-size:.62rem;font-weight:700;color:#3B0764;margin-left:auto">'+fmt(gV(r))+'</span>';
+        html+='</div>';
+        if(fecha)html+='<div style="font-size:.57rem;color:#94A3B8">📅 '+fecha+'</div>';
+        html+='</div>';
+      });
+      if(grp.length>1)html+='<div style="margin-top:5px;padding-top:5px;border-top:1px solid #DDD6FE;font-size:.65rem;font-weight:700;color:#3B0764;text-align:right">Total: '+fmt(totalVal)+'</div>';
+      html+='</div>';
+    });
+    html+='</div></div>';
+  }
 
   el.innerHTML=html;
 
