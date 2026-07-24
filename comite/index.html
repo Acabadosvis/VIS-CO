@@ -1132,7 +1132,7 @@ function renderLeadsMensual(){
   if(kEl)kEl.innerHTML=
     '<div class="kp" style="background:#F0FDF4;border-top:3px solid #25D366"><div class="kl">&#128172; WPP del mes</div><div class="kv" style="color:#16A34A">'+wppM+'</div><div class="ks">'+(d1.wpp?dH(wppM,d1.wpp,false).replace(/<[^>]+>/g,'').replace(/[▲▼=]/g,'').trim()+' vs mes ant':'—')+'</div></div>'+
     '<div class="kp o"><div class="kl">&#129518; Calculadoras</div><div class="kv">'+totalM+'</div><div class="ks">'+(pCrecT?(parseFloat(pCrecT)>0?'+':'')+pCrecT+'% vs mes ant':'—')+'</div></div>'+
-    '<div class="kp" style="background:#FFFBF0;border-top:3px solid var(--y)"><div class="kl">% WPP &#8594; Calc.</div><div class="kv" style="color:var(--am)">'+pWppCalcM+'%</div><div class="ks">conversi&#243;n clave</div></div>'+
+    '<div class="kp" style="background:#FFFBF0;border-top:3px solid var(--y)"><div class="kl">&#129518; Calc. Bitrix</div><div class="kv" style="color:var(--am)">'+totalM+'</div><div class="ks">todas fuentes · independiente WPP</div></div>'+
     '<div class="kp b"><div class="kl">&#9989; Verificados</div><div class="kv">'+verM+'</div><div class="ks">'+pVerM+'% de calc.</div></div>'+
     '<div class="kp" style="background:#F8FAFC;border-left:4px solid #94A3B8"><div class="kl">&#10060; No verificados</div><div class="kv" style="color:#64748B">'+nverM+'</div><div class="ks">'+(totalM>0?pct(nverM,totalM,1)+'%':'—')+'</div></div>'+
     '<div class="kp g"><div class="kl">Interesados &#9733;</div><div class="kv">'+intM+'</div><div class="ks">'+pVerIntM+'% de ver.</div></div>'+
@@ -1157,7 +1157,7 @@ function renderLeadsMensual(){
   var pCV=totalM>0?Math.round(verM/totalM*100)+'%':'&#8212;';
   var fase1M='<div style="font-size:.7rem;font-weight:800;color:#92400E;padding:6px 0 4px 0;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #FED7AA;margin-bottom:6px">&#128241; Fase 1 &#8212; Captaci&#243;n</div>'+
     fnBar(wppM,'#25D366','&#128172; WPP','','')+
-    fnBar(totalM,'#F97316','&#129518; Calculadora',pWC,wppM>0?'del WPP':'')+
+    fnBar(totalM,'#F97316','&#129518; Calc. Bitrix','','fuente independiente · todas las entradas')+
     (nverM>0?fnBar(nverM,'#CBD5E1','&#10060; No verificados',totalM>0?Math.round(nverM/totalM*100)+'%':'&#8212;','sin clasificar a&#250;n',true):'')+
     fnBar(verM,'#0891B2','&#9989; Verificados',pCV,'de calculadora');
   var fase2M='<div style="font-size:.7rem;font-weight:800;color:#0891B2;padding:10px 0 4px 0;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #BFDBFE;margin-bottom:6px">&#9989; Fase 2 &#8212; De los '+verM+' verificados</div>'+
@@ -1268,7 +1268,7 @@ function renderLeads(){
   var d0=Object.assign({},allL[p0.sISO]||{});
   /* WPP y wpp_calc desde Redes si no hay en Leads */
   var rD2=allR[p2.sISO]||{};
-  if(!d2.wpp){var rw=rD2.wpp||0;if(rw){d2.wpp=rw;if(!d2.total)d2.total=rw;}}
+  if(!d2.wpp){var rw=rD2.wpp||0;if(rw){d2.wpp=rw;}} /* total (Calculadoras Bitrix) NO se auto-llena desde WPP — son fuentes distintas */
   if(!d2.wpp_calc){d2.wpp_calc=rD2.wpp_calc||0;}
   /* ni automático */
   d2.ni=Math.max(0,(d2.ver||0)-(d2.cno||0)-(d2.sr||0)-(d2.int||0));
