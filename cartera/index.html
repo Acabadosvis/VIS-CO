@@ -1399,8 +1399,9 @@ function renderCola(){
   const entrado      =all.filter(([k,v])=>v.estado==='entro');
   const rechazados   =all.filter(([k,v])=>v.estado==='rechazado');
   const entradoSemana=entrado.filter(([k,v])=>v.fecha_entro&&v.fecha_entro>=WEEK.ss&&v.fecha_entro<=WEEK.es);
-  const pendMonto   =pending.reduce((a,[k,v])=>a+(v.monto||0),0);
-  const entroMonto  =entradoSemana.reduce((a,[k,v])=>a+(v.monto||0),0);
+  const pendMonto      = pending.reduce((a,[k,v])=>a+(v.monto||0),0);
+  const entroMonto     = entradoSemana.reduce((a,[k,v])=>a+(v.monto||0),0);
+  const entroTotalMonto= entrado.reduce((a,[k,v])=>a+(v.monto||0),0);
 
   document.getElementById('ptitle').textContent='💳 Cola de Pagos';
   document.getElementById('phint').textContent='Soportes enviados + confirmaciones de contabilidad';
@@ -1453,16 +1454,24 @@ function renderCola(){
     <tr><td colspan="20" style="padding:0">
       <!-- RESUMEN SEMANA -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 16px;background:var(--gc);border-bottom:1px solid var(--brd)">
+        <!-- PENDIENTE -->
         <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:10px;padding:12px 16px">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#92400E;margin-bottom:4px">📤 Soporte enviado · Pendiente contabilidad</div>
-          <div style="font-size:22px;font-weight:800;color:#D97706">${fmtMF(pendMonto)}</div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#92400E;margin-bottom:4px">📤 Por aprobar · Pendiente contabilidad</div>
+          <div style="font-size:26px;font-weight:800;color:#D97706">${fmtMF(pendMonto)}</div>
           <div style="font-size:11px;color:#A16207;margin-bottom:10px">${pending.length} pago${pending.length!==1?'s':''} por confirmar</div>
           <button onclick="exportPendientes()" style="font-size:10px;padding:4px 11px;border-radius:6px;border:1.5px solid #FDE68A;background:#fff;color:#D97706;cursor:pointer;font-family:inherit;font-weight:700">📥 Exportar pendientes</button>
         </div>
+        <!-- APROBADO -->
         <div style="background:#ECFDF5;border:1.5px solid #A7F3D0;border-radius:10px;padding:12px 16px">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#065F46;margin-bottom:4px">✅ Confirmado — Entró esta semana</div>
-          <div style="font-size:22px;font-weight:800;color:#059669">${fmtMF(entroMonto)}</div>
-          <div style="font-size:11px;color:#047857;margin-bottom:10px">${entrado.filter(([k,v])=>v.fecha_entro&&v.fecha_entro>=WEEK.ss&&v.fecha_entro<=WEEK.es).length} confirmados esta semana</div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#065F46;margin-bottom:4px">✅ Total aprobado acumulado</div>
+          <div style="font-size:26px;font-weight:800;color:#059669">${fmtMF(entroTotalMonto)}</div>
+          <div style="font-size:11px;color:#047857;margin-bottom:6px">${entrado.length} pago${entrado.length!==1?'s':''} confirmados en total</div>
+          <!-- Esta semana -->
+          <div style="border-top:1px solid #A7F3D0;padding-top:8px;margin-top:2px;margin-bottom:8px">
+            <div style="font-size:9px;font-weight:700;color:#047857;text-transform:uppercase;letter-spacing:.05em">Esta semana</div>
+            <div style="font-size:15px;font-weight:800;color:#059669">${fmtMF(entroMonto)}</div>
+            <div style="font-size:10px;color:#6EE7B7">${entradoSemana.length} confirmados · ${WEEK.ss} → ${WEEK.es}</div>
+          </div>
           <button onclick="exportConfirmaciones()" style="font-size:10px;padding:4px 11px;border-radius:6px;border:1.5px solid #A7F3D0;background:#fff;color:#059669;cursor:pointer;font-family:inherit;font-weight:700">📥 Exportar confirmados</button>
         </div>
       </div>
