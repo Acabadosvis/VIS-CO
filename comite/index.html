@@ -2068,15 +2068,20 @@ function renderAptos(){
   var lagK3=function(r){return(r[7]||'').toString().trim().toUpperCase();};var lagomByAptP={};lagomAllR.forEach(function(r){var k=lagK3(r);(lagomByAptP[k]=lagomByAptP[k]||[]).push(r);});
   var lagomApts=Object.values(lagomByAptP);
 
+  /* ── xrR dedup: Lagom X RECIBIR cuenta una vez por apto único ── */
+  var xrNoLag=xrR.filter(function(r){return !norm(r[9]).includes('LAGOM');});
+  var lagXRGrps=lagomApts.filter(function(g){return g.some(function(r){return norm(r[8])==='X RECIBIR';});});
+  var xrRDedup=xrNoLag.concat(lagXRGrps.map(function(g){return g[0];}));
+
   /* ── Donut por RESPONSABLE (residente) ── */
   var byRes={};
   ejR.forEach(function(r){var k=(r[7]||'Sin residente').toString().trim().toUpperCase();byRes[k]=(byRes[k]||0)+1;});
   var rK=Object.keys(byRes).sort(function(a,b){return byRes[b]-byRes[a];});
   var rClrs=rK.map(function(k,i){return RES_COLS[k]||COLS[i%COLS.length];});
 
-  /* ── X RECIBIR: agrupado por mes de entrega ── */
+  /* ── X RECIBIR: agrupado por mes de entrega (Lagom deduplicado) ── */
   var byXR={};
-  xrR.forEach(function(r){
+  xrRDedup.forEach(function(r){
     var l='Sin fecha';
     try{
       var raw=r[12]; /* FECHA DE RECIBIDO col 12 */
@@ -2129,8 +2134,9 @@ function renderAptos(){
   if(ejR.length){
     html+='<div class="apt-kp dark"><div class="apt-kpn">'+ejR.length+'</div><div class="apt-kpl">En Ejecucion</div><div class="apt-kps">'+rK.length+' residentes activos</div></div>';
   }
-  if(xrR.length){
-    html+='<div class="apt-kp navy"><div class="apt-kpn">'+xrR.length+'</div><div class="apt-kpl">Por Recibir</div><div class="apt-kps">pendientes de entrega</div></div>';
+  if(xrRDedup.length){
+    var lagXRNote=lagXRGrps.length?' · '+lagXRGrps.length+' Lagom':'';
+    html+='<div class="apt-kp navy"><div class="apt-kpn">'+xrRDedup.length+'</div><div class="apt-kpl">Por Recibir</div><div class="apt-kps">aptos únicos pendientes'+lagXRNote+'</div></div>';
   }
   if(gcConvEj.length){
     html+='<div class="apt-kp" style="background:#92400E;color:#fff"><div class="apt-kpn" style="color:#FCD34D">'+gcConvEj.length+'</div><div class="apt-kpl">GC Convenio</div><div class="apt-kps">Gran Central en ejecucion</div></div>';
@@ -2150,7 +2156,7 @@ function renderAptos(){
   }
 
   /* Charts row */
-  if(ejR.length||xrR.length){
+  if(ejR.length||xrRDedup.length){
     html+='<div class="apt-charts">';
     if(ejR.length){
       html+='<div class="apt-ch"><div class="apt-ch-hd">Ejecucion por residente</div><canvas id="ca_ej" height="280"></canvas>'
