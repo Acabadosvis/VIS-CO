@@ -668,6 +668,9 @@ function goTab(i){
     var wL=[getPer(off-2),getPer(off-1),getPer(off)].map(w=>w.sISO);
     syncDatosAPI('leads',wL).then(function(ch){if(ch)renderLeads();});
   }
+  if(i===3&&xlR){setTimeout(function(){renderVentas();},50);}
+  if(i===4&&xlR){setTimeout(function(){renderAptos();},50);}
+  if(i===5&&xlR){setTimeout(function(){renderAlianzas();},50);}
 }
 
 /* ═══ CHARTS ═══ */
