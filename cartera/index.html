@@ -1705,8 +1705,9 @@ function getVM(mi,yr,filt){const rows=(xlR||[]).filter(r=>{const raw=(r[3]||'').
 /* ── Helper: deduplicar Lagom 2 fases (TORRE+APTO), suma valores ── */
 function getLagDedup(rows){
   var isL=function(r){return(r[9]||"").toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().includes("LAGOM");};
+  var lagK=function(r){var a=(r[11]||"").toString().trim();if(a)return(r[10]||"")+"||"+a;var m=(r[1]||"").toString().match(/(\d{3,})$/);return(r[10]||"")+"||"+(m?m[1]:(r[1]||"").toString().slice(-6));};  
   var lagR=rows.filter(isL),noL=rows.filter(function(r){return !isL(r);});
-  var byApt={};lagR.forEach(function(r){var k=(r[10]||"")+"||"+(r[11]||"");(byApt[k]=byApt[k]||[]).push(r);});
+  var byApt={};lagR.forEach(function(r){var k=lagK(r);(byApt[k]=byApt[k]||[]).push(r);});
   var groups=Object.values(byApt);
   return{
     rows:noL.concat(groups.map(function(g){return g[0];})),
@@ -1729,17 +1730,18 @@ function renderVentas(){
   const isRef=r=>[(r[9]||''),(r[13]||'')].some(v=>v.toUpperCase().includes('REFERIDO'));
   /* ── Lagom 2-fases: deduplicar por cliente+torre+apto ── */
   const isLag=r=>(r[9]||"").toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().includes("LAGOM");
+  const lagK2=r=>{const a=(r[11]||"").toString().trim();if(a)return(r[10]||"")+"||"+a;const m2=(r[1]||"").toString().match(/(\d{3,})$/);return(r[10]||"")+"||"+(m2?m2[1]:(r[1]||"").toString().slice(-6));};
   const lagR=vm.filter(isLag),noLagR=vm.filter(r=>!isLag(r));
   const lagByApt={};
-  lagR.forEach(r=>{const k=(r[10]||"")+"||"+(r[11]||"");(lagByApt[k]=lagByApt[k]||[]).push(r);});
+  lagR.forEach(r=>{const k=lagK2(r);(lagByApt[k]=lagByApt[k]||[]).push(r);});
   const lagGroups=Object.values(lagByApt);
   const lagDedup=lagGroups.map(g=>g[0]);
   const lagMulti=lagGroups.filter(g=>g.length>1);
   /* lagValMap / lagAIUMap: valor total (ambas fases) por apto clave */
   const lagValMap={},lagAIUMap={};
-  lagGroups.forEach(g=>{const k=(g[0][10]||"")+"||"+(g[0][11]||"");lagValMap[k]=g.reduce((s,r)=>s+gV(r),0);lagAIUMap[k]=g.reduce((s,r)=>s+gAIU(r),0);});
-  const gVD=r=>{if(isLag(r)){const k=(r[10]||"")+"||"+(r[11]||"");return lagValMap[k]||gV(r);}return gV(r);};
-  const gAIUD=r=>{if(isLag(r)){const k=(r[10]||"")+"||"+(r[11]||"");return lagAIUMap[k]||gAIU(r);}return gAIU(r);};
+  lagGroups.forEach(g=>{const k=lagK2(g[0]);lagValMap[k]=g.reduce((s,r)=>s+gV(r),0);lagAIUMap[k]=g.reduce((s,r)=>s+gAIU(r),0);});
+  const gVD=r=>{if(isLag(r)){const k=lagK2(r);return lagValMap[k]||gV(r);}return gV(r);};
+  const gAIUD=r=>{if(isLag(r)){const k=lagK2(r);return lagAIUMap[k]||gAIU(r);}return gAIU(r);};
   const vmDedup=[...noLagR,...lagDedup];
   const aliR=vmDedup.filter(r=>eAli(r));
   const orgR=vmDedup.filter(r=>eOrg(r));
@@ -2062,7 +2064,7 @@ function renderAptos(){
 
   /* ── Lagom: todos los aptos del proyecto, dedup por cliente+torre+apto ── */
   var lagomAllR=xlR?xlR.filter(function(r){returnnorm(r[9]).includes('LAGOM')&&norm(r[8])!=='CAIDO';}).filter(function(r){var e=norm(r[8]);return e!=='';})  :[];
-  var lagomByAptP={};lagomAllR.forEach(function(r){var k=(r[10]||'')+'||'+(r[11]||'');(lagomByAptP[k]=lagomByAptP[k]||[]).push(r);});
+  var lagK3=function(r){var a=(r[11]||'').toString().trim();if(a)return(r[10]||'')+'||'+a;var m3=(r[1]||'').toString().match(/(\d{3,})$/);return(r[10]||'')+'||'+(m3?m3[1]:(r[1]||'').toString().slice(-6));};var lagomByAptP={};lagomAllR.forEach(function(r){var k=lagK3(r);(lagomByAptP[k]=lagomByAptP[k]||[]).push(r);});
   var lagomApts=Object.values(lagomByAptP);
 
   /* ── Donut por RESPONSABLE (residente) ── */
