@@ -1131,8 +1131,7 @@ function renderLeadsMensual(){
   /* KPIs */
   if(kEl)kEl.innerHTML=
     '<div class="kp" style="background:#F0FDF4;border-top:3px solid #25D366"><div class="kl">&#128172; WPP del mes</div><div class="kv" style="color:#16A34A">'+wppM+'</div><div class="ks">'+(d1.wpp?dH(wppM,d1.wpp,false).replace(/<[^>]+>/g,'').replace(/[▲▼=]/g,'').trim()+' vs mes ant':'—')+'</div></div>'+
-    '<div class="kp o"><div class="kl">&#129518; Calculadoras</div><div class="kv">'+totalM+'</div><div class="ks">'+(pCrecT?(parseFloat(pCrecT)>0?'+':'')+pCrecT+'% vs mes ant':'—')+'</div></div>'+
-    '<div class="kp" style="background:#FFFBF0;border-top:3px solid var(--y)"><div class="kl">&#129518; Calc. Bitrix</div><div class="kv" style="color:var(--am)">'+totalM+'</div><div class="ks">todas fuentes · independiente WPP</div></div>'+
+    '<div class="kp o"><div class="kl">&#129518; Calc. Bitrix</div><div class="kv">'+totalM+'</div><div class="ks">todas fuentes · '+(pCrecT?(parseFloat(pCrecT)>0?'+':'')+pCrecT+'% vs mes ant':'—')+'</div></div>'+
     '<div class="kp b"><div class="kl">&#9989; Verificados</div><div class="kv">'+verM+'</div><div class="ks">'+pVerM+'% de calc.</div></div>'+
     '<div class="kp" style="background:#F8FAFC;border-left:4px solid #94A3B8"><div class="kl">&#10060; No verificados</div><div class="kv" style="color:#64748B">'+nverM+'</div><div class="ks">'+(totalM>0?pct(nverM,totalM,1)+'%':'—')+'</div></div>'+
     '<div class="kp g"><div class="kl">Interesados &#9733;</div><div class="kv">'+intM+'</div><div class="ks">'+pVerIntM+'% de ver.</div></div>'+
@@ -1284,18 +1283,19 @@ function renderLeads(){
   var _lbl=document.getElementById('l_ci_total_lbl');if(_lbl)_lbl.textContent=d2.ci||0;
   /* KPIs */
   var t2=d2.total||0,t1=d1.total||0,t0=d0.total||0;
+  var wppCalc2c=d2.wpp_calc||0; /* WPP que hicieron calculadora (subconjunto de WPP) */
   var pCrecT=t1>0?((t2-t1)/t1*100).toFixed(1):null;
   var pInt=t2>0?((d2.int||0)/t2*100).toFixed(1):'0.0';
   var pCi=t2>0?((d2.ci||0)/t2*100).toFixed(2):'0.00';
   var kEl=document.getElementById('l-kpis');
   var ver2c=d2.ver||0,nver2c=d2.nver||0,pVer=t2>0?pct(ver2c,t2,1):'0.0',pInt2=ver2c>0?pct(d2.int||0,ver2c,1):'0.0';
-  var pctWppCalc=(d2.wpp||0)>0?pct(t2,d2.wpp||1,1):'0.0';
+  var pctWppCalc=(d2.wpp||0)>0&&wppCalc2c>0?pct(wppCalc2c,d2.wpp||1,1):'0.0'; /* % WPP→Calc usa wpp_calc, no el total Bitrix */
   var ci2total=d2.ci||0,ci2org=d2.ci_org||0,ci2ant=d2.ci_ant||0,ci2gc=d2.ci_gc||0,ci2lag=d2.ci_lag||0,ci2cv=d2.ci_cv||0,ci2cred=d2.ci_cred||0;
   var vig2no=d2.vig_no||0,lag2=d2.lag||0,cred2=d2.cred||0;
   if(kEl)kEl.innerHTML=
     '<div class="kp" style="background:#F0FDF4;border-top:3px solid #25D366"><div class="kl">💬 Llegaron WPP</div><div class="kv" style="color:#16A34A">'+(d2.wpp||0)+'</div><div class="ks">'+(pCrecT?(pCrecT>0?'+':'')+pCrecT+'% vs sem ant':'—')+'</div></div>'+
-    '<div class="kp o"><div class="kl">🧮 Calculadora</div><div class="kv">'+t2+'</div><div class="ks">'+pctWppCalc+'% del WPP</div></div>'+
-    '<div class="kp" style="background:#FFFBF0;border-top:3px solid var(--y)"><div class="kl">% WPP → Calc.</div><div class="kv" style="color:var(--am)">'+pctWppCalc+'%</div><div class="ks">conversión clave</div></div>'+
+    (wppCalc2c>0?'<div class="kp" style="background:#FFF0F6;border-top:3px solid #DB2777"><div class="kl">&#128172;&#8594;&#129518; WPP calcularon</div><div class="kv" style="color:#DB2777">'+wppCalc2c+'</div><div class="ks">'+pctWppCalc+'% del WPP</div></div>':'')+
+    '<div class="kp o"><div class="kl">&#129518; Calc. Bitrix</div><div class="kv">'+t2+'</div><div class="ks">todas fuentes · independiente WPP</div></div>'+
     '<div class="kp b"><div class="kl">✓ Verificados</div><div class="kv">'+ver2c+'</div><div class="ks">'+pVer+'% de calc.</div></div>'+
     '<div class="kp" style="background:#F8FAFC;border-left:4px solid #94A3B8"><div class="kl">✗ No verificados</div><div class="kv" style="color:#64748B">'+nver2c+'</div><div class="ks">'+(t2>0?pct(nver2c,t2,1)+'%':'—')+'</div></div>'+
     '<div class="kp g"><div class="kl">Interesados ★</div><div class="kv">'+(d2.int||0)+'</div><div class="ks">'+pInt2+'% de ver.</div></div>'+
@@ -1312,7 +1312,7 @@ function renderLeads(){
   /* ── EMBUDO REDISEÑADO — 3 FASES ── */
   var wpp2=d2.wpp||0,calc2=d2.total||0,ver2b=d2.ver||0,nver2=Math.max(0,calc2-ver2b),cno2=d2.cno||0,srVal=d2.sr||0,sr2Val=d2.sr2||0,int2=d2.int||0,ni2=d2.ni||0,ci2=d2.ci||0;
   var ci2org=d2.ci_org||0,ci2ant=d2.ci_ant||0,ci2gc=d2.ci_gc||0,ci2lag=d2.ci_lag||0,ci2cv=d2.ci_cv||0,ci2cred=d2.ci_cred||0;
-  var maxF=Math.max(wpp2,calc2,ver2b,1);
+  var maxF=Math.max(wpp2,wppCalc2c,calc2,ver2b,1);
   function fnBar(val,color,label,conv,note,dimmed){
     var pw=Math.max(4,Math.round(val/maxF*100));
     return'<div class="fn-row" style="'+(dimmed?'opacity:.55':'')+'"><div class="fn-lbl">'+label+'</div>'+
@@ -1320,7 +1320,7 @@ function renderLeads(){
       '<div class="fn-conv" style="font-size:.7rem;font-weight:700;color:#555;text-align:right;white-space:nowrap">'+conv+'</div></div>'+
       (note?'<div style="font-size:.63rem;color:#888;margin:-2px 0 4px 96px">'+note+'</div>':'');
   }
-  var pWppCalc=wpp2>0?Math.round(calc2/wpp2*100)+'%':'—';
+  var pWppCalc=wpp2>0&&wppCalc2c>0?Math.round(wppCalc2c/wpp2*100)+'%':'—'; /* WPP_calc/WPP, no total/WPP */
   var pCalcVer=calc2>0?Math.round(ver2b/calc2*100)+'%':'—';
   var pVerInt=ver2b>0?Math.round(int2/ver2b*100)+'%':'—';
   var pVerSr=ver2b>0?Math.round(srVal/ver2b*100)+'%':'—';
@@ -1330,7 +1330,8 @@ function renderLeads(){
   
   var fase1='<div style="font-size:.7rem;font-weight:800;color:#92400E;padding:6px 0 4px 0;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #FED7AA;margin-bottom:6px">&#128241; Fase 1 — Captaci&#243;n</div>'+
     fnBar(wpp2,'#25D366','&#128172; WPP','','')+
-    fnBar(calc2,'#F97316','&#129518; Calculadora',pWppCalc,wpp2>0?'del WPP':'')+
+    (wppCalc2c>0?fnBar(wppCalc2c,'#DB2777','&#128172;&#8594;&#129518; WPP&#8594;Calc',pWppCalc,'de WPP que calcularon'):'')+
+    fnBar(calc2,'#F97316','&#129518; Calc. Bitrix','','todas fuentes · independiente WPP')+
     (nver2>0?fnBar(nver2,'#CBD5E1','&#10060; No verificados',calc2>0?Math.round(nver2/calc2*100)+'%':'—','sin clasificar aún',true):'')+
     fnBar(ver2b,'#0891B2','&#9989; Verificados',pCalcVer,'de calculadora');
   
