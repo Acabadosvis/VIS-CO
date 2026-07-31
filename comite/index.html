@@ -2133,95 +2133,136 @@ function renderAptos(){
   /* ── HTML ── */
   var html='';
 
-  /* KPI top row */
-  html+='<div class="apt-kpg">';
-  if(ejR.length){
-    html+='<div class="apt-kp dark"><div class="apt-kpn">'+ejR.length+'</div><div class="apt-kpl">En Ejecucion</div><div class="apt-kps">'+rK.length+' residentes activos</div></div>';
-  }
-  if(xrRDedup.length){
-    var lagXRNote=lagXRGrps.length?' · '+lagXRGrps.length+' Lagom':'';
-    html+='<div class="apt-kp navy"><div class="apt-kpn">'+xrRDedup.length+'</div><div class="apt-kpl">Por Recibir</div><div class="apt-kps">aptos únicos pendientes'+lagXRNote+'</div></div>';
-  }
-  if(gcConvEj.length){
-    html+='<div class="apt-kp" style="background:#92400E;color:#fff"><div class="apt-kpn" style="color:#FCD34D">'+gcConvEj.length+'</div><div class="apt-kpl">GC Convenio</div><div class="apt-kps">Gran Central en ejecucion</div></div>';
-  }
-  if(convR.length){
-    html+='<div class="apt-kp" style="background:#1A1A1A;color:#fff"><div class="apt-kpn" style="color:var(--y)">'+convR.length+'</div><div class="apt-kpl">Convenios activos</div><div class="apt-kps">en ejecucion (obra)</div></div>';
-  }
-  if(lagomApts.length){
-    var lagMultiCnt=lagomApts.filter(function(g){return g.length>1;}).length;
-    html+='<div class="apt-kp" style="background:#3B0764;color:#fff"><div class="apt-kpn" style="color:#C4B5FD">'+lagomApts.length+'</div><div class="apt-kpl">Lagom</div><div class="apt-kps">'+(lagMultiCnt?lagMultiCnt+' en 2 fases · ':'')+'aptos únicos</div></div>';
-  }
-  html+='</div>';
-
-  /* Aviso si falta xlA */
-  if(!xlA){
-    html+='<div class="msg msg-a" style="margin-bottom:12px">Carga PROYECTOS EN EJECUCION 2026.xlsx para ver residentes y detalle de obras.</div>';
-  }
-
-  /* Charts row */
-  if(ejR.length||xrRDedup.length){
-    html+='<div class="apt-charts">';
-    if(ejR.length){
-      html+='<div class="apt-ch"><div class="apt-ch-hd">Ejecucion por residente</div><canvas id="ca_ej" height="280"></canvas>'
-        +'<div class="apt-legend">'+rK.map(function(k,i){
-          return '<div class="apt-leg-item"><span class="apt-dot" style="background:'+(RES_COLS[k]||COLS[i%COLS.length])+'"></span><span>'+k+' - '+byRes[k]+' apto'+(byRes[k]>1?'s':'')+' ('+Math.round(byRes[k]/ejR.length*100)+'%)</span></div>';
-        }).join('')+'</div></div>';
-    }
-    if(xrK.length){
-      html+='<div class="apt-ch"><div class="apt-ch-hd">Por recibir - mes de entrega</div><canvas id="ca_xr" height="280"></canvas>'
-        +'<div class="apt-legend">'+xrK.map(function(k,i){
-          return '<div class="apt-leg-item"><span class="apt-dot" style="background:'+xrClrs[i]+'"></span><span>'+k+' - '+byXR[k]+' apt</span></div>';
-        }).join('')+'</div></div>';
-    }
+  /* ══ BLOQUE 1 — EN EJECUCIÓN ══ */
+  if(ejR.length||gcConvEj.length){
+    html+='<div style="border-radius:12px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 6px rgba(0,0,0,.10)">';
+    /* Header */
+    html+='<div style="background:#1C1C1C;color:#fff;padding:11px 18px;display:flex;align-items:center;gap:12px">';
+    html+='<span style="font-family:Syne,sans-serif;font-weight:800;font-size:.82rem;letter-spacing:.6px;flex:1">🏗️ EN EJECUCIÓN</span>';
+    html+='<span style="font-size:1.8rem;font-weight:900;color:var(--y);line-height:1">'+ejR.length+'</span>';
+    html+='<span style="font-size:.7rem;color:#aaa;margin-left:-4px">aptos</span>';
     html+='</div>';
+    /* Body */
+    html+='<div style="background:#F9F9F9;padding:14px 16px;display:grid;grid-template-columns:180px 1fr;gap:14px;align-items:start">';
+    /* Donut */
+    html+='<div style="display:flex;flex-direction:column;align-items:center"><canvas id="ca_ej" height="170"></canvas></div>';
+    /* Tabla de residentes */
+    html+='<div>';
+    html+='<div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:6px">Por residente</div>';
+    rK.forEach(function(k,i){
+      var col=RES_COLS[k]||COLS[i%COLS.length];
+      var pct2=Math.round(byRes[k]/ejR.length*100);
+      html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #eee">';
+      html+='<span style="width:11px;height:11px;border-radius:50%;background:'+col+';flex-shrink:0"></span>';
+      html+='<span style="font-weight:700;font-size:.73rem;flex:1;color:#222">'+k+'</span>';
+      html+='<div style="display:flex;align-items:center;gap:6px">';
+      html+='<div style="width:60px;background:#e5e7eb;border-radius:4px;height:5px"><div style="width:'+pct2+'%;background:'+col+';border-radius:4px;height:5px"></div></div>';
+      html+='<span style="font-size:.75rem;font-weight:800;color:#333;width:20px;text-align:right">'+byRes[k]+'</span>';
+      html+='<span style="font-size:.63rem;color:#999;width:34px">apt ('+pct2+'%)</span>';
+      html+='</div></div>';
+    });
+    if(gcConvEj.length){
+      html+='<div style="margin-top:8px;padding:6px 9px;background:#92400E0D;border-left:3px solid #92400E;border-radius:0 6px 6px 0;font-size:.67rem;color:#92400E;font-weight:700">🏢 '+gcConvEj.length+' GC Convenio incluidos en el total</div>';
+    }
+    if(convR.length){
+      html+='<div style="margin-top:5px;padding:6px 9px;background:#1A1A1A0D;border-left:3px solid #555;border-radius:0 6px 6px 0;font-size:.67rem;color:#555;font-weight:700">📋 '+convR.length+' Convenios activos</div>';
+    }
+    if(!xlA){
+      html+='<div style="margin-top:8px;padding:6px 9px;background:#FFF3CD;border-left:3px solid #F59E0B;border-radius:0 6px 6px 0;font-size:.67rem;color:#92400E;font-weight:700">⚠️ Carga PROYECTOS EN EJECUCION 2026.xlsx para ver detalle de residentes</div>';
+    }
+    html+='</div></div></div>';
   }
 
-  /* ── Pipeline Lagom ── */
+  /* ══ BLOQUE 2 — POR RECIBIR ══ */
+  if(xrRDedup.length){
+    html+='<div style="border-radius:12px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 6px rgba(0,0,0,.10)">';
+    /* Header */
+    html+='<div style="background:#1E3A5F;color:#fff;padding:11px 18px;display:flex;align-items:center;gap:12px">';
+    html+='<span style="font-family:Syne,sans-serif;font-weight:800;font-size:.82rem;letter-spacing:.6px;flex:1">📦 POR RECIBIR</span>';
+    html+='<span style="font-size:1.8rem;font-weight:900;color:#93C5FD;line-height:1">'+xrRDedup.length+'</span>';
+    html+='<span style="font-size:.7rem;color:#7fb3d9;margin-left:-4px">aptos únicos</span>';
+    html+='</div>';
+    /* Body */
+    html+='<div style="background:#F8FAFF;padding:14px 16px;display:grid;grid-template-columns:180px 1fr;gap:14px;align-items:start">';
+    /* Donut */
+    html+='<div style="display:flex;flex-direction:column;align-items:center"><canvas id="ca_xr" height="170"></canvas></div>';
+    /* Tabla por mes */
+    html+='<div>';
+    html+='<div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#4A7BA7;margin-bottom:6px">Cronograma de entrega</div>';
+    var totalXR=xrRDedup.length;
+    xrK.forEach(function(k,i){
+      var cnt=byXR[k];
+      var pct3=Math.round(cnt/totalXR*100);
+      html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #DBEAFE">';
+      html+='<span style="width:11px;height:11px;border-radius:50%;background:'+xrClrs[i]+';flex-shrink:0"></span>';
+      html+='<span style="font-weight:700;font-size:.73rem;flex:1;color:#1E3A5F">'+k+'</span>';
+      html+='<div style="display:flex;align-items:center;gap:6px">';
+      html+='<div style="width:60px;background:#DBEAFE;border-radius:4px;height:5px"><div style="width:'+pct3+'%;background:'+xrClrs[i]+';border-radius:4px;height:5px"></div></div>';
+      html+='<span style="font-size:.75rem;font-weight:800;color:#1E3A5F;width:20px;text-align:right">'+cnt+'</span>';
+      html+='<span style="font-size:.63rem;color:#7fb3d9;width:34px">apt ('+pct3+'%)</span>';
+      html+='</div></div>';
+    });
+    if(lagXRGrps.length){
+      html+='<div style="margin-top:8px;padding:6px 9px;background:#7C3AED0D;border-left:3px solid #7C3AED;border-radius:0 6px 6px 0;font-size:.67rem;color:#7C3AED;font-weight:700">🏠 '+lagXRGrps.length+' son Lagom (contados 1 vez — dedup por cliente)</div>';
+    }
+    html+='</div></div></div>';
+  }
+
+  /* ══ BLOQUE 3 — LAGOM ══ */
   if(lagomApts.length){
     var lagMultiC=lagomApts.filter(function(g){return g.length>1;}).length;
     var lagXR=lagomApts.filter(function(g){return g.some(function(r){return norm(r[8])==='X RECIBIR';});});
     var lagEj=lagomApts.filter(function(g){return g.some(function(r){return norm(r[8]).includes('EJECUCI');});});
-    html+='<div style="border:1px solid #7C3AED33;border-top:3px solid #7C3AED;border-radius:10px;padding:14px 16px;margin-bottom:12px">';
-    /* Header con resumen */
-    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px">';
-    html+='<div style="font-family:Syne,sans-serif;font-weight:700;font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;color:#7C3AED">🏠 Lagom Pipeline</div>';
-    html+='<div style="display:flex;gap:5px;flex-wrap:wrap">';
-    html+='<span style="font-size:.62rem;background:#3B076422;color:#3B0764;border-radius:4px;padding:2px 7px;font-weight:700">'+lagomApts.length+' aptos únicos</span>';
-    if(lagMultiC)html+='<span style="font-size:.62rem;background:#7C3AED22;color:#7C3AED;border-radius:4px;padding:2px 7px;font-weight:700">'+lagMultiC+' en 2 fases</span>';
-    if(lagEj.length)html+='<span style="font-size:.62rem;background:#16A34A22;color:#16A34A;border-radius:4px;padding:2px 7px;font-weight:700">'+lagEj.length+' en ejecución</span>';
-    if(lagXR.length)html+='<span style="font-size:.62rem;background:#7C3AED22;color:#6D28D9;border-radius:4px;padding:2px 7px;font-weight:700">'+lagXR.length+' por recibir</span>';
-    html+='</div></div>';
-    /* Tarjetas por apto */
-    html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px">';
+    html+='<div style="border-radius:12px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 6px rgba(0,0,0,.10)">';
+    /* Header */
+    html+='<div style="background:#3B0764;color:#fff;padding:11px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
+    html+='<span style="font-family:Syne,sans-serif;font-weight:800;font-size:.82rem;letter-spacing:.6px;flex:1">🏠 LAGOM</span>';
+    html+='<span style="font-size:1.8rem;font-weight:900;color:#C4B5FD;line-height:1">'+lagomApts.length+'</span>';
+    html+='<span style="font-size:.7rem;color:#A78BFA;margin-left:-4px">aptos únicos</span>';
+    /* badges resumen */
+    html+='<div style="width:100%;display:flex;gap:6px;flex-wrap:wrap;margin-top:2px">';
+    if(lagMultiC)html+='<span style="font-size:.62rem;background:#7C3AED88;color:#EDE9FE;border-radius:4px;padding:2px 8px;font-weight:700">'+lagMultiC+' en 2 fases</span>';
+    if(lagEj.length)html+='<span style="font-size:.62rem;background:#16A34A88;color:#DCFCE7;border-radius:4px;padding:2px 8px;font-weight:700">🏗️ '+lagEj.length+' en ejecución</span>';
+    if(lagXR.length)html+='<span style="font-size:.62rem;background:#1E3A5F88;color:#BFDBFE;border-radius:4px;padding:2px 8px;font-weight:700">📦 '+lagXR.length+' por recibir</span>';
+    html+='</div>';
+    html+='</div>';
+    /* Grid de tarjetas */
+    html+='<div style="background:#FAF8FF;padding:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">';
     lagomApts.forEach(function(grp){
       var totalVal=grp.reduce(function(s,rx){return s+gV(rx);},0);
       var apto=(grp[0][10]?'T'+grp[0][10]+' ':'')+('A'+(grp[0][11]||'—'));
       var cliente=grp[0][7]||'—';
-      html+='<div style="background:#F5F3FF;border:1px solid #DDD6FE;border-radius:8px;padding:10px 12px">';
-      /* Header apto */
-      html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">';
-      html+='<div style="font-weight:800;font-size:.78rem;color:#3B0764">'+apto+'</div>';
-      if(grp.length>1)html+='<span style="font-size:.58rem;background:#7C3AED;color:#fff;border-radius:3px;padding:1px 5px;font-weight:700">2F</span>';
+      /* estado general de la tarjeta (domina el del apto) */
+      var tieneEj=grp.some(function(r){return norm(r[8]).includes('EJECUCI');});
+      var tieneXR=grp.some(function(r){return norm(r[8])==='X RECIBIR';});
+      var cardBorder=tieneEj&&tieneXR?'#7C3AED':tieneXR?'#1E3A5F':'#16A34A';
+      html+='<div style="background:#fff;border:1.5px solid '+cardBorder+'40;border-top:3px solid '+cardBorder+';border-radius:8px;padding:10px 12px">';
+      /* Cabecera */
+      html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">';
+      html+='<span style="font-weight:900;font-size:.82rem;color:#3B0764">'+apto+'</span>';
+      if(grp.length>1)html+='<span style="font-size:.55rem;background:#7C3AED;color:#fff;border-radius:3px;padding:1px 5px;font-weight:700;margin-left:auto">2 FASES</span>';
       html+='</div>';
-      html+='<div style="font-size:.63rem;color:#6D28D9;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+cliente+'</div>';
-      /* Fases */
+      html+='<div style="font-size:.62rem;color:#6D28D9;margin-bottom:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+cliente+'">'+cliente+'</div>';
+      /* Fases — cada una con su badge de estado */
       grp.forEach(function(r,i){
         var est=norm(r[8]);
-        var estCol=est==='X RECIBIR'?'#7C3AED':est.includes('EJECUCI')?'#16A34A':'#64748B';
-        var estLbl=est==='X RECIBIR'?'Por Recibir':est.includes('EJECUCI')?'En Ejecución':(r[8]||'').toString().slice(0,10)||'—';
+        var esXR=est==='X RECIBIR',esEj=est.includes('EJECUCI');
+        var badgeBg=esXR?'#EFF6FF':esEj?'#F0FDF4':'#F1F5F9';
+        var badgeCol=esXR?'#1D4ED8':esEj?'#15803D':'#64748B';
+        var badgeIcon=esXR?'📦':esEj?'🏗️':'○';
+        var badgeLbl=esXR?'Por Recibir':esEj?'En Ejecución':(r[8]||'').toString().slice(0,8)||'—';
+        var fLbl=(r[9]||'').toString().toUpperCase().includes('FASE 2')?'F2':(r[9]||'').toString().toUpperCase().includes('FASE 1')?'F1':grp.length>1?'F'+(i+1):'';
         var fecha=r[12]?r[12].toString().trim():'';
-        html+='<div style="margin-bottom:'+(i<grp.length-1?'5':'0')+'px;padding-bottom:'+(i<grp.length-1?'5':'0')+'px;border-bottom:'+(i<grp.length-1?'1px solid #EDE9FE':'none')+'">';
-        html+='<div style="display:flex;align-items:center;gap:4px;margin-bottom:1px">';
-        var fLbl=(r[9]||'').toString().toUpperCase().includes('FASE 2')?'Fase 2':(r[9]||'').toString().toUpperCase().includes('FASE 1')?'Fase 1':grp.length>1?'F'+(i+1):null;
-        if(fLbl)html+='<span style="font-size:.58rem;color:#94A3B8;font-weight:600">'+fLbl+'</span>';
-        html+='<span style="font-size:.6rem;background:'+estCol+'22;color:'+estCol+';border-radius:3px;padding:0px 4px;font-weight:700">'+estLbl+'</span>';
-        html+='<span style="font-size:.62rem;font-weight:700;color:#3B0764;margin-left:auto">'+fmt(gV(r))+'</span>';
+        html+='<div style="background:'+badgeBg+';border-radius:5px;padding:5px 7px;margin-bottom:'+(i<grp.length-1?'5':'0')+'px">';
+        html+='<div style="display:flex;align-items:center;gap:4px">';
+        if(fLbl)html+='<span style="font-size:.58rem;font-weight:800;color:#94A3B8;background:#e2e8f0;border-radius:3px;padding:0 4px">'+fLbl+'</span>';
+        html+='<span style="font-size:.6rem;font-weight:700;color:'+badgeCol+'">'+badgeIcon+' '+badgeLbl+'</span>';
+        html+='<span style="font-size:.64rem;font-weight:700;color:#3B0764;margin-left:auto">'+fmt(gV(r))+'</span>';
         html+='</div>';
-        if(fecha)html+='<div style="font-size:.57rem;color:#94A3B8">📅 '+fecha+'</div>';
+        if(fecha)html+='<div style="font-size:.56rem;color:#94A3B8;margin-top:2px">📅 '+fecha+'</div>';
         html+='</div>';
       });
-      if(grp.length>1)html+='<div style="margin-top:5px;padding-top:5px;border-top:1px solid #DDD6FE;font-size:.65rem;font-weight:700;color:#3B0764;text-align:right">Total: '+fmt(totalVal)+'</div>';
+      if(grp.length>1)html+='<div style="margin-top:6px;font-size:.65rem;font-weight:700;color:#3B0764;text-align:right;border-top:1px solid #EDE9FE;padding-top:5px">Total: '+fmt(totalVal)+'</div>';
       html+='</div>';
     });
     html+='</div></div>';
