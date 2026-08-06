@@ -880,13 +880,14 @@ function calcNI(){
   var ver=parseInt(document.getElementById('l_ver')?.value||'0')||0;
   var cno=parseInt(document.getElementById('l_cno')?.value||'0')||0;
   var sr=parseInt(document.getElementById('l_sr')?.value||'0')||0;
+  var sr2=parseInt(document.getElementById('l_sr2')?.value||'0')||0;
   var int2=parseInt(document.getElementById('l_int')?.value||'0')||0;
   /* No verificados = calculadora - verificados */
   var nver=Math.max(0,tot-ver);
   var nverEl=document.getElementById('l_nver');
   if(nverEl){nverEl.value=nver>0?nver:'';}
-  /* No interesados = verificados - incompletas - sin respuesta - interesados */
-  var ni=Math.max(0,ver-cno-sr-int2);
+  /* No interesados = verificados - incompletas - mensajes proceso - sin respuesta - interesados */
+  var ni=Math.max(0,ver-cno-sr-sr2-int2);
   var el=document.getElementById('l_ni');
   if(el){el.value=ni>0?ni:'';el.style.background=ni>0?'#FFF3E6':'';}
 }
@@ -1282,7 +1283,7 @@ function renderLeads(){
   if(!d2.wpp){var rw=rD2.wpp||0;if(rw){d2.wpp=rw;}} /* total (Calculadoras Bitrix) NO se auto-llena desde WPP — son fuentes distintas */
   if(!d2.wpp_calc){d2.wpp_calc=rD2.wpp_calc||0;}
   /* ni automático */
-  d2.ni=Math.max(0,(d2.ver||0)-(d2.cno||0)-(d2.sr||0)-(d2.int||0));
+  d2.ni=Math.max(0,(d2.ver||0)-(d2.cno||0)-(d2.sr||0)-(d2.sr2||0)-(d2.int||0));
   /* poblar form */
   LF.forEach(function(pair){
     var k=pair[0],id=pair[1];
@@ -1337,7 +1338,7 @@ function renderLeads(){
   var pCalcVer=calc2>0?Math.round(ver2b/calc2*100)+'%':'—';
   var pVerInt=ver2b>0?Math.round(int2/ver2b*100)+'%':'—';
   var pVerSr=ver2b>0?Math.round(srVal/ver2b*100)+'%':'—';
-  var pSr2=srVal>0?Math.round(sr2Val/srVal*100)+'%':'—';
+  var pVerSr2=ver2b>0&&sr2Val>0?Math.round(sr2Val/ver2b*100)+'%':'—'; /* sr2 sobre verificados, no sobre sr */
   var pVerNi=ver2b>0?Math.round(ni2/ver2b*100)+'%':'—';
   var pVerCno=ver2b>0?Math.round(cno2/ver2b*100)+'%':'—';
   
@@ -1351,7 +1352,7 @@ function renderLeads(){
   var fase2='<div style="font-size:.7rem;font-weight:800;color:#0891B2;padding:10px 0 4px 0;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #BFDBFE;margin-bottom:6px">&#9989; Fase 2 — De los '+ver2b+' verificados</div>'+
     fnBar(int2,'#16A34A','&#11088; Interesados',pVerInt,'de verificados')+
     fnBar(srVal,'#6366F1','&#128228; Mensajes en proceso',pVerSr,'de verificados')+
-    (sr2Val>0?fnBar(sr2Val,'#64748B','&#128172; Sin respuesta',pSr2,'de mensajes en proceso',true):'')+
+    (sr2Val>0?fnBar(sr2Val,'#64748B','&#128172; Sin respuesta',pVerSr2,'de verificados'):'')+
     fnBar(ni2,'#94A3B8','&#128078; No interesados',pVerNi,'de verificados')+
     fnBar(cno2,'#D97706','&#128203; Incompletas',pVerCno,'de verificados');
   
