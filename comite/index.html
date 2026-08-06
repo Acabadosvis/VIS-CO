@@ -462,11 +462,12 @@ body.modo-comite .brow{display:none!important}
     <!-- REMODELACIONES — NM -->
     <div style="background:#FFF7ED;border:1px solid #FED7AA;border-top:3px solid #F97316;border-radius:10px;padding:12px 14px;margin-bottom:12px">
       <div style="font-size:.68rem;font-weight:700;color:#C2410C;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">&#128296; Remodelaciones <span style="font-size:.62rem;background:#F97316;color:#fff;border-radius:4px;padding:1px 6px;margin-left:4px;font-weight:700">NM · Nathalia</span></div>
-      <div class="fg" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr));margin-bottom:0">
-        <div class="fl" style="border-left:3px solid #F97316;padding-left:8px"><label style="color:#C2410C">Total leads remo</label><input type="number" id="l_remo_tot" min="0" placeholder="0" style="border-color:#FED7AA"></div>
-        <div class="fl" style="border-left:3px solid #FB923C;padding-left:8px"><label style="color:#C2410C">Reuniones agend.</label><input type="number" id="l_remo_ag" min="0" placeholder="0" style="border-color:#FED7AA"></div>
-        <div class="fl" style="border-left:3px solid #EA580C;padding-left:8px"><label style="color:#C2410C">Reuniones ef.</label><input type="number" id="l_remo_ef" min="0" placeholder="0" style="border-color:#FED7AA"></div>
-        <div class="fl" style="border-left:3px solid #9A3412;padding-left:8px"><label style="color:#9A3412">Cierres remo</label><input type="number" id="l_remo_ci" min="0" placeholder="0" style="border-color:#FED7AA"></div>
+      <div class="fg" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr));margin-bottom:0">
+        <div class="fl" style="border-left:3px solid #F97316;padding-left:8px"><label style="color:#C2410C">&#128221; Llegaron</label><input type="number" id="l_remo_tot" min="0" placeholder="0" style="border-color:#FED7AA"></div>
+        <div class="fl" style="border-left:3px solid #16A34A;padding-left:8px"><label style="color:#15803D">&#11088; Interesados</label><input type="number" id="l_remo_int" min="0" placeholder="0" style="border-color:#86EFAC"></div>
+        <div class="fl" style="border-left:3px solid #FB923C;padding-left:8px"><label style="color:#C2410C">&#128197; Reun. agend.</label><input type="number" id="l_remo_ag" min="0" placeholder="0" style="border-color:#FED7AA"></div>
+        <div class="fl" style="border-left:3px solid #EA580C;padding-left:8px"><label style="color:#C2410C">&#9989; Reun. ef.</label><input type="number" id="l_remo_ef" min="0" placeholder="0" style="border-color:#FED7AA"></div>
+        <div class="fl" style="border-left:3px solid #9A3412;padding-left:8px"><label style="color:#9A3412">&#127942; Cierres</label><input type="number" id="l_remo_ci" min="0" placeholder="0" style="border-color:#FED7AA"></div>
       </div>
     </div>
     <div class="brow">
@@ -479,6 +480,7 @@ body.modo-comite .brow{display:none!important}
   <div id="l-kpis" class="kg"></div>
   <div id="l-ver-kpi" class="kg" style="display:none"></div>
   <div id="l-funnel" class="fn-wrap"></div>
+  <div id="l-remo-funnel" class="fn-wrap" style="margin-top:10px;border-top:2px solid #FED7AA;padding-top:10px"></div>
   <div id="l-form-mes"></div>
   <div id="l-ins" class="ins" style="display:none"></div>
   <div id="l-cmp"></div>
@@ -872,7 +874,7 @@ function renderRedes(){
 }
 
 /* ═══ LEADS ═══ */
-const LF=[['total','l_total'],['wpp','l_wpp'],['wpp_calc','l_wpp_calc'],['cno','l_cno'],['sr','l_sr'],['sr2','l_sr2'],['ni','l_ni'],['int','l_int'],['vig','l_vig'],['vig_no','l_vig_no'],['ci','l_ci'],['ci_org','l_ci_org'],['ci_ant','l_ci_ant'],['ci_gc','l_ci_gc'],['ci_lag','l_ci_lag'],['ci_cv','l_ci_cv'],['ci_cred','l_ci_cred'],['ver','l_ver'],['nver','l_nver'],['gc','l_gc'],['cv','l_cv'],['lag','l_lag'],['cred','l_cred'],['remo_tot','l_remo_tot'],['remo_ag','l_remo_ag'],['remo_ef','l_remo_ef'],['remo_ci','l_remo_ci']];
+const LF=[['total','l_total'],['wpp','l_wpp'],['wpp_calc','l_wpp_calc'],['cno','l_cno'],['sr','l_sr'],['sr2','l_sr2'],['ni','l_ni'],['int','l_int'],['vig','l_vig'],['vig_no','l_vig_no'],['ci','l_ci'],['ci_org','l_ci_org'],['ci_ant','l_ci_ant'],['ci_gc','l_ci_gc'],['ci_lag','l_ci_lag'],['ci_cv','l_ci_cv'],['ci_cred','l_ci_cred'],['ver','l_ver'],['nver','l_nver'],['gc','l_gc'],['cv','l_cv'],['lag','l_lag'],['cred','l_cred'],['remo_tot','l_remo_tot'],['remo_int','l_remo_int'],['remo_ag','l_remo_ag'],['remo_ef','l_remo_ef'],['remo_ci','l_remo_ci']];
 function calcNI(){
   var tot=parseInt(document.getElementById('l_total')?.value||'0')||0;
   var ver=parseInt(document.getElementById('l_ver')?.value||'0')||0;
@@ -1319,7 +1321,7 @@ function renderLeads(){
     (lag2>0?'<div class="kp" style="border-left:4px solid #7C3AED"><div class="kl">Lagom leads</div><div class="kv" style="color:#7C3AED">'+lag2+'</div></div>':'')+
     ((d2.cv||0)>0?'<div class="kp" style="border-left:4px solid #0891B2"><div class="kl">CV leads</div><div class="kv" style="color:#0891B2">'+d2.cv+'</div></div>':'')+
     (cred2>0?'<div class="kp" style="border-left:4px solid #059669"><div class="kl">Cred. leads</div><div class="kv" style="color:#059669">'+cred2+'</div></div>':'')+
-    ((d2.remo_tot||0)>0?'<div class="kp" style="background:#FFF7ED;border-top:3px solid #F97316"><div class="kl">&#128296; Remo — NM</div><div class="kv" style="color:#C2410C">'+(d2.remo_tot||0)+'</div><div class="ks">'+(d2.remo_ag?'ag:'+d2.remo_ag+' · ':'')+(d2.remo_ef?'ef:'+d2.remo_ef+' · ':'')+((d2.remo_ci||0)>0?d2.remo_ci+' cierre'+(d2.remo_ci>1?'s':''):'— cierres')+'</div></div>':'');
+    ((d2.remo_tot||0)>0?'<div class="kp" style="background:#FFF7ED;border-top:3px solid #F97316;border-left:4px solid #C2410C"><div class="kl">&#128296; Remo NM — llegaron</div><div class="kv" style="color:#C2410C">'+(d2.remo_tot||0)+'</div><div class="ks">'+((d2.remo_int||0)>0?'&#11088; '+d2.remo_int+' int · ':'')+((d2.remo_ci||0)>0?'&#127942; '+d2.remo_ci+' cierre'+(d2.remo_ci>1?'s':''):'— cierres')+'</div></div>':'');
   /* ── EMBUDO REDISEÑADO — 3 FASES ── */
   var wpp2=d2.wpp||0,calc2=d2.total||0,ver2b=d2.ver||0,nver2=Math.max(0,calc2-ver2b),cno2=d2.cno||0,srVal=d2.sr||0,sr2Val=d2.sr2||0,int2=d2.int||0,ni2=d2.ni||0,ci2=d2.ci||0;
   var ci2org=d2.ci_org||0,ci2ant=d2.ci_ant||0,ci2gc=d2.ci_gc||0,ci2lag=d2.ci_lag||0,ci2cv=d2.ci_cv||0,ci2cred=d2.ci_cred||0;
@@ -1373,6 +1375,31 @@ function renderLeads(){
   var funnelHTML=fase1+fase2+fase3;
   var fEl=document.getElementById('l-funnel');
   if(fEl)fEl.innerHTML='<div class="fn-title">Embudo de conversi&#243;n</div>'+funnelHTML;
+  /* ── MINI-FUNNEL REMODELACIONES NM ── */
+  var remoTot2=d2.remo_tot||0,remoInt2=d2.remo_int||0,remoCi2=d2.remo_ci||0;
+  var remoFEl=document.getElementById('l-remo-funnel');
+  if(remoFEl){
+    if(remoTot2>0){
+      var maxR=Math.max(remoTot2,1);
+      function fnRBar(val,color,label,conv){
+        var pw=Math.max(4,Math.round(val/maxR*100));
+        return'<div class="fn-row"><div class="fn-lbl">'+label+'</div>'+
+          '<div class="fn-bar-wrap"><div class="fn-bar" style="width:'+pw+'%;background:'+color+';justify-content:center"><span style="padding:0 6px;font-weight:700;font-size:.72rem;color:#fff">'+val+'</span></div></div>'+
+          '<div class="fn-conv" style="font-size:.7rem;font-weight:700;color:#555;text-align:right;white-space:nowrap">'+conv+'</div></div>';
+      }
+      var pRemoInt=remoTot2>0&&remoInt2>0?Math.round(remoInt2/remoTot2*100)+'%':'—';
+      var pRemoCi=remoInt2>0&&remoCi2>0?Math.round(remoCi2/remoInt2*100)+'% de int':remoTot2>0&&remoCi2>0?Math.round(remoCi2/remoTot2*100)+'%':'—';
+      var remoFunnel=
+        fnRBar(remoTot2,'#F97316','&#128221; Llegaron','')+
+        (remoInt2>0?fnRBar(remoInt2,'#16A34A','&#11088; Interesados',pRemoInt):'')+
+        (remoCi2>0?fnRBar(remoCi2,'#9A3412','&#127942; Cierres Remo',pRemoCi):'<div style="padding:6px 12px;background:#FFF7ED;border-radius:6px;border:1px dashed #FED7AA;font-size:.72rem;color:#C2410C;margin-top:4px">&#128296; Sin cierres remo esta semana</div>');
+      remoFEl.style.display='';
+      remoFEl.innerHTML='<div class="fn-title" style="color:#C2410C">&#128296; Embudo Remodelaciones — NM</div>'+remoFunnel;
+    }else{
+      remoFEl.style.display='none';
+      remoFEl.innerHTML='';
+    }
+  }
   var vkEl=document.getElementById('l-ver-kpi');if(vkEl)vkEl.style.display='none';
 
   /* ── TABLA: base = VERIFICADOS, comparación semana a semana ── */
@@ -1657,13 +1684,23 @@ function renderReunionesLocal(){
   const conv2=lb2>0?pct(totP,lb2,2):0,conv1=lb1>0?pct((allC[p1.sISO]?.KM?.prog||0)+(allC[p1.sISO]?.AB?.prog||0)+(allC[p1.sISO]?.NM?.prog||0),lb1,2):0;
   const remoNM=cur['ali_NM']?.remo||{prog:0,ef:0};
   const remoLeadsNM=allL[p2.sISO]?.remo_tot||0;
+  const remoLeadsIntNM=allL[p2.sISO]?.remo_int||0;
+  const remoLeadsCiNM=allL[p2.sISO]?.remo_ci||0;
+  const hasRemo=!!(remoNM.prog||remoNM.ef||remoLeadsNM);
   document.getElementById('reu-kpis').innerHTML=`
     <div class="kp o"><div class="kl">✅ Calc. verificadas</div><div class="kv">${lb2}</div><div class="ks">Base para % de reuniones</div></div>
     <div class="kp b"><div class="kl">Agendadas total</div><div class="kv">${totP}</div><div class="ks">${conv2}% de leads</div></div>
     <div class="kp g"><div class="kl">Efectivas total</div><div class="kv">${totE}</div><div class="ks">${lb2>0?pct(totE,lb2,2):0}% de leads</div></div>
     <div class="kp p"><div class="kl">KM</div><div class="kv">${cur.KM?.ef||0}/${cur.KM?.prog||0}</div><div class="ks">${cur.KM?.prog>0?pct(cur.KM.ef,cur.KM.prog,0):0}% conv</div></div>
     <div class="kp a"><div class="kl">NM</div><div class="kv">${cur.NM?.ef||0}/${cur.NM?.prog||0}</div><div class="ks">${cur.NM?.prog>0?pct(cur.NM.ef,cur.NM.prog,0):0}% conv</div></div>
-    ${(remoNM.prog||remoNM.ef||remoLeadsNM)?`<div class="kp" style="background:#FFF7ED;border-top:3px solid #F97316"><div class="kl">&#128296; Remo NM</div><div class="kv" style="color:#C2410C">${remoNM.ef||0}<span style="font-size:.75rem;font-weight:400;color:#888"> / ${remoNM.prog||0} ag</span></div><div class="ks">${remoLeadsNM?remoLeadsNM+' leads · ':''}${remoNM.prog>0?pct(remoNM.ef,remoNM.prog,0)+'% conv':'—'}</div></div>`:''}
+    ${hasRemo?`<div class="kp" style="background:#FFF7ED;border:2px solid #F97316;border-top:4px solid #C2410C;border-radius:10px;min-width:140px">
+      <div class="kl" style="color:#C2410C;font-weight:800;font-size:.72rem">&#128296; REMO — NM</div>
+      <div class="kv" style="color:#C2410C;font-size:1.45rem;font-weight:800">${remoNM.ef||0}<span style="font-size:.8rem;font-weight:600;color:#9A3412"> ef / ${remoNM.prog||0} ag</span></div>
+      <div class="ks" style="font-size:.68rem;color:#92400E;margin-top:3px;line-height:1.4">
+        ${remoLeadsNM?'📝 '+remoLeadsNM+' llegaron':''}${remoLeadsIntNM?' · ⭐ '+remoLeadsIntNM+' int':''}${remoLeadsCiNM?' · 🏆 '+remoLeadsCiNM+' cierre'+(remoLeadsCiNM>1?'s':''):''}<br>
+        ${remoNM.prog>0?pct(remoNM.ef,remoNM.prog,0)+'% conv reuniones':'—'}
+      </div>
+    </div>`:''}
     ` ;
   // Tabla estilo PDF (Leads base / Agendadas / Atendidas) — 3 semanas
   function reuRow(lbl,v0,v1,v2,lb0,lb1,lb2,inv){
