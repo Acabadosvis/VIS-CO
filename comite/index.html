@@ -459,6 +459,16 @@ body.modo-comite .brow{display:none!important}
       <div class="fl" style="border-left:3px solid #0891B2;padding-left:9px"><label style="color:#0891B2">&#127774; Corner View</label><input type="number" id="l_cv" min="0" placeholder="0" style="border-color:#0891B2"></div>
       <div class="fl" style="border-left:3px solid #059669;padding-left:9px"><label style="color:#059669">&#128179; Credifamilia</label><input type="number" id="l_cred" min="0" placeholder="0" style="border-color:#059669"></div>
     </div>
+    <!-- REMODELACIONES — NM -->
+    <div style="background:#FFF7ED;border:1px solid #FED7AA;border-top:3px solid #F97316;border-radius:10px;padding:12px 14px;margin-bottom:12px">
+      <div style="font-size:.68rem;font-weight:700;color:#C2410C;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">&#128296; Remodelaciones <span style="font-size:.62rem;background:#F97316;color:#fff;border-radius:4px;padding:1px 6px;margin-left:4px;font-weight:700">NM · Nathalia</span></div>
+      <div class="fg" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr));margin-bottom:0">
+        <div class="fl" style="border-left:3px solid #F97316;padding-left:8px"><label style="color:#C2410C">Total leads remo</label><input type="number" id="l_remo_tot" min="0" placeholder="0" style="border-color:#FED7AA"></div>
+        <div class="fl" style="border-left:3px solid #FB923C;padding-left:8px"><label style="color:#C2410C">Reuniones agend.</label><input type="number" id="l_remo_ag" min="0" placeholder="0" style="border-color:#FED7AA"></div>
+        <div class="fl" style="border-left:3px solid #EA580C;padding-left:8px"><label style="color:#C2410C">Reuniones ef.</label><input type="number" id="l_remo_ef" min="0" placeholder="0" style="border-color:#FED7AA"></div>
+        <div class="fl" style="border-left:3px solid #9A3412;padding-left:8px"><label style="color:#9A3412">Cierres remo</label><input type="number" id="l_remo_ci" min="0" placeholder="0" style="border-color:#FED7AA"></div>
+      </div>
+    </div>
     <div class="brow">
       <button class="btn btn-o" onclick="saveLeads()">&#128190; Guardar leads</button>
       <button class="btn btn-s" onclick="renderLeads()">&#8617; Cancelar</button>
@@ -862,7 +872,7 @@ function renderRedes(){
 }
 
 /* ═══ LEADS ═══ */
-const LF=[['total','l_total'],['wpp','l_wpp'],['wpp_calc','l_wpp_calc'],['cno','l_cno'],['sr','l_sr'],['sr2','l_sr2'],['ni','l_ni'],['int','l_int'],['vig','l_vig'],['vig_no','l_vig_no'],['ci','l_ci'],['ci_org','l_ci_org'],['ci_ant','l_ci_ant'],['ci_gc','l_ci_gc'],['ci_lag','l_ci_lag'],['ci_cv','l_ci_cv'],['ci_cred','l_ci_cred'],['ver','l_ver'],['nver','l_nver'],['gc','l_gc'],['cv','l_cv'],['lag','l_lag'],['cred','l_cred']];
+const LF=[['total','l_total'],['wpp','l_wpp'],['wpp_calc','l_wpp_calc'],['cno','l_cno'],['sr','l_sr'],['sr2','l_sr2'],['ni','l_ni'],['int','l_int'],['vig','l_vig'],['vig_no','l_vig_no'],['ci','l_ci'],['ci_org','l_ci_org'],['ci_ant','l_ci_ant'],['ci_gc','l_ci_gc'],['ci_lag','l_ci_lag'],['ci_cv','l_ci_cv'],['ci_cred','l_ci_cred'],['ver','l_ver'],['nver','l_nver'],['gc','l_gc'],['cv','l_cv'],['lag','l_lag'],['cred','l_cred'],['remo_tot','l_remo_tot'],['remo_ag','l_remo_ag'],['remo_ef','l_remo_ef'],['remo_ci','l_remo_ci']];
 function calcNI(){
   var tot=parseInt(document.getElementById('l_total')?.value||'0')||0;
   var ver=parseInt(document.getElementById('l_ver')?.value||'0')||0;
@@ -1308,7 +1318,8 @@ function renderLeads(){
     ((d2.gc||0)>0?'<div class="kp" style="border-left:4px solid #92400E"><div class="kl">GC leads</div><div class="kv" style="color:#92400E">'+d2.gc+'</div></div>':'')+
     (lag2>0?'<div class="kp" style="border-left:4px solid #7C3AED"><div class="kl">Lagom leads</div><div class="kv" style="color:#7C3AED">'+lag2+'</div></div>':'')+
     ((d2.cv||0)>0?'<div class="kp" style="border-left:4px solid #0891B2"><div class="kl">CV leads</div><div class="kv" style="color:#0891B2">'+d2.cv+'</div></div>':'')+
-    (cred2>0?'<div class="kp" style="border-left:4px solid #059669"><div class="kl">Cred. leads</div><div class="kv" style="color:#059669">'+cred2+'</div></div>':'');
+    (cred2>0?'<div class="kp" style="border-left:4px solid #059669"><div class="kl">Cred. leads</div><div class="kv" style="color:#059669">'+cred2+'</div></div>':'')+
+    ((d2.remo_tot||0)>0?'<div class="kp" style="background:#FFF7ED;border-top:3px solid #F97316"><div class="kl">&#128296; Remo — NM</div><div class="kv" style="color:#C2410C">'+(d2.remo_tot||0)+'</div><div class="ks">'+(d2.remo_ag?'ag:'+d2.remo_ag+' · ':'')+(d2.remo_ef?'ef:'+d2.remo_ef+' · ':'')+((d2.remo_ci||0)>0?d2.remo_ci+' cierre'+(d2.remo_ci>1?'s':''):'— cierres')+'</div></div>':'');
   /* ── EMBUDO REDISEÑADO — 3 FASES ── */
   var wpp2=d2.wpp||0,calc2=d2.total||0,ver2b=d2.ver||0,nver2=Math.max(0,calc2-ver2b),cno2=d2.cno||0,srVal=d2.sr||0,sr2Val=d2.sr2||0,int2=d2.int||0,ni2=d2.ni||0,ci2=d2.ci||0;
   var ci2org=d2.ci_org||0,ci2ant=d2.ci_ant||0,ci2gc=d2.ci_gc||0,ci2lag=d2.ci_lag||0,ci2cv=d2.ci_cv||0,ci2cred=d2.ci_cred||0;
@@ -1644,12 +1655,15 @@ function renderReunionesLocal(){
   // Base: calculadoras VERIFICADAS desde módulo Leads
   const lb2=allL[p2.sISO]?.ver||0,lb1=allL[p1.sISO]?.ver||0,lb0=allL[p0.sISO]?.ver||0;
   const conv2=lb2>0?pct(totP,lb2,2):0,conv1=lb1>0?pct((allC[p1.sISO]?.KM?.prog||0)+(allC[p1.sISO]?.AB?.prog||0)+(allC[p1.sISO]?.NM?.prog||0),lb1,2):0;
+  const remoNM=cur['ali_NM']?.remo||{prog:0,ef:0};
+  const remoLeadsNM=allL[p2.sISO]?.remo_tot||0;
   document.getElementById('reu-kpis').innerHTML=`
     <div class="kp o"><div class="kl">✅ Calc. verificadas</div><div class="kv">${lb2}</div><div class="ks">Base para % de reuniones</div></div>
     <div class="kp b"><div class="kl">Agendadas total</div><div class="kv">${totP}</div><div class="ks">${conv2}% de leads</div></div>
     <div class="kp g"><div class="kl">Efectivas total</div><div class="kv">${totE}</div><div class="ks">${lb2>0?pct(totE,lb2,2):0}% de leads</div></div>
     <div class="kp p"><div class="kl">KM</div><div class="kv">${cur.KM?.ef||0}/${cur.KM?.prog||0}</div><div class="ks">${cur.KM?.prog>0?pct(cur.KM.ef,cur.KM.prog,0):0}% conv</div></div>
     <div class="kp a"><div class="kl">NM</div><div class="kv">${cur.NM?.ef||0}/${cur.NM?.prog||0}</div><div class="ks">${cur.NM?.prog>0?pct(cur.NM.ef,cur.NM.prog,0):0}% conv</div></div>
+    ${(remoNM.prog||remoNM.ef||remoLeadsNM)?`<div class="kp" style="background:#FFF7ED;border-top:3px solid #F97316"><div class="kl">&#128296; Remo NM</div><div class="kv" style="color:#C2410C">${remoNM.ef||0}<span style="font-size:.75rem;font-weight:400;color:#888"> / ${remoNM.prog||0} ag</span></div><div class="ks">${remoLeadsNM?remoLeadsNM+' leads · ':''}${remoNM.prog>0?pct(remoNM.ef,remoNM.prog,0)+'% conv':'—'}</div></div>`:''}
     ` ;
   // Tabla estilo PDF (Leads base / Agendadas / Atendidas) — 3 semanas
   function reuRow(lbl,v0,v1,v2,lb0,lb1,lb2,inv){
