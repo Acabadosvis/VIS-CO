@@ -458,13 +458,38 @@ const SOP_ESTADOS = {
   'rechazado':  {ico:'❌', lbl:'Rechazado',             cls:'red',      order:3},
 };
 // ── In-memory cache — fuente autoritativa en runtime ─────────
+// Al cargar: limpiar dataUrls viejas del localStorage para liberar espacio
+(()=>{
+  try{
+    const raw = localStorage.getItem(LS_SOPORTES);
+    if(!raw) return;
+    const parsed = JSON.parse(raw);
+    let dirty = false;
+    for(const k of Object.keys(parsed)){
+      if(parsed[k].dataUrl){ delete parsed[k].dataUrl; dirty=true; }
+    }
+    if(dirty) localStorage.setItem(LS_SOPORTES, JSON.stringify(parsed));
+  }catch(e){}
+})();
 let VC_SOPS = (()=>{ try{return JSON.parse(localStorage.getItem(LS_SOPORTES)||'{}');}catch{return{};} })();
 function getSoportes(){ return VC_SOPS; }
 function _saveSop(data){
   VC_SOPS = data;
-  try{ localStorage.setItem(LS_SOPORTES,JSON.stringify(data)); }catch(e){}
-  // Sincronizar con API (fire-and-forget)
-  fetch(API_SOPORTES,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+  // Guardar en localStorage SIN dataUrl (evita quota exceeded — las fotos son ~2MB en base64)
+  // El dataUrl queda en memoria (VC_SOPS) durante la sesión
+  const stripped = {};
+  for(const [k,v] of Object.entries(data)){
+    const {dataUrl, ...rest} = v;
+    stripped[k] = rest;
+  }
+  try{
+    localStorage.setItem(LS_SOPORTES, JSON.stringify(stripped));
+  }catch(e){
+    console.warn('VIS-CO: localStorage lleno',e);
+    toast('⚠ Almacenamiento local lleno — recarga y vuelve a intentar','warn');
+  }
+  // Sincronizar con API (fire-and-forget) — solo metadatos, sin imagen
+  fetch(API_SOPORTES,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(stripped)})
     .catch(e=>console.warn('VIS-CO: API sync failed',e));
 }
 // Carga inicial desde API (autoritativa sobre localStorage)
