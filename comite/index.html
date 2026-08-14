@@ -419,7 +419,7 @@ body.modo-comite .brow{display:none!important}
       </div>
       <div style="background:#F8FAFC;border:1.5px solid #94A3B8;border-radius:10px;padding:12px 14px">
         <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:6px">&#128172; Sin respuesta</label>
-        <input type="number" id="l_sr2" min="0" placeholder="0" style="width:100%;border:1.5px solid #94A3B8;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#64748B;background:#fff;outline:none">
+        <input type="number" id="l_sr2" min="0" placeholder="0" oninput="calcNI()" style="width:100%;border:1.5px solid #94A3B8;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#64748B;background:#fff;outline:none">
       </div>
       <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:10px;padding:12px 14px">
         <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:6px">&#11088; Interesados</label>
@@ -989,13 +989,20 @@ function toggleMesLeads(){
   showMonthlyLeads=!showMonthlyLeads;
   var btn=document.getElementById('btn-mes-leads');
   if(btn)btn.textContent=showMonthlyLeads?'&#128336; Vista semanal':'&#128197; Vista mensual';
-  if(showMonthlyLeads)renderLeadsMensual();
-  else renderLeads();
+  if(showMonthlyLeads){
+    /* Sincronizar las últimas 12 semanas (~3 meses) para cubrir julio completo */
+    var wMes=[];for(var _i=11;_i>=0;_i--)wMes.push(getPer(off-_i).sISO);
+    syncDatosAPI('leads',wMes).then(function(){renderLeadsMensual();});
+  }else renderLeads();
 }
 var viewMesKey=null;
 function navMes(dir){
-  var allLM=gLS(LS_LM);
-  var mk=Object.keys(allLM).filter(function(k){return /^\d{4}-\d{2}$/.test(k);}).sort();
+  /* Combinar meses de datos manuales Y de semanas auto-guardadas */
+  var _lManual=gLS(LS_LM);var _lW=gLS(LS_L);
+  var _mSet={};
+  Object.keys(_lManual).forEach(function(k){if(/^\d{4}-\d{2}$/.test(k))_mSet[k]=1;});
+  Object.keys(_lW).forEach(function(k){if(/^\d{4}-\d{2}-\d{2}$/.test(k))_mSet[k.substr(0,7)]=1;});
+  var mk=Object.keys(_mSet).sort();
   if(!mk.length)return;
   var idx=mk.indexOf(viewMesKey);
   if(idx<0)idx=mk.length-1;
