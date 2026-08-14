@@ -732,6 +732,27 @@ function parseBuffer(buf) {
       blocks.push({etapa:b.n,label:ETAPA_LABELS[b.n],mc,mr:credit,saldo,fc,fr,bst});
     }
 
+    // ── LÓGICA DE AVANCE POR CRONOGRAMA ──────────────────────
+    // Si el recaudado total cubre todo lo que debía pagarse según
+    // las fechas del Excel hasta hoy → el cliente va al día,
+    // aunque algún bloque individual tenga fecha pasada sin mr.
+    if (vencAmt > 0 && ep === 'EN EJECUCIÓN') {
+      let debiaPagar = 0;
+      for (const b of BLOCKS) {
+        const mc_b = xlM(r[b.mc]);
+        if (!mc_b || mc_b < 100) continue;
+        const fc_b = b.fc ? xlDate(r[b.fc]) : null;
+        if (!fc_b) continue;
+        if (new Date(fc_b+'T12:00:00') < TODAY) debiaPagar += mc_b;
+      }
+      // Margen de $100 para redondeos
+      if (debiaPagar > 0 && recaudado >= debiaPagar - 100) {
+        vencAmt   = 0;
+        oldestVenc = null;
+        blocks.forEach(b => { if (b.bst === 'vencido') b.bst = 'proximo'; });
+      }
+    }
+
     // Determine días en mora (from oldest overdue block)
     const diasMora = oldestVenc ? Math.abs(daysDiff(oldestVenc)) : 0;
 
