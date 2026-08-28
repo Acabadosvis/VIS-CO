@@ -2147,8 +2147,12 @@ function renderAptos(){
   var xrNoLag=xrR.filter(function(r){return !norm(r[9]).includes('LAGOM');});
   var lagXRGrps=lagomApts.filter(function(g){return g.some(function(r){return norm(r[8])==='X RECIBIR';});});
   var xrRDedup=xrNoLag.concat(lagXRGrps.map(function(g){return g[0];}));
-  /* Desglose de Por Recibir */
+  /* Desglose de Por Recibir — separar Lagom Etapa 1 y Etapa 2 */
+  var lagXRGrps2=lagXRGrps.filter(function(g){return g.some(function(r){return(r[9]||'').toUpperCase().includes('FASE 2')||(r[9]||'').toUpperCase().includes('ETAPA 2');});});
+  var lagXRGrps1=lagXRGrps.filter(function(g){return !lagXRGrps2.includes(g);});
   var xrCntLagom=lagXRGrps.length;
+  var xrCntLagom1=lagXRGrps1.length;
+  var xrCntLagom2=lagXRGrps2.length;
   var xrCntGC=gcConvXR.filter(function(r){return !norm(r[9]).includes('LAGOM');}).length;
   var xrCntOtros=xrRDedup.length-xrCntLagom-xrCntGC;
 
@@ -2217,7 +2221,8 @@ function renderAptos(){
   /* Por Recibir — con desglose */
   if(xrRDedup.length){
     var brkParts=[];
-    if(xrCntLagom>0)brkParts.push(xrCntLagom+' Lagom');
+    if(xrCntLagom1>0)brkParts.push(xrCntLagom1+' Lagom E1');
+    if(xrCntLagom2>0)brkParts.push(xrCntLagom2+' Lagom E2 ★');
     if(xrCntGC>0)brkParts.push(xrCntGC+' GC Convenio');
     if(xrCntOtros>0)brkParts.push(xrCntOtros+' otros');
     html+='<div class="apt-kp navy"><div class="apt-kpn">'+xrRDedup.length+'</div><div class="apt-kpl">Por Recibir</div><div class="apt-kps">'+brkParts.join(' · ')+'</div></div>';
@@ -2270,7 +2275,8 @@ function renderAptos(){
       });
       /* Desglose por tipo */
       html+='<div style="margin-top:8px;border-top:1px solid #e5e7eb;padding-top:7px;font-size:.63rem;font-weight:700;color:#555">Composici&#243;n:</div>';
-      if(xrCntLagom>0)html+='<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><span style="width:8px;height:8px;border-radius:50%;background:#7C3AED;flex-shrink:0"></span><span style="font-size:.63rem;color:#3B0764;font-weight:700">'+xrCntLagom+' Lagom</span></div>';
+      if(xrCntLagom1>0)html+='<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><span style="width:8px;height:8px;border-radius:50%;background:#7C3AED;flex-shrink:0"></span><span style="font-size:.63rem;color:#3B0764;font-weight:700">'+xrCntLagom1+' Lagom Etapa 1</span></div>';
+      if(xrCntLagom2>0)html+='<div style="display:flex;align-items:center;gap:5px;margin-top:3px;padding:2px 6px;background:#ECFEFF;border-radius:4px;border:1px solid #67E8F9"><span style="width:8px;height:8px;border-radius:50%;background:#0891B2;flex-shrink:0"></span><span style="font-size:.63rem;color:#0E7490;font-weight:800">'+xrCntLagom2+' Lagom Etapa 2</span></div>';
       if(xrCntGC>0)html+='<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><span style="width:8px;height:8px;border-radius:50%;background:#92400E;flex-shrink:0"></span><span style="font-size:.63rem;color:#92400E;font-weight:700">'+xrCntGC+' GC Convenio</span></div>';
       if(xrCntOtros>0)html+='<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><span style="width:8px;height:8px;border-radius:50%;background:#0891B2;flex-shrink:0"></span><span style="font-size:.63rem;color:#0C4A6E;font-weight:700">'+xrCntOtros+' otros proyectos</span></div>';
       html+='</div></div>';
@@ -2297,10 +2303,16 @@ function renderAptos(){
       var tieneEj=grp.some(function(r){return norm(r[8]).includes('EJECUCI');});
       var tieneXR=grp.some(function(r){return norm(r[8])==='X RECIBIR';});
       var topCol=tieneEj&&tieneXR?'#7C3AED':tieneXR?'#1E3A5F':'#16A34A';
-      html+='<div style="background:#fff;border:1px solid #E9D5FF;border-left:4px solid '+topCol+';border-radius:8px;padding:9px 11px">';
+      /* Detectar Etapa 2 de Lagom */
+      var esFase2=grp.some(function(r){return(r[9]||'').toUpperCase().includes('FASE 2')||( r[9]||'').toUpperCase().includes('ETAPA 2');});
+      var cardBg=esFase2?'#ECFEFF':'#fff';
+      var cardBorder=esFase2?'1px solid #67E8F9':'1px solid #E9D5FF';
+      var cardLeftBorder=esFase2?'4px solid #0891B2':'4px solid '+topCol;
+      html+='<div style="background:'+cardBg+';border:'+cardBorder+';border-left:'+cardLeftBorder+';border-radius:8px;padding:9px 11px">';
       html+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">';
-      html+='<span style="font-weight:900;font-size:.8rem;color:#3B0764">'+apto+'</span>';
-      if(grp.length>1)html+='<span style="font-size:.52rem;background:#7C3AED;color:#fff;border-radius:3px;padding:0 4px;font-weight:700;margin-left:auto">2F</span>';
+      html+='<span style="font-weight:900;font-size:.8rem;color:'+(esFase2?'#0E7490':'#3B0764')+'">'+apto+'</span>';
+      if(esFase2)html+='<span style="font-size:.5rem;background:#0891B2;color:#fff;border-radius:3px;padding:1px 5px;font-weight:800;letter-spacing:.3px">ETAPA 2</span>';
+      if(grp.length>1)html+='<span style="font-size:.52rem;background:'+(esFase2?'#0891B2':'#7C3AED')+';color:#fff;border-radius:3px;padding:0 4px;font-weight:700;margin-left:auto">2F</span>';
       html+='</div>';
       html+='<div style="font-size:.6rem;color:#6D28D9;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+cliente+'">'+cliente+'</div>';
       grp.forEach(function(r,i){
