@@ -1750,9 +1750,15 @@ function renderReunionesLocal(){
 
 /* ═══ VENTAS ═══ */
 let vFVD='Todas';
-const eAli=r=>{const p=(r[9]||'').toUpperCase().trim();return ALIANZA.some(a=>p.includes(a))||CONV_KW.some(k=>p.includes(k));};
+/* r[13] = columna TIPO/CANAL — tiene prioridad sobre nombre de proyecto */
+const eOrg=r=>(r[13]||'').toLowerCase().includes('rgán')||(r[13]||'').toLowerCase().includes('organ');
+const ePres=r=>(r[13]||'').toLowerCase().includes('presu');
 const eConv=r=>CONV_KW.some(k=>(r[9]||'').toUpperCase().trim().includes(k));
-const eOrg=r=>!eAli(r)&&((r[13]||'').toLowerCase().includes('rgán')||(r[13]||'').toLowerCase().includes('organ'));
+const eAli=r=>{
+  if(eOrg(r)||ePres(r))return false; /* orgánico/presupuesto gana sobre nombre proyecto */
+  const p=(r[9]||'').toUpperCase().trim();
+  return ALIANZA.some(a=>p.includes(a))||CONV_KW.some(k=>p.includes(k));
+};
 const gV=r=>{const v=fv(r[19]);return v>0?v:fv(r[14])+fv(r[16]);};
 const gAIU=r=>fv(r[16]);
 /* Origen: para alianza usa nombre del partner (r[9]), para otros usa r[13] */
