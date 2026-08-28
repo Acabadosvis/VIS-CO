@@ -1003,7 +1003,8 @@ function render() {
   // HEADERS
   const showVencAmt  = curTab==='vencido';
   const showSemAmt   = curTab==='semana';
-  const showDias     = curTab!=='adicionales'&&curTab!=='cola'; // fecha vcto en todos los tabs
+  const showDias     = curTab!=='adicionales'&&curTab!=='cola';
+  const projDataAll  = getProjData(); // para mostrar fecha inicio en tabla
   const showReason   = curTab==='vencido';
   const showPagoBtn  = curTab==='vencido'||curTab==='semana'||curTab==='mora'||curTab==='recibir'||curTab==='aldia';
 
@@ -1081,12 +1082,22 @@ function render() {
 
     const xRecClass = curTab==='mora'?'mm':curTab==='vencido'?'mv':curTab==='semana'?'ms':curTab==='recibir'?'mr2':'mok';
 
+    // Fecha inicio de obra en tabla
+    const pd = projDataAll[c.cid]||{};
+    const sinFechaEjec = c.ep==='EN EJECUCIÓN' && !pd.fecha_inicio;
+    const inicioChip = c.ep==='EN EJECUCIÓN'
+      ? (pd.fecha_inicio
+          ? `<span style="font-size:9px;color:#0891B2;font-weight:600">🏗 ${fmtD(pd.fecha_inicio)}${pd.plazo?` · ${(pd.plazo||60)+(pd.dias_adicionales||0)}d`:''}${sinFechaEjec?'':''}</span>`
+          : `<span style="font-size:9px;color:var(--venc);font-weight:600;cursor:pointer" title="Clic para ingresar fecha de inicio">⚠ Sin fecha inicio</span>`)
+      : '';
+
     return `<tr class="${rowCls[curTab]}" onclick="openModal('${c.cid}')">
       <td>${epBadge(c.ep)}</td>
       <td style="max-width:200px;font-weight:500" title="${c.cli}">
         ${c.cli}${pagoBadge}<br>
         <span class="bproy" style="margin-top:3px;display:inline-block">${c.proy}</span>
         <span style="font-size:10px;color:var(--g);font-weight:400;margin-left:4px">T${c.torre||'—'} A${c.apto||'—'}</span>
+        ${inicioChip?`<br>${inicioChip}`:''}
       </td>
       <td class="m" style="text-align:right">${fmtMF(c.total)}</td>
       <td class="m mok" style="text-align:right">${fmtMF(c.recaudado)}</td>
@@ -1289,7 +1300,18 @@ function openModal(cid) {
   </div>
   ${proj.fecha_inicio ? cronoTimeline : '<div style="font-size:11px;color:#BBB;margin-top:8px">Define la fecha de inicio para ver el cronograma y la clasificación real</div>'}`;
 
+  // Banner de alerta si es EN EJECUCIÓN sin fecha inicio
+  const sinFechaBanner = (c.ep==='EN EJECUCIÓN' && !proj.fecha_inicio) ? `
+  <div style="background:rgba(234,179,8,.12);border:1.5px solid #D97706;border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;gap:10px;align-items:center">
+    <span style="font-size:20px">⚠️</span>
+    <div>
+      <div style="font-weight:700;font-size:12px;color:#D97706">Falta la fecha de inicio de obra</div>
+      <div style="font-size:11px;color:var(--g);margin-top:2px">Sin esta fecha no se puede calcular si el cliente está al día o atrasado en sus pagos. Ingresa la fecha abajo.</div>
+    </div>
+  </div>` : '';
+
   document.getElementById('mbody').innerHTML = `
+  ${sinFechaBanner}
   <div class="ig">
     <div class="ii"><div class="iil">Estado</div><div class="iiv">${c.ep}</div></div>
     <div class="ii"><div class="iil">Asesor / VD</div><div class="iiv">${c.asesor||'—'}</div></div>
