@@ -1765,10 +1765,13 @@ const eAli=r=>{
 };
 const gV=r=>{const v=fv(r[19]);return v>0?v:fv(r[14])+fv(r[16]);};
 const gAIU=r=>fv(r[16]);
-/* Origen: para alianza usa nombre del partner (r[9]), para otros usa r[13] */
+/* Origen: r[13] tiene prioridad para identificar partner; caer a r[9] si vacío */
 function getOrigen(r){
   if(eAli(r)){
+    const o=(r[13]||'').toUpperCase().trim();
+    for(const a of ALIANZA){if(o.includes(a))return a;} /* r[13] primero */
     const proj=(r[9]||'').toUpperCase().trim();
+    if(CONV_KW.some(k=>proj.includes(k)))return 'GC Convenio';
     for(const a of ALIANZA){if(proj.includes(a))return a;}
     return 'Alianza';
   }
@@ -1822,7 +1825,7 @@ function renderVentas(){
   const refR=vmDedup.filter(r=>isRef(r));
   const remR=vmDedup.filter(r=>!eAli(r)&&!eOrg(r)&&!isRef(r));
   const tv=vmDedup.length,tVal=vmDedup.reduce((s,r)=>s+gVD(r),0),tAIU=vmDedup.reduce((s,r)=>s+gAIUD(r),0);
-  console.log('🔍 VIS-CO v2.8 — Clasificación',p.mes,p.yr,{total:tv,alianza:aliR.length,organico:orgR.length,referido:refR.length,presupuesto:remR.length,origenes_r13:[...new Set(vmDedup.map(r=>(r[13]||'(vacío)').toString().trim()))].sort()});
+  console.log('🔍 VIS-CO v2.9 — Clasificación',p.mes,p.yr,{total:tv,alianza:aliR.length,organico:orgR.length,referido:refR.length,presupuesto:remR.length,origenes_r13:[...new Set(vmDedup.map(r=>(r[13]||'(vacío)').toString().trim()))].sort()});
   const aliV=aliR.reduce((s,r)=>s+gVD(r),0),orgV=orgR.reduce((s,r)=>s+gVD(r),0),remV=remR.reduce((s,r)=>s+gVD(r),0);
   const refV=refR.reduce((s,r)=>s+gVD(r),0);
   const aliAIU=aliR.reduce((s,r)=>s+gAIUD(r),0),orgAIU=orgR.reduce((s,r)=>s+gAIUD(r),0),remAIU=remR.reduce((s,r)=>s+gAIUD(r),0);
@@ -1920,23 +1923,10 @@ function renderVentas(){
         <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.6rem;text-transform:uppercase;letter-spacing:.5px;color:#fff;margin-bottom:6px">Por origen / alianza</div>
         <div class="vi-org-grid">
           ${(function(){
-            // Separate GC Convenio vs Gran Central (sin convenio)
-            const gcConv=vmDedup.filter(r=>eConv(r)&&(r[9]||'').toUpperCase().includes('GRAN CENTRAL'));
-            const gcSolo=vmDedup.filter(r=>!eConv(r)&&(r[9]||'').toUpperCase().includes('GRAN CENTRAL')&&eAli(r));
-            const orgTotal=orgR.length;
-            const counts={
-              'Gran Central':gcSolo.length,
-              'GC Convenio':gcConv.length,
-              'Klik':vmDedup.filter(r=>(r[9]||'').toUpperCase().includes('KLIK')&&eAli(r)).length,
-              'Corner View':vmDedup.filter(r=>(r[9]||'').toUpperCase().includes('CORNER')&&eAli(r)).length,
-              'Vanti':vmDedup.filter(r=>(r[9]||'').toUpperCase().includes('VANTI')&&eAli(r)).length,
-              'Orgánico':orgTotal,
-              'Presupuestos':remR.length,
-              'Credifamilia':vmDedup.filter(r=>(r[9]||'').toUpperCase().includes('CREDIFAMILIA')&&eAli(r)).length,
-              'Referidos':refR.length,
-              'Compensar':vmDedup.filter(r=>[(r[9]||''),(r[13]||'')].some(v=>v.toUpperCase().includes('COMPENSAR'))).length,
-            };
-            return Object.entries(counts).map(([lbl,n])=>`<div class="vi-org-row"><span class="vi-tipodot" style="background:${n>0?'var(--y)':'rgba(255,255,255,.2)'}"></span>${lbl}<span class="val ${n===0?'zero':''}">${n}</span></div>`).join('');
+            /* Grid Por Origen — dinámico desde byOrg, todos los orígenes con n>0 */
+            const _ogColor=k=>{const ku=k.toUpperCase();if(ku.includes('RGÁN')||ku.includes('ORGAN'))return'#E4721B';if(ku.includes('REFERI'))return'#6D28D9';if(ku.includes('PRESU')||ku==='SIN ORIGEN')return'#64748B';return'var(--y)';};
+            const orgGridItems=orgSort.filter(([,n])=>n>0).map(([k,n])=>`<div class="vi-org-row"><span class="vi-tipodot" style="background:${_ogColor(k)}"></span>${k}<span class="val">${n}</span></div>`).join('');
+            return orgGridItems||'<div class="vi-org-row" style="opacity:.5">Sin datos</div>';
           })()}
         </div>
       </div>
