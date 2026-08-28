@@ -1766,13 +1766,15 @@ const eAli=r=>{
 const gV=r=>{const v=fv(r[19]);return v>0?v:fv(r[14])+fv(r[16]);};
 const gAIU=r=>fv(r[16]);
 /* Origen: r[13] tiene prioridad para identificar partner; caer a r[9] si vacío */
+/* Alias: VANTI → WELL (Vanti ya no opera, sus ventas se consolidan en WELL) */
+const _aliasOrig=k=>k==='VANTI'?'WELL':k;
 function getOrigen(r){
   if(eAli(r)){
     const o=(r[13]||'').toUpperCase().trim();
-    for(const a of ALIANZA){if(o.includes(a))return a;} /* r[13] primero */
+    for(const a of ALIANZA){if(o.includes(a))return _aliasOrig(a);} /* r[13] primero */
     const proj=(r[9]||'').toUpperCase().trim();
     if(CONV_KW.some(k=>proj.includes(k)))return 'GC Convenio';
-    for(const a of ALIANZA){if(proj.includes(a))return a;}
+    for(const a of ALIANZA){if(proj.includes(a))return _aliasOrig(a);}
     return 'Alianza';
   }
   return(r[13]||'Sin origen').toString().trim()||'Sin origen';
