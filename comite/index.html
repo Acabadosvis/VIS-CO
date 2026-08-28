@@ -1750,22 +1750,31 @@ function renderReunionesLocal(){
 
 /* ═══ VENTAS ═══ */
 let vFVD='Todas';
-/* r[13] = columna TIPO/CANAL — tiene prioridad sobre nombre de proyecto */
+/* r[13] = columna ORIGEN LEAD — prioridad TOTAL sobre nombre de proyecto (r[9]) */
 const eOrg=r=>(r[13]||'').toLowerCase().includes('rgán')||(r[13]||'').toLowerCase().includes('organ');
 const ePres=r=>(r[13]||'').toLowerCase().includes('presu');
 const eConv=r=>CONV_KW.some(k=>(r[9]||'').toUpperCase().trim().includes(k));
 const eAli=r=>{
-  if(eOrg(r)||ePres(r))return false; /* orgánico/presupuesto gana sobre nombre proyecto */
+  if(eOrg(r)||ePres(r))return false;
+  const o=(r[13]||'').toUpperCase().trim();
+  /* Si r[13] tiene valor → decide solo él: alianza si coincide, NO-alianza si no coincide */
+  if(o){return ALIANZA.some(a=>o.includes(a))||CONV_KW.some(k=>o.includes(k));}
+  /* r[13] vacío → caer a nombre de proyecto */
   const p=(r[9]||'').toUpperCase().trim();
   return ALIANZA.some(a=>p.includes(a))||CONV_KW.some(k=>p.includes(k));
 };
 const gV=r=>{const v=fv(r[19]);return v>0?v:fv(r[14])+fv(r[16]);};
 const gAIU=r=>fv(r[16]);
-/* Origen: para alianza usa nombre del partner (r[9]), para otros usa r[13] */
+/* Origen: r[13] tiene prioridad para identificar partner; caer a r[9] si vacío */
+/* Alias: VANTI → WELL (Vanti ya no opera, sus ventas se consolidan en WELL) */
+const _aliasOrig=k=>k==='VANTI'?'WELL':k;
 function getOrigen(r){
   if(eAli(r)){
+    const o=(r[13]||'').toUpperCase().trim();
+    for(const a of ALIANZA){if(o.includes(a))return _aliasOrig(a);} /* r[13] primero */
     const proj=(r[9]||'').toUpperCase().trim();
-    for(const a of ALIANZA){if(proj.includes(a))return a;}
+    if(CONV_KW.some(k=>proj.includes(k)))return 'GC Convenio';
+    for(const a of ALIANZA){if(proj.includes(a))return _aliasOrig(a);}
     return 'Alianza';
   }
   return(r[13]||'Sin origen').toString().trim()||'Sin origen';
@@ -1818,6 +1827,7 @@ function renderVentas(){
   const refR=vmDedup.filter(r=>isRef(r));
   const remR=vmDedup.filter(r=>!eAli(r)&&!eOrg(r)&&!isRef(r));
   const tv=vmDedup.length,tVal=vmDedup.reduce((s,r)=>s+gVD(r),0),tAIU=vmDedup.reduce((s,r)=>s+gAIUD(r),0);
+  console.log('🔍 VIS-CO v2.9 — Clasificación',p.mes,p.yr,{total:tv,alianza:aliR.length,organico:orgR.length,referido:refR.length,presupuesto:remR.length,origenes_r13:[...new Set(vmDedup.map(r=>(r[13]||'(vacío)').toString().trim()))].sort()});
   const aliV=aliR.reduce((s,r)=>s+gVD(r),0),orgV=orgR.reduce((s,r)=>s+gVD(r),0),remV=remR.reduce((s,r)=>s+gVD(r),0);
   const refV=refR.reduce((s,r)=>s+gVD(r),0);
   const aliAIU=aliR.reduce((s,r)=>s+gAIUD(r),0),orgAIU=orgR.reduce((s,r)=>s+gAIUD(r),0),remAIU=remR.reduce((s,r)=>s+gAIUD(r),0);
@@ -1915,23 +1925,10 @@ function renderVentas(){
         <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.6rem;text-transform:uppercase;letter-spacing:.5px;color:#fff;margin-bottom:6px">Por origen / alianza</div>
         <div class="vi-org-grid">
           ${(function(){
-            // Separate GC Convenio vs Gran Central (sin convenio)
-            const gcConv=vmDedup.filter(r=>eConv(r)&&(r[9]||'').toUpperCase().includes('GRAN CENTRAL'));
-            const gcSolo=vmDedup.filter(r=>!eConv(r)&&(r[9]||'').toUpperCase().includes('GRAN CENTRAL')&&eAli(r));
-            const orgTotal=orgR.length;
-            const counts={
-              'Gran Central':gcSolo.length,
-              'GC Convenio':gcConv.length,
-              'Klik':vmDedup.filter(r=>(r[9]||'').toUpperCase().includes('KLIK')&&eAli(r)).length,
-              'Corner View':vmDedup.filter(r=>(r[9]||'').toUpperCase().includes('CORNER')&&eAli(r)).length,
-              'Vanti':vmDedup.filter(r=>(r[9]||'').toUpperCase().includes('VANTI')&&eAli(r)).length,
-              'Orgánico':orgTotal,
-              'Presupuestos':remR.length,
-              'Credifamilia':vmDedup.filter(r=>(r[9]||'').toUpperCase().includes('CREDIFAMILIA')&&eAli(r)).length,
-              'Referidos':refR.length,
-              'Compensar':vmDedup.filter(r=>[(r[9]||''),(r[13]||'')].some(v=>v.toUpperCase().includes('COMPENSAR'))).length,
-            };
-            return Object.entries(counts).map(([lbl,n])=>`<div class="vi-org-row"><span class="vi-tipodot" style="background:${n>0?'var(--y)':'rgba(255,255,255,.2)'}"></span>${lbl}<span class="val ${n===0?'zero':''}">${n}</span></div>`).join('');
+            /* Grid Por Origen — dinámico desde byOrg, todos los orígenes con n>0 */
+            const _ogColor=k=>{const ku=k.toUpperCase();if(ku.includes('RGÁN')||ku.includes('ORGAN'))return'#E4721B';if(ku.includes('REFERI'))return'#6D28D9';if(ku.includes('PRESU')||ku==='SIN ORIGEN')return'#64748B';return'var(--y)';};
+            const orgGridItems=orgSort.filter(([,n])=>n>0).map(([k,n])=>`<div class="vi-org-row"><span class="vi-tipodot" style="background:${_ogColor(k)}"></span>${k}<span class="val">${n}</span></div>`).join('');
+            return orgGridItems||'<div class="vi-org-row" style="opacity:.5">Sin datos</div>';
           })()}
         </div>
       </div>
@@ -1978,6 +1975,16 @@ function renderVentas(){
       </div>
     </div>
   </div>
+
+  <!-- DEBUG panel (colapso) -->
+  <details style="margin:8px 0;font-size:.68rem;background:var(--gc);border:1px solid var(--brd);border-radius:8px;padding:8px 12px">
+    <summary style="cursor:pointer;font-weight:700;color:var(--g);letter-spacing:.3px">🔍 Debug clasificación — ${p.mes} ${p.yr}</summary>
+    <div style="margin-top:8px;line-height:1.8;color:var(--n)">
+      <strong>Totales:</strong> ${tv} ventas → Ali: ${aliR.length} | Org: ${orgR.length} | Ref: ${refR.length} | Pres: ${remR.length}<br>
+      <strong>Valores únicos r[13] (ORIGEN LEAD):</strong><br>
+      ${[...new Map(vmDedup.map(r=>[(r[13]||'(vacío)').trim(),(r[13]||'(vacío)').trim()])).values()].map(v=>{const c=vmDedup.filter(r=>(r[13]||'(vacío)').trim()===v).length;return`<span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 7px;border-radius:12px;background:var(--brd);font-weight:600">${v}: ${c}</span>`;}).join('')}
+    </div>
+  </details>
 
   <!-- 2. INSIGHTS -->
   ${vIns.length?`<div class="ins"><div class="ins-hd">💡 Insights automáticos</div>${vIns.map(i=>`<div class="ins-item"><span class="ic">${i.ic}</span><span>${i.t}</span></div>`).join('')}</div>`:''}
@@ -2140,8 +2147,12 @@ function renderAptos(){
   var xrNoLag=xrR.filter(function(r){return !norm(r[9]).includes('LAGOM');});
   var lagXRGrps=lagomApts.filter(function(g){return g.some(function(r){return norm(r[8])==='X RECIBIR';});});
   var xrRDedup=xrNoLag.concat(lagXRGrps.map(function(g){return g[0];}));
-  /* Desglose de Por Recibir */
+  /* Desglose de Por Recibir — separar Lagom Etapa 1 y Etapa 2 */
+  var lagXRGrps2=lagXRGrps.filter(function(g){return g.some(function(r){return(r[9]||'').toUpperCase().includes('FASE 2')||(r[9]||'').toUpperCase().includes('ETAPA 2');});});
+  var lagXRGrps1=lagXRGrps.filter(function(g){return !lagXRGrps2.includes(g);});
   var xrCntLagom=lagXRGrps.length;
+  var xrCntLagom1=lagXRGrps1.length;
+  var xrCntLagom2=lagXRGrps2.length;
   var xrCntGC=gcConvXR.filter(function(r){return !norm(r[9]).includes('LAGOM');}).length;
   var xrCntOtros=xrRDedup.length-xrCntLagom-xrCntGC;
 
@@ -2210,7 +2221,8 @@ function renderAptos(){
   /* Por Recibir — con desglose */
   if(xrRDedup.length){
     var brkParts=[];
-    if(xrCntLagom>0)brkParts.push(xrCntLagom+' Lagom');
+    if(xrCntLagom1>0)brkParts.push(xrCntLagom1+' Lagom E1');
+    if(xrCntLagom2>0)brkParts.push(xrCntLagom2+' Lagom E2 ★');
     if(xrCntGC>0)brkParts.push(xrCntGC+' GC Convenio');
     if(xrCntOtros>0)brkParts.push(xrCntOtros+' otros');
     html+='<div class="apt-kp navy"><div class="apt-kpn">'+xrRDedup.length+'</div><div class="apt-kpl">Por Recibir</div><div class="apt-kps">'+brkParts.join(' · ')+'</div></div>';
@@ -2263,7 +2275,8 @@ function renderAptos(){
       });
       /* Desglose por tipo */
       html+='<div style="margin-top:8px;border-top:1px solid #e5e7eb;padding-top:7px;font-size:.63rem;font-weight:700;color:#555">Composici&#243;n:</div>';
-      if(xrCntLagom>0)html+='<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><span style="width:8px;height:8px;border-radius:50%;background:#7C3AED;flex-shrink:0"></span><span style="font-size:.63rem;color:#3B0764;font-weight:700">'+xrCntLagom+' Lagom</span></div>';
+      if(xrCntLagom1>0)html+='<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><span style="width:8px;height:8px;border-radius:50%;background:#7C3AED;flex-shrink:0"></span><span style="font-size:.63rem;color:#3B0764;font-weight:700">'+xrCntLagom1+' Lagom Etapa 1</span></div>';
+      if(xrCntLagom2>0)html+='<div style="display:flex;align-items:center;gap:5px;margin-top:3px;padding:2px 6px;background:#ECFEFF;border-radius:4px;border:1px solid #67E8F9"><span style="width:8px;height:8px;border-radius:50%;background:#0891B2;flex-shrink:0"></span><span style="font-size:.63rem;color:#0E7490;font-weight:800">'+xrCntLagom2+' Lagom Etapa 2</span></div>';
       if(xrCntGC>0)html+='<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><span style="width:8px;height:8px;border-radius:50%;background:#92400E;flex-shrink:0"></span><span style="font-size:.63rem;color:#92400E;font-weight:700">'+xrCntGC+' GC Convenio</span></div>';
       if(xrCntOtros>0)html+='<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><span style="width:8px;height:8px;border-radius:50%;background:#0891B2;flex-shrink:0"></span><span style="font-size:.63rem;color:#0C4A6E;font-weight:700">'+xrCntOtros+' otros proyectos</span></div>';
       html+='</div></div>';
@@ -2290,10 +2303,16 @@ function renderAptos(){
       var tieneEj=grp.some(function(r){return norm(r[8]).includes('EJECUCI');});
       var tieneXR=grp.some(function(r){return norm(r[8])==='X RECIBIR';});
       var topCol=tieneEj&&tieneXR?'#7C3AED':tieneXR?'#1E3A5F':'#16A34A';
-      html+='<div style="background:#fff;border:1px solid #E9D5FF;border-left:4px solid '+topCol+';border-radius:8px;padding:9px 11px">';
+      /* Detectar Etapa 2 de Lagom */
+      var esFase2=grp.some(function(r){return(r[9]||'').toUpperCase().includes('FASE 2')||( r[9]||'').toUpperCase().includes('ETAPA 2');});
+      var cardBg=esFase2?'#ECFEFF':'#fff';
+      var cardBorder=esFase2?'1px solid #67E8F9':'1px solid #E9D5FF';
+      var cardLeftBorder=esFase2?'4px solid #0891B2':'4px solid '+topCol;
+      html+='<div style="background:'+cardBg+';border:'+cardBorder+';border-left:'+cardLeftBorder+';border-radius:8px;padding:9px 11px">';
       html+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">';
-      html+='<span style="font-weight:900;font-size:.8rem;color:#3B0764">'+apto+'</span>';
-      if(grp.length>1)html+='<span style="font-size:.52rem;background:#7C3AED;color:#fff;border-radius:3px;padding:0 4px;font-weight:700;margin-left:auto">2F</span>';
+      html+='<span style="font-weight:900;font-size:.8rem;color:'+(esFase2?'#0E7490':'#3B0764')+'">'+apto+'</span>';
+      if(esFase2)html+='<span style="font-size:.5rem;background:#0891B2;color:#fff;border-radius:3px;padding:1px 5px;font-weight:800;letter-spacing:.3px">ETAPA 2</span>';
+      if(grp.length>1)html+='<span style="font-size:.52rem;background:'+(esFase2?'#0891B2':'#7C3AED')+';color:#fff;border-radius:3px;padding:0 4px;font-weight:700;margin-left:auto">2F</span>';
       html+='</div>';
       html+='<div style="font-size:.6rem;color:#6D28D9;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+cliente+'">'+cliente+'</div>';
       grp.forEach(function(r,i){
