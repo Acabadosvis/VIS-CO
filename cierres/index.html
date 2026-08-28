@@ -1750,12 +1750,16 @@ function renderReunionesLocal(){
 
 /* ═══ VENTAS ═══ */
 let vFVD='Todas';
-/* r[13] = columna TIPO/CANAL — tiene prioridad sobre nombre de proyecto */
+/* r[13] = columna ORIGEN LEAD — prioridad TOTAL sobre nombre de proyecto (r[9]) */
 const eOrg=r=>(r[13]||'').toLowerCase().includes('rgán')||(r[13]||'').toLowerCase().includes('organ');
 const ePres=r=>(r[13]||'').toLowerCase().includes('presu');
 const eConv=r=>CONV_KW.some(k=>(r[9]||'').toUpperCase().trim().includes(k));
 const eAli=r=>{
-  if(eOrg(r)||ePres(r))return false; /* orgánico/presupuesto gana sobre nombre proyecto */
+  if(eOrg(r)||ePres(r))return false;
+  const o=(r[13]||'').toUpperCase().trim();
+  /* Si r[13] tiene valor → decide solo él: alianza si coincide, NO-alianza si no coincide */
+  if(o){return ALIANZA.some(a=>o.includes(a))||CONV_KW.some(k=>o.includes(k));}
+  /* r[13] vacío → caer a nombre de proyecto */
   const p=(r[9]||'').toUpperCase().trim();
   return ALIANZA.some(a=>p.includes(a))||CONV_KW.some(k=>p.includes(k));
 };
@@ -1818,6 +1822,7 @@ function renderVentas(){
   const refR=vmDedup.filter(r=>isRef(r));
   const remR=vmDedup.filter(r=>!eAli(r)&&!eOrg(r)&&!isRef(r));
   const tv=vmDedup.length,tVal=vmDedup.reduce((s,r)=>s+gVD(r),0),tAIU=vmDedup.reduce((s,r)=>s+gAIUD(r),0);
+  console.log('🔍 VIS-CO v2.8 — Clasificación',p.mes,p.yr,{total:tv,alianza:aliR.length,organico:orgR.length,referido:refR.length,presupuesto:remR.length,origenes_r13:[...new Set(vmDedup.map(r=>(r[13]||'(vacío)').toString().trim()))].sort()});
   const aliV=aliR.reduce((s,r)=>s+gVD(r),0),orgV=orgR.reduce((s,r)=>s+gVD(r),0),remV=remR.reduce((s,r)=>s+gVD(r),0);
   const refV=refR.reduce((s,r)=>s+gVD(r),0);
   const aliAIU=aliR.reduce((s,r)=>s+gAIUD(r),0),orgAIU=orgR.reduce((s,r)=>s+gAIUD(r),0),remAIU=remR.reduce((s,r)=>s+gAIUD(r),0);
@@ -1978,6 +1983,16 @@ function renderVentas(){
       </div>
     </div>
   </div>
+
+  <!-- DEBUG panel (colapso) -->
+  <details style="margin:8px 0;font-size:.68rem;background:var(--gc);border:1px solid var(--brd);border-radius:8px;padding:8px 12px">
+    <summary style="cursor:pointer;font-weight:700;color:var(--g);letter-spacing:.3px">🔍 Debug clasificación — ${p.mes} ${p.yr}</summary>
+    <div style="margin-top:8px;line-height:1.8;color:var(--n)">
+      <strong>Totales:</strong> ${tv} ventas → Ali: ${aliR.length} | Org: ${orgR.length} | Ref: ${refR.length} | Pres: ${remR.length}<br>
+      <strong>Valores únicos r[13] (ORIGEN LEAD):</strong><br>
+      ${[...new Map(vmDedup.map(r=>[(r[13]||'(vacío)').trim(),(r[13]||'(vacío)').trim()])).values()].map(v=>{const c=vmDedup.filter(r=>(r[13]||'(vacío)').trim()===v).length;return`<span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 7px;border-radius:12px;background:var(--brd);font-weight:600">${v}: ${c}</span>`;}).join('')}
+    </div>
+  </details>
 
   <!-- 2. INSIGHTS -->
   ${vIns.length?`<div class="ins"><div class="ins-hd">💡 Insights automáticos</div>${vIns.map(i=>`<div class="ins-item"><span class="ic">${i.ic}</span><span>${i.t}</span></div>`).join('')}</div>`:''}
