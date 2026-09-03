@@ -382,62 +382,83 @@ body.modo-comite .brow{display:none!important}
   <div class="card">
     <div class="card-hd">&#128101; Clasificaci&#243;n de leads <span id="l-per" style="color:var(--o)"></span><span class="card-hd-sub">Referencia: Bitrix24 BI</span><button id="btn-leads-toggle" onclick="toggleFormSection('l-form-semanal','btn-leads-toggle','vc3_l0_col')" style="margin-left:auto;background:#E0F2FE;border:1.5px solid #7DD3FC;border-radius:6px;padding:3px 11px;font-size:.7rem;cursor:pointer;font-family:Syne,sans-serif;font-weight:700;color:#0369A1;white-space:nowrap">－ Ocultar</button><button id="btn-mes-leads" onclick="toggleMesLeads()" style="background:var(--gc);border:1.5px solid var(--brd);border-radius:6px;padding:3px 11px;font-size:.7rem;cursor:pointer;font-family:Syne,sans-serif;font-weight:700;color:var(--n)">&#128197; Vista mensual</button></div>
   <div id="l-form-semanal">
-    <!-- CAPTACION WPP -> CALCULADORA -->
-    <div class="sec" style="margin-bottom:8px;color:#92400E">&#128241; Captaci&#243;n WPP &#8594; Calculadora</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px;margin-bottom:14px">
-      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:10px;padding:12px 14px">
-        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:6px">&#128172; Llegaron WPP &#9889; <span style="font-size:.6rem;font-weight:400;color:#888">auto Redes</span></label>
-        <input type="number" id="l_wpp" min="0" placeholder="0" readonly style="width:100%;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#16A34A;background:#DCFCE7;outline:none;cursor:default">
-      </div>
-      <div style="background:#FFF0F6;border:1.5px solid #F9A8D4;border-radius:10px;padding:12px 14px">
-        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#DB2777;display:block;margin-bottom:6px">&#128172;&#8594;&#129518; WPP hicieron calc. &#9889; <span style="font-size:.6rem;font-weight:400;color:#888">auto Redes</span></label>
-        <input type="number" id="l_wpp_calc" min="0" placeholder="0" readonly style="width:100%;border:1.5px solid #F9A8D4;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#DB2777;background:#FFF0F6;outline:none;cursor:default">
-      </div>
-      <div style="background:#FFF8F0;border:1.5px solid #ECCDB0;border-radius:10px;padding:12px 14px">
-        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--o);display:block;margin-bottom:6px">&#129518; Calc. totales Bitrix</label>
-        <input type="number" id="l_total" min="0" placeholder="0" oninput="calcNI()" style="width:100%;border:1.5px solid #ECCDB0;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:var(--o);background:#fff;outline:none">
-      </div>
-      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:10px;padding:12px 14px">
-        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#0891B2;display:block;margin-bottom:6px">&#9989; Verificados</label>
-        <input type="number" id="l_ver" min="0" placeholder="0" oninput="calcNI()" style="width:100%;border:1.5px solid #93C5FD;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#0891B2;background:#fff;outline:none">
-      </div>
-      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:10px;padding:12px 14px">
-        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:6px">&#10060; No verificados <span style="font-size:.6rem;background:#F3F4F6;border-radius:4px;padding:1px 4px">auto</span></label>
-        <input type="number" id="l_nver" min="0" placeholder="0" readonly style="width:100%;border:1.5px solid #CBD5E1;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#64748B;background:#F1F5F9;outline:none;cursor:default">
-      </div>
+  <!-- SELECTOR PERFILADOR -->
+  <div style="display:flex;gap:4px;margin-bottom:14px;padding:3px;background:var(--gc);border:1px solid var(--brd);border-radius:10px">
+    <button id="btn-pf-M" onclick="selPF('M')" style="flex:1;padding:8px;font-family:Syne,sans-serif;font-weight:800;font-size:.72rem;border:none;border-radius:7px;cursor:pointer;background:var(--o);color:#fff">&#128100; Marcela</button>
+    <button id="btn-pf-A" onclick="selPF('A')" style="flex:1;padding:8px;font-family:Syne,sans-serif;font-weight:800;font-size:.72rem;border:none;border-radius:7px;cursor:pointer;background:transparent;color:var(--g)">&#128100; Andr&#233;s S.</button>
+  </div>
+  <!-- ═══ MARCELA ═══ -->
+  <div id="pf-M">
+    <div class="sec" style="color:#0891B2;margin-bottom:8px">&#9989; Calculadoras Verificadas</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px">
+      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#0891B2;display:block;margin-bottom:4px">&#128203; Asignadas</label><input type="number" id="mf_cv_asig" min="0" placeholder="0" style="width:100%;border:1.5px solid #93C5FD;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#0891B2;background:#fff;outline:none"></div>
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:4px">&#128172; Con respuesta</label><input type="number" id="mf_cv_resp" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
+      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:4px">&#128277; Sin respuesta</label><input type="number" id="mf_cv_sr" min="0" placeholder="0" style="width:100%;border:1.5px solid #CBD5E1;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#64748B;background:#fff;outline:none"></div>
+      <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#EA580C;display:block;margin-bottom:4px">&#127758; Fuera cobertura</label><input type="number" id="mf_cv_cob" min="0" placeholder="0" style="width:100%;border:1.5px solid #FED7AA;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#EA580C;background:#fff;outline:none"></div>
+      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#DC2626;display:block;margin-bottom:4px">&#128078; Sin inter&#233;s</label><input type="number" id="mf_cv_ni" min="0" placeholder="0" style="width:100%;border:1.5px solid #FCA5A5;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#DC2626;background:#fff;outline:none"></div>
     </div>
-    <!-- DE LOS VERIFICADOS -->
-    <div class="sec" style="margin-top:4px;font-size:.75rem;color:#0891B2">&#9989; De los verificados &#8594;</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px;margin-bottom:14px">
-      <div style="background:#FFF8F0;border:1.5px solid #ECCDB0;border-radius:10px;padding:12px 14px">
-        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--o);display:block;margin-bottom:6px">&#128203; Calc. incompletas</label>
-        <input type="number" id="l_cno" min="0" placeholder="0" oninput="calcNI()" style="width:100%;border:1.5px solid #ECCDB0;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:var(--o);background:#fff;outline:none">
-      </div>
-      <div style="background:#EEECFF;border:1.5px solid #A5B4FC;border-radius:10px;padding:12px 14px">
-        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#4F46E5;display:block;margin-bottom:6px">&#128228; Mensajes en proceso</label>
-        <input type="number" id="l_sr" min="0" placeholder="0" oninput="calcNI()" style="width:100%;border:1.5px solid #A5B4FC;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#4F46E5;background:#fff;outline:none">
-      </div>
-      <div style="background:#F8FAFC;border:1.5px solid #94A3B8;border-radius:10px;padding:12px 14px">
-        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:6px">&#128172; Sin respuesta</label>
-        <input type="number" id="l_sr2" min="0" placeholder="0" oninput="calcNI()" style="width:100%;border:1.5px solid #94A3B8;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#64748B;background:#fff;outline:none">
-      </div>
-      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:10px;padding:12px 14px">
-        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:6px">&#11088; Interesados</label>
-        <input type="number" id="l_int" min="0" placeholder="0" oninput="calcNI()" style="width:100%;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#16A34A;background:#fff;outline:none">
-      </div>
-      <div style="background:#FFF3E6;border:1.5px solid #FDBA74;border-radius:10px;padding:12px 14px">
-        <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#888;display:block;margin-bottom:6px">&#128078; No interesados <span style="font-size:.6rem;background:#F3F4F6;border-radius:4px;padding:1px 4px">auto</span></label>
-        <input type="number" id="l_ni" min="0" placeholder="0" readonly style="width:100%;border:1.5px solid #FDBA74;border-radius:7px;padding:8px 10px;font-size:1.1rem;font-weight:700;color:#666;background:#FFF3E6;outline:none;cursor:default">
-      </div>
+    <div class="sec" style="color:#F97316;margin-bottom:8px">&#128203; Calculadoras No Verificadas</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px">
+      <div style="background:#FFF8F0;border:1.5px solid #FDBA74;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#F97316;display:block;margin-bottom:4px">&#128203; Asignadas</label><input type="number" id="mf_nv_asig" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDBA74;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#F97316;background:#fff;outline:none"></div>
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:4px">&#128172; Con respuesta</label><input type="number" id="mf_nv_resp" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
+      <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:4px">&#9989; Completaron (&#8594;verif)</label><input type="number" id="mf_nv_comp" min="0" placeholder="0" style="width:100%;border:1.5px solid #6EE7B7;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#059669;background:#fff;outline:none"></div>
+      <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#EA580C;display:block;margin-bottom:4px">&#127758; Fuera cobertura</label><input type="number" id="mf_nv_cob" min="0" placeholder="0" style="width:100%;border:1.5px solid #FED7AA;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#EA580C;background:#fff;outline:none"></div>
+      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#DC2626;display:block;margin-bottom:4px">&#128078; Sin inter&#233;s</label><input type="number" id="mf_nv_ni" min="0" placeholder="0" style="width:100%;border:1.5px solid #FCA5A5;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#DC2626;background:#fff;outline:none"></div>
     </div>
-    <!-- VIGENTES SEGUIMIENTO -->
-    <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:12px 14px;margin-bottom:12px">
-      <div style="font-size:.68rem;font-weight:700;color:#1E40AF;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">&#128204; Vigentes seguimiento <span id="l_vig_ctx" style="font-weight:400;color:#3B82F6;font-size:.7rem;margin-left:6px"></span></div>
-      <div class="fg" style="margin-bottom:0">
-        <div class="fl"><label style="color:#1D4ED8">&#9989; Siguen vigentes (activos)</label><input type="number" id="l_vig" min="0" placeholder="0" oninput="calcVigNo()"></div>
-        <div class="fl"><label style="color:#888">&#128277; Ya no responden <span style="font-size:.68rem;background:#F3F4F6;border-radius:4px;padding:1px 5px">auto</span></label><input type="number" id="l_vig_no" min="0" placeholder="0" readonly style="background:#FEF2F2;color:#DC2626;cursor:default"></div>
-      </div>
+    <div class="sec" style="color:#059669;margin-bottom:8px">&#128172; WhatsApp &#8212; Gesti&#243;n</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px">
+      <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:4px">&#128172; Gestionadas</label><input type="number" id="mf_wpp_tot" min="0" placeholder="0" style="width:100%;border:1.5px solid #6EE7B7;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#059669;background:#fff;outline:none"></div>
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:4px">&#128483; Con interacci&#243;n</label><input type="number" id="mf_wpp_int" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
+      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:4px">&#128277; Sin respuesta</label><input type="number" id="mf_wpp_sr" min="0" placeholder="0" style="width:100%;border:1.5px solid #CBD5E1;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#64748B;background:#fff;outline:none"></div>
+      <div style="background:#EEF2FF;border:1.5px solid #A5B4FC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#4F46E5;display:block;margin-bottom:4px">&#129302; Retomadas chatbot</label><input type="number" id="mf_wpp_bot" min="0" placeholder="0" style="width:100%;border:1.5px solid #A5B4FC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#4F46E5;background:#fff;outline:none"></div>
     </div>
+    <div class="sec" style="color:#7C3AED;margin-bottom:8px">&#127909; Webinar</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px">
+      <div style="background:#F5F3FF;border:1.5px solid #DDD6FE;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7C3AED;display:block;margin-bottom:4px">&#128221; Inscritas</label><input type="number" id="mf_web_ins" min="0" placeholder="0" style="width:100%;border:1.5px solid #DDD6FE;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#7C3AED;background:#fff;outline:none"></div>
+      <div style="background:#EDE9FE;border:1.5px solid #C4B5FD;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#6D28D9;display:block;margin-bottom:4px">&#128222; Contactadas</label><input type="number" id="mf_web_cont" min="0" placeholder="0" style="width:100%;border:1.5px solid #C4B5FD;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#6D28D9;background:#fff;outline:none"></div>
+      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:4px">&#8987; Pendientes</label><input type="number" id="mf_web_pend" min="0" placeholder="0" style="width:100%;border:1.5px solid #CBD5E1;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#64748B;background:#fff;outline:none"></div>
+      <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#D97706;display:block;margin-bottom:4px">&#9989; Confirmadas</label><input type="number" id="mf_web_conf" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDE68A;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#D97706;background:#fff;outline:none"></div>
+    </div>
+    <div class="sec" style="margin-bottom:8px">&#128197; Reuniones</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px">
+      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#2563EB;display:block;margin-bottom:4px">&#128197; Agendadas</label><input type="number" id="mf_reu_ag" min="0" placeholder="0" style="width:100%;border:1.5px solid #93C5FD;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#2563EB;background:#fff;outline:none"></div>
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:4px">&#9989; Efectivas</label><input type="number" id="mf_reu_ef" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
+      <div style="background:#FFF8F0;border:1.5px solid #FDBA74;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#F97316;display:block;margin-bottom:4px">&#11088; Clientes potenciales</label><input type="number" id="mf_reu_pot" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDBA74;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#F97316;background:#fff;outline:none"></div>
+    </div>
+    <div class="brow"><button class="btn btn-o" onclick="savePF('M')">&#128190; Guardar Marcela</button><button class="btn btn-s" onclick="renderLeads()">&#8617; Cancelar</button></div>
+  </div>
+  <!-- ═══ ANDRÉS ═══ -->
+  <div id="pf-A" style="display:none">
+    <div class="sec" style="color:#7C3AED;margin-bottom:8px">&#127909; Webinar</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px">
+      <div style="background:#F5F3FF;border:1.5px solid #DDD6FE;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7C3AED;display:block;margin-bottom:4px">&#128221; Inscritos totales</label><input type="number" id="af_web_ins" min="0" placeholder="0" style="width:100%;border:1.5px solid #DDD6FE;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#7C3AED;background:#fff;outline:none"></div>
+      <div style="background:#EDE9FE;border:1.5px solid #C4B5FD;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#6D28D9;display:block;margin-bottom:4px">&#128222; Contactados</label><input type="number" id="af_web_cont" min="0" placeholder="0" style="width:100%;border:1.5px solid #C4B5FD;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#6D28D9;background:#fff;outline:none"></div>
+      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#DC2626;display:block;margin-bottom:4px">&#8987; Faltantes</label><input type="number" id="af_web_falt" min="0" placeholder="0" style="width:100%;border:1.5px solid #FCA5A5;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#DC2626;background:#fff;outline:none"></div>
+    </div>
+    <div class="sec" style="color:#059669;margin-bottom:8px">&#128172; WhatsApp / Bitrix &#8212; Calculadoras</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px">
+      <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:4px">&#128172; Conversaciones totales</label><input type="number" id="af_wpp_conv" min="0" placeholder="0" style="width:100%;border:1.5px solid #6EE7B7;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#059669;background:#fff;outline:none"></div>
+      <div style="background:#FFF8F0;border:1.5px solid #FDBA74;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#F97316;display:block;margin-bottom:4px">&#129518; Iniciaron calc.</label><input type="number" id="af_wpp_calc" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDBA74;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#F97316;background:#fff;outline:none"></div>
+      <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#D97706;display:block;margin-bottom:4px">&#128203; Total diligenciadas</label><input type="number" id="af_wpp_dil" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDE68A;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#D97706;background:#fff;outline:none"></div>
+      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#0891B2;display:block;margin-bottom:4px">&#9989; Verificadas</label><input type="number" id="af_wpp_ver" min="0" placeholder="0" style="width:100%;border:1.5px solid #93C5FD;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#0891B2;background:#fff;outline:none"></div>
+      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:4px">&#10060; No verificadas</label><input type="number" id="af_wpp_nver" min="0" placeholder="0" style="width:100%;border:1.5px solid #CBD5E1;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#64748B;background:#fff;outline:none"></div>
+    </div>
+    <div class="sec" style="margin-bottom:8px">&#128222; Gesti&#243;n Seguimiento</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px">
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:4px">&#128172; Primer contacto</label><input type="number" id="af_seg_resp" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
+      <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#D97706;display:block;margin-bottom:4px">&#128260; No verif. respondidos</label><input type="number" id="af_seg_nvrep" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDE68A;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#D97706;background:#fff;outline:none"></div>
+      <div style="background:#EEF2FF;border:1.5px solid #A5B4FC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#4F46E5;display:block;margin-bottom:4px">&#129302; Chats estancados</label><input type="number" id="af_seg_bot" min="0" placeholder="0" style="width:100%;border:1.5px solid #A5B4FC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#4F46E5;background:#fff;outline:none"></div>
+      <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#EA580C;display:block;margin-bottom:4px">&#127758; Fuera de cobertura</label><input type="number" id="af_seg_cob" min="0" placeholder="0" style="width:100%;border:1.5px solid #FED7AA;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#EA580C;background:#fff;outline:none"></div>
+    </div>
+    <div class="sec" style="color:#16A34A;margin-bottom:8px">&#128176; Cotizaciones &#8212; Pipeline</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px">
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:4px">&#128203; Cotizaci&#243;n + reuni&#243;n</label><input type="number" id="af_cot_reun" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
+      <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#D97706;display:block;margin-bottom:4px">&#11088; Interesados a futuro</label><input type="number" id="af_cot_fut" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDE68A;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#D97706;background:#fff;outline:none"></div>
+      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#2563EB;display:block;margin-bottom:4px">&#8987; En espera de info</label><input type="number" id="af_cot_esp" min="0" placeholder="0" style="width:100%;border:1.5px solid #93C5FD;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#2563EB;background:#fff;outline:none"></div>
+      <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:4px">&#128640; Prospectos activos</label><input type="number" id="af_cot_tot" min="0" placeholder="0" style="width:100%;border:1.5px solid #6EE7B7;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#059669;background:#fff;outline:none"></div>
+    </div>
+    <div class="brow"><button class="btn btn-o" onclick="savePF('A')">&#128190; Guardar Andr&#233;s</button><button class="btn btn-s" onclick="renderLeads()">&#8617; Cancelar</button></div>
+  </div>
     <!-- CIERRES SEMANA -->
     <div style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:10px;padding:12px 14px;margin-bottom:12px">
       <div style="font-size:.68rem;font-weight:700;color:#166534;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">&#127942; Cierres semana &#8212; <span id="l_ci_total_lbl" style="font-size:.85rem;font-weight:800;color:#16A34A">0</span> total <span style="font-weight:400;color:#4B7563">auto</span></div>
@@ -556,7 +577,7 @@ body.modo-comite .brow{display:none!important}
 
 <script>
 /* ═══ CONSTANTES ═══ */
-const LS_R='vc3_redes_v1',LS_L='vc3_leads_v1',LS_LM='vc3_leads_mes_v1',LS_C='vc3_conf_v2',LS_P='vc3_pasos_v1',LS_XL='vc3_xl_v1',LS_XLA='vc3_xla_v1';
+const LS_R='vc3_redes_v1',LS_L='vc3_leads_v1',LS_LM='vc3_leads_mes_v1',LS_C='vc3_conf_v2',LS_P='vc3_pasos_v1',LS_XL='vc3_xl_v1',LS_XLA='vc3_xla_v1',LS_PF='vc3_pf_v1';
 const LS_META='vc3_meta_v2';
 function getMeta(){const m=gLS(LS_META)||{};return{v:parseInt(m.v)||17,val:parseInt(m.val)||595000000,va:parseInt(m.va)||204,vala:parseInt(m.vala)||7200000000};}
 function saveMeta(){const m={v:parseInt(document.getElementById('mt_v')?.value)||17,val:Math.round((parseFloat(document.getElementById('mt_val')?.value)||595)*1e6),va:parseInt(document.getElementById('mt_va')?.value)||204,vala:Math.round((parseFloat(document.getElementById('mt_vala')?.value)||7200)*1e6)};sLS(LS_META,m);renderVentas();renderAlianzas?.();}
@@ -588,7 +609,7 @@ function _idbGet(k){return new Promise(function(res){if(!_idb){res(null);return;
 function _idbSet(k,d){if(!_idb)return;try{var tx=_idb.transaction(_IDB_ST,'readwrite');tx.objectStore(_IDB_ST).put(d,k);}catch(e){}}
 async function initStorage(){
   await _openIDB();
-  var keys=[LS_R,LS_L,LS_C,LS_P,LS_XL,LS_XLA,LS_LM];
+  var keys=[LS_R,LS_L,LS_C,LS_P,LS_XL,LS_XLA,LS_LM,LS_PF];
   for(var i=0;i<keys.length;i++){
     var v=await _idbGet(keys[i]);
     if(v&&typeof v==='object')VC3[keys[i]]=v;
@@ -898,12 +919,12 @@ async function saveLeads(){
   LF.forEach(function(pair){
     var k=pair[0],id=pair[1];
     var el=document.getElementById(id);
-    o[k]=el?Math.max(0,parseInt(el.value)||0):0;
+    if(el)o[k]=Math.max(0,parseInt(el.value)||0);
   });
-  /* guardar local */
+  /* guardar local — merge con datos existentes */
   var key=getPer().sISO;
   var store=gLS(LS_L);
-  store[key]=o;sLS(LS_L,store);
+  store[key]=Object.assign(store[key]||{},o);sLS(LS_L,store);
   /* mostrar debug */
   var dbgEl=document.getElementById('l-dbg');
   if(dbgEl){var readback=gLS(LS_L)[key]||{};dbgEl.style.display='block';dbgEl.innerHTML='Semana: '+key+' | Total: '+readback.total+' | WPP: '+readback.wpp+' | Interesados: '+readback.int+' | Cierres: '+readback.ci;}
@@ -942,6 +963,51 @@ function calcVigNo(){
   if(el){el.value=vno>0?vno:'';el.style.background=vno>0?'#FEF2F2':'';}
   var ctxEl=document.getElementById('l_vig_ctx');
   if(ctxEl)ctxEl.textContent=intPast>0?'Sem. ant.: '+intPast+' interesados':'';
+}
+/* ═══ PERFILADORES ═══ */
+var _curPF='M';
+function selPF(pf){
+  _curPF=pf;
+  var mDiv=document.getElementById('pf-M'),aDiv=document.getElementById('pf-A');
+  var btnM=document.getElementById('btn-pf-M'),btnA=document.getElementById('btn-pf-A');
+  if(mDiv)mDiv.style.display=pf==='M'?'':'none';
+  if(aDiv)aDiv.style.display=pf==='A'?'':'none';
+  if(btnM){btnM.style.background=pf==='M'?'var(--o)':'transparent';btnM.style.color=pf==='M'?'#fff':'var(--g)';}
+  if(btnA){btnA.style.background=pf==='A'?'var(--o)':'transparent';btnA.style.color=pf==='A'?'#fff':'var(--g)';}
+}
+/* IDs de campos por perfilador */
+const PF_FIELDS={
+  M:['cv_asig','cv_resp','cv_sr','cv_cob','cv_ni','nv_asig','nv_resp','nv_comp','nv_cob','nv_ni','wpp_tot','wpp_int','wpp_sr','wpp_bot','web_ins','web_cont','web_pend','web_conf','reu_ag','reu_ef','reu_pot'],
+  A:['web_ins','web_cont','web_falt','wpp_conv','wpp_calc','wpp_dil','wpp_ver','wpp_nver','seg_resp','seg_nvrep','seg_bot','seg_cob','cot_reun','cot_fut','cot_esp','cot_tot']
+};
+function loadPF(){
+  var key=getPer().sISO;
+  var pfAll=gLS(LS_PF);
+  var pfW=pfAll[key]||{};
+  ['M','A'].forEach(function(pf){
+    var d=pfW[pf]||{};
+    PF_FIELDS[pf].forEach(function(f){
+      var el=document.getElementById((pf==='M'?'mf_':'af_')+f);
+      if(el)el.value=(d[f]||0)>0?d[f]:'';
+    });
+  });
+}
+async function savePF(pf){
+  var key=getPer().sISO;
+  var pfAll=gLS(LS_PF);
+  if(!pfAll[key])pfAll[key]={};
+  var prefix=pf==='M'?'mf_':'af_';
+  var d={};
+  PF_FIELDS[pf].forEach(function(f){
+    var el=document.getElementById(prefix+f);
+    d[f]=el?Math.max(0,parseInt(el.value)||0):0;
+  });
+  pfAll[key][pf]=d;
+  sLS(LS_PF,pfAll);
+  renderLeads();
+  var btn=document.querySelector('[onclick="savePF(\''+pf+'\')"]');
+  if(btn)btn.textContent='&#9989; Guardado';
+  setTimeout(function(){if(btn)btn.innerHTML='&#128190; Guardar '+(pf==='M'?'Marcela':'Andr&#233;s');},1800);
 }
 /* ── CARGA MENSUAL MANUAL ── */
 var showFormMes=false;
@@ -1287,9 +1353,8 @@ function renderLeads(){
   var d0=Object.assign({},allL[p0.sISO]||{});
   /* WPP y wpp_calc desde Redes si no hay en Leads */
   var rD2=allR[p2.sISO]||{};
-  if(!d2.wpp){var rw=rD2.wpp||0;if(rw){d2.wpp=rw;}} /* total (Calculadoras Bitrix) NO se auto-llena desde WPP — son fuentes distintas */
+  if(!d2.wpp){var rw=rD2.wpp||0;if(rw){d2.wpp=rw;}}
   if(!d2.wpp_calc){d2.wpp_calc=rD2.wpp_calc||0;}
-  /* ni automático */
   d2.ni=Math.max(0,(d2.ver||0)-(d2.cno||0)-(d2.sr||0)-(d2.sr2||0)-(d2.int||0));
   /* poblar form */
   LF.forEach(function(pair){
@@ -1297,92 +1362,88 @@ function renderLeads(){
     var el=document.getElementById(id);
     if(el)el.value=(d2[k]||0)>0?d2[k]:'';
   });
-  calcNI();
   calcCierres();
-  calcVigNo();
+  /* poblar perfiladores */
+  loadPF();
+  /* datos perfiladores */
+  var pfAll2=gLS(LS_PF),pfW2=pfAll2[p2.sISO]||{};
+  var pfM=pfW2.M||{},pfA=pfW2.A||{};
+  var mCvAsig=pfM.cv_asig||0,mCvResp=pfM.cv_resp||0,mCvSr=pfM.cv_sr||0,mCvCob=pfM.cv_cob||0,mCvNi=pfM.cv_ni||0;
+  var mNvAsig=pfM.nv_asig||0,mNvResp=pfM.nv_resp||0,mNvComp=pfM.nv_comp||0,mNvCob=pfM.nv_cob||0,mNvNi=pfM.nv_ni||0;
+  var mWppTot=pfM.wpp_tot||0,mWppInt=pfM.wpp_int||0,mWppSr=pfM.wpp_sr||0,mWppBot=pfM.wpp_bot||0;
+  var mWebIns=pfM.web_ins||0,mWebCont=pfM.web_cont||0,mWebConf=pfM.web_conf||0;
+  var mReuAg=pfM.reu_ag||0,mReuEf=pfM.reu_ef||0,mReuPot=pfM.reu_pot||0;
+  var aWebIns=pfA.web_ins||0,aWebCont=pfA.web_cont||0,aWebFalt=pfA.web_falt||0;
+  var aWppConv=pfA.wpp_conv||0,aWppCalc=pfA.wpp_calc||0,aWppDil=pfA.wpp_dil||0,aWppVer=pfA.wpp_ver||0,aWppNver=pfA.wpp_nver||0;
+  var aSegResp=pfA.seg_resp||0,aSegNvrep=pfA.seg_nvrep||0,aSegBot=pfA.seg_bot||0,aSegCob=pfA.seg_cob||0;
+  var aCotReun=pfA.cot_reun||0,aCotFut=pfA.cot_fut||0,aCotEsp=pfA.cot_esp||0,aCotTot=pfA.cot_tot||0;
+  var hasPFM=mCvAsig>0||mNvAsig>0||mWppTot>0||mWebIns>0||mReuAg>0;
+  var hasPFA=aWebIns>0||aWppConv>0||aSegResp>0||aCotReun>0;
   var _lbl=document.getElementById('l_ci_total_lbl');if(_lbl)_lbl.textContent=d2.ci||0;
-  /* KPIs */
-  var t2=d2.total||0,t1=d1.total||0,t0=d0.total||0;
-  var wppCalc2c=d2.wpp_calc||0; /* WPP que hicieron calculadora (subconjunto de WPP) */
-  var pCrecT=t1>0?((t2-t1)/t1*100).toFixed(1):null;
-  var pInt=t2>0?((d2.int||0)/t2*100).toFixed(1):'0.0';
-  var pCi=t2>0?((d2.ci||0)/t2*100).toFixed(2):'0.00';
+  /* ── KPIs PERFILADORES ── */
   var kEl=document.getElementById('l-kpis');
-  var ver2c=d2.ver||0,nver2c=d2.nver||0,pVer=t2>0?pct(ver2c,t2,1):'0.0',pInt2=ver2c>0?pct(d2.int||0,ver2c,1):'0.0';
-  var pctWppCalc=(d2.wpp||0)>0&&wppCalc2c>0?pct(wppCalc2c,d2.wpp||1,1):'0.0'; /* % WPP→Calc usa wpp_calc, no el total Bitrix */
   var ci2total=d2.ci||0,ci2org=d2.ci_org||0,ci2ant=d2.ci_ant||0,ci2gc=d2.ci_gc||0,ci2lag=d2.ci_lag||0,ci2cv=d2.ci_cv||0,ci2cred=d2.ci_cred||0;
-  var vig2no=d2.vig_no||0,lag2=d2.lag||0,cred2=d2.cred||0;
-  if(kEl)kEl.innerHTML=
-    '<div class="kp" style="background:#F0FDF4;border-top:3px solid #25D366"><div class="kl">💬 Llegaron WPP</div><div class="kv" style="color:#16A34A">'+(d2.wpp||0)+'</div><div class="ks">'+(pCrecT?(pCrecT>0?'+':'')+pCrecT+'% vs sem ant':'—')+'</div></div>'+
-    (wppCalc2c>0?'<div class="kp" style="background:#FFF0F6;border-top:3px solid #DB2777"><div class="kl">&#128172;&#8594;&#129518; WPP calcularon</div><div class="kv" style="color:#DB2777">'+wppCalc2c+'</div><div class="ks">'+pctWppCalc+'% del WPP</div></div>':'')+
-    '<div class="kp o"><div class="kl">&#129518; Calc. Bitrix</div><div class="kv">'+t2+'</div><div class="ks">todas fuentes · independiente WPP</div></div>'+
-    '<div class="kp b"><div class="kl">✓ Verificados</div><div class="kv">'+ver2c+'</div><div class="ks">'+pVer+'% de calc.</div></div>'+
-    '<div class="kp" style="background:#F8FAFC;border-left:4px solid #94A3B8"><div class="kl">✗ No verificados</div><div class="kv" style="color:#64748B">'+nver2c+'</div><div class="ks">'+(t2>0?pct(nver2c,t2,1)+'%':'—')+'</div></div>'+
-    '<div class="kp g"><div class="kl">Interesados ★</div><div class="kv">'+(d2.int||0)+'</div><div class="ks">'+pInt2+'% de ver.</div></div>'+
-    '<div class="kp p"><div class="kl">No interesados</div><div class="kv">'+(d2.ni||0)+'</div><div class="ks">'+(ver2c>0?pct(d2.ni||0,ver2c,1)+'% de ver.':'—')+'</div></div>'+
-    '<div class="kp" style="background:#F0F0FF;border-top:3px solid #6366F1"><div class="kl">&#128228; Mensajes en proceso</div><div class="kv" style="color:#4F46E5">'+(d2.sr||0)+'</div><div class="ks">'+(ver2c>0?pct(d2.sr||0,ver2c,1)+'% de ver.':'—')+'</div></div>'+
-    '<div class="kp" style="border-left:3px solid #64748B"><div class="kl">&#128172; Sin respuesta</div><div class="kv" style="color:#64748B">'+(d2.sr2||0)+'</div><div class="ks">'+(d2.sr>0?pct(d2.sr2||0,d2.sr,1)+'% de msg':'—')+'</div></div>'+
-    '<div class="kp" style="border-left:4px solid #9CA3AF"><div class="kl">Cierres (aparte)</div><div class="kv" style="color:#6B7280">'+(d2.ci||0)+'</div><div class="ks">'+(d2.ci>0?'orgánico/alianza/anterior':'—')+'</div></div>'+
-    (ci2total>0?'<div class="kp" style="background:#F0FDF4;border-top:3px solid #16A34A"><div class="kl">&#127942; Cierres semana</div><div class="kv" style="color:#16A34A">'+ci2total+'</div><div class="ks">'+(ci2org?'Org.est.'+ci2org+' ':'')+(ci2ant?'Ant.'+ci2ant+' ':'')+(ci2gc?'GC '+ci2gc+' ':'')+(ci2lag?'Lag '+ci2lag+' ':'')+(ci2cv?'CV '+ci2cv+' ':'')+(ci2cred?'Cred '+ci2cred:'')+'</div></div>':'<div class="kp" style="border-left:3px solid #D1D5DB"><div class="kl">Cierres</div><div class="kv" style="color:#9CA3AF">0</div></div>')+
-    (vig2no>0?'<div class="kp" style="background:#FEF2F2;border-top:3px solid #DC2626"><div class="kl">&#128277; Ya no resp.</div><div class="kv" style="color:#DC2626">'+vig2no+'</div></div>':'')+
-    ((d2.gc||0)>0?'<div class="kp" style="border-left:4px solid #92400E"><div class="kl">GC leads</div><div class="kv" style="color:#92400E">'+d2.gc+'</div></div>':'')+
-    (lag2>0?'<div class="kp" style="border-left:4px solid #7C3AED"><div class="kl">Lagom leads</div><div class="kv" style="color:#7C3AED">'+lag2+'</div></div>':'')+
-    ((d2.cv||0)>0?'<div class="kp" style="border-left:4px solid #0891B2"><div class="kl">CV leads</div><div class="kv" style="color:#0891B2">'+d2.cv+'</div></div>':'')+
-    (cred2>0?'<div class="kp" style="border-left:4px solid #059669"><div class="kl">Cred. leads</div><div class="kv" style="color:#059669">'+cred2+'</div></div>':'')+
-    ((d2.remo_tot||0)>0?'<div class="kp" style="background:#FFF7ED;border-top:3px solid #F97316;border-left:4px solid #C2410C"><div class="kl">&#128296; Remo NM — llegaron</div><div class="kv" style="color:#C2410C">'+(d2.remo_tot||0)+'</div><div class="ks">'+((d2.remo_int||0)>0?'&#11088; '+d2.remo_int+' int · ':'')+((d2.remo_ci||0)>0?'&#127942; '+d2.remo_ci+' cierre'+(d2.remo_ci>1?'s':''):'— cierres')+'</div></div>':'');
-  /* ── EMBUDO REDISEÑADO — 3 FASES ── */
-  var wpp2=d2.wpp||0,calc2=d2.total||0,ver2b=d2.ver||0,nver2=Math.max(0,calc2-ver2b),cno2=d2.cno||0,srVal=d2.sr||0,sr2Val=d2.sr2||0,int2=d2.int||0,ni2=d2.ni||0,ci2=d2.ci||0;
-  var ci2org=d2.ci_org||0,ci2ant=d2.ci_ant||0,ci2gc=d2.ci_gc||0,ci2lag=d2.ci_lag||0,ci2cv=d2.ci_cv||0,ci2cred=d2.ci_cred||0;
-  var maxF=Math.max(wpp2,wppCalc2c,calc2,ver2b,1);
-  function fnBar(val,color,label,conv,note,dimmed){
-    var pw=Math.max(4,Math.round(val/maxF*100));
-    return'<div class="fn-row" style="'+(dimmed?'opacity:.55':'')+'"><div class="fn-lbl">'+label+'</div>'+
-      '<div class="fn-bar-wrap"><div class="fn-bar" style="width:'+pw+'%;background:'+color+';justify-content:center"><span style="padding:0 6px;font-weight:700;font-size:.72rem;color:#fff">'+val+'</span></div></div>'+
-      '<div class="fn-conv" style="font-size:.7rem;font-weight:700;color:#555;text-align:right;white-space:nowrap">'+conv+'</div></div>'+
-      (note?'<div style="font-size:.63rem;color:#888;margin:-2px 0 4px 96px">'+note+'</div>':'');
+  function kp(bg,bt,lbl,val,sub){return'<div class="kp" style="background:'+bg+';border-top:3px solid '+bt+'"><div class="kl">'+lbl+'</div><div class="kv" style="color:'+bt+'">'+val+'</div><div class="ks">'+sub+'</div></div>';}
+  function kpL(col,lbl,val,sub){return'<div class="kp" style="border-left:4px solid '+col+'"><div class="kl">'+lbl+'</div><div class="kv" style="color:'+col+'">'+val+'</div><div class="ks">'+sub+'</div></div>';}
+  function secHdr(col,txt){return'<div style="grid-column:1/-1;font-size:.65rem;font-weight:800;color:'+col+';text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid '+col+'30;padding-bottom:3px;margin:4px 0 2px">'+txt+'</div>';}
+  var kHtml='';
+  if(hasPFM){
+    kHtml+=secHdr('#0891B2','&#128100; Marcela — Semana');
+    if(mCvAsig>0)kHtml+=kp('#EFF6FF','#0891B2','&#9989; Calc. Verif. asig.',mCvAsig,mCvResp>0?mCvResp+' con resp · '+Math.round(mCvResp/mCvAsig*100)+'% tasa':'—');
+    if(mNvAsig>0)kHtml+=kp('#FFF8F0','#F97316','&#128203; Calc. No verif. asig.',mNvAsig,mNvComp>0?mNvComp+' completaron (&#8594;verif)':'—');
+    if(mWppTot>0)kHtml+=kp('#ECFDF5','#059669','&#128172; WPP gestionadas',mWppTot,mWppInt>0?mWppInt+' con interacci&#243;n':'—');
+    if(mWebIns>0)kHtml+=kp('#F5F3FF','#7C3AED','&#127909; Webinar inscritas',mWebIns,mWebCont>0?mWebCont+' contactadas · '+mWebConf+' confirm.':'—');
+    if(mReuAg>0)kHtml+=kp('#EFF6FF','#2563EB','&#128197; Reuniones agendadas',mReuAg,(mReuEf>0?mReuEf+' efectivas · ':'')+( mReuPot>0?mReuPot+' potenciales':'—'));
   }
-  var pWppCalc=wpp2>0&&wppCalc2c>0?Math.round(wppCalc2c/wpp2*100)+'%':'—'; /* WPP_calc/WPP, no total/WPP */
-  var pCalcVer=calc2>0?Math.round(ver2b/calc2*100)+'%':'—';
-  var pVerInt=ver2b>0?Math.round(int2/ver2b*100)+'%':'—';
-  var pVerSr=ver2b>0?Math.round(srVal/ver2b*100)+'%':'—';
-  var pVerSr2=ver2b>0&&sr2Val>0?Math.round(sr2Val/ver2b*100)+'%':'—'; /* sr2 sobre verificados, no sobre sr */
-  var pVerNi=ver2b>0?Math.round(ni2/ver2b*100)+'%':'—';
-  var pVerCno=ver2b>0?Math.round(cno2/ver2b*100)+'%':'—';
-  
-  var fase1='<div style="font-size:.7rem;font-weight:800;color:#92400E;padding:6px 0 4px 0;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #FED7AA;margin-bottom:6px">&#128241; Fase 1 — Captaci&#243;n</div>'+
-    fnBar(wpp2,'#25D366','&#128172; WPP','','')+
-    (wppCalc2c>0?fnBar(wppCalc2c,'#DB2777','&#128172;&#8594;&#129518; WPP&#8594;Calc',pWppCalc,'de WPP que calcularon'):'')+
-    fnBar(calc2,'#F97316','&#129518; Calc. Bitrix','','todas fuentes · independiente WPP')+
-    (nver2>0?fnBar(nver2,'#CBD5E1','&#10060; No verificados',calc2>0?Math.round(nver2/calc2*100)+'%':'—','sin clasificar aún',true):'')+
-    fnBar(ver2b,'#0891B2','&#9989; Verificados',pCalcVer,'de calculadora');
-  
-  var fase2='<div style="font-size:.7rem;font-weight:800;color:#0891B2;padding:10px 0 4px 0;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #BFDBFE;margin-bottom:6px">&#9989; Fase 2 — De los '+ver2b+' verificados</div>'+
-    fnBar(int2,'#16A34A','&#11088; Interesados',pVerInt,'de verificados')+
-    fnBar(srVal,'#6366F1','&#128228; Mensajes en proceso',pVerSr,'de verificados')+
-    (sr2Val>0?fnBar(sr2Val,'#64748B','&#128172; Sin respuesta',pVerSr2,'de verificados'):'')+
-    fnBar(ni2,'#94A3B8','&#128078; No interesados',pVerNi,'de verificados')+
-    fnBar(cno2,'#D97706','&#128203; Incompletas',pVerCno,'de verificados');
-  
-  var ciPartes=[];
-  if(ci2org>0)ciPartes.push('Org.est. '+ci2org);
-  if(ci2ant>0)ciPartes.push('Org.ant. '+ci2ant);
-  if(ci2gc>0)ciPartes.push('GC '+ci2gc);
-  if(ci2lag>0)ciPartes.push('Lagom '+ci2lag);
-  if(ci2cv>0)ciPartes.push('CV '+ci2cv);
-  if(ci2cred>0)ciPartes.push('Cred. '+ci2cred);
-  var fase3=ci2>0
-    ?'<div style="font-size:.7rem;font-weight:800;color:#166534;padding:10px 0 4px 0;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #86EFAC;margin-bottom:6px">&#127942; Fase 3 — Cierres semana</div>'+
-      '<div style="padding:10px 12px;background:#F0FDF4;border-radius:8px;border:1px solid #86EFAC;display:flex;align-items:center;gap:12px;flex-wrap:wrap">'+
-      '<span style="font-size:1.5rem;font-weight:800;color:#16A34A">'+ci2+'</span>'+
-      '<div style="flex:1"><div style="font-size:.72rem;font-weight:700;color:#166534">cierres totales</div>'+
-      (ciPartes.length?'<div style="font-size:.68rem;color:#4B7563;margin-top:2px">'+ciPartes.join(' · ')+'</div>':'')+
-      '</div></div>'
-    :'<div style="font-size:.7rem;font-weight:800;color:#6B7280;padding:10px 0 4px 0;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #E5E7EB;margin-bottom:6px">&#127942; Fase 3 — Cierres semana</div>'+
-      '<div style="padding:8px 12px;background:#F9FAFB;border-radius:8px;border:1px dashed #D1D5DB;font-size:.75rem;color:#9CA3AF">Sin cierres registrados esta semana</div>';
-  
-  var funnelHTML=fase1+fase2+fase3;
+  if(hasPFA){
+    kHtml+=secHdr('#7C3AED','&#128100; Andr&#233;s S. — Semana');
+    if(aWebIns>0)kHtml+=kp('#F5F3FF','#7C3AED','&#127909; Webinar inscritos',aWebIns,aWebCont+' contactados · '+aWebFalt+' faltantes');
+    if(aWppConv>0)kHtml+=kp('#ECFDF5','#059669','&#128172; WPP/Bitrix conv.',aWppConv,(aWppDil>0?aWppDil+' dil. · ':'')+aWppVer+' verif. · '+aWppNver+' no verif.');
+    if(aSegResp>0)kHtml+=kpL('#16A34A','&#128222; Seg. primer contacto',aSegResp,(aSegNvrep>0?aSegNvrep+' no verif resp':'—'));
+    if(aCotReun>0||aCotTot>0)kHtml+=kp('#F0FDF4','#16A34A','&#128176; Cotiz. + reuni&#243;n',aCotReun,(aCotFut>0?aCotFut+' futuro · ':'')+aCotTot+' prospectos activos');
+  }
+  if(!hasPFM&&!hasPFA)kHtml+='<div style="grid-column:1/-1;padding:12px;background:#F8FAFC;border-radius:8px;border:1px dashed #CBD5E1;font-size:.75rem;color:#64748B;text-align:center">&#128100; Sin datos de perfiladores esta semana — ingresa los datos en el formulario</div>';
+  kHtml+=secHdr('#16A34A','&#127942; Cierres semana');
+  var ciPartes=[];if(ci2org)ciPartes.push('Org.est.'+ci2org);if(ci2ant)ciPartes.push('Ant.'+ci2ant);if(ci2gc)ciPartes.push('GC '+ci2gc);if(ci2lag)ciPartes.push('Lag '+ci2lag);if(ci2cv)ciPartes.push('CV '+ci2cv);if(ci2cred)ciPartes.push('Cred.'+ci2cred);
+  kHtml+=ci2total>0?kp('#F0FDF4','#16A34A','&#127942; Total cierres',ci2total,ciPartes.join(' · ')||'—'):kpL('#D1D5DB','Cierres','0','—');
+  if((d2.remo_tot||0)>0)kHtml+=kp('#FFF7ED','#F97316','&#128296; Remo NM — llegaron',d2.remo_tot||0,((d2.remo_int||0)>0?'&#11088; '+d2.remo_int+' int · ':'')+((d2.remo_ci||0)>0?'&#127942; '+d2.remo_ci+' cierre'+(d2.remo_ci>1?'s':''):'— cierres'));
+  if(kEl)kEl.innerHTML=kHtml;
+  /* ── PIPELINE PERFILADORES ── */
+  var wpp2=d2.wpp||0;
   var fEl=document.getElementById('l-funnel');
-  if(fEl)fEl.innerHTML='<div class="fn-title">Embudo de conversi&#243;n</div>'+funnelHTML;
+  if(fEl){
+    function fnB(val,col,lbl,conv,note,dim,mx){
+      if(val<=0)return'';
+      var pw=Math.max(4,Math.round(val/Math.max(mx,1)*100));
+      return'<div class="fn-row" style="'+(dim?'opacity:.5':'')+'"><div class="fn-lbl">'+lbl+'</div>'+
+        '<div class="fn-bar-wrap"><div class="fn-bar" style="width:'+pw+'%;background:'+col+';justify-content:center"><span style="padding:0 6px;font-weight:700;font-size:.72rem;color:#fff">'+val+'</span></div></div>'+
+        '<div class="fn-conv" style="font-size:.7rem;font-weight:700;color:#555;text-align:right;white-space:nowrap">'+(conv||'')+'</div></div>'+
+        (note?'<div style="font-size:.63rem;color:#888;margin:-2px 0 4px 96px">'+note+'</div>':'');
+    }
+    function pfH(col,txt){return'<div style="font-size:.7rem;font-weight:800;color:'+col+';padding:10px 0 4px 0;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid '+col+'40;margin-bottom:6px">'+txt+'</div>';}
+    var pfHTML='<div class="fn-title">Pipeline Perfiladores &#8212; '+wShort(p2)+'</div>';
+    if(hasPFM){
+      var mMx=Math.max(mCvAsig,mNvAsig,mWppTot,mWebIns,mReuAg,1);
+      if(mCvAsig>0){pfHTML+=pfH('#0891B2','&#128100; Marcela &#8212; Calc. Verificadas');pfHTML+=fnB(mCvAsig,'#0891B2','Asignadas','',null,false,mMx);pfHTML+=fnB(mCvResp,'#16A34A','&#8627; Con respuesta',mCvAsig>0?Math.round(mCvResp/mCvAsig*100)+'%':null,null,true,mMx);pfHTML+=fnB(mCvSr,'#94A3B8','&#8627; Sin respuesta',null,null,true,mMx);pfHTML+=fnB(mCvCob,'#EA580C','&#8627; Fuera cobertura',null,null,true,mMx);pfHTML+=fnB(mCvNi,'#DC2626','&#8627; Sin inter&#233;s',null,null,true,mMx);}
+      if(mNvAsig>0){pfHTML+=pfH('#F97316','&#128100; Marcela &#8212; Calc. No Verificadas');pfHTML+=fnB(mNvAsig,'#F97316','Asignadas','',null,false,mMx);pfHTML+=fnB(mNvResp,'#16A34A','&#8627; Con respuesta',mNvAsig>0?Math.round(mNvResp/mNvAsig*100)+'%':null,null,true,mMx);pfHTML+=fnB(mNvComp,'#059669','&#8627; Completaron (&#8594;verif)',null,'pasaron a verificadas',true,mMx);}
+      if(mWppTot>0){pfHTML+=pfH('#059669','&#128100; Marcela &#8212; WhatsApp');pfHTML+=fnB(mWppTot,'#25D366','Gestionadas','',null,false,mMx);pfHTML+=fnB(mWppInt,'#16A34A','&#8627; Con interacci&#243;n',mWppTot>0?Math.round(mWppInt/mWppTot*100)+'%':null,null,true,mMx);pfHTML+=fnB(mWppBot,'#4F46E5','&#8627; Retomadas chatbot',null,null,true,mMx);}
+      if(mWebIns>0){pfHTML+=pfH('#7C3AED','&#128100; Marcela &#8212; Webinar');pfHTML+=fnB(mWebIns,'#7C3AED','Inscritas','',null,false,mMx);pfHTML+=fnB(mWebCont,'#6D28D9','&#8627; Contactadas',mWebIns>0?Math.round(mWebCont/mWebIns*100)+'%':null,null,true,mMx);pfHTML+=fnB(mWebConf,'#D97706','&#8627; Confirmadas',mWebIns>0?Math.round(mWebConf/mWebIns*100)+'%':null,null,true,mMx);}
+      if(mReuAg>0){pfHTML+=pfH('#2563EB','&#128100; Marcela &#8212; Reuniones');pfHTML+=fnB(mReuAg,'#2563EB','Agendadas','',null,false,mMx);pfHTML+=fnB(mReuEf,'#16A34A','&#8627; Efectivas',mReuAg>0?Math.round(mReuEf/mReuAg*100)+'%':null,null,true,mMx);pfHTML+=fnB(mReuPot,'#F97316','&#8627; Clientes potenciales',null,null,true,mMx);}
+    }
+    if(hasPFA){
+      var aMx=Math.max(aWebIns,aWppConv,aWppDil,aWppVer,aSegResp,aCotReun,1);
+      if(aWebIns>0){pfHTML+=pfH('#7C3AED','&#128100; Andr&#233;s &#8212; Webinar');pfHTML+=fnB(aWebIns,'#7C3AED','Inscritos totales','',null,false,aMx);pfHTML+=fnB(aWebCont,'#6D28D9','&#8627; Contactados',aWebIns>0?Math.round(aWebCont/aWebIns*100)+'%':null,null,true,aMx);pfHTML+=fnB(aWebFalt,'#DC2626','&#8627; Faltantes',null,null,true,aMx);}
+      if(aWppConv>0){pfHTML+=pfH('#059669','&#128100; Andr&#233;s &#8212; WhatsApp / Bitrix');pfHTML+=fnB(aWppConv,'#25D366','Conversaciones totales','',null,false,aMx);pfHTML+=fnB(aWppCalc,'#F97316','&#8627; Iniciaron calc.',aWppConv>0?Math.round(aWppCalc/aWppConv*100)+'%':null,null,true,aMx);pfHTML+=fnB(aWppDil,'#D97706','&#8627; Total diligenciadas',null,null,true,aMx);pfHTML+=fnB(aWppVer,'#0891B2','&#8627; Verificadas',aWppDil>0?Math.round(aWppVer/aWppDil*100)+'%':null,null,true,aMx);pfHTML+=fnB(aWppNver,'#94A3B8','&#8627; No verificadas',null,null,true,aMx);}
+      if(aSegResp>0){pfHTML+=pfH('#16A34A','&#128100; Andr&#233;s &#8212; Seguimiento');pfHTML+=fnB(aSegResp,'#16A34A','Primer contacto','',null,false,aMx);pfHTML+=fnB(aSegNvrep,'#D97706','&#8627; No verif. respondidos',null,null,true,aMx);pfHTML+=fnB(aSegBot,'#4F46E5','&#8627; Chats estancados chatbot',null,null,true,aMx);pfHTML+=fnB(aSegCob,'#EA580C','&#8627; Fuera de cobertura',null,null,true,aMx);}
+      if(aCotReun>0||aCotTot>0){pfHTML+=pfH('#16A34A','&#128100; Andr&#233;s &#8212; Cotizaciones');pfHTML+=fnB(aCotReun,'#16A34A','Cotiz. + reuni&#243;n',null,null,false,aMx);pfHTML+=fnB(aCotFut,'#D97706','&#8627; Interesados a futuro',null,null,true,aMx);pfHTML+=fnB(aCotEsp,'#2563EB','&#8627; En espera de info',null,null,true,aMx);pfHTML+=fnB(aCotTot,'#059669','&#128640; Prospectos activos',null,null,false,aMx);}
+    }
+    var ciP3=[];if(ci2org)ciP3.push('Org.est.'+ci2org);if(ci2ant)ciP3.push('Ant.'+ci2ant);if(ci2gc)ciP3.push('GC '+ci2gc);if(ci2lag)ciP3.push('Lagom '+ci2lag);if(ci2cv)ciP3.push('CV '+ci2cv);if(ci2cred)ciP3.push('Cred.'+ci2cred);
+    pfHTML+='<div style="margin-top:10px;padding-top:8px;border-top:2px solid #86EFAC">';
+    pfHTML+=ci2total>0?'<div style="padding:10px 12px;background:#F0FDF4;border-radius:8px;border:1px solid #86EFAC;display:flex;align-items:center;gap:12px"><span style="font-size:1.5rem;font-weight:800;color:#16A34A">'+ci2total+'</span><div style="flex:1"><div style="font-size:.72rem;font-weight:700;color:#166534">&#127942; Cierres semana</div>'+(ciP3.length?'<div style="font-size:.68rem;color:#4B7563;margin-top:2px">'+ciP3.join(' · ')+'</div>':'')+'</div></div>':'<div style="padding:8px 12px;background:#F9FAFB;border-radius:8px;border:1px dashed #D1D5DB;font-size:.75rem;color:#9CA3AF">&#127942; Sin cierres registrados esta semana</div>';
+    pfHTML+='</div>';
+    if(!hasPFM&&!hasPFA&&!ci2total)pfHTML='<div class="fn-title">Pipeline Perfiladores</div><div style="padding:14px;background:#F8FAFC;border-radius:8px;border:1px dashed #CBD5E1;font-size:.8rem;color:#64748B;text-align:center">&#128100; Ingresa los datos en el formulario para ver el pipeline semanal</div>';
+    fEl.innerHTML=pfHTML;
+  }
   /* ── MINI-FUNNEL REMODELACIONES NM ── */
   var remoTot2=d2.remo_tot||0,remoInt2=d2.remo_int||0,remoCi2=d2.remo_ci||0;
   var remoFEl=document.getElementById('l-remo-funnel');
