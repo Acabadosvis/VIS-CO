@@ -305,6 +305,7 @@ body.modo-comite .brow{display:none!important}
   <div class="tab"    onclick="goTab(3)">&#128176; Ventas</div>
   <div class="tab"    onclick="goTab(4)">&#127968; Aptos</div>
   <div class="tab"    onclick="goTab(5)">🤝 Alianzas</div>
+  <div class="tab"    onclick="goTab(6)">&#128296; Remo</div>
 </nav>
 
 <!-- P0 REDES -->
@@ -546,23 +547,6 @@ body.modo-comite .brow{display:none!important}
   <div id="l-kpis" class="kg"></div>
   <div id="l-ver-kpi" class="kg" style="display:none"></div>
   <div id="l-funnel" class="fn-wrap"></div>
-  <!-- REMODELACIONES — pipeline dedicado -->
-  <div class="card" id="card-remo" style="margin-top:14px;border-top:3px solid #F97316">
-    <div class="card-hd" style="color:#C2410C">&#128296; Remodelaciones <span style="font-size:.7rem;font-weight:600;color:#EA580C;background:#FFF7ED;border:1px solid #FED7AA;border-radius:4px;padding:1px 8px;margin-left:6px">NM · Nathalia</span></div>
-    <!-- FORM REMO -->
-    <div id="remo-form-wrap">
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:10px">
-        <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#C2410C;display:block;margin-bottom:3px">&#128222; Llegaron</label><input type="number" id="l_remo_tot" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#C2410C;background:transparent"></div>
-        <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:3px">&#11088; Interesados</label><input type="number" id="l_remo_int" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#16A34A;background:transparent"></div>
-        <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#EA580C;display:block;margin-bottom:3px">&#128197; Reun. agendadas</label><input type="number" id="l_remo_ag" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#EA580C;background:transparent"></div>
-        <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:3px">&#9989; Reun. efectivas</label><input type="number" id="l_remo_ef" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#059669;background:transparent"></div>
-        <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-top:2px solid #166534;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#166534;display:block;margin-bottom:3px">&#127942; Cierres Remo</label><input type="number" id="l_remo_ci" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#166534;background:transparent"></div>
-      </div>
-      <div class="brow"><button class="btn btn-o" style="background:#F97316" onclick="saveLeads()">&#128190; Guardar Remodelaciones</button></div>
-    </div>
-    <!-- FUNNEL REMO -->
-    <div id="l-remo-funnel" class="fn-wrap" style="margin-top:10px;border-top:2px solid #FED7AA;padding-top:10px"></div>
-  </div>
   <div id="l-form-mes"></div>
   <div id="l-ins" class="ins" style="display:none"></div>
   <div id="l-cmp"></div>
@@ -633,6 +617,24 @@ body.modo-comite .brow{display:none!important}
       <div class="card-hd">Detalle de cierres por alianza</div>
       <div id="ali-tabla" style="overflow-x:auto"></div>
     </div>
+  </div>
+</div>
+
+<!-- P6 REMODELACIONES -->
+<div class="panel" id="p6">
+  <div class="card" id="card-remo" style="border-top:3px solid #F97316">
+    <div class="card-hd" style="color:#C2410C">&#128296; Remodelaciones <span style="font-size:.7rem;font-weight:600;color:#EA580C;background:#FFF7ED;border:1px solid #FED7AA;border-radius:4px;padding:1px 8px;margin-left:6px">NM · Nathalia</span></div>
+    <div id="remo-form-wrap">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:10px">
+        <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#C2410C;display:block;margin-bottom:3px">&#128222; Llegaron</label><input type="number" id="l_remo_tot" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#C2410C;background:transparent"></div>
+        <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:3px">&#11088; Interesados</label><input type="number" id="l_remo_int" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#16A34A;background:transparent"></div>
+        <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#EA580C;display:block;margin-bottom:3px">&#128197; Reun. agendadas</label><input type="number" id="l_remo_ag" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#EA580C;background:transparent"></div>
+        <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:3px">&#9989; Reun. efectivas</label><input type="number" id="l_remo_ef" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#059669;background:transparent"></div>
+        <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-top:2px solid #166534;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#166534;display:block;margin-bottom:3px">&#127942; Cierres Remo</label><input type="number" id="l_remo_ci" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#166534;background:transparent"></div>
+      </div>
+      <div class="brow"><button class="btn btn-o" style="background:#F97316" onclick="saveLeads()">&#128190; Guardar Remodelaciones</button></div>
+    </div>
+    <div id="l-remo-funnel" class="fn-wrap" style="margin-top:10px;border-top:2px solid #FED7AA;padding-top:10px"></div>
   </div>
 </div>
 
@@ -765,6 +767,7 @@ function goTab(i){
   if(i===3&&xlR){setTimeout(function(){renderVentas();},50);}
   if(i===4&&xlR){setTimeout(function(){renderAptos();},50);}
   if(i===5&&xlR){setTimeout(function(){renderAlianzas();},50);}
+  if(i===6){setTimeout(function(){renderRemo();},50);}
 }
 
 /* ═══ CHARTS ═══ */
