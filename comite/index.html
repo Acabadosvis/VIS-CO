@@ -2084,6 +2084,8 @@ function renderVentas(){
   const tvA=vAD.count,tvAVal=vAD.val;
   const byMes=Array(12).fill(0);for(var _mi=0;_mi<12;_mi++){var _mr=vA.filter(function(r){return MN[(r[3]||'').toString().toLowerCase().trim()]===_mi;});byMes[_mi]=getLagDedup(_mr).count;}
   const byMesVal=Array(12).fill(0);for(var _miv=0;_miv<12;_miv++){var _mrv=vA.filter(function(r){return MN[(r[3]||'').toString().toLowerCase().trim()]===_miv;});byMesVal[_miv]=getLagDedup(_mrv).val;}
+  /* meta individual por mes: año anterior mismo mes × 1.5, o fallback a meta guardada */
+  const metaByMes=Array(12).fill(0).map(function(_x,mi){var pR=(xlR||[]).filter(function(r){var raw=(r[3]||'').toString().toLowerCase().trim();var m=MN[raw];var est=(r[8]||'').toString().toUpperCase().trim();return m===mi&&(parseInt(r[4])||0)===(p.yr-1)&&est!=='CAIDO'&&est!=='';});var pV2=pR.reduce(function(s,r){return s+gV(r);},0);return pV2>0?pV2*1.5:_m.val;});
   /* Insights */
   const vIns=[];
   const fpV=parseFloat(pV);
@@ -2295,7 +2297,7 @@ function renderVentas(){
       /* porcentajes debajo */
       var pctEl=document.getElementById('cv_mes_pct');
       if(pctEl)pctEl.innerHTML=mesLabels.map(function(m,i){
-        var pp=Math.round(mesData[i]/META_VAL*100);
+        var pp=Math.round(mesData[i]/(metaByMes[i]||META_VAL)*100);
         var col=pp>=100?'#16A34A':pp>=70?'var(--o)':'#DC2626';
         return'<span style="font-size:.69rem;color:'+col+';background:rgba(0,0,0,.04);border-radius:4px;padding:2px 6px">'+m+' <strong>'+pp+'%</strong></span>';
       }).join('');
@@ -2309,7 +2311,7 @@ function renderVentas(){
           if(!v||v<=0)return;
           var bar=meta.data[i];if(!bar)return;
           var lbl=v>=1e9?'$'+(v/1e9).toFixed(2)+'B':'$'+Math.round(v/1e6)+'M';
-          var pp=Math.round(v/META_VAL*100);
+          var pp=Math.round(v/(metaByMes[i]||META_VAL)*100);
           var ppLbl=pp+'%';
           c.save();
           c.textAlign='center';c.textBaseline='bottom';
@@ -2327,11 +2329,11 @@ function renderVentas(){
         type:'bar',
         data:{labels:mesLabels,datasets:[
           {data:mesData,backgroundColor:mesClrs,borderRadius:6,borderSkipped:false,label:'Valor'},
-          {data:mesLabels.map(function(){return META_VAL;}),type:'line',label:'Meta',borderColor:'rgba(220,38,38,.45)',borderDash:[5,4],borderWidth:1.5,pointRadius:0,backgroundColor:'transparent',order:0}
+          {data:mesLabels.map(function(_,i){return metaByMes[i]||META_VAL;}),type:'line',label:'Meta',borderColor:'rgba(220,38,38,.45)',borderDash:[5,4],borderWidth:1.5,pointRadius:0,backgroundColor:'transparent',order:0}
         ]},
         options:{responsive:true,layout:{padding:{top:38}},plugins:{
           legend:{display:false},
-          tooltip:{callbacks:{label:function(c){if(c.datasetIndex===1)return'Meta: '+fmtC(META_VAL);var pp=Math.round(c.raw/META_VAL*100);return fmtC(c.raw)+' — '+pp+'% meta · '+mesDataCnt[c.dataIndex]+' ventas';}}}
+          tooltip:{callbacks:{label:function(c){if(c.datasetIndex===1)return'Meta: '+fmtC(metaByMes[c.dataIndex]||META_VAL);var pp=Math.round(c.raw/(metaByMes[c.dataIndex]||META_VAL)*100);return fmtC(c.raw)+' — '+pp+'% meta · '+mesDataCnt[c.dataIndex]+' ventas';}}}
         },scales:{
           y:{beginAtZero:true,grid:{color:'#EDEBE6'},ticks:{font:{family:'Syne',size:9,weight:'700'},color:'#888',callback:function(v){return v===0?'':v>=1e9?'$'+(v/1e9).toFixed(1)+'B':'$'+(v/1e6).toFixed(0)+'M';}},suggestedMax:Math.max(META_VAL*1.12,maxV*1.18)},
           x:{grid:{display:false},ticks:{font:{family:'Syne',size:9,weight:'600'},color:'#333'}}
