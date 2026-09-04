@@ -744,10 +744,11 @@ function parseBuffer(buf) {
 
     if (xrec < 100) continue; // pagado completamente
 
-    const cid    = String(r[1]);           // CODIGO NEGOCIO (ej: "NATURA/T1/1502")
-    const cli    = String(r[7]||'').trim(); // CLIENTE
-    const proy   = String(r[9]||'').trim(); // PROYECTO
-    const asesor = String(r[2]||'').trim(); // VD
+    const cid    = String(r[1]);                          // CODIGO NEGOCIO
+    const cli    = String(r[7]||'').trim();               // CLIENTE
+    const proy   = String(r[9]||'').trim();               // PROYECTO
+    const asesor = String(r[2]||'').trim();               // VD
+    const origen = String(r[13]||'').trim().toUpperCase(); // ORIGEN LEAD
 
     // Cuánto del adicional está pendiente
     // Los pagos cubren primero cotización base, luego adicional
@@ -843,7 +844,7 @@ function parseBuffer(buf) {
     }
 
     result.push({
-      cid, cli, ep, proy, asesor,
+      cid, cli, ep, proy, asesor, origen,
       torre: String(r[10]||'').trim(),  // col[10]=TORRE
       apto:  String(r[11]||'').trim(),  // col[11]=APTO
       total, recaudado, xrec, adic, pending_adic, cotiz,
@@ -863,7 +864,7 @@ function applyFilters(arr) {
   return arr.filter(c=>{
     if(p && c.proy!==p) return false;
     if(e && c.ep!==e) return false;
-    if(s){const h=(c.cli+c.proy+c.asesor+c.apto+c.torre).toLowerCase();if(!h.includes(s))return false;}
+    if(s){const h=(c.cli+c.proy+c.asesor+c.apto+c.torre+(c.origen||'')).toLowerCase();if(!h.includes(s))return false;}
     return true;
   });
 }
@@ -963,33 +964,32 @@ function switchCartera(mode){
   const fp=document.getElementById('fp'); if(fp) fp.value='';
   render();
 }
-function isConvenio(proy){
-  // Proyectos bono: KLIK, Gran Central convenio, WELL
-  const p=(proy||'').toUpperCase().trim();
-  return [...CONVENIO_PROYECTOS].some(cp=>p===cp.toUpperCase().trim())
-    || (p.includes('KLIK')&&!p.startsWith('PP'))
-    || (p.includes('GRAN CENTRAL')&&p.includes('CONVENIO'));
+// Clasificación basada en ORIGEN LEAD (col 13 del Excel)
+function isConvenio(c){
+  const o=(c.origen||'').toUpperCase();
+  const p=(c.proy||'').toUpperCase();
+  return o==='KLIK' || p.includes('CONVENIO');
 }
-function isAlianza(proy){
-  const p=(proy||'').toUpperCase().trim();
-  return [...ALIANZA_PROYECTOS].some(cp=>p===cp.toUpperCase().trim());
+function isAlianza(c){
+  const o=(c.origen||'').toUpperCase();
+  return ['COMPENSAR','CONINSA','CREDIFAMILIA','MACANA','VANTI','WELL'].includes(o);
 }
-function isPpto(proy){
-  // Presupuestos: todo lo que empiece con PP
-  const p=(proy||'').toUpperCase().trim();
-  return p.startsWith('PP ')||p.startsWith('PP-')||/^PP\d/.test(p)||p==='PP';
+function isPpto(c){
+  const o=(c.origen||'').toUpperCase();
+  return o.startsWith('PP');
 }
-function isLagom(proy){
-  const p=(proy||'').toUpperCase().trim();
-  return [...LAGOM_PROYECTOS].some(cp=>p===cp)||p.includes('LAGOM');
+function isLagom(c){
+  const o=(c.origen||'').toUpperCase();
+  const p=(c.proy||'').toUpperCase();
+  return o==='LAGOM'||p.includes('LAGOM');
 }
 function getActiveData(){
-  if(carteraMode==='convenios')    return DATA.filter(c=>isConvenio(c.proy));
-  if(carteraMode==='alianzas')     return DATA.filter(c=>isAlianza(c.proy));
-  if(carteraMode==='presupuestos') return DATA.filter(c=>isPpto(c.proy));
-  if(carteraMode==='lagom')        return DATA.filter(c=>isLagom(c.proy));
-  // VIS-CO: todo lo que no cae en otro pipeline
-  return DATA.filter(c=>!isConvenio(c.proy)&&!isAlianza(c.proy)&&!isPpto(c.proy)&&!isLagom(c.proy));
+  if(carteraMode==='convenios')    return DATA.filter(c=>isConvenio(c));
+  if(carteraMode==='alianzas')     return DATA.filter(c=>isAlianza(c));
+  if(carteraMode==='presupuestos') return DATA.filter(c=>isPpto(c));
+  if(carteraMode==='lagom')        return DATA.filter(c=>isLagom(c));
+  // VIS-CO: ORGÁNICO, REFERIDO, o cualquier origen no clasificado
+  return DATA.filter(c=>!isConvenio(c)&&!isAlianza(c)&&!isPpto(c)&&!isLagom(c));
 }
 
 // ── MAIN RENDER ───────────────────────────────────────────────
@@ -1128,6 +1128,7 @@ function render() {
         ${c.cli}${pagoBadge}<br>
         <span class="bproy" style="margin-top:3px;display:inline-block">${c.proy}</span>
         <span style="font-size:10px;color:var(--g);font-weight:400;margin-left:4px">T${c.torre||'—'} A${c.apto||'—'}</span>
+        ${c.origen?`<span style="font-size:9px;color:#9CA3AF;margin-left:4px">· ${c.origen}</span>`:''}
         ${inicioChip?`<br>${inicioChip}`:''}
       </td>
       <td class="m" style="text-align:right">${fmtMF(c.total)}</td>
