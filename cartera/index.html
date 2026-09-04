@@ -235,16 +235,18 @@ textarea.fi{resize:vertical;min-height:64px;}
 .fbtn.rechazar{background:#FEF2F2;border-color:#FECACA;color:#DC2626;}
 .fbtn.rechazar:hover{background:#FEE2E2;}
 /* cartera mode toggle */
-.cmodo-wrap{display:flex;align-items:center;background:var(--gc);border:1.5px solid var(--brd);border-radius:8px;padding:3px;gap:2px;}
-.cmodo-btn{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:5px 12px;border-radius:6px;border:none;background:transparent;color:var(--g);cursor:pointer;transition:.15s;white-space:nowrap;}
+.cmodo-wrap{display:flex;align-items:center;background:var(--w);border-bottom:1.5px solid var(--brd);padding:0 20px;gap:2px;position:sticky;top:52px;z-index:90;}
+.cmodo-btn{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:10px 16px;border-radius:0;border:none;border-bottom:2.5px solid transparent;background:transparent;color:var(--g);cursor:pointer;transition:.15s;white-space:nowrap;margin-bottom:-1.5px;}
 .cmodo-btn:hover{color:var(--n);}
-.cmodo-btn.active{background:var(--w);color:var(--r);box-shadow:0 1px 4px rgba(0,0,0,.12);}
-.cmodo-btn.active.conv{color:#6D28D9;}
-.cmodo-btn.active.lagom{color:#0891B2;}
-.cmodo-btn.ali{border-color:#7C3AED;color:#7C3AED;}
-.cmodo-btn.active.ali{color:#7C3AED;}
-.cmodo-btn.ppto{border-color:#D97706;color:#D97706;}
-.cmodo-btn.active.ppto{color:#D97706;}
+.cmodo-btn.active{color:var(--r);border-bottom-color:var(--r);}
+.cmodo-btn.conv{color:#6D28D9;}
+.cmodo-btn.active.conv{color:#6D28D9;border-bottom-color:#6D28D9;}
+.cmodo-btn.ali{color:#7C3AED;}
+.cmodo-btn.active.ali{color:#7C3AED;border-bottom-color:#7C3AED;}
+.cmodo-btn.ppto{color:#D97706;}
+.cmodo-btn.active.ppto{color:#D97706;border-bottom-color:#D97706;}
+.cmodo-btn.lagom{color:#0891B2;}
+.cmodo-btn.active.lagom{color:#0891B2;border-bottom-color:#0891B2;}
 .dash-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:10px 0 6px;color:var(--g);}
 .dash-title span{color:var(--r);}
 .dash-title span.conv{color:#6D28D9;}
@@ -317,14 +319,6 @@ textarea.fi{resize:vertical;min-height:64px;}
         <button onclick="goToday()" style="font-size:9px;font-family:'Syne',sans-serif;font-weight:700;width:auto;padding:0 5px;">HOY</button>
       </div>
     </div>
-    <!-- Archivo activo -->
-    <div class="cmodo-wrap" id="cmodo-wrap" style="display:none">
-      <button class="cmodo-btn active" data-mode="principal" onclick="switchCartera('principal')">VIS-CO</button>
-      <button class="cmodo-btn conv" data-mode="convenios" onclick="switchCartera('convenios')">Convenios</button>
-      <button class="cmodo-btn ali" data-mode="alianzas" onclick="switchCartera('alianzas')">Alianzas</button>
-      <button class="cmodo-btn ppto" data-mode="presupuestos" onclick="switchCartera('presupuestos')">Presupuestos</button>
-      <button class="cmodo-btn lagom" data-mode="lagom" onclick="switchCartera('lagom')">Lagom</button>
-    </div>
     <div class="file-pill" id="file-pill" onclick="recargar()" title="Haz clic para recargar">
       📊 <span id="file-name">—</span> · Recargar
     </div>
@@ -336,6 +330,15 @@ textarea.fi{resize:vertical;min-height:64px;}
     <button class="hbtn" id="btn-csv" onclick="exportCSV()" style="display:none">⬇ CSV</button>
   </div>
 </header>
+
+<!-- ── PIPELINE NAV ──────────────────────────────────────────── -->
+<div class="cmodo-wrap" id="cmodo-wrap" style="display:none">
+  <button class="cmodo-btn active" data-mode="principal" onclick="switchCartera('principal')">VIS-CO</button>
+  <button class="cmodo-btn conv" data-mode="convenios" onclick="switchCartera('convenios')">Convenios</button>
+  <button class="cmodo-btn ali" data-mode="alianzas" onclick="switchCartera('alianzas')">Alianzas</button>
+  <button class="cmodo-btn ppto" data-mode="presupuestos" onclick="switchCartera('presupuestos')">Presupuestos</button>
+  <button class="cmodo-btn lagom" data-mode="lagom" onclick="switchCartera('lagom')">Lagom</button>
+</div>
 
 <!-- ── PRIMERA VEZ ───────────────────────────────────────────── -->
 <div class="first-screen" id="first-screen">
