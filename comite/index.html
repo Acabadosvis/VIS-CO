@@ -1831,8 +1831,9 @@ async function saveConf(){
   const toSave=(yoEfectivo===''||yoEfectivo==='ADMIN')?actBase:[yoEfectivo];
   toSave.forEach(a=>{
     const prog=parseInt(document.getElementById('cp_'+a)?.value||'0')||0;
+    const con=parseInt(document.getElementById('cc_'+a)?.value||'0')||0;
     const ef=parseInt(document.getElementById('ce_'+a)?.value||'0')||0;
-    w[a]={prog,ef};
+    w[a]={prog,con,ef};
     w['ali_'+a]={};
     (ALI_PER[a]||[]).forEach(({k})=>{
       w['ali_'+a][k]={
@@ -1879,7 +1880,7 @@ function renderReunionesLocal(){
   const allC=gLS(LS_C);const allL=gLS(LS_L);
   const cur=allC[p2.sISO]||{};
   // Cards
-  document.getElementById('reu-cards').innerHTML=['KM','NM'].map(a=>{const x=cur[a]||{prog:0,ef:0};const pA=x.prog>0?pct(x.ef,x.prog,0):0;return`<div class="rc ${a.toLowerCase()}"><div class="rcn"><span style="width:9px;height:9px;border-radius:50%;background:${VDC[a]};display:inline-block"></span>${a} · ${VDN[a]}</div><div class="rck"><div class="rcm"><div class="rcmv">${x.prog||0}</div><div class="rcml">Prog.</div></div><div class="rcm"><div class="rcmv" style="color:var(--up)">${x.ef||0}</div><div class="rcml">Ef.</div></div><div class="rcm"><div class="rcmv" style="color:var(--o)">${pA}%</div><div class="rcml">Conv.</div></div></div><div class="rcin"><div class="fl" style="margin:0;flex:1"><label>Prog.</label><input type="number" id="cp_${a}" min="0" value="${x.prog||0}" style="padding:5px 7px;font-size:.8rem"></div><div class="fl" style="margin:0;flex:1"><label>Efectivas</label><input type="number" id="ce_${a}" min="0" value="${x.ef||0}" style="padding:5px 7px;font-size:.8rem"></div></div></div>`;}).join('');
+  document.getElementById('reu-cards').innerHTML=['KM','NM'].map(a=>{const x=cur[a]||{prog:0,con:0,ef:0};const pA=x.prog>0?pct(x.ef,x.prog,0):0;const pC=x.con>0?pct(x.ef,x.con,0):0;return`<div class="rc ${a.toLowerCase()}"><div class="rcn"><span style="width:9px;height:9px;border-radius:50%;background:${VDC[a]};display:inline-block"></span>${a} · ${VDN[a]}</div><div class="rck"><div class="rcm"><div class="rcmv">${x.prog||0}</div><div class="rcml">Programadas</div></div><div class="rcm"><div class="rcmv" style="color:#3B82F6">${x.con||0}</div><div class="rcml">Conectaron</div></div><div class="rcm"><div class="rcmv" style="color:var(--up)">${x.ef||0}</div><div class="rcml">Efectivas</div></div><div class="rcm"><div class="rcmv" style="color:var(--o)">${pA}%</div><div class="rcml">Conv.</div></div></div><div class="rcin"><div class="fl" style="margin:0;flex:1"><label>Programadas</label><input type="number" id="cp_${a}" min="0" value="${x.prog||0}" style="padding:5px 7px;font-size:.8rem"></div><div class="fl" style="margin:0;flex:1"><label>Conectaron</label><input type="number" id="cc_${a}" min="0" value="${x.con||0}" style="padding:5px 7px;font-size:.8rem;border-color:#3B82F6"></div><div class="fl" style="margin:0;flex:1"><label>Efectivas</label><input type="number" id="ce_${a}" min="0" value="${x.ef||0}" style="padding:5px 7px;font-size:.8rem"></div></div></div>`;}).join('');
   /* Tarjetas de alianzas por asesora */
   document.getElementById('reu-proj-cards').innerHTML=['KM','NM'].map(a=>{
     const aliData=cur['ali_'+a]||{};
