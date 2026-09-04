@@ -2463,7 +2463,7 @@ function renderAptos(){
   html+='<div class="apt-kpg">';
   /* En Ejecución (KLIK) */
   if(ejR.length){
-    html+='<div class="apt-kp dark"><div class="apt-kpn">'+ejR.length+'</div><div class="apt-kpl">En Ejecuci&#243;n</div><div class="apt-kps">KLIK · '+rK.length+' residentes</div></div>';
+    html+='<div class="apt-kp dark"><div class="apt-kpn">'+ejR.length+'</div><div class="apt-kpl">En Ejecuci&#243;n</div><div class="apt-kps">'+rK.length+' residentes</div></div>';
   }
   /* Por Recibir — con desglose */
   if(xrRDedup.length){
@@ -2500,7 +2500,7 @@ function renderAptos(){
     /* Columna 1: En Ejecución (KLIK) */
     if(ejR.length){
       html+='<div class="apt-ch">';
-      html+='<div class="apt-ch-hd">🏗️ En Ejecuci&#243;n — por residente (KLIK)</div>';
+      html+='<div class="apt-ch-hd">🏗️ En Ejecuci&#243;n — por residente</div>';
       html+='<canvas id="ca_ej" height="240"></canvas>';
       html+='<div class="apt-legend">';
       rK.forEach(function(k,i){
