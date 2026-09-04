@@ -55,9 +55,9 @@ header{background:var(--n);display:flex;align-items:center;gap:8px;padding:0 18p
 .kg{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:9px;margin-bottom:12px}
 .kp{background:var(--w);border:1px solid var(--brd);border-radius:var(--rad);padding:12px 13px;box-shadow:var(--sh);overflow:hidden}
 .kp.o{border-top:3px solid var(--o)}.kp.g{border-top:3px solid var(--up)}.kp.b{border-top:3px solid var(--bl)}.kp.a{border-top:3px solid var(--am)}.kp.p{border-top:3px solid var(--pur)}.kp.n{border-top:3px solid var(--n)}.kp.y{border-top:3px solid var(--y)}
-.kl{font-family:'Syne',sans-serif;font-size:.59rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--g);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kl{font-family:'Syne',sans-serif;font-size:.59rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--g);margin-bottom:3px;white-space:normal;line-height:1.3}
 .kv{font-family:'Syne',sans-serif;font-weight:700;font-size:1.28rem;color:var(--n);line-height:1.05;letter-spacing:-.5px}
-.kv.md{font-size:1.05rem}.kv.sm{font-size:.85rem}
+.kv.md{font-size:1.05rem}.kv.sm{font-size:.82rem;word-break:break-all}
 .ks{font-size:.64rem;color:var(--g);margin-top:3px}
 /* INSIGHT BOX */
 .ins{background:var(--b);border:1px solid var(--brd);border-radius:var(--rad);padding:14px 16px;margin-bottom:12px}
@@ -133,13 +133,13 @@ tr:hover td{background:var(--b)}
 .vi-tipo:last-child{border:none}
 .vi-tipodot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .vi-tipon{font-family:'Syne',sans-serif;font-weight:700;font-size:.79rem;color:#fff;margin-left:auto}
-.vi-body{display:grid;grid-template-columns:148px 1fr}
+.vi-body{display:grid;grid-template-columns:210px 1fr}
 .vi-circ{background:var(--n);padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:7px}
 .vi-svgw{position:relative;width:110px;height:110px}
 .vi-svgw svg{transform:rotate(-90deg)}
 .vi-svgpct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:1.45rem;color:var(--o);letter-spacing:-1px}
-.vi-meta{font-size:.62rem;color:rgba(255,255,255,.9);text-align:center;line-height:1.9;margin-top:2px}
-.vi-meta strong{color:#fff;font-size:.68rem}
+.vi-meta{font-size:.72rem;color:rgba(255,255,255,.9);text-align:left;line-height:2;margin-top:2px}
+.vi-meta strong{color:#fff;font-size:.78rem}
 .vi-det{padding:13px 15px}
 .vi-slbl{font-family:'Syne',sans-serif;font-weight:700;font-size:.58rem;text-transform:uppercase;letter-spacing:.6px;color:var(--g);margin-bottom:6px;margin-top:9px}
 .vi-slbl:first-child{margin-top:0}
@@ -2162,14 +2162,14 @@ function renderVentas(){
           <div style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#fff;margin-bottom:4px">Meta ${p.mes} ${p.yr}</div>
           <div style="font-size:3rem;font-weight:800;color:var(--o);letter-spacing:-3px;line-height:1">${META_V} <span style="font-size:.8rem;font-weight:600;color:#fff">vtas</span></div>
           <div style="font-size:1.1rem;font-weight:700;color:${parseFloat(pV)>=100?'#4ADE80':'#fff'};margin-top:4px">${tv} <span style="font-size:.7rem;font-weight:600;color:#fff">/ ${META_V} · ${pV}%</span></div>
-          <div style="margin-top:10px;border-top:1px solid #444;padding-top:8px;font-size:.62rem;color:#fff;line-height:2">
-            ${autoMetaV?`<div>${p.mes} ${p.yr-1}: <strong style="color:var(--o)">${fmtC(vmPrevYrVal)}</strong></div>
-            <div>× 1.5 → <strong style="color:var(--y)">${fmtC(metaValorTarget)}</strong></div>
+          <div style="margin-top:10px;border-top:1px solid #444;padding-top:8px;font-size:.72rem;color:#fff;line-height:2.1">
+            ${autoMetaV?`<div>${p.mes} ${p.yr-1}: <strong style="color:var(--o)">${fmt(vmPrevYrVal)}</strong></div>
+            <div>× 1.5 → <strong style="color:var(--y)">${fmt(metaValorTarget)}</strong></div>
             <div>÷ $37M = <strong style="color:#4ADE80">${META_V} ventas</strong></div>
             <div style="border-top:1px solid #444;margin-top:4px;padding-top:4px">`:'<div>'}
-            Meta mes: <strong>${fmtC(META_VAL)}</strong></div>
-            <div>Meta año: <strong>${fmtC(META_VALA)}</strong></div>
-            <div>Año real: <strong>${tvA} vtas</strong> · ${fmtC(tvAVal)}</div>
+            Meta mes: <strong>${fmt(META_VAL)}</strong></div>
+            <div>Meta año: <strong>${fmt(META_VALA)}</strong></div>
+            <div>Año real: <strong>${tvA} vtas</strong> · ${fmt(tvAVal)}</div>
           </div>
         </div>
       </div>
