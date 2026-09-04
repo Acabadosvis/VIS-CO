@@ -2182,15 +2182,15 @@ function renderVentas(){
             {lbl:'Referidos',   tk:tkRef,aiu:refAIU,n:refR.length,col:'#6D28D9'},
             {lbl:'Alianza',     tk:tkAli,aiu:aliAIU,n:aliR.length,col:'#F5B800'},
           ].map(({lbl,tk,aiu,n,col})=>`
-            <div style="background:var(--gc);border:1px solid var(--brd);border-top:3px solid ${col};border-radius:8px;padding:10px 11px">
-              <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:${col};margin-bottom:6px">${lbl} <span style="color:var(--g);font-weight:400">(${n})</span></div>
-              <div style="margin-bottom:4px">
-                <div style="font-size:.55rem;color:var(--g);font-weight:600;text-transform:uppercase;margin-bottom:2px">Ticket prom.</div>
-                <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;color:${col}">${tk>0?fmtC(tk):'—'}</div>
+            <div style="background:var(--gc);border:1px solid var(--brd);border-top:3px solid ${col};border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:${col}">${lbl} <span style="color:var(--g);font-weight:500;font-size:.58rem">(${n})</span></div>
+              <div>
+                <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.35rem;color:${col};line-height:1">${tk>0?fmtC(tk):'—'}</div>
+                <div style="font-size:.58rem;color:var(--g);font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-top:3px">Ticket promedio</div>
               </div>
-              <div style="border-top:1px solid var(--brd);padding-top:5px;margin-top:5px">
-                <div style="font-size:.55rem;color:var(--g);font-weight:600;text-transform:uppercase;margin-bottom:2px">AIU total</div>
-                <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;color:var(--n)">${aiu>0?fmtC(aiu):'—'}</div>
+              <div style="border-top:1px solid var(--brd);padding-top:8px">
+                <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:var(--n);line-height:1">${aiu>0?fmtC(aiu):'—'}</div>
+                <div style="font-size:.58rem;color:var(--g);font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-top:3px">AIU total</div>
               </div>
             </div>`).join('')}
         </div>
