@@ -647,8 +647,7 @@ body.modo-comite .brow{display:none!important}
       </div>
       <div class="brow"><button class="btn btn-o" style="background:#F97316" onclick="saveLeads()">&#128190; Guardar Remodelaciones</button></div>
     </div>
-    <div id="remo-kpis" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin:12px 0"></div>
-    <div id="remo-tabla" style="overflow-x:auto;margin:4px 0 12px"></div>
+    <div id="remo-tabla" style="overflow-x:auto;margin:12px 0"></div>
     <div id="l-remo-funnel" class="fn-wrap" style="margin-top:10px;border-top:2px solid #FED7AA;padding-top:10px"></div>
   </div>
 </div>
@@ -1036,17 +1035,6 @@ function renderRemo(){
   var ci=parseInt(document.getElementById('l_remo_ci')?.value)||0;
   var vis=parseInt(document.getElementById('l_remo_vis')?.value)||0;
   var visVal=parseInt(document.getElementById('l_remo_vis_val')?.value)||0;
-  /* helper flecha */
-  function arr(v2,v1){if(!v1&&!v2)return'';var d=v2-v1;if(!d)return'';return '<span style="color:'+(d>0?'#16A34A':'#DC2626')+';font-size:.65rem">'+(d>0?'&#8593;':'&#8595;')+Math.abs(d)+' vs sem ant</span>';}
-  /* KPI chips */
-  var kEl=document.getElementById('remo-kpis');
-  if(kEl)kEl.innerHTML=
-    '<div class="kp" style="border-top:3px solid #F97316"><div class="kl">&#128222; Llegaron</div><div class="kv">'+tot+'</div><div class="ks">'+arr(tot,d1.remo_tot||0)+'</div></div>'+
-    '<div class="kp" style="border-top:3px solid #16A34A"><div class="kl">&#11088; Interesados</div><div class="kv">'+int2+'</div><div class="ks">'+(tot>0?Math.round(int2/tot*100)+'% de llegaron':'—')+'</div></div>'+
-    '<div class="kp" style="border-top:3px solid #1D4ED8"><div class="kl">&#128197; Reun. ag.</div><div class="kv">'+ag+'</div><div class="ks">'+arr(ag,d1.remo_ag||0)+'</div></div>'+
-    '<div class="kp" style="border-top:3px solid #059669"><div class="kl">&#9989; Reun. ef.</div><div class="kv">'+ef+'</div><div class="ks">'+(ag>0?Math.round(ef/ag*100)+'% de agendadas':'—')+'</div></div>'+
-    '<div class="kp" style="border-top:3px solid #166534"><div class="kl">&#127942; Cierres</div><div class="kv" style="color:#166534">'+ci+'</div><div class="ks">'+arr(ci,d1.remo_ci||0)+'</div></div>'+
-    (vis>0?'<div class="kp" style="border-top:3px solid #D97706;background:#FFFBEB"><div class="kl">&#128176; Visitas cobradas</div><div class="kv" style="color:#92400E">'+vis+'</div><div class="ks">'+(visVal>0?fmt(visVal):'')+'</div></div>':'');
   /* tabla comparativo semanal */
   function tRow(lbl,v2,v1,v0,isCur){
     function cell(v,vp){var d=v-vp;var col=d>0?'#16A34A':d<0?'#DC2626':'#888';return '<td style="padding:5px 8px;font-size:.74rem;font-weight:700;text-align:right;color:'+(v>0?col:'#ccc')+'">'+(v>0?v:'—')+(vp>0&&d!==0?'<span style="font-size:.58rem"> '+(d>0?'↑':'↓')+'</span>':'')+'</td>';}
@@ -1069,7 +1057,29 @@ function renderRemo(){
     '<td style="padding:5px 8px;font-size:.72rem;text-align:right;color:#aaa">'+(d0.remo_vis_val>0?fmt(d0.remo_vis_val):'—')+'</td>'+
     '<td style="padding:5px 8px;font-size:.72rem;text-align:right;color:#888">'+(d1.remo_vis_val>0?fmt(d1.remo_vis_val):'—')+'</td>'+
     '<td style="padding:5px 8px;font-size:.72rem;text-align:right;color:var(--o);font-weight:800">'+(visVal>0?fmt(visVal):'—')+'</td></tr>':'')+
-    '</tbody></table>';
+    /* fila métrica: % conversión lead → cierre */
+    (function(){
+      function pctC(ci,tot){return tot>0?Math.round(ci/tot*100)+'%':'—';}
+      var c2=pctC(ci,tot),c1=pctC(d1.remo_ci||0,d1.remo_tot||0),c0=pctC(d0.remo_ci||0,d0.remo_tot||0);
+      var col2=ci>0&&tot>0?(ci/tot>=0.15?'#166534':ci/tot>=0.07?'#D97706':'#DC2626'):'#ccc';
+      return '<tr style="background:#FFF7ED"><td style="padding:6px 8px;font-size:.71rem;color:#C2410C;font-weight:800">&#128200; Conv. Lead→Cierre</td>'+
+      '<td style="padding:6px 8px;font-size:.74rem;text-align:right;color:#aaa;font-weight:700">'+c0+'</td>'+
+      '<td style="padding:6px 8px;font-size:.74rem;text-align:right;color:#888;font-weight:700">'+c1+'</td>'+
+      '<td style="padding:6px 8px;font-size:.8rem;text-align:right;color:'+col2+';font-weight:800">'+c2+'</td></tr>';
+    })()+
+    '</tbody></table>'+
+    /* insight inteligente */
+    (function(){
+      if(!tot)return'';
+      var conv=tot>0?ci/tot:0;
+      var msg='',col='#C2410C',bg='#FFF7ED',brd='#FED7AA';
+      if(ci===0&&tot>0){msg='&#9888;&#65039; Sin cierres esta semana — '+tot+' leads llegaron. '+(ef>0?'Hay '+ef+' reuniones efectivas que pueden convertir.':'Revisar seguimiento.');}
+      else if(conv>=0.15){msg='&#127942; Excelente conversión: '+Math.round(conv*100)+'% de leads cerró. '+ci+' cierre'+(ci>1?'s':'')+'  de '+tot+' leads.';col='#166534';bg='#F0FDF4';brd='#86EFAC';}
+      else if(conv>=0.07){msg='&#128200; Conversión media: '+Math.round(conv*100)+'%. '+(ef>ci?'Hay '+ef+' reuniones efectivas, '+(ef-ci)+' sin cerrar aún.':'Reforzar seguimiento post-reunión.');col='#92400E';bg='#FFFBEB';brd='#FDE68A';}
+      else if(conv>0){msg='&#128270; Conversión baja ('+Math.round(conv*100)+'%). '+(ag>0&&ef<ag?'Solo '+(ag>0?Math.round(ef/ag*100):0)+'% de reuniones agendadas fueron efectivas — revisar confirmaciones.':'Reforzar cierre en reuniones efectivas.');}
+      if(!msg)return'';
+      return '<div style="margin-top:8px;padding:8px 12px;background:'+bg+';border-left:3px solid '+brd+';border-radius:6px;font-size:.72rem;color:'+col+';line-height:1.5">'+msg+'</div>';
+    })()+'';
   /* funnel visual */
   var fEl=document.getElementById('l-remo-funnel');if(!fEl)return;
   if(tot<=0&&!ci&&!vis){fEl.innerHTML='';return;}
