@@ -2302,19 +2302,31 @@ function renderVentas(){
       /* Chart con anotación de meta */
       if(charts['cv_mes']){try{charts['cv_mes'].destroy();}catch(e){}delete charts['cv_mes'];}
       var ctx=document.getElementById('cv_mes');if(!ctx)return;
+      /* plugin inline para etiquetas de valor sobre cada barra */
+      var barValueLabels={id:'barValueLabels',afterDatasetsDraw:function(chart){
+        var c=chart.ctx,ds=chart.data.datasets[0],meta=chart.getDatasetMeta(0);
+        ds.data.forEach(function(v,i){
+          if(!v||v<=0)return;
+          var bar=meta.data[i];if(!bar)return;
+          var lbl=v>=1e9?'$'+(v/1e9).toFixed(2)+'B':'$'+Math.round(v/1e6)+'M';
+          c.save();c.fillStyle='#1e293b';c.font='bold 9.5px Syne,sans-serif';c.textAlign='center';c.textBaseline='bottom';
+          c.fillText(lbl,bar.x,bar.y-3);c.restore();
+        });
+      }};
       charts['cv_mes']=new Chart(ctx,{
         type:'bar',
         data:{labels:mesLabels,datasets:[
           {data:mesData,backgroundColor:mesClrs,borderRadius:6,borderSkipped:false,label:'Valor'},
-          {data:mesLabels.map(function(){return META_VAL;}),type:'line',label:'Meta valor',borderColor:'rgba(220,38,38,.5)',borderDash:[5,4],borderWidth:1.5,pointRadius:0,backgroundColor:'transparent',order:0}
+          {data:mesLabels.map(function(){return META_VAL;}),type:'line',label:'Meta',borderColor:'rgba(220,38,38,.45)',borderDash:[5,4],borderWidth:1.5,pointRadius:0,backgroundColor:'transparent',order:0}
         ]},
-        options:{responsive:true,plugins:{
+        options:{responsive:true,layout:{padding:{top:22}},plugins:{
           legend:{display:false},
-          tooltip:{callbacks:{label:function(c){if(c.datasetIndex===1)return'Meta: '+fmtC(META_VAL);var pp=Math.round(c.raw/META_VAL*100);return fmtC(c.raw)+' ('+pp+'% meta) · '+mesDataCnt[c.dataIndex]+' ventas';}}}
+          tooltip:{callbacks:{label:function(c){if(c.datasetIndex===1)return'Meta: '+fmtC(META_VAL);var pp=Math.round(c.raw/META_VAL*100);return fmtC(c.raw)+' — '+pp+'% meta · '+mesDataCnt[c.dataIndex]+' ventas';}}}
         },scales:{
-          y:{beginAtZero:true,grid:{color:'#EDEBE6'},ticks:{font:{family:'Syne',size:9,weight:'700'},color:'#555',callback:function(v){return v>=1e9?'$'+(v/1e9).toFixed(1)+'B':v>=1e6?'$'+(v/1e6).toFixed(0)+'M':'$'+v;}},suggestedMax:Math.max(META_VAL*1.05,maxV*1.05)},
+          y:{beginAtZero:true,grid:{color:'#EDEBE6'},ticks:{font:{family:'Syne',size:9,weight:'700'},color:'#888',callback:function(v){return v===0?'':v>=1e9?'$'+(v/1e9).toFixed(1)+'B':'$'+(v/1e6).toFixed(0)+'M';}},suggestedMax:Math.max(META_VAL*1.12,maxV*1.18)},
           x:{grid:{display:false},ticks:{font:{family:'Syne',size:9,weight:'600'},color:'#333'}}
-        }}
+        }},
+        plugins:[barValueLabels]
       });
     })();
     mkDona('cv_tipo',['Presupuestos','Orgánicos','Alianza'],[remR.length,orgR.length,aliR.length],['#888','#E4721B','#F5B800']);
