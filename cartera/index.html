@@ -241,10 +241,16 @@ textarea.fi{resize:vertical;min-height:64px;}
 .cmodo-btn.active{background:var(--w);color:var(--r);box-shadow:0 1px 4px rgba(0,0,0,.12);}
 .cmodo-btn.active.conv{color:#6D28D9;}
 .cmodo-btn.active.lagom{color:#0891B2;}
+.cmodo-btn.ali{border-color:#7C3AED;color:#7C3AED;}
+.cmodo-btn.active.ali{color:#7C3AED;}
+.cmodo-btn.ppto{border-color:#D97706;color:#D97706;}
+.cmodo-btn.active.ppto{color:#D97706;}
 .dash-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:10px 0 6px;color:var(--g);}
 .dash-title span{color:var(--r);}
 .dash-title span.conv{color:#6D28D9;}
 .dash-title span.lagom{color:#0891B2;}
+.dash-title span.ali{color:#7C3AED;}
+.dash-title span.ppto{color:#D97706;}
 /* adicionales */
 .adic-kpi{background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:10px;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;}
 .adic-kpi-left{display:flex;align-items:center;gap:10px;}
@@ -315,6 +321,8 @@ textarea.fi{resize:vertical;min-height:64px;}
     <div class="cmodo-wrap" id="cmodo-wrap" style="display:none">
       <button class="cmodo-btn active" data-mode="principal" onclick="switchCartera('principal')">VIS-CO</button>
       <button class="cmodo-btn conv" data-mode="convenios" onclick="switchCartera('convenios')">Convenios</button>
+      <button class="cmodo-btn ali" data-mode="alianzas" onclick="switchCartera('alianzas')">Alianzas</button>
+      <button class="cmodo-btn ppto" data-mode="presupuestos" onclick="switchCartera('presupuestos')">Presupuestos</button>
       <button class="cmodo-btn lagom" data-mode="lagom" onclick="switchCartera('lagom')">Lagom</button>
     </div>
     <div class="file-pill" id="file-pill" onclick="recargar()" title="Haz clic para recargar">
@@ -592,8 +600,11 @@ const BLOCKS = [
 ];
 const ETAPA_LABELS = {SEP:'Separación',ANT:'Anticipo',P1:'Obra Blanca',P2:'Carpintería',P3:'Entrega',P4:'Pago 4',P5:'Pago 5',P6:'Pago 6'};
 const VALID_ESTADOS = new Set(['EN EJECUCIÓN','EN EJECUCION','ENTREGADO','X RECIBIR']);
-const CONVENIO_PROYECTOS = new Set(['WELL','KLIK CONVENIO','GRAN CENTRAL - CONVENIO','CREDIFAMILIA']);
-const LAGOM_PROYECTOS = new Set(['LAGOM','LAGOM ETAPA 1','LAGOM ETAPA 2','LAGOM - ETAPA 1','LAGOM - ETAPA 2']);
+// CONVENIOS: proyectos bono (KLIK, Gran Central bono)
+const CONVENIO_PROYECTOS = new Set(['KLIK CONVENIO','GRAN CENTRAL - CONVENIO','GRAN CENTRAL CONVENIO','KLIK']);
+// ALIANZAS: aliados comerciales
+const ALIANZA_PROYECTOS  = new Set(['CONINSA','DOM','CREDIFAMILIA','COMPENSAR','VANTI','MACANA','CREDIFAMILIA CONVENIO','WELL']);
+const LAGOM_PROYECTOS    = new Set(['LAGOM','LAGOM ETAPA 1','LAGOM ETAPA 2','LAGOM - ETAPA 1','LAGOM - ETAPA 2']);
 
 // ── RUNTIME ───────────────────────────────────────────────────
 let DATA = [];           // parsed clients
@@ -603,7 +614,7 @@ const TODAY = new Date(); TODAY.setHours(12,0,0,0);
 let WEEK = calcWeek(TODAY);
 let curTab = 'mora';
 let sortK = 'x_recaudar', sortD = -1;
-let carteraMode = 'principal'; // 'principal' | 'convenios' | 'lagom'
+let carteraMode = 'principal'; // 'principal' | 'convenios' | 'alianzas' | 'presupuestos' | 'lagom'
 const MODO_CONTAB = new URLSearchParams(location.search).get('modo')==='contabilidad';
 
 // ── FECHA ─────────────────────────────────────────────────────
@@ -953,18 +964,32 @@ function switchCartera(mode){
   render();
 }
 function isConvenio(proy){
+  // Proyectos bono: KLIK, Gran Central convenio, WELL
   const p=(proy||'').toUpperCase().trim();
-  return [...CONVENIO_PROYECTOS].some(cp=>p===cp.toUpperCase().trim());
+  return [...CONVENIO_PROYECTOS].some(cp=>p===cp.toUpperCase().trim())
+    || (p.includes('KLIK')&&!p.startsWith('PP'))
+    || (p.includes('GRAN CENTRAL')&&p.includes('CONVENIO'));
+}
+function isAlianza(proy){
+  const p=(proy||'').toUpperCase().trim();
+  return [...ALIANZA_PROYECTOS].some(cp=>p===cp.toUpperCase().trim());
+}
+function isPpto(proy){
+  // Presupuestos: todo lo que empiece con PP
+  const p=(proy||'').toUpperCase().trim();
+  return p.startsWith('PP ')||p.startsWith('PP-')||/^PP\d/.test(p)||p==='PP';
 }
 function isLagom(proy){
   const p=(proy||'').toUpperCase().trim();
-  // Coincidencia exacta con nombres conocidos O que contenga "LAGOM"
   return [...LAGOM_PROYECTOS].some(cp=>p===cp)||p.includes('LAGOM');
 }
 function getActiveData(){
-  if(carteraMode==='convenios') return DATA.filter(c=>isConvenio(c.proy));
-  if(carteraMode==='lagom')     return DATA.filter(c=>isLagom(c.proy));
-  return DATA.filter(c=>!isConvenio(c.proy)&&!isLagom(c.proy));
+  if(carteraMode==='convenios')    return DATA.filter(c=>isConvenio(c.proy));
+  if(carteraMode==='alianzas')     return DATA.filter(c=>isAlianza(c.proy));
+  if(carteraMode==='presupuestos') return DATA.filter(c=>isPpto(c.proy));
+  if(carteraMode==='lagom')        return DATA.filter(c=>isLagom(c.proy));
+  // VIS-CO: todo lo que no cae en otro pipeline
+  return DATA.filter(c=>!isConvenio(c.proy)&&!isAlianza(c.proy)&&!isPpto(c.proy)&&!isLagom(c.proy));
 }
 
 // ── MAIN RENDER ───────────────────────────────────────────────
@@ -974,12 +999,18 @@ function render() {
   const titleEl = document.getElementById('dash-title');
   if (titleEl) {
     const isConv = carteraMode==='convenios';
+    const isAli  = carteraMode==='alianzas';
+    const isPp   = carteraMode==='presupuestos';
     const isLag  = carteraMode==='lagom';
     titleEl.innerHTML = isConv
-      ? '<span class="conv">Cartera Convenios</span> <span style="font-size:10px;color:#9CA3AF;font-weight:400">— WELL · KLIK · Gran Central Conv. · CREDIFAMILIA</span>'
+      ? '<span class="conv">Cartera Convenios</span> <span style="font-size:10px;color:#9CA3AF;font-weight:400">— KLIK · Gran Central Conv. (bono)</span>'
+      : isAli
+      ? '<span class="ali">Cartera Alianzas</span> <span style="font-size:10px;color:#9CA3AF;font-weight:400">— Coninsa · DOM · Credifamilia · Compensar · Vanti · Macana · WELL</span>'
+      : isPp
+      ? '<span class="ppto">Cartera Presupuestos</span> <span style="font-size:10px;color:#9CA3AF;font-weight:400">— Proyectos PP*</span>'
       : isLag
       ? '<span class="lagom">Cartera Lagom</span> <span style="font-size:10px;color:#9CA3AF;font-weight:400">— Dos etapas de pago</span>'
-      : '<span>Cartera VIS-CO</span> <span style="font-size:10px;color:#9CA3AF;font-weight:400">— Proyectos propios</span>';
+      : '<span>Cartera VIS-CO</span> <span style="font-size:10px;color:#9CA3AF;font-weight:400">— Proyectos propios · Orgánicas · Referidos</span>';
   }
   const cfg = CAT_CFG[curTab];
   document.getElementById('ptitle').textContent = cfg.label;
