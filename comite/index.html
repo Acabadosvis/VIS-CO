@@ -2309,8 +2309,18 @@ function renderVentas(){
           if(!v||v<=0)return;
           var bar=meta.data[i];if(!bar)return;
           var lbl=v>=1e9?'$'+(v/1e9).toFixed(2)+'B':'$'+Math.round(v/1e6)+'M';
-          c.save();c.fillStyle='#1e293b';c.font='bold 9.5px Syne,sans-serif';c.textAlign='center';c.textBaseline='bottom';
-          c.fillText(lbl,bar.x,bar.y-3);c.restore();
+          var pp=Math.round(v/META_VAL*100);
+          var ppLbl=pp+'%';
+          c.save();
+          c.textAlign='center';c.textBaseline='bottom';
+          /* línea superior: % cumplimiento coloreado */
+          c.fillStyle=pp>=100?'#16a34a':'#dc2626';
+          c.font='bold 8.5px Syne,sans-serif';
+          c.fillText(ppLbl,bar.x,bar.y-14);
+          /* línea inferior: valor COP */
+          c.fillStyle='#1e293b';c.font='bold 9.5px Syne,sans-serif';
+          c.fillText(lbl,bar.x,bar.y-3);
+          c.restore();
         });
       }};
       charts['cv_mes']=new Chart(ctx,{
@@ -2319,7 +2329,7 @@ function renderVentas(){
           {data:mesData,backgroundColor:mesClrs,borderRadius:6,borderSkipped:false,label:'Valor'},
           {data:mesLabels.map(function(){return META_VAL;}),type:'line',label:'Meta',borderColor:'rgba(220,38,38,.45)',borderDash:[5,4],borderWidth:1.5,pointRadius:0,backgroundColor:'transparent',order:0}
         ]},
-        options:{responsive:true,layout:{padding:{top:22}},plugins:{
+        options:{responsive:true,layout:{padding:{top:38}},plugins:{
           legend:{display:false},
           tooltip:{callbacks:{label:function(c){if(c.datasetIndex===1)return'Meta: '+fmtC(META_VAL);var pp=Math.round(c.raw/META_VAL*100);return fmtC(c.raw)+' — '+pp+'% meta · '+mesDataCnt[c.dataIndex]+' ventas';}}}
         },scales:{
