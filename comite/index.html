@@ -2083,6 +2083,7 @@ function renderVentas(){
   const vAD=getLagDedup(vA);
   const tvA=vAD.count,tvAVal=vAD.val;
   const byMes=Array(12).fill(0);for(var _mi=0;_mi<12;_mi++){var _mr=vA.filter(function(r){return MN[(r[3]||'').toString().toLowerCase().trim()]===_mi;});byMes[_mi]=getLagDedup(_mr).count;}
+  const byMesVal=Array(12).fill(0);for(var _miv=0;_miv<12;_miv++){var _mrv=vA.filter(function(r){return MN[(r[3]||'').toString().toLowerCase().trim()]===_miv;});byMesVal[_miv]=getLagDedup(_mrv).val;}
   /* Insights */
   const vIns=[];
   const fpV=parseFloat(pV);
@@ -2264,7 +2265,7 @@ function renderVentas(){
   <div class="chg2">
     ${orgSort.length>2?`<div class="ch chgfull"><div class="chl">Por origen · ${p.mes}</div><div style="position:relative;height:${Math.max(120,orgSort.length*26)}px"><canvas id="cv_orig"></canvas></div></div>`:''}
     <div class="ch chgfull">
-      <div class="chl">Ventas por mes ${p.yr} — meta ${META_V}/mes</div>
+      <div class="chl">Valor ventas por mes ${p.yr} — meta ${fmtC(META_VAL)}/mes</div>
       <div id="cv_mes_kpis" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"></div>
       <canvas id="cv_mes" height="140"></canvas>
       <div id="cv_mes_pct" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"></div>
@@ -2274,25 +2275,27 @@ function renderVentas(){
   setTimeout(function(){
     (function(){
       var mesLabels=MES.slice(0,p.mi+1);
-      var mesData=byMes.slice(0,p.mi+1);
+      var mesDataCnt=byMes.slice(0,p.mi+1);
+      var mesData=byMesVal.slice(0,p.mi+1);
       var maxV=Math.max.apply(null,mesData)||1;
       /* color único por mes — paleta VIS-CO */
       var PALETTE=['#E4721B','#F5B800','#7C3AED','#0891B2','#16A34A','#DC2626','#0369A1','#D97706','#059669','#DB2777','#6366F1','#92400E'];
       var mesClrs=mesLabels.map(function(_,i){return PALETTE[i%PALETTE.length];});
       /* mini KPIs arriba */
-      var totalAno=mesData.reduce(function(s,v){return s+v;},0);
-      var promMes=mesData.length>0?(totalAno/mesData.length).toFixed(1):0;
+      var totalAnoVal=mesData.reduce(function(s,v){return s+v;},0);
+      var totalAno=mesDataCnt.reduce(function(s,v){return s+v;},0);
+      var promMes=mesData.length>0?fmtC(totalAnoVal/mesData.length):0;
       var mejorIdx=mesData.indexOf(Math.max.apply(null,mesData));
       var kpiEl=document.getElementById('cv_mes_kpis');
       if(kpiEl)kpiEl.innerHTML=
-        '<span style="font-size:.72rem;background:#FFF8F0;border:1px solid #ECCDB0;border-radius:6px;padding:3px 9px;color:#92400E"><strong>'+totalAno+'</strong> ventas en el año</span>'+
+        '<span style="font-size:.72rem;background:#FFF8F0;border:1px solid #ECCDB0;border-radius:6px;padding:3px 9px;color:#92400E"><strong>'+fmtC(totalAnoVal)+'</strong> en el año</span>'+
         '<span style="font-size:.72rem;background:#FFF8F0;border:1px solid #ECCDB0;border-radius:6px;padding:3px 9px;color:#555">Prom. <strong>'+promMes+'</strong>/mes</span>'+
-        (mesLabels[mejorIdx]?'<span style="font-size:.72rem;background:#FFF8F0;border:1px solid #ECCDB0;border-radius:6px;padding:3px 9px;color:#16A34A">Mejor: <strong>'+mesLabels[mejorIdx]+' ('+mesData[mejorIdx]+')</strong></span>':'')+
-        '<span style="font-size:.72rem;background:#FFF8F0;border:1px solid #ECCDB0;border-radius:6px;padding:3px 9px;color:var(--o)">Meta: <strong>'+pV+'%</strong> en '+p.mes+'</span>';
+        (mesLabels[mejorIdx]?'<span style="font-size:.72rem;background:#FFF8F0;border:1px solid #ECCDB0;border-radius:6px;padding:3px 9px;color:#16A34A">Mejor: <strong>'+mesLabels[mejorIdx]+' ('+fmtC(mesData[mejorIdx])+')</strong></span>':'')+
+        '<span style="font-size:.72rem;background:#FFF8F0;border:1px solid #ECCDB0;border-radius:6px;padding:3px 9px;color:var(--o)">Meta: <strong>'+pVal+'%</strong> en '+p.mes+'</span>';
       /* porcentajes debajo */
       var pctEl=document.getElementById('cv_mes_pct');
       if(pctEl)pctEl.innerHTML=mesLabels.map(function(m,i){
-        var pp=Math.round(mesData[i]/META_V*100);
+        var pp=Math.round(mesData[i]/META_VAL*100);
         var col=pp>=100?'#16A34A':pp>=70?'var(--o)':'#DC2626';
         return'<span style="font-size:.69rem;color:'+col+';background:rgba(0,0,0,.04);border-radius:4px;padding:2px 6px">'+m+' <strong>'+pp+'%</strong></span>';
       }).join('');
@@ -2302,14 +2305,14 @@ function renderVentas(){
       charts['cv_mes']=new Chart(ctx,{
         type:'bar',
         data:{labels:mesLabels,datasets:[
-          {data:mesData,backgroundColor:mesClrs,borderRadius:6,borderSkipped:false,label:'Ventas'},
-          {data:mesLabels.map(function(){return META_V;}),type:'line',label:'Meta',borderColor:'rgba(220,38,38,.5)',borderDash:[5,4],borderWidth:1.5,pointRadius:0,backgroundColor:'transparent',order:0}
+          {data:mesData,backgroundColor:mesClrs,borderRadius:6,borderSkipped:false,label:'Valor'},
+          {data:mesLabels.map(function(){return META_VAL;}),type:'line',label:'Meta valor',borderColor:'rgba(220,38,38,.5)',borderDash:[5,4],borderWidth:1.5,pointRadius:0,backgroundColor:'transparent',order:0}
         ]},
         options:{responsive:true,plugins:{
           legend:{display:false},
-          tooltip:{callbacks:{label:function(ctx){if(ctx.datasetIndex===1)return'Meta: '+META_V;var pp=Math.round(ctx.raw/META_V*100);return ctx.raw+' ventas ('+pp+'% meta)';}}}
+          tooltip:{callbacks:{label:function(c){if(c.datasetIndex===1)return'Meta: '+fmtC(META_VAL);var pp=Math.round(c.raw/META_VAL*100);return fmtC(c.raw)+' ('+pp+'% meta) · '+mesDataCnt[c.dataIndex]+' ventas';}}}
         },scales:{
-          y:{beginAtZero:true,grid:{color:'#EDEBE6'},ticks:{font:{family:'Syne',size:9,weight:'700'},color:'#555'},suggestedMax:Math.max(META_V+2,maxV+2)},
+          y:{beginAtZero:true,grid:{color:'#EDEBE6'},ticks:{font:{family:'Syne',size:9,weight:'700'},color:'#555',callback:function(v){return v>=1e9?'$'+(v/1e9).toFixed(1)+'B':v>=1e6?'$'+(v/1e6).toFixed(0)+'M':'$'+v;}},suggestedMax:Math.max(META_VAL*1.05,maxV*1.05)},
           x:{grid:{display:false},ticks:{font:{family:'Syne',size:9,weight:'600'},color:'#333'}}
         }}
       });
