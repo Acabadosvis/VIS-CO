@@ -382,6 +382,8 @@ body.modo-comite .brow{display:none!important}
   <div class="card">
     <div class="card-hd">&#128101; Clasificaci&#243;n de leads <span id="l-per" style="color:var(--o)"></span><span class="card-hd-sub">Referencia: Bitrix24 BI</span><button id="btn-leads-toggle" onclick="toggleFormSection('l-form-semanal','btn-leads-toggle','vc3_l0_col')" style="margin-left:auto;background:#E0F2FE;border:1.5px solid #7DD3FC;border-radius:6px;padding:3px 11px;font-size:.7rem;cursor:pointer;font-family:Syne,sans-serif;font-weight:700;color:#0369A1;white-space:nowrap">－ Ocultar</button><button id="btn-mes-leads" onclick="toggleMesLeads()" style="background:var(--gc);border:1.5px solid var(--brd);border-radius:6px;padding:3px 11px;font-size:.7rem;cursor:pointer;font-family:Syne,sans-serif;font-weight:700;color:var(--n)">&#128197; Vista mensual</button></div>
   <div id="l-form-semanal">
+  <!-- BASE REDES — auto Ángela -->
+  <div id="l-redes-banner" style="margin-bottom:12px"></div>
   <!-- SELECTOR PERFILADOR -->
   <div style="display:flex;gap:4px;margin-bottom:14px;padding:3px;background:var(--gc);border:1px solid var(--brd);border-radius:10px">
     <button id="btn-pf-M" onclick="selPF('M')" style="flex:1;padding:8px;font-family:Syne,sans-serif;font-weight:800;font-size:.72rem;border:none;border-radius:7px;cursor:pointer;background:var(--o);color:#fff">&#128100; Marcela</button>
@@ -477,40 +479,65 @@ body.modo-comite .brow{display:none!important}
     </div>
     <div class="brow"><button class="btn btn-o" onclick="savePF('A')">&#128190; Guardar Andr&#233;s</button><button class="btn btn-s" onclick="renderLeads()">&#8617; Cancelar</button></div>
   </div>
-    <!-- CIERRES SEMANA -->
-    <div style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:10px;padding:12px 14px;margin-bottom:12px">
-      <div style="font-size:.68rem;font-weight:700;color:#166534;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">&#127942; Cierres semana &#8212; <span id="l_ci_total_lbl" style="font-size:.85rem;font-weight:800;color:#16A34A">0</span> total <span style="font-weight:400;color:#4B7563">auto</span></div>
+    <!-- LEADS POR ALIANZA -->
+    <div style="background:#FAFAFA;border:1px solid #E2E8F0;border-top:3px solid #92400E;border-radius:10px;padding:12px 14px;margin-bottom:12px">
+      <div style="font-size:.68rem;font-weight:800;color:#78350F;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">&#127968; Leads por Alianza <span style="font-size:.6rem;font-weight:400;color:#94A3B8;background:#F1F5F9;border-radius:4px;padding:1px 6px;margin-left:6px">No cuentan en Bitrix</span></div>
+      <!-- Gran Central -->
+      <div style="border-left:3px solid #92400E;padding-left:10px;margin-bottom:10px">
+        <div style="font-size:.65rem;font-weight:700;color:#92400E;margin-bottom:6px;text-transform:uppercase">&#127968; Gran Central / Convenio</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="background:#fff;border:1.5px solid #D6B99A;border-radius:7px;padding:8px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#92400E;display:block;margin-bottom:3px">&#128222; Llegaron</label><input type="number" id="l_gc" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#92400E;background:transparent"></div>
+          <div style="background:#FFF8F0;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:3px">&#11088; Interesados</label><input type="number" id="l_gc_int" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#16A34A;background:transparent"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px">
+          <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:7px;padding:7px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#166534;display:block;margin-bottom:3px">&#127942; Cierres GC</label><input type="number" id="l_ci_gc" min="0" placeholder="0" oninput="calcCierres()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#166534;background:transparent"></div>
+        </div>
+      </div>
+      <!-- Lagom -->
+      <div style="border-left:3px solid #7C3AED;padding-left:10px;margin-bottom:10px">
+        <div style="font-size:.65rem;font-weight:700;color:#7C3AED;margin-bottom:6px;text-transform:uppercase">&#128156; Lagom</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="background:#fff;border:1.5px solid #C4B5FD;border-radius:7px;padding:8px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7C3AED;display:block;margin-bottom:3px">&#128222; Llegaron</label><input type="number" id="l_lag" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#7C3AED;background:transparent"></div>
+          <div style="background:#F5F3FF;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:3px">&#11088; Interesados</label><input type="number" id="l_lag_int" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#16A34A;background:transparent"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px">
+          <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:7px;padding:7px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#166534;display:block;margin-bottom:3px">&#127942; Cierres Lagom</label><input type="number" id="l_ci_lag" min="0" placeholder="0" oninput="calcCierres()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#166534;background:transparent"></div>
+        </div>
+      </div>
+      <!-- Corner View -->
+      <div style="border-left:3px solid #0891B2;padding-left:10px;margin-bottom:10px">
+        <div style="font-size:.65rem;font-weight:700;color:#0891B2;margin-bottom:6px;text-transform:uppercase">&#127774; Corner View</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="background:#fff;border:1.5px solid #93C5FD;border-radius:7px;padding:8px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#0891B2;display:block;margin-bottom:3px">&#128222; Llegaron</label><input type="number" id="l_cv" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#0891B2;background:transparent"></div>
+          <div style="background:#EFF6FF;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:3px">&#11088; Interesados</label><input type="number" id="l_cv_int" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#16A34A;background:transparent"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px">
+          <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:7px;padding:7px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#166534;display:block;margin-bottom:3px">&#127942; Cierres Corner View</label><input type="number" id="l_ci_cv" min="0" placeholder="0" oninput="calcCierres()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#166534;background:transparent"></div>
+        </div>
+      </div>
+      <!-- Credifamilia -->
+      <div style="border-left:3px solid #059669;padding-left:10px;margin-bottom:4px">
+        <div style="font-size:.65rem;font-weight:700;color:#059669;margin-bottom:6px;text-transform:uppercase">&#128179; Credifamilia</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="background:#fff;border:1.5px solid #6EE7B7;border-radius:7px;padding:8px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:3px">&#128222; Llegaron</label><input type="number" id="l_cred" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#059669;background:transparent"></div>
+          <div style="background:#ECFDF5;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:3px">&#11088; Interesados</label><input type="number" id="l_cred_int" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#16A34A;background:transparent"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px">
+          <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:7px;padding:7px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#166534;display:block;margin-bottom:3px">&#127942; Cierres Credifamilia</label><input type="number" id="l_ci_cred" min="0" placeholder="0" oninput="calcCierres()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#166534;background:transparent"></div>
+        </div>
+      </div>
+    </div>
+    <!-- CIERRES ORGÁNICOS — AL FINAL -->
+    <div style="background:#F0FDF4;border:1px solid #86EFAC;border-top:3px solid #16A34A;border-radius:10px;padding:12px 14px;margin-bottom:12px">
+      <div style="font-size:.68rem;font-weight:700;color:#166534;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">&#127942; Cierres org&#225;nicos Bitrix &#8212; <span id="l_ci_total_lbl" style="font-size:.85rem;font-weight:800;color:#16A34A">0</span> total <span style="font-weight:400;color:#4B7563">auto</span></div>
       <input type="number" id="l_ci" style="display:none" min="0" value="0">
       <div class="fg" style="grid-template-columns:repeat(auto-fill,minmax(145px,1fr));margin-bottom:0">
         <div class="fl" style="border-left:3px solid #16A34A;padding-left:8px"><label style="color:#16A34A">&#127822; Org&#225;nicos esta sem.</label><input type="number" id="l_ci_org" min="0" placeholder="0" oninput="calcCierres()"></div>
         <div class="fl" style="border-left:3px solid #65A30D;padding-left:8px"><label style="color:#65A30D">&#128197; Org&#225;nicos sems. ant.</label><input type="number" id="l_ci_ant" min="0" placeholder="0" oninput="calcCierres()"></div>
-        <div class="fl" style="border-left:3px solid #92400E;padding-left:8px"><label style="color:#92400E">&#127968; Alianza Gran Central</label><input type="number" id="l_ci_gc" min="0" placeholder="0" oninput="calcCierres()"></div>
-        <div class="fl" style="border-left:3px solid #7C3AED;padding-left:8px"><label style="color:#7C3AED">&#128156; Alianza Lagom</label><input type="number" id="l_ci_lag" min="0" placeholder="0" oninput="calcCierres()"></div>
-        <div class="fl" style="border-left:3px solid #0891B2;padding-left:8px"><label style="color:#0891B2">&#127774; Alianza Corner View</label><input type="number" id="l_ci_cv" min="0" placeholder="0" oninput="calcCierres()"></div>
-        <div class="fl" style="border-left:3px solid #059669;padding-left:8px"><label style="color:#059669">&#128179; Alianza Credifamilia</label><input type="number" id="l_ci_cred" min="0" placeholder="0" oninput="calcCierres()"></div>
-      </div>
-    </div>
-    <!-- LEADS POR ALIANZA -->
-    <div class="sec" style="margin-top:4px">Leads por alianza <span style="font-size:.72rem;color:#888;font-weight:400">&#8212; No cuentan en el embudo de calculadora</span></div>
-    <div class="fg">
-      <div class="fl" style="border-left:3px solid #92400E;padding-left:9px"><label style="color:#92400E">&#127968; Gran Central / Convenio</label><input type="number" id="l_gc" min="0" placeholder="0" style="border-color:#92400E"></div>
-      <div class="fl" style="border-left:3px solid #7C3AED;padding-left:9px"><label style="color:#7C3AED">&#128156; Lagom</label><input type="number" id="l_lag" min="0" placeholder="0" style="border-color:#7C3AED"></div>
-      <div class="fl" style="border-left:3px solid #0891B2;padding-left:9px"><label style="color:#0891B2">&#127774; Corner View</label><input type="number" id="l_cv" min="0" placeholder="0" style="border-color:#0891B2"></div>
-      <div class="fl" style="border-left:3px solid #059669;padding-left:9px"><label style="color:#059669">&#128179; Credifamilia</label><input type="number" id="l_cred" min="0" placeholder="0" style="border-color:#059669"></div>
-    </div>
-    <!-- REMODELACIONES — NM -->
-    <div style="background:#FFF7ED;border:1px solid #FED7AA;border-top:3px solid #F97316;border-radius:10px;padding:12px 14px;margin-bottom:12px">
-      <div style="font-size:.68rem;font-weight:700;color:#C2410C;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">&#128296; Remodelaciones <span style="font-size:.62rem;background:#F97316;color:#fff;border-radius:4px;padding:1px 6px;margin-left:4px;font-weight:700">NM · Nathalia</span></div>
-      <div class="fg" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr));margin-bottom:0">
-        <div class="fl" style="border-left:3px solid #F97316;padding-left:8px"><label style="color:#C2410C">&#128221; Llegaron</label><input type="number" id="l_remo_tot" min="0" placeholder="0" style="border-color:#FED7AA"></div>
-        <div class="fl" style="border-left:3px solid #16A34A;padding-left:8px"><label style="color:#15803D">&#11088; Interesados</label><input type="number" id="l_remo_int" min="0" placeholder="0" style="border-color:#86EFAC"></div>
-        <div class="fl" style="border-left:3px solid #FB923C;padding-left:8px"><label style="color:#C2410C">&#128197; Reun. agend.</label><input type="number" id="l_remo_ag" min="0" placeholder="0" style="border-color:#FED7AA"></div>
-        <div class="fl" style="border-left:3px solid #EA580C;padding-left:8px"><label style="color:#C2410C">&#9989; Reun. ef.</label><input type="number" id="l_remo_ef" min="0" placeholder="0" style="border-color:#FED7AA"></div>
-        <div class="fl" style="border-left:3px solid #9A3412;padding-left:8px"><label style="color:#9A3412">&#127942; Cierres</label><input type="number" id="l_remo_ci" min="0" placeholder="0" style="border-color:#FED7AA"></div>
       </div>
     </div>
     <div class="brow">
-      <button class="btn btn-o" onclick="saveLeads()">&#128190; Guardar leads</button>
+      <button class="btn btn-o" onclick="saveLeads()">&#128190; Guardar semana</button>
       <button class="btn btn-s" onclick="renderLeads()">&#8617; Cancelar</button>
     </div>
   </div>
@@ -519,7 +546,23 @@ body.modo-comite .brow{display:none!important}
   <div id="l-kpis" class="kg"></div>
   <div id="l-ver-kpi" class="kg" style="display:none"></div>
   <div id="l-funnel" class="fn-wrap"></div>
-  <div id="l-remo-funnel" class="fn-wrap" style="margin-top:10px;border-top:2px solid #FED7AA;padding-top:10px"></div>
+  <!-- REMODELACIONES — pipeline dedicado -->
+  <div class="card" id="card-remo" style="margin-top:14px;border-top:3px solid #F97316">
+    <div class="card-hd" style="color:#C2410C">&#128296; Remodelaciones <span style="font-size:.7rem;font-weight:600;color:#EA580C;background:#FFF7ED;border:1px solid #FED7AA;border-radius:4px;padding:1px 8px;margin-left:6px">NM · Nathalia</span></div>
+    <!-- FORM REMO -->
+    <div id="remo-form-wrap">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:10px">
+        <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#C2410C;display:block;margin-bottom:3px">&#128222; Llegaron</label><input type="number" id="l_remo_tot" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#C2410C;background:transparent"></div>
+        <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:3px">&#11088; Interesados</label><input type="number" id="l_remo_int" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#16A34A;background:transparent"></div>
+        <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#EA580C;display:block;margin-bottom:3px">&#128197; Reun. agendadas</label><input type="number" id="l_remo_ag" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#EA580C;background:transparent"></div>
+        <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:3px">&#9989; Reun. efectivas</label><input type="number" id="l_remo_ef" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#059669;background:transparent"></div>
+        <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-top:2px solid #166534;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#166534;display:block;margin-bottom:3px">&#127942; Cierres Remo</label><input type="number" id="l_remo_ci" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#166534;background:transparent"></div>
+      </div>
+      <div class="brow"><button class="btn btn-o" style="background:#F97316" onclick="saveLeads()">&#128190; Guardar Remodelaciones</button></div>
+    </div>
+    <!-- FUNNEL REMO -->
+    <div id="l-remo-funnel" class="fn-wrap" style="margin-top:10px;border-top:2px solid #FED7AA;padding-top:10px"></div>
+  </div>
   <div id="l-form-mes"></div>
   <div id="l-ins" class="ins" style="display:none"></div>
   <div id="l-cmp"></div>
@@ -913,7 +956,7 @@ function renderRedes(){
 }
 
 /* ═══ LEADS ═══ */
-const LF=[['total','l_total'],['wpp','l_wpp'],['wpp_calc','l_wpp_calc'],['cno','l_cno'],['sr','l_sr'],['sr2','l_sr2'],['ni','l_ni'],['int','l_int'],['vig','l_vig'],['vig_no','l_vig_no'],['ci','l_ci'],['ci_org','l_ci_org'],['ci_ant','l_ci_ant'],['ci_gc','l_ci_gc'],['ci_lag','l_ci_lag'],['ci_cv','l_ci_cv'],['ci_cred','l_ci_cred'],['ver','l_ver'],['nver','l_nver'],['gc','l_gc'],['cv','l_cv'],['lag','l_lag'],['cred','l_cred'],['remo_tot','l_remo_tot'],['remo_int','l_remo_int'],['remo_ag','l_remo_ag'],['remo_ef','l_remo_ef'],['remo_ci','l_remo_ci']];
+const LF=[['total','l_total'],['wpp','l_wpp'],['wpp_calc','l_wpp_calc'],['cno','l_cno'],['sr','l_sr'],['sr2','l_sr2'],['ni','l_ni'],['int','l_int'],['vig','l_vig'],['vig_no','l_vig_no'],['ci','l_ci'],['ci_org','l_ci_org'],['ci_ant','l_ci_ant'],['ci_gc','l_ci_gc'],['ci_lag','l_ci_lag'],['ci_cv','l_ci_cv'],['ci_cred','l_ci_cred'],['ver','l_ver'],['nver','l_nver'],['gc','l_gc'],['gc_int','l_gc_int'],['cv','l_cv'],['cv_int','l_cv_int'],['lag','l_lag'],['lag_int','l_lag_int'],['cred','l_cred'],['cred_int','l_cred_int'],['remo_tot','l_remo_tot'],['remo_int','l_remo_int'],['remo_ag','l_remo_ag'],['remo_ef','l_remo_ef'],['remo_ci','l_remo_ci']];
 function calcNI(){
   var tot=parseInt(document.getElementById('l_total')?.value||'0')||0;
   var ver=parseInt(document.getElementById('l_ver')?.value||'0')||0;
@@ -959,6 +1002,26 @@ async function saveLeads(){
   }catch(e){
     if(btn){btn.textContent='⚠️ Sin conexión — guardado local';setTimeout(function(){btn.innerHTML='💾 Guardar leads';},2000);}
   }
+}
+function renderRemo(){
+  var tot=parseInt(document.getElementById('l_remo_tot')?.value)||0;
+  var int2=parseInt(document.getElementById('l_remo_int')?.value)||0;
+  var ag=parseInt(document.getElementById('l_remo_ag')?.value)||0;
+  var ef=parseInt(document.getElementById('l_remo_ef')?.value)||0;
+  var ci=parseInt(document.getElementById('l_remo_ci')?.value)||0;
+  var fEl=document.getElementById('l-remo-funnel');
+  if(!fEl)return;
+  if(tot<=0){fEl.innerHTML='';return;}
+  var mx=Math.max(tot,1);
+  function fR(v,col,lbl,pct){if(v<=0)return'';var pw=Math.max(4,Math.round(v/mx*100));return'<div class="fn-row"><div class="fn-lbl">'+lbl+'</div><div class="fn-bar-wrap"><div class="fn-bar" style="width:'+pw+'%;background:'+col+'"><span style="padding:0 6px;font-weight:700;font-size:.72rem;color:#fff">'+v+'</span></div></div><div class="fn-conv" style="font-size:.7rem;font-weight:700;color:#555;text-align:right">'+pct+'</div></div>';}
+  var html='<div class="fn-title" style="color:#C2410C">&#128296; Pipeline Remodelaciones</div>';
+  html+=fR(tot,'#F97316','&#128221; Llegaron','100%');
+  html+=fR(int2,'#16A34A','&#11088; Interesados',tot>0?Math.round(int2/tot*100)+'%':'');
+  html+=fR(ag,'#2563EB','&#128197; Reuniones agendadas',int2>0?Math.round(ag/int2*100)+'% de int':'');
+  html+=fR(ef,'#059669','&#9989; Reuniones efectivas',ag>0?Math.round(ef/ag*100)+'% de agend':'');
+  html+=fR(ci,'#9A3412','&#127942; Cierres Remo',ef>0?Math.round(ci/ef*100)+'% de ef':tot>0?Math.round(ci/tot*100)+'%':'');
+  if(!ci)html+='<div style="padding:6px 12px;background:#FFF7ED;border-radius:6px;border:1px dashed #FED7AA;font-size:.72rem;color:#C2410C;margin-top:4px">Sin cierres remo esta semana</div>';
+  fEl.innerHTML=html;
 }
 function calcCierres(){
   var org=parseInt(document.getElementById('l_ci_org')?.value)||0;
@@ -1379,6 +1442,32 @@ function renderLeads(){
     if(el)el.value=(d2[k]||0)>0?d2[k]:'';
   });
   calcCierres();
+  /* ── BANNER BASE REDES (Ángela) ── */
+  var rBanner=document.getElementById('l-redes-banner');
+  if(rBanner){
+    var rWpp=rD2.wpp||0,rWppCalc=rD2.wpp_calc||0,rTotal=d2.total||0,rVer=d2.ver||0,rMsj=rD2.mensajes||d2.sr||0;
+    var hasBanner=rWpp>0||rTotal>0;
+    if(hasBanner){
+      function rCard(bg,col,lbl,val,sub){return'<div style="background:'+bg+';border:1.5px solid '+col+'40;border-top:2px solid '+col+';border-radius:8px;padding:9px 11px;text-align:center"><div style="font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:'+col+';margin-bottom:2px">'+lbl+'</div><div style="font-size:1.25rem;font-weight:800;color:'+col+'">'+val+'</div>'+(sub?'<div style="font-size:.6rem;color:#888;margin-top:1px">'+sub+'</div>':'')+'</div>';}
+      var bannerHTML='<div style="background:linear-gradient(135deg,#F0FDF4,#EFF6FF);border:1px solid #BFDBFE;border-left:3px solid #0891B2;border-radius:10px;padding:8px 12px;margin-bottom:2px">';
+      bannerHTML+='<div style="font-size:.6rem;font-weight:800;color:#0891B2;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">&#9889; Base semanal &#8212; Datos de Redes (auto) · '+wShort(p2)+'</div>';
+      bannerHTML+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:7px">';
+      if(rWpp>0)bannerHTML+=rCard('#F0FDF4','#059669','&#128172; WPP llegaron',rWpp,'');
+      if(rWppCalc>0)bannerHTML+=rCard('#FFF8F0','#F97316','&#129518; WPP → Calc',rWppCalc,rWpp>0?Math.round(rWppCalc/rWpp*100)+'% conv.':'');
+      if(rTotal>0)bannerHTML+=rCard('#FFF8F0','#F97316','&#129518; Calc Bitrix',rTotal,'todas fuentes');
+      if(rVer>0)bannerHTML+=rCard('#EFF6FF','#0891B2','&#9989; Verificadas',rVer,rTotal>0?Math.round(rVer/rTotal*100)+'% de calc':'');
+      var rNver=(rTotal>0&&rVer>0)?Math.max(0,rTotal-rVer):0;
+      if(rNver>0)bannerHTML+=rCard('#F8FAFC','#64748B','&#10060; No verif.',rNver,rTotal>0?Math.round(rNver/rTotal*100)+'% de calc':'');
+      /* Lógica: qué % gestionan los perfiladores */
+      var totPFasig=(mCalAsig||0)+(aCalAsig||0);
+      if(totPFasig>0&&rTotal>0){
+        var cob=Math.round(totPFasig/rTotal*100);
+        bannerHTML+='<div style="grid-column:1/-1;margin-top:4px;padding:6px 10px;background:rgba(249,115,22,.08);border-radius:6px;border:1px dashed #FDBA74;font-size:.65rem;color:#C2410C;font-weight:700">&#128203; Equipo gestion&#243; '+totPFasig+' / '+rTotal+' calculadoras ('+cob+'% cobertura)</div>';
+      }
+      bannerHTML+='</div></div>';
+      rBanner.innerHTML=bannerHTML;
+    }else{rBanner.innerHTML='';}
+  }
   /* poblar perfiladores */
   loadPF();
   /* datos perfiladores — pipeline unificado */
@@ -1584,7 +1673,7 @@ function renderLeads(){
       {label:'Interesados',data:int6,borderColor:'#16A34A',backgroundColor:'rgba(22,163,74,.08)',fill:true}
     ]);
   },80);
-
+  renderRemo();
 }
 
 function renderAlianzas(){
