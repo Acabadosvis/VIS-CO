@@ -1699,7 +1699,11 @@ function renderLeads(){
   /* ── LISTA DE CHEQUEO ── */
   var clEl=document.getElementById('l-checklist');
   if(clEl){
-    var rWppR=rD2.wpp||0,rCalR=d2.total||0;
+    var rWppR=rD2.wpp||0,rBitrixR=rD2.cli_calc||0,rVerR=rD2.cli_ver||0;
+    /* Reuniones Karen+Nathalia */
+    var allC2=gLS(LS_C);var curC2=allC2[p2.sISO]||{};
+    var knReuAg=(curC2.KM?.prog||0)+(curC2.NM?.prog||0);
+    var knReuEf=(curC2.KM?.ef||0)+(curC2.NM?.ef||0);
     function fmtPesos(m){return m>0?'$'+m+'M':'—';}
     function clRow(lbl,mV,aV,ref,col){
       var tot=mV+aV;var ok=ref>0?(tot===ref):true;
@@ -1713,27 +1717,32 @@ function renderLeads(){
         (ref>0?'<td style="text-align:right;padding:5px 8px;font-size:.7rem;color:#64748B">'+ref+'</td>':'<td></td>')+
         '</tr>';
     }
+    /* helper para separador de sección */
+    function clSec(txt,col){return'<tr><td colspan="5" style="padding:4px 8px 2px;background:'+col+'15;font-size:.6rem;font-weight:800;color:'+col+';text-transform:uppercase;letter-spacing:.4px;border-top:2px solid '+col+'30">'+txt+'</td></tr>';}
     var clHtml='<div style="background:#fff;border:1px solid #E2E8F0;border-top:3px solid #1E40AF;border-radius:10px;padding:12px 14px;margin-bottom:12px">';
-    clHtml+='<div style="font-size:.68rem;font-weight:800;color:#1E40AF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">&#9989; Lista de chequeo &#8212; Pipeline perfiladores vs Redes · '+wShort(p2)+'</div>';
+    clHtml+='<div style="font-size:.68rem;font-weight:800;color:#1E40AF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">&#9989; Lista de chequeo &#8212; Redes · Leads · Reuniones · '+wShort(p2)+'</div>';
     clHtml+='<table style="width:100%;border-collapse:collapse">';
-    clHtml+='<thead><tr style="background:#F8FAFC"><th style="text-align:left;padding:5px 8px;font-size:.62rem;color:#64748B;text-transform:uppercase;border-bottom:1px solid #E2E8F0">Indicador</th><th style="text-align:right;padding:5px 8px;font-size:.62rem;color:#0891B2">Marcela</th><th style="text-align:right;padding:5px 8px;font-size:.62rem;color:#7C3AED">Andr&#233;s</th><th style="text-align:right;padding:5px 8px;font-size:.62rem;color:#1E40AF">Total</th><th style="text-align:right;padding:5px 8px;font-size:.62rem;color:#64748B">Ref.Redes</th></tr></thead>';
+    clHtml+='<thead><tr style="background:#F8FAFC"><th style="text-align:left;padding:5px 8px;font-size:.62rem;color:#64748B;text-transform:uppercase;border-bottom:1px solid #E2E8F0">Indicador</th><th style="text-align:right;padding:5px 8px;font-size:.62rem;color:#0891B2">Marcela</th><th style="text-align:right;padding:5px 8px;font-size:.62rem;color:#7C3AED">Andr&#233;s</th><th style="text-align:right;padding:5px 8px;font-size:.62rem;color:#1E40AF">Total</th><th style="text-align:right;padding:5px 8px;font-size:.62rem;color:#64748B">REF.</th></tr></thead>';
     clHtml+='<tbody>';
-    clHtml+=clRow('&#128172; Chats ManyChat asignados',mWppAsig,aWppAsig,rWppR,'#059669');
+    /* ─ SECCIÓN 1: ManyChat vs Redes Ángela ─ */
+    clHtml+=clSec('&#128172; ManyChat / WhatsApp &mdash; vs. Redes (&#193;ngela)','#059669');
+    clHtml+=clRow('Chats ManyChat asignados',mWppAsig,aWppAsig,rWppR,'#059669');
     clHtml+=clRow('&nbsp;&nbsp;├ Env&#237;a cotizaci&#243;n',mMcCot,aMcCot,0,'#0891B2');
     clHtml+=clRow('&nbsp;&nbsp;├ Agenda reuni&#243;n',mMcReu,aMcReu,0,'#EA580C');
-    clHtml+=clRow('&nbsp;&nbsp;├ No contesta',mMcNc,aMcNc,0,'#64748B');
-    clHtml+=clRow('&nbsp;&nbsp;└ Alianzas (GC+CV+Cred)',mMcAliGc+mMcAliCv+mMcAliCred,aMcAliGc+aMcAliCv+aMcAliCred,0,'#92400E');
-    clHtml+='<tr><td colspan="5" style="padding:2px;background:#F1F5F9"></td></tr>';
-    clHtml+=clRow('&#129518; Bitrix llegan',mCalAsig,aCalAsig,rCalR,'#F97316');
+    clHtml+=clRow('&nbsp;&nbsp;└ No contesta',mMcNc,aMcNc,0,'#64748B');
+    /* ─ SECCIÓN 2: Bitrix vs Redes Ángela ─ */
+    clHtml+=clSec('&#129518; Bitrix &mdash; vs. Redes (&#193;ngela)','#F97316');
+    clHtml+=clRow('Bitrix llegan',mCalAsig,aCalAsig,rBitrixR,'#F97316');
     clHtml+=clRow('&nbsp;&nbsp;├ Atienden y responden',mCalResp,aCalResp,0,'#16A34A');
     clHtml+=clRow('&nbsp;&nbsp;├ Hacen la calculadora',mCalHace,aCalHace,0,'#059669');
-    clHtml+=clRow('&nbsp;&nbsp;├ Verificadas',mCalVer,aCalVer,0,'#0891B2');
-    clHtml+=clRow('&nbsp;&nbsp;└ No contactados: 1vc.+'+(mCalNcV1+aCalNcV1)+' / calc.+'+(mCalNcV2+aCalNcV2)+' / post.+'+(mCalNcV3+aCalNcV3),mCalNcV1+mCalNcV2+mCalNcV3,aCalNcV1+aCalNcV2+aCalNcV3,0,'#DC2626');
-    clHtml+='<tr><td colspan="5" style="padding:2px;background:#F1F5F9"></td></tr>';
-    clHtml+=clRow('&#128197; Reuniones agendadas',mReuAg,aReuAg,0,'#2563EB');
+    clHtml+=clRow('&nbsp;&nbsp;├ Verificadas',mCalVer,aCalVer,rVerR,'#0891B2');
+    clHtml+=clRow('&nbsp;&nbsp;└ No contactados',mCalNcV1+mCalNcV2+mCalNcV3,aCalNcV1+aCalNcV2+aCalNcV3,0,'#DC2626');
+    /* ─ SECCIÓN 3: Reuniones vs Karen+Nathalia ─ */
+    clHtml+=clSec('&#128197; Reuniones &mdash; vs. Karen + Nathalia','#2563EB');
+    clHtml+=clRow('Agendadas',mReuAg,aReuAg,knReuAg,'#2563EB');
     clHtml+=clRow('&nbsp;&nbsp;├ Confirmadas 24h antes',mReuConf24,aReuConf24,0,'#D97706');
     clHtml+=clRow('&nbsp;&nbsp;├ Reagendadas',mReuReag,aReuReag,0,'#4F46E5');
-    clHtml+=clRow('&nbsp;&nbsp;└ Efectivas',mReuEf,aReuEf,0,'#16A34A');
+    clHtml+=clRow('&nbsp;&nbsp;└ Efectivas',mReuEf,aReuEf,knReuEf,'#16A34A');
     clHtml+='</tbody></table></div>';
     clEl.innerHTML=clHtml;
   }
