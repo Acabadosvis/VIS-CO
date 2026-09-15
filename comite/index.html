@@ -1812,7 +1812,7 @@ function renderLeads(){
       '<td class="tr">'+dH(v1,v0,cat.k!='int'&&cat.k!='ver')+'</td>'+
       '<td class="tr">'+dH(v2,v1,cat.k!='int'&&cat.k!='ver')+'</td></tr>';
   }).join('');
-  var calc0=d0.total||0,calc1=d1.total||0;
+  var calc0=d0.total||0,calc1=d1.total||0,calc2=d2.total||0;
   var convRow='<tr style="background:#EFF6FF"><td class="mc" style="font-size:.68rem;color:#0891B2;font-weight:700">% Verificados / Calc.</td>'+
     '<td class="tr" style="font-size:.72rem;color:#0891B2;font-weight:700">'+(calc0>0?Math.round(ver0/calc0*100)+'%':'—')+'</td>'+
     '<td class="tr" style="font-size:.72rem;color:#0891B2;font-weight:700">'+(calc1>0?Math.round(ver1/calc1*100)+'%':'—')+'</td>'+
