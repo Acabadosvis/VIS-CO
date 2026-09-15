@@ -386,10 +386,7 @@ body.modo-comite .brow{display:none!important}
   <!-- BASE REDES — auto Ángela -->
   <div id="l-redes-banner" style="margin-bottom:12px"></div>
   <!-- SELECTOR PERFILADOR -->
-  <div style="display:flex;gap:4px;margin-bottom:14px;padding:3px;background:var(--gc);border:1px solid var(--brd);border-radius:10px">
-    <button id="btn-pf-M" onclick="selPF('M')" style="flex:1;padding:8px;font-family:Syne,sans-serif;font-weight:800;font-size:.72rem;border:none;border-radius:7px;cursor:pointer;background:var(--o);color:#fff">&#128100; Marcela</button>
-    <button id="btn-pf-A" onclick="selPF('A')" style="flex:1;padding:8px;font-family:Syne,sans-serif;font-weight:800;font-size:.72rem;border:none;border-radius:7px;cursor:pointer;background:transparent;color:var(--g)">&#128100; Andr&#233;s S.</button>
-  </div>
+  <div style="font-size:.7rem;font-weight:800;color:var(--o);text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--o)30;padding-bottom:4px;margin-bottom:12px">&#128101; Perfiladores de semana</div>
   <!-- ═══ MARCELA ═══ -->
   <div id="pf-M">
     <!-- MANYCHAT -->
@@ -475,12 +472,19 @@ body.modo-comite .brow{display:none!important}
             <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:6px;padding:7px 9px"><label style="font-size:.56rem;font-weight:700;text-transform:uppercase;color:#16A34A;display:block;margin-bottom:2px">Interesados</label><input type="number" id="mf_ali_cred_int" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#16A34A;background:transparent"></div>
           </div>
         </div>
+        <div style="border-left:3px solid #7C3AED;padding-left:8px">
+          <div style="font-size:.6rem;font-weight:700;color:#7C3AED;margin-bottom:5px;text-transform:uppercase">Cantoval</div>
+          <div style="display:grid;gap:5px">
+            <div style="background:#F5F3FF;border:1.5px solid #C4B5FD;border-radius:6px;padding:7px 9px"><label style="font-size:.56rem;font-weight:700;text-transform:uppercase;color:#7C3AED;display:block;margin-bottom:2px">Llegaron</label><input type="number" id="mf_ali_cant" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#7C3AED;background:transparent"></div>
+            <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:6px;padding:7px 9px"><label style="font-size:.56rem;font-weight:700;text-transform:uppercase;color:#16A34A;display:block;margin-bottom:2px">Interesados</label><input type="number" id="mf_ali_cant_int" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#16A34A;background:transparent"></div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="brow"><button class="btn btn-o" onclick="savePF('M')">&#128190; Guardar Marcela</button><button class="btn btn-s" onclick="renderLeads()">&#8617; Cancelar</button></div>
   </div>
   <!-- ═══ ANDRÉS ═══ -->
-  <div id="pf-A" style="display:none">
+  <div id="pf-A">
     <!-- MANYCHAT -->
     <div class="sec" style="color:#059669;margin-bottom:6px">&#128172; ManyChat &#8212; Chats asignados</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:6px">
@@ -563,6 +567,13 @@ body.modo-comite .brow{display:none!important}
           <div style="display:grid;gap:5px">
             <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:6px;padding:7px 9px"><label style="font-size:.56rem;font-weight:700;text-transform:uppercase;color:#059669;display:block;margin-bottom:2px">Llegaron</label><input type="number" id="af_ali_cred" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#059669;background:transparent"></div>
             <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:6px;padding:7px 9px"><label style="font-size:.56rem;font-weight:700;text-transform:uppercase;color:#16A34A;display:block;margin-bottom:2px">Interesados</label><input type="number" id="af_ali_cred_int" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#16A34A;background:transparent"></div>
+          </div>
+        </div>
+        <div style="border-left:3px solid #7C3AED;padding-left:8px">
+          <div style="font-size:.6rem;font-weight:700;color:#7C3AED;margin-bottom:5px;text-transform:uppercase">Cantoval</div>
+          <div style="display:grid;gap:5px">
+            <div style="background:#F5F3FF;border:1.5px solid #C4B5FD;border-radius:6px;padding:7px 9px"><label style="font-size:.56rem;font-weight:700;text-transform:uppercase;color:#7C3AED;display:block;margin-bottom:2px">Llegaron</label><input type="number" id="af_ali_cant" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#7C3AED;background:transparent"></div>
+            <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:6px;padding:7px 9px"><label style="font-size:.56rem;font-weight:700;text-transform:uppercase;color:#16A34A;display:block;margin-bottom:2px">Interesados</label><input type="number" id="af_ali_cant_int" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#16A34A;background:transparent"></div>
           </div>
         </div>
       </div>
@@ -1165,13 +1176,13 @@ function selPF(pf){
   _curPF=pf;
   var mDiv=document.getElementById('pf-M'),aDiv=document.getElementById('pf-A');
   var btnM=document.getElementById('btn-pf-M'),btnA=document.getElementById('btn-pf-A');
-  if(mDiv)mDiv.style.display=pf==='M'?'':'none';
-  if(aDiv)aDiv.style.display=pf==='A'?'':'none';
+  if(mDiv)mDiv.style.display='';
+  if(aDiv)aDiv.style.display='';
   if(btnM){btnM.style.background=pf==='M'?'var(--o)':'transparent';btnM.style.color=pf==='M'?'#fff':'var(--g)';}
   if(btnA){btnA.style.background=pf==='A'?'var(--o)':'transparent';btnA.style.color=pf==='A'?'#fff':'var(--g)';}
 }
 /* IDs de campos por perfilador — mismo pipeline para M y A */
-var PF_UNIFIED=['wpp_asig','mc_cot','mc_reu','mc_nc','mc_otros','mc_ali_gc','mc_ali_cv','mc_ali_cred','cal_asig','cal_ver','cal_inc','cal_nver','cal_dup','cal_resp','cal_hace','cal_nc_v1','cal_nc_v2','cal_nc_v3','ver_resp','ver_sr','ver_ciu','ver_ni','nver_resp','nver_comp','nver_cob','nver_ni','nver_real','reu_ag','reu_conf24','reu_reag','reu_ef','reu_pot','ali_gc','ali_gc_int','ali_cv','ali_cv_int','ali_cred','ali_cred_int'];
+var PF_UNIFIED=['wpp_asig','mc_cot','mc_reu','mc_nc','mc_otros','mc_ali_gc','mc_ali_cv','mc_ali_cred','cal_asig','cal_ver','cal_inc','cal_nver','cal_dup','cal_resp','cal_hace','cal_nc_v1','cal_nc_v2','cal_nc_v3','ver_resp','ver_sr','ver_ciu','ver_ni','nver_resp','nver_comp','nver_cob','nver_ni','nver_real','reu_ag','reu_conf24','reu_reag','reu_ef','reu_pot','ali_gc','ali_gc_int','ali_cv','ali_cv_int','ali_cred','ali_cred_int','ali_cant','ali_cant_int'];
 const PF_FIELDS={M:PF_UNIFIED,A:PF_UNIFIED};
 function loadPF(){
   var key=getPer().sISO;
@@ -1615,7 +1626,7 @@ function renderLeads(){
   var mWppAsig=pfM.wpp_asig||0;
   var mMcCot=pfM.mc_cot||0,mMcReu=pfM.mc_reu||0,mMcNc=pfM.mc_nc||0,mMcOtros=pfM.mc_otros||0;
   var mMcAliGc=pfM.mc_ali_gc||0,mMcAliCv=pfM.mc_ali_cv||0,mMcAliCred=pfM.mc_ali_cred||0;
-  var mAliGc=pfM.ali_gc||0,mAliGcInt=pfM.ali_gc_int||0,mAliCv=pfM.ali_cv||0,mAliCvInt=pfM.ali_cv_int||0,mAliCred=pfM.ali_cred||0,mAliCredInt=pfM.ali_cred_int||0;
+  var mAliGc=pfM.ali_gc||0,mAliGcInt=pfM.ali_gc_int||0,mAliCv=pfM.ali_cv||0,mAliCvInt=pfM.ali_cv_int||0,mAliCred=pfM.ali_cred||0,mAliCredInt=pfM.ali_cred_int||0,mAliCant=pfM.ali_cant||0,mAliCantInt=pfM.ali_cant_int||0;
   /* Marcela — Bitrix */
   var mCalAsig=pfM.cal_asig||0,mCalResp=pfM.cal_resp||0,mCalHace=pfM.cal_hace||0;
   var mCalVer=pfM.cal_ver||0,mCalInc=pfM.cal_inc||0,mCalNver=pfM.cal_nver||0,mCalDup=pfM.cal_dup||0;
@@ -1628,7 +1639,7 @@ function renderLeads(){
   var aWppAsig=pfA.wpp_asig||0;
   var aMcCot=pfA.mc_cot||0,aMcReu=pfA.mc_reu||0,aMcNc=pfA.mc_nc||0,aMcOtros=pfA.mc_otros||0;
   var aMcAliGc=pfA.mc_ali_gc||0,aMcAliCv=pfA.mc_ali_cv||0,aMcAliCred=pfA.mc_ali_cred||0;
-  var aAliGc=pfA.ali_gc||0,aAliGcInt=pfA.ali_gc_int||0,aAliCv=pfA.ali_cv||0,aAliCvInt=pfA.ali_cv_int||0,aAliCred=pfA.ali_cred||0,aAliCredInt=pfA.ali_cred_int||0;
+  var aAliGc=pfA.ali_gc||0,aAliGcInt=pfA.ali_gc_int||0,aAliCv=pfA.ali_cv||0,aAliCvInt=pfA.ali_cv_int||0,aAliCred=pfA.ali_cred||0,aAliCredInt=pfA.ali_cred_int||0,aAliCant=pfA.ali_cant||0,aAliCantInt=pfA.ali_cant_int||0;
   /* Andrés — Bitrix */
   var aCalAsig=pfA.cal_asig||0,aCalResp=pfA.cal_resp||0,aCalHace=pfA.cal_hace||0;
   var aCalVer=pfA.cal_ver||0,aCalInc=pfA.cal_inc||0,aCalNver=pfA.cal_nver||0,aCalDup=pfA.cal_dup||0;
@@ -1691,7 +1702,7 @@ function renderLeads(){
     function fmtPesos(m){return m>0?'$'+m+'M':'—';}
     function clRow(lbl,mV,aV,ref,col){
       var tot=mV+aV;var ok=ref>0?(tot===ref):true;
-      var icon=ref>0?(ok?'✅':'⚠️'):'';
+      var icon=ref>0?(ok?'✅':'❌'):'';
       var diff=ref>0?(tot-ref):0;
       var diffTxt=ref>0&&!ok?'<span style="color:#DC2626;font-size:.65rem"> (dif.'+diff+')</span>':'';
       return'<tr><td style="padding:5px 8px;font-size:.72rem;color:#334155">'+icon+' '+lbl+'</td>'+
@@ -1722,6 +1733,15 @@ function renderLeads(){
     clHtml+=clRow('&nbsp;&nbsp;├ Confirmadas 24h antes',mReuConf24,aReuConf24,0,'#D97706');
     clHtml+=clRow('&nbsp;&nbsp;├ Reagendadas',mReuReag,aReuReag,0,'#4F46E5');
     clHtml+=clRow('&nbsp;&nbsp;└ Efectivas',mReuEf,aReuEf,0,'#16A34A');
+    clHtml+='<tr><td colspan="5" style="padding:2px;background:#F1F5F9"></td></tr>';
+    clHtml+=clRow('&#129309; Alianzas — GC llegaron',mAliGc,aAliGc,0,'#92400E');
+    clHtml+=clRow('&nbsp;&nbsp;&#11088; GC interesados',mAliGcInt,aAliGcInt,0,'#92400E');
+    clHtml+=clRow('&#129309; Alianzas — CV llegaron',mAliCv,aAliCv,0,'#0891B2');
+    clHtml+=clRow('&nbsp;&nbsp;&#11088; CV interesados',mAliCvInt,aAliCvInt,0,'#0891B2');
+    clHtml+=clRow('&#129309; Alianzas — Cred llegaron',mAliCred,aAliCred,0,'#059669');
+    clHtml+=clRow('&nbsp;&nbsp;&#11088; Cred interesados',mAliCredInt,aAliCredInt,0,'#059669');
+    clHtml+=clRow('&#129309; Alianzas — Cant llegaron',mAliCant,aAliCant,0,'#7C3AED');
+    clHtml+=clRow('&nbsp;&nbsp;&#11088; Cant interesados',mAliCantInt,aAliCantInt,0,'#7C3AED');
     clHtml+='</tbody></table></div>';
     clEl.innerHTML=clHtml;
   }else if(clEl){clEl.innerHTML='';}
