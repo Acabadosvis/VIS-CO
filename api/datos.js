@@ -86,7 +86,14 @@ module.exports = async function handler(req, res) {
         const { state, sha } = await readState();
         if (!state[tipo]) state[tipo] = {};
         if (week) {
-          state[tipo][week] = Object.assign({}, state[tipo][week] || {}, body);
+          if (tipo === 'pf') {
+            // merge profundo por perfilador para no borrar datos del otro
+            const existing = state[tipo][week] || {};
+            ['M','A'].forEach(p => { if (body[p]) existing[p] = Object.assign({}, existing[p] || {}, body[p]); });
+            state[tipo][week] = existing;
+          } else {
+            state[tipo][week] = Object.assign({}, state[tipo][week] || {}, body);
+          }
         } else {
           Object.assign(state[tipo], body);
         }
