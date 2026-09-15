@@ -392,91 +392,136 @@ body.modo-comite .brow{display:none!important}
   </div>
   <!-- ═══ MARCELA ═══ -->
   <div id="pf-M">
-    <!-- WPP -->
-    <div class="sec" style="color:#059669;margin-bottom:8px">&#128172; WhatsApp &#8212; Gesti&#243;n de conversaciones</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px">
-      <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:4px">&#128172; Conversaciones asignadas</label><input type="number" id="mf_wpp_asig" min="0" placeholder="0" style="width:100%;border:1.5px solid #6EE7B7;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#059669;background:#fff;outline:none"></div>
-      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:4px">&#128483; Personas con interacci&#243;n</label><input type="number" id="mf_wpp_int" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
-      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:4px">&#128277; Sin respuesta</label><input type="number" id="mf_wpp_sr" min="0" placeholder="0" style="width:100%;border:1.5px solid #CBD5E1;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#64748B;background:#fff;outline:none"></div>
-      <div style="background:#EEF2FF;border:1.5px solid #A5B4FC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#4F46E5;display:block;margin-bottom:4px">&#128260; Retomadas de sem. pasadas</label><input type="number" id="mf_wpp_ret" min="0" placeholder="0" style="width:100%;border:1.5px solid #A5B4FC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#4F46E5;background:#fff;outline:none"></div>
+    <!-- MANYCHAT -->
+    <div class="sec" style="color:#059669;margin-bottom:6px">&#128172; ManyChat &#8212; Chats asignados</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:7px;margin-bottom:6px">
+      <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:3px">&#128172; Total chats asignados</label><input type="number" id="mf_wpp_asig" min="0" placeholder="0" oninput="calcPFCheck('M')" style="width:100%;border:1.5px solid #6EE7B7;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#059669;background:#fff;outline:none"></div>
+      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#2563EB;display:block;margin-bottom:3px">&#128220; Env&#237;a cotizaci&#243;n</label><input type="number" id="mf_mc_cot" min="0" placeholder="0" oninput="calcPFCheck('M')" style="width:100%;border:1.5px solid #93C5FD;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#2563EB;background:#fff;outline:none"></div>
+      <div style="background:#FFF8F0;border:1.5px solid #FDBA74;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#F97316;display:block;margin-bottom:3px">&#128197; Agenda reuni&#243;n</label><input type="number" id="mf_mc_reu" min="0" placeholder="0" oninput="calcPFCheck('M')" style="width:100%;border:1.5px solid #FDBA74;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#F97316;background:#fff;outline:none"></div>
+      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:3px">&#128277; No contesta</label><input type="number" id="mf_mc_nc" min="0" placeholder="0" oninput="calcPFCheck('M')" style="width:100%;border:1.5px solid #CBD5E1;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#64748B;background:#fff;outline:none"></div>
+      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#DC2626;display:block;margin-bottom:3px">&#127760; Otros (otra ciu. / sin int.)</label><input type="number" id="mf_mc_otros" min="0" placeholder="0" oninput="calcPFCheck('M')" style="width:100%;border:1.5px solid #FCA5A5;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#DC2626;background:#fff;outline:none"></div>
     </div>
+    <!-- ALIANZAS EN MANYCHAT -->
+    <div style="font-size:.62rem;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.5px;margin:4px 0 5px 2px">&#127968; Alianzas en chats &#8594;</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:10px">
+      <div style="background:#FFF8EF;border:1.5px solid #D6B99A;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#92400E;display:block;margin-bottom:3px">&#127968; Gran Central</label><input type="number" id="mf_mc_ali_gc" min="0" placeholder="0" oninput="calcPFCheck('M')" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#92400E;background:transparent"></div>
+      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#0891B2;display:block;margin-bottom:3px">&#127774; Corner View</label><input type="number" id="mf_mc_ali_cv" min="0" placeholder="0" oninput="calcPFCheck('M')" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#0891B2;background:transparent"></div>
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#059669;display:block;margin-bottom:3px">&#128179; Credifamilia</label><input type="number" id="mf_mc_ali_cred" min="0" placeholder="0" oninput="calcPFCheck('M')" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#059669;background:transparent"></div>
+    </div>
+    <!-- CHECK BALANCE MANYCHAT -->
+    <div id="pf-chk-M" style="display:none;margin-bottom:10px;padding:7px 11px;border-radius:7px;font-size:.71rem;font-weight:700"></div>
     <!-- BITRIX CALCULADORAS -->
-    <div class="sec" style="color:var(--o);margin-bottom:8px">&#129518; Bitrix &#8212; Calculadoras</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:8px">
-      <div style="background:#FFF8F0;border:1.5px solid #FDBA74;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#F97316;display:block;margin-bottom:4px">&#128203; Asignadas</label><input type="number" id="mf_cal_asig" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDBA74;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#F97316;background:#fff;outline:none"></div>
-      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#0891B2;display:block;margin-bottom:4px">&#9989; Verificadas</label><input type="number" id="mf_cal_ver" min="0" placeholder="0" style="width:100%;border:1.5px solid #93C5FD;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#0891B2;background:#fff;outline:none"></div>
-      <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#D97706;display:block;margin-bottom:4px">&#128203; Incompletas</label><input type="number" id="mf_cal_inc" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDE68A;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#D97706;background:#fff;outline:none"></div>
-      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:4px">&#10060; No verificadas</label><input type="number" id="mf_cal_nver" min="0" placeholder="0" style="width:100%;border:1.5px solid #CBD5E1;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#64748B;background:#fff;outline:none"></div>
-      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#DC2626;display:block;margin-bottom:4px">&#128258; Duplicados</label><input type="number" id="mf_cal_dup" min="0" placeholder="0" style="width:100%;border:1.5px solid #FCA5A5;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#DC2626;background:#fff;outline:none"></div>
+    <div class="sec" style="color:var(--o);margin-bottom:6px">&#129518; Bitrix &#8212; Calculadoras</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:6px">
+      <div style="background:#FFF8F0;border:1.5px solid #FDBA74;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#F97316;display:block;margin-bottom:3px">&#128203; Llegan a Bitrix</label><input type="number" id="mf_cal_asig" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDBA74;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#F97316;background:#fff;outline:none"></div>
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:3px">&#128172; Atienden y responden</label><input type="number" id="mf_cal_resp" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
+      <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:3px">&#129518; Hacen la calculadora</label><input type="number" id="mf_cal_hace" min="0" placeholder="0" style="width:100%;border:1.5px solid #6EE7B7;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#059669;background:#fff;outline:none"></div>
+      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#0891B2;display:block;margin-bottom:3px">&#9989; Verificadas</label><input type="number" id="mf_cal_ver" min="0" placeholder="0" style="width:100%;border:1.5px solid #93C5FD;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#0891B2;background:#fff;outline:none"></div>
+      <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#D97706;display:block;margin-bottom:3px">&#128203; Incompletas</label><input type="number" id="mf_cal_inc" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDE68A;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#D97706;background:#fff;outline:none"></div>
+      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:3px">&#10060; No verificadas</label><input type="number" id="mf_cal_nver" min="0" placeholder="0" style="width:100%;border:1.5px solid #CBD5E1;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#64748B;background:#fff;outline:none"></div>
+      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#DC2626;display:block;margin-bottom:3px">&#128258; Duplicados</label><input type="number" id="mf_cal_dup" min="0" placeholder="0" style="width:100%;border:1.5px solid #FCA5A5;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#DC2626;background:#fff;outline:none"></div>
     </div>
-    <!-- DE LAS VERIFICADAS -->
-    <div style="font-size:.65rem;font-weight:700;color:#0891B2;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 6px 2px">&#9989; De las verificadas &#8594;</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:8px">
-      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:4px">&#128172; Contacto con respuesta</label><input type="number" id="mf_ver_resp" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
-      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:4px">&#128277; Sin respuesta</label><input type="number" id="mf_ver_sr" min="0" placeholder="0" style="width:100%;border:1.5px solid #CBD5E1;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#64748B;background:#fff;outline:none"></div>
-      <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#EA580C;display:block;margin-bottom:4px">&#127758; Otras ciudades</label><input type="number" id="mf_ver_ciu" min="0" placeholder="0" style="width:100%;border:1.5px solid #FED7AA;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#EA580C;background:#fff;outline:none"></div>
-      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#DC2626;display:block;margin-bottom:4px">&#128078; Sin inter&#233;s</label><input type="number" id="mf_ver_ni" min="0" placeholder="0" style="width:100%;border:1.5px solid #FCA5A5;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#DC2626;background:#fff;outline:none"></div>
+    <div style="font-size:.62rem;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin:4px 0 5px 2px">&#128683; No contestan &#8212; &#191;en qu&#233; momento? &#8594;</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">
+      <div style="background:#F1F5F9;border:1.5px solid #94A3B8;border-radius:7px;padding:8px 10px;text-align:center"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#475569;display:block;margin-bottom:3px">1&#176; contacto</label><input type="number" id="mf_cal_nc_v1" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#475569;background:transparent;text-align:center"></div>
+      <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:7px;padding:8px 10px;text-align:center"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#EA580C;display:block;margin-bottom:3px">En calculadora</label><input type="number" id="mf_cal_nc_v2" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#EA580C;background:transparent;text-align:center"></div>
+      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:7px;padding:8px 10px;text-align:center"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#DC2626;display:block;margin-bottom:3px">Despu&#233;s de calc.</label><input type="number" id="mf_cal_nc_v3" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#DC2626;background:transparent;text-align:center"></div>
     </div>
-    <!-- DE LAS NO VERIFICADAS -->
-    <div style="font-size:.65rem;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 6px 2px">&#10060; De las no verificadas &#8594;</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px">
-      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:4px">&#128172; Contacto con respuesta</label><input type="number" id="mf_nver_resp" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
-      <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:4px">&#9989; Completaron calc.</label><input type="number" id="mf_nver_comp" min="0" placeholder="0" style="width:100%;border:1.5px solid #6EE7B7;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#059669;background:#fff;outline:none"></div>
-      <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#EA580C;display:block;margin-bottom:4px">&#127758; Fuera de cobertura</label><input type="number" id="mf_nver_cob" min="0" placeholder="0" style="width:100%;border:1.5px solid #FED7AA;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#EA580C;background:#fff;outline:none"></div>
-      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#DC2626;display:block;margin-bottom:4px">&#128078; Sin inter&#233;s</label><input type="number" id="mf_nver_ni" min="0" placeholder="0" style="width:100%;border:1.5px solid #FCA5A5;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#DC2626;background:#fff;outline:none"></div>
-      <div style="background:#F1F5F9;border:1.5px solid #94A3B8;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#475569;display:block;margin-bottom:4px">&#128683; Realmente no verif.</label><input type="number" id="mf_nver_real" min="0" placeholder="0" style="width:100%;border:1.5px solid #94A3B8;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#475569;background:#fff;outline:none"></div>
+    <div style="font-size:.62rem;font-weight:700;color:#0891B2;text-transform:uppercase;letter-spacing:.5px;margin:4px 0 5px 2px">&#9989; De las verificadas &#8594;</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:8px">
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#16A34A;display:block;margin-bottom:3px">&#128172; Con respuesta</label><input type="number" id="mf_ver_resp" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#16A34A;background:transparent"></div>
+      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#64748B;display:block;margin-bottom:3px">&#128277; Sin respuesta</label><input type="number" id="mf_ver_sr" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#64748B;background:transparent"></div>
+      <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#EA580C;display:block;margin-bottom:3px">&#127758; Otras ciudades</label><input type="number" id="mf_ver_ciu" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#EA580C;background:transparent"></div>
+      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#DC2626;display:block;margin-bottom:3px">&#128078; Sin inter&#233;s</label><input type="number" id="mf_ver_ni" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#DC2626;background:transparent"></div>
     </div>
-    <!-- REUNIONES -->
-    <div class="sec" style="margin-bottom:8px">&#128197; Reuniones</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px">
-      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#2563EB;display:block;margin-bottom:4px">&#128197; Agendadas</label><input type="number" id="mf_reu_ag" min="0" placeholder="0" style="width:100%;border:1.5px solid #93C5FD;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#2563EB;background:#fff;outline:none"></div>
-      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:4px">&#9989; Efectivas</label><input type="number" id="mf_reu_ef" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
-      <div style="background:#FFF8F0;border:1.5px solid #FDBA74;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#F97316;display:block;margin-bottom:4px">&#11088; Clientes potenciales</label><input type="number" id="mf_reu_pot" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDBA74;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#F97316;background:#fff;outline:none"></div>
+    <div style="font-size:.62rem;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin:4px 0 5px 2px">&#10060; De las no verificadas &#8594;</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:10px">
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#16A34A;display:block;margin-bottom:3px">&#128172; Con respuesta</label><input type="number" id="mf_nver_resp" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#16A34A;background:transparent"></div>
+      <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#059669;display:block;margin-bottom:3px">&#9989; Completaron calc.</label><input type="number" id="mf_nver_comp" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#059669;background:transparent"></div>
+      <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#EA580C;display:block;margin-bottom:3px">&#127758; Fuera de cobertura</label><input type="number" id="mf_nver_cob" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#EA580C;background:transparent"></div>
+      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#DC2626;display:block;margin-bottom:3px">&#128078; Sin inter&#233;s</label><input type="number" id="mf_nver_ni" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#DC2626;background:transparent"></div>
+      <div style="background:#F1F5F9;border:1.5px solid #94A3B8;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#475569;display:block;margin-bottom:3px">&#128683; Real. no verif.</label><input type="number" id="mf_nver_real" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#475569;background:transparent"></div>
+    </div>
+    <!-- REUNIONES EXPANDIDAS -->
+    <div class="sec" style="margin-bottom:6px">&#128197; Reuniones</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:10px">
+      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#2563EB;display:block;margin-bottom:3px">&#128197; Agendadas</label><input type="number" id="mf_reu_ag" min="0" placeholder="0" style="width:100%;border:1.5px solid #93C5FD;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#2563EB;background:#fff;outline:none"></div>
+      <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#D97706;display:block;margin-bottom:3px">&#9203; Confirm. 24h antes</label><input type="number" id="mf_reu_conf24" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDE68A;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#D97706;background:#fff;outline:none"></div>
+      <div style="background:#EEF2FF;border:1.5px solid #A5B4FC;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#4F46E5;display:block;margin-bottom:3px">&#128260; Reagendadas</label><input type="number" id="mf_reu_reag" min="0" placeholder="0" style="width:100%;border:1.5px solid #A5B4FC;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#4F46E5;background:#fff;outline:none"></div>
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#16A34A;display:block;margin-bottom:3px">&#9989; Efectivas</label><input type="number" id="mf_reu_ef" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
+      <div style="background:#FFF8F0;border:1.5px solid #FDBA74;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#F97316;display:block;margin-bottom:3px">&#11088; Potenciales</label><input type="number" id="mf_reu_pot" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDBA74;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#F97316;background:#fff;outline:none"></div>
+    </div>
+    <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-top:3px solid #F97316;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+      <div style="font-size:.63rem;font-weight:800;color:#C2410C;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">&#128176; Valor proyectado cierre ($M)</div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:1.1rem;font-weight:800;color:#F97316">$</span><input type="number" id="mf_val" min="0" placeholder="ej: 120" style="width:100%;border:1.5px solid #FDBA74;border-radius:6px;padding:7px 10px;font-size:1.05rem;font-weight:800;color:#C2410C;background:#fff;outline:none"><span style="font-size:.8rem;font-weight:700;color:#888">millones</span></div>
     </div>
     <div class="brow"><button class="btn btn-o" onclick="savePF('M')">&#128190; Guardar Marcela</button><button class="btn btn-s" onclick="renderLeads()">&#8617; Cancelar</button></div>
   </div>
   <!-- ═══ ANDRÉS ═══ -->
   <div id="pf-A" style="display:none">
-    <!-- WPP -->
-    <div class="sec" style="color:#059669;margin-bottom:8px">&#128172; WhatsApp &#8212; Gesti&#243;n de conversaciones</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px">
-      <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:4px">&#128172; Conversaciones asignadas</label><input type="number" id="af_wpp_asig" min="0" placeholder="0" style="width:100%;border:1.5px solid #6EE7B7;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#059669;background:#fff;outline:none"></div>
-      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:4px">&#128483; Personas con interacci&#243;n</label><input type="number" id="af_wpp_int" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
-      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:4px">&#128277; Sin respuesta</label><input type="number" id="af_wpp_sr" min="0" placeholder="0" style="width:100%;border:1.5px solid #CBD5E1;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#64748B;background:#fff;outline:none"></div>
-      <div style="background:#EEF2FF;border:1.5px solid #A5B4FC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#4F46E5;display:block;margin-bottom:4px">&#128260; Retomadas de sem. pasadas</label><input type="number" id="af_wpp_ret" min="0" placeholder="0" style="width:100%;border:1.5px solid #A5B4FC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#4F46E5;background:#fff;outline:none"></div>
+    <!-- MANYCHAT -->
+    <div class="sec" style="color:#059669;margin-bottom:6px">&#128172; ManyChat &#8212; Chats asignados</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:6px">
+      <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:3px">&#128172; Total chats asignados</label><input type="number" id="af_wpp_asig" min="0" placeholder="0" oninput="calcPFCheck('A')" style="width:100%;border:1.5px solid #6EE7B7;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#059669;background:#fff;outline:none"></div>
     </div>
+    <div style="font-size:.62rem;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.5px;margin:4px 0 5px 2px">Gesti&#243;n de chats &#8594;</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:8px">
+      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#0891B2;display:block;margin-bottom:3px">&#128241; Env&#237;a cotizaci&#243;n</label><input type="number" id="af_mc_cot" min="0" placeholder="0" oninput="calcPFCheck('A')" style="width:100%;border:1.5px solid #93C5FD;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#0891B2;background:#fff;outline:none"></div>
+      <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#EA580C;display:block;margin-bottom:3px">&#128197; Agenda reuni&#243;n</label><input type="number" id="af_mc_reu" min="0" placeholder="0" oninput="calcPFCheck('A')" style="width:100%;border:1.5px solid #FED7AA;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#EA580C;background:#fff;outline:none"></div>
+      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:3px">&#128277; No contesta</label><input type="number" id="af_mc_nc" min="0" placeholder="0" oninput="calcPFCheck('A')" style="width:100%;border:1.5px solid #CBD5E1;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#64748B;background:#fff;outline:none"></div>
+      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#DC2626;display:block;margin-bottom:3px">&#128683; Otros</label><input type="number" id="af_mc_otros" min="0" placeholder="0" oninput="calcPFCheck('A')" style="width:100%;border:1.5px solid #FCA5A5;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#DC2626;background:#fff;outline:none"></div>
+    </div>
+    <div style="font-size:.62rem;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.5px;margin:4px 0 5px 2px">&#127968; Alianzas &#8594;</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px">
+      <div style="background:#FEF3C7;border:1.5px solid #FDE68A;border-radius:7px;padding:7px 8px;text-align:center"><label style="font-size:.54rem;font-weight:700;text-transform:uppercase;color:#92400E;display:block;margin-bottom:2px">Gran Central</label><input type="number" id="af_mc_ali_gc" min="0" placeholder="0" oninput="calcPFCheck('A')" style="width:100%;border:none;outline:none;font-size:.88rem;font-weight:700;color:#92400E;background:transparent;text-align:center"></div>
+      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:7px;padding:7px 8px;text-align:center"><label style="font-size:.54rem;font-weight:700;text-transform:uppercase;color:#0891B2;display:block;margin-bottom:2px">Corner View</label><input type="number" id="af_mc_ali_cv" min="0" placeholder="0" oninput="calcPFCheck('A')" style="width:100%;border:none;outline:none;font-size:.88rem;font-weight:700;color:#0891B2;background:transparent;text-align:center"></div>
+      <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:7px;padding:7px 8px;text-align:center"><label style="font-size:.54rem;font-weight:700;text-transform:uppercase;color:#059669;display:block;margin-bottom:2px">Credifamilia</label><input type="number" id="af_mc_ali_cred" min="0" placeholder="0" oninput="calcPFCheck('A')" style="width:100%;border:none;outline:none;font-size:.88rem;font-weight:700;color:#059669;background:transparent;text-align:center"></div>
+    </div>
+    <div id="pf-chk-A" style="display:none;background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:7px;padding:8px 11px;margin-bottom:8px;font-size:.72rem;font-weight:700;color:#DC2626"></div>
     <!-- BITRIX CALCULADORAS -->
-    <div class="sec" style="color:var(--o);margin-bottom:8px">&#129518; Bitrix &#8212; Calculadoras</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:8px">
-      <div style="background:#FFF8F0;border:1.5px solid #FDBA74;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#F97316;display:block;margin-bottom:4px">&#128203; Asignadas</label><input type="number" id="af_cal_asig" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDBA74;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#F97316;background:#fff;outline:none"></div>
-      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#0891B2;display:block;margin-bottom:4px">&#9989; Verificadas</label><input type="number" id="af_cal_ver" min="0" placeholder="0" style="width:100%;border:1.5px solid #93C5FD;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#0891B2;background:#fff;outline:none"></div>
-      <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#D97706;display:block;margin-bottom:4px">&#128203; Incompletas</label><input type="number" id="af_cal_inc" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDE68A;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#D97706;background:#fff;outline:none"></div>
-      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:4px">&#10060; No verificadas</label><input type="number" id="af_cal_nver" min="0" placeholder="0" style="width:100%;border:1.5px solid #CBD5E1;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#64748B;background:#fff;outline:none"></div>
-      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#DC2626;display:block;margin-bottom:4px">&#128258; Duplicados</label><input type="number" id="af_cal_dup" min="0" placeholder="0" style="width:100%;border:1.5px solid #FCA5A5;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#DC2626;background:#fff;outline:none"></div>
+    <div class="sec" style="color:var(--o);margin-bottom:6px">&#129518; Bitrix &#8212; Calculadoras</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:6px">
+      <div style="background:#FFF8F0;border:1.5px solid #FDBA74;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#F97316;display:block;margin-bottom:3px">&#128203; Llegan a Bitrix</label><input type="number" id="af_cal_asig" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDBA74;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#F97316;background:#fff;outline:none"></div>
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#16A34A;display:block;margin-bottom:3px">&#128172; Atienden y responden</label><input type="number" id="af_cal_resp" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
+      <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#059669;display:block;margin-bottom:3px">&#129518; Hacen la calculadora</label><input type="number" id="af_cal_hace" min="0" placeholder="0" style="width:100%;border:1.5px solid #6EE7B7;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#059669;background:#fff;outline:none"></div>
+      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#0891B2;display:block;margin-bottom:3px">&#9989; Verificadas</label><input type="number" id="af_cal_ver" min="0" placeholder="0" style="width:100%;border:1.5px solid #93C5FD;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#0891B2;background:#fff;outline:none"></div>
+      <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#D97706;display:block;margin-bottom:3px">&#128203; Incompletas</label><input type="number" id="af_cal_inc" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDE68A;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#D97706;background:#fff;outline:none"></div>
+      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#64748B;display:block;margin-bottom:3px">&#10060; No verificadas</label><input type="number" id="af_cal_nver" min="0" placeholder="0" style="width:100%;border:1.5px solid #CBD5E1;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#64748B;background:#fff;outline:none"></div>
+      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#DC2626;display:block;margin-bottom:3px">&#128258; Duplicados</label><input type="number" id="af_cal_dup" min="0" placeholder="0" style="width:100%;border:1.5px solid #FCA5A5;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#DC2626;background:#fff;outline:none"></div>
     </div>
-    <!-- DE LAS VERIFICADAS -->
-    <div style="font-size:.65rem;font-weight:700;color:#0891B2;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 6px 2px">&#9989; De las verificadas &#8594;</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:8px">
-      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:4px">&#128172; Contacto con respuesta</label><input type="number" id="af_ver_resp" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
-      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;display:block;margin-bottom:4px">&#128277; Sin respuesta</label><input type="number" id="af_ver_sr" min="0" placeholder="0" style="width:100%;border:1.5px solid #CBD5E1;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#64748B;background:#fff;outline:none"></div>
-      <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#EA580C;display:block;margin-bottom:4px">&#127758; Otras ciudades</label><input type="number" id="af_ver_ciu" min="0" placeholder="0" style="width:100%;border:1.5px solid #FED7AA;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#EA580C;background:#fff;outline:none"></div>
-      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#DC2626;display:block;margin-bottom:4px">&#128078; Sin inter&#233;s</label><input type="number" id="af_ver_ni" min="0" placeholder="0" style="width:100%;border:1.5px solid #FCA5A5;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#DC2626;background:#fff;outline:none"></div>
+    <div style="font-size:.62rem;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin:4px 0 5px 2px">&#128683; No contestan &#8212; &#191;en qu&#233; momento? &#8594;</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">
+      <div style="background:#F1F5F9;border:1.5px solid #94A3B8;border-radius:7px;padding:8px 10px;text-align:center"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#475569;display:block;margin-bottom:3px">1&#176; contacto</label><input type="number" id="af_cal_nc_v1" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#475569;background:transparent;text-align:center"></div>
+      <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:7px;padding:8px 10px;text-align:center"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#EA580C;display:block;margin-bottom:3px">En calculadora</label><input type="number" id="af_cal_nc_v2" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#EA580C;background:transparent;text-align:center"></div>
+      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:7px;padding:8px 10px;text-align:center"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#DC2626;display:block;margin-bottom:3px">Despu&#233;s de calc.</label><input type="number" id="af_cal_nc_v3" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#DC2626;background:transparent;text-align:center"></div>
     </div>
-    <!-- DE LAS NO VERIFICADAS -->
-    <div style="font-size:.65rem;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 6px 2px">&#10060; De las no verificadas &#8594;</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px">
-      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:4px">&#128172; Contacto con respuesta</label><input type="number" id="af_nver_resp" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
-      <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:4px">&#9989; Completaron calc.</label><input type="number" id="af_nver_comp" min="0" placeholder="0" style="width:100%;border:1.5px solid #6EE7B7;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#059669;background:#fff;outline:none"></div>
-      <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#EA580C;display:block;margin-bottom:4px">&#127758; Fuera de cobertura</label><input type="number" id="af_nver_cob" min="0" placeholder="0" style="width:100%;border:1.5px solid #FED7AA;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#EA580C;background:#fff;outline:none"></div>
-      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#DC2626;display:block;margin-bottom:4px">&#128078; Sin inter&#233;s</label><input type="number" id="af_nver_ni" min="0" placeholder="0" style="width:100%;border:1.5px solid #FCA5A5;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#DC2626;background:#fff;outline:none"></div>
-      <div style="background:#F1F5F9;border:1.5px solid #94A3B8;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#475569;display:block;margin-bottom:4px">&#128683; Realmente no verif.</label><input type="number" id="af_nver_real" min="0" placeholder="0" style="width:100%;border:1.5px solid #94A3B8;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#475569;background:#fff;outline:none"></div>
+    <div style="font-size:.62rem;font-weight:700;color:#0891B2;text-transform:uppercase;letter-spacing:.5px;margin:4px 0 5px 2px">&#9989; De las verificadas &#8594;</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:8px">
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#16A34A;display:block;margin-bottom:3px">&#128172; Con respuesta</label><input type="number" id="af_ver_resp" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#16A34A;background:transparent"></div>
+      <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#64748B;display:block;margin-bottom:3px">&#128277; Sin respuesta</label><input type="number" id="af_ver_sr" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#64748B;background:transparent"></div>
+      <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#EA580C;display:block;margin-bottom:3px">&#127758; Otras ciudades</label><input type="number" id="af_ver_ciu" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#EA580C;background:transparent"></div>
+      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#DC2626;display:block;margin-bottom:3px">&#128078; Sin inter&#233;s</label><input type="number" id="af_ver_ni" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#DC2626;background:transparent"></div>
     </div>
-    <!-- REUNIONES -->
-    <div class="sec" style="margin-bottom:8px">&#128197; Reuniones</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px">
-      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#2563EB;display:block;margin-bottom:4px">&#128197; Agendadas</label><input type="number" id="af_reu_ag" min="0" placeholder="0" style="width:100%;border:1.5px solid #93C5FD;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#2563EB;background:#fff;outline:none"></div>
-      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:4px">&#9989; Efectivas</label><input type="number" id="af_reu_ef" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
-      <div style="background:#FFF8F0;border:1.5px solid #FDBA74;border-radius:8px;padding:10px 12px"><label style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#F97316;display:block;margin-bottom:4px">&#11088; Clientes potenciales</label><input type="number" id="af_reu_pot" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDBA74;border-radius:5px;padding:6px 8px;font-size:.95rem;font-weight:700;color:#F97316;background:#fff;outline:none"></div>
+    <div style="font-size:.62rem;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin:4px 0 5px 2px">&#10060; De las no verificadas &#8594;</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:10px">
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#16A34A;display:block;margin-bottom:3px">&#128172; Con respuesta</label><input type="number" id="af_nver_resp" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#16A34A;background:transparent"></div>
+      <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#059669;display:block;margin-bottom:3px">&#9989; Completaron calc.</label><input type="number" id="af_nver_comp" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#059669;background:transparent"></div>
+      <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#EA580C;display:block;margin-bottom:3px">&#127758; Fuera de cobertura</label><input type="number" id="af_nver_cob" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#EA580C;background:transparent"></div>
+      <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#DC2626;display:block;margin-bottom:3px">&#128078; Sin inter&#233;s</label><input type="number" id="af_nver_ni" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#DC2626;background:transparent"></div>
+      <div style="background:#F1F5F9;border:1.5px solid #94A3B8;border-radius:7px;padding:8px 10px"><label style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:#475569;display:block;margin-bottom:3px">&#128683; Real. no verif.</label><input type="number" id="af_nver_real" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#475569;background:transparent"></div>
+    </div>
+    <!-- REUNIONES EXPANDIDAS -->
+    <div class="sec" style="margin-bottom:6px">&#128197; Reuniones</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:10px">
+      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#2563EB;display:block;margin-bottom:3px">&#128197; Agendadas</label><input type="number" id="af_reu_ag" min="0" placeholder="0" style="width:100%;border:1.5px solid #93C5FD;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#2563EB;background:#fff;outline:none"></div>
+      <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#D97706;display:block;margin-bottom:3px">&#9203; Confirm. 24h antes</label><input type="number" id="af_reu_conf24" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDE68A;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#D97706;background:#fff;outline:none"></div>
+      <div style="background:#EEF2FF;border:1.5px solid #A5B4FC;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#4F46E5;display:block;margin-bottom:3px">&#128260; Reagendadas</label><input type="number" id="af_reu_reag" min="0" placeholder="0" style="width:100%;border:1.5px solid #A5B4FC;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#4F46E5;background:#fff;outline:none"></div>
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#16A34A;display:block;margin-bottom:3px">&#9989; Efectivas</label><input type="number" id="af_reu_ef" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
+      <div style="background:#FFF8F0;border:1.5px solid #FDBA74;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#F97316;display:block;margin-bottom:3px">&#11088; Potenciales</label><input type="number" id="af_reu_pot" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDBA74;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#F97316;background:#fff;outline:none"></div>
+    </div>
+    <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-top:3px solid #F97316;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+      <div style="font-size:.63rem;font-weight:800;color:#C2410C;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">&#128176; Valor proyectado cierre ($M)</div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:1.1rem;font-weight:800;color:#F97316">$</span><input type="number" id="af_val" min="0" placeholder="ej: 120" style="width:100%;border:1.5px solid #FDBA74;border-radius:6px;padding:7px 10px;font-size:1.05rem;font-weight:800;color:#C2410C;background:#fff;outline:none"><span style="font-size:.8rem;font-weight:700;color:#888">millones</span></div>
     </div>
     <div class="brow"><button class="btn btn-o" onclick="savePF('A')">&#128190; Guardar Andr&#233;s</button><button class="btn btn-s" onclick="renderLeads()">&#8617; Cancelar</button></div>
   </div>
@@ -492,17 +537,6 @@ body.modo-comite .brow{display:none!important}
         </div>
         <div style="display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px">
           <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:7px;padding:7px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#166534;display:block;margin-bottom:3px">&#127942; Cierres GC</label><input type="number" id="l_ci_gc" min="0" placeholder="0" oninput="calcCierres()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#166534;background:transparent"></div>
-        </div>
-      </div>
-      <!-- Lagom -->
-      <div style="border-left:3px solid #7C3AED;padding-left:10px;margin-bottom:10px">
-        <div style="font-size:.65rem;font-weight:700;color:#7C3AED;margin-bottom:6px;text-transform:uppercase">&#128156; Lagom</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div style="background:#fff;border:1.5px solid #C4B5FD;border-radius:7px;padding:8px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7C3AED;display:block;margin-bottom:3px">&#128222; Llegaron</label><input type="number" id="l_lag" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#7C3AED;background:transparent"></div>
-          <div style="background:#F5F3FF;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:3px">&#11088; Interesados</label><input type="number" id="l_lag_int" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#16A34A;background:transparent"></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px">
-          <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:7px;padding:7px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#166534;display:block;margin-bottom:3px">&#127942; Cierres Lagom</label><input type="number" id="l_ci_lag" min="0" placeholder="0" oninput="calcCierres()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#166534;background:transparent"></div>
         </div>
       </div>
       <!-- Corner View -->
@@ -545,6 +579,7 @@ body.modo-comite .brow{display:none!important}
   </div><!-- /l-form-semanal -->
   <div id="l-dbg" style="display:none;background:#1E293B;color:#94A3B8;font-size:.72rem;padding:8px 12px;border-radius:6px;margin:6px 0;font-family:monospace;line-height:1.6"></div>
   <div id="l-kpis" class="kg"></div>
+  <div id="l-checklist"></div>
   <div id="l-ver-kpi" class="kg" style="display:none"></div>
   <div id="l-funnel" class="fn-wrap"></div>
   <div id="l-form-mes"></div>
@@ -572,7 +607,7 @@ body.modo-comite .brow{display:none!important}
   <div class="card">
     <div class="card-hd">Confirmaciones individuales <span id="r2-per" style="color:var(--o)"></span><span class="card-hd-sub">% calculado sobre leads calculadora — alianzas se miden aparte</span></div>
     <div class="rconf" id="reu-cards"></div>
-    <div class="sec" style="margin-top:14px">Reuniones por alianza <span style="font-size:.72rem;color:#888;font-weight:400">— GC · Corner View · LAGOM (NM)</span></div>
+    <div class="sec" style="margin-top:14px">Reuniones por alianza <span style="font-size:.72rem;color:#888;font-weight:400">— GC · Corner View</span></div>
     <div class="rconf" id="reu-proj-cards"></div>
     <div class="brow">
       <button class="btn btn-o" onclick="saveConf()">&#128190; Guardar semana</button>
@@ -731,15 +766,25 @@ function _maxMergeR(local,cloud){
 }
 /* ── syncDatosAPI: descarga datos de la nube y mezcla con local ── */
 async function syncDatosAPI(tipo,weeks){
-  var storeKey=tipo==='redes'?LS_R:tipo==='reuniones'?LS_C:LS_L;
+  var storeKey=tipo==='redes'?LS_R:tipo==='reuniones'?LS_C:tipo==='pf'?LS_PF:LS_L;
   var all=gLS(storeKey);var changed=false;
   await Promise.all(weeks.map(async function(w){
     try{
       var r=await fetch('/api/datos?tipo='+tipo+'&week='+w);
       var j=await r.json();
       if(j.ok&&j.data&&Object.keys(j.data).length>0){
-        // reuniones: max-merge (local y cloud compiten campo a campo, gana el mayor)
-        var merged=tipo==='reuniones'?_maxMergeR(all[w]||{},j.data):Object.assign({},all[w]||{},j.data);
+        var merged;
+        if(tipo==='reuniones'){merged=_maxMergeR(all[w]||{},j.data);}
+        else if(tipo==='pf'){
+          // merge profundo por perfilador (M y A)
+          var local=all[w]||{};
+          merged={};
+          ['M','A'].forEach(function(p){
+            merged[p]=Object.assign({},j.data[p]||{},local[p]||{});
+            // si local tiene valor>0 en algún campo, gana local; si solo en nube, usar nube
+            if(local[p]){Object.keys(local[p]).forEach(function(k){if((local[p][k]||0)===0&&(j.data[p]||{})[k]>0)merged[p][k]=(j.data[p]||{})[k];});}
+          });
+        }else{merged=Object.assign({},all[w]||{},j.data);}
         if(JSON.stringify(all[w])!==JSON.stringify(merged)){all[w]=merged;changed=true;}
       }
     }catch(e){}
@@ -973,7 +1018,7 @@ function renderRedes(){
 }
 
 /* ═══ LEADS ═══ */
-const LF=[['total','l_total'],['wpp','l_wpp'],['wpp_calc','l_wpp_calc'],['cno','l_cno'],['sr','l_sr'],['sr2','l_sr2'],['ni','l_ni'],['int','l_int'],['vig','l_vig'],['vig_no','l_vig_no'],['ci','l_ci'],['ci_org','l_ci_org'],['ci_ant','l_ci_ant'],['ci_gc','l_ci_gc'],['ci_lag','l_ci_lag'],['ci_cv','l_ci_cv'],['ci_cred','l_ci_cred'],['ver','l_ver'],['nver','l_nver'],['gc','l_gc'],['gc_int','l_gc_int'],['cv','l_cv'],['cv_int','l_cv_int'],['lag','l_lag'],['lag_int','l_lag_int'],['cred','l_cred'],['cred_int','l_cred_int'],['remo_tot','l_remo_tot'],['remo_int','l_remo_int'],['remo_ag','l_remo_ag'],['remo_ef','l_remo_ef'],['remo_ci','l_remo_ci'],['remo_vis','l_remo_vis'],['remo_vis_val','l_remo_vis_val']];
+const LF=[['total','l_total'],['wpp','l_wpp'],['wpp_calc','l_wpp_calc'],['cno','l_cno'],['sr','l_sr'],['sr2','l_sr2'],['ni','l_ni'],['int','l_int'],['vig','l_vig'],['vig_no','l_vig_no'],['ci','l_ci'],['ci_org','l_ci_org'],['ci_ant','l_ci_ant'],['ci_gc','l_ci_gc'],['ci_cv','l_ci_cv'],['ci_cred','l_ci_cred'],['ver','l_ver'],['nver','l_nver'],['gc','l_gc'],['gc_int','l_gc_int'],['cv','l_cv'],['cv_int','l_cv_int'],['cred','l_cred'],['cred_int','l_cred_int'],['remo_tot','l_remo_tot'],['remo_int','l_remo_int'],['remo_ag','l_remo_ag'],['remo_ef','l_remo_ef'],['remo_ci','l_remo_ci'],['remo_vis','l_remo_vis'],['remo_vis_val','l_remo_vis_val']];
 function calcNI(){
   var tot=parseInt(document.getElementById('l_total')?.value||'0')||0;
   var ver=parseInt(document.getElementById('l_ver')?.value||'0')||0;
@@ -1099,10 +1144,9 @@ function calcCierres(){
   var org=parseInt(document.getElementById('l_ci_org')?.value)||0;
   var ant=parseInt(document.getElementById('l_ci_ant')?.value)||0;
   var gc=parseInt(document.getElementById('l_ci_gc')?.value)||0;
-  var lag=parseInt(document.getElementById('l_ci_lag')?.value)||0;
   var cv=parseInt(document.getElementById('l_ci_cv')?.value)||0;
   var cred=parseInt(document.getElementById('l_ci_cred')?.value)||0;
-  var tot=org+ant+gc+lag+cv+cred;
+  var tot=org+ant+gc+cv+cred;
   var el=document.getElementById('l_ci');if(el)el.value=tot;
   var lbl=document.getElementById('l_ci_total_lbl');if(lbl)lbl.textContent=tot;
 }
@@ -1129,7 +1173,7 @@ function selPF(pf){
   if(btnA){btnA.style.background=pf==='A'?'var(--o)':'transparent';btnA.style.color=pf==='A'?'#fff':'var(--g)';}
 }
 /* IDs de campos por perfilador — mismo pipeline para M y A */
-var PF_UNIFIED=['wpp_asig','wpp_int','wpp_sr','wpp_ret','cal_asig','cal_ver','cal_inc','cal_nver','cal_dup','ver_resp','ver_sr','ver_ciu','ver_ni','nver_resp','nver_comp','nver_cob','nver_ni','nver_real','reu_ag','reu_ef','reu_pot'];
+var PF_UNIFIED=['wpp_asig','mc_cot','mc_reu','mc_nc','mc_otros','mc_ali_gc','mc_ali_cv','mc_ali_cred','cal_asig','cal_ver','cal_inc','cal_nver','cal_dup','cal_resp','cal_hace','cal_nc_v1','cal_nc_v2','cal_nc_v3','ver_resp','ver_sr','ver_ciu','ver_ni','nver_resp','nver_comp','nver_cob','nver_ni','nver_real','reu_ag','reu_conf24','reu_reag','reu_ef','reu_pot','val'];
 const PF_FIELDS={M:PF_UNIFIED,A:PF_UNIFIED};
 function loadPF(){
   var key=getPer().sISO;
@@ -1142,6 +1186,25 @@ function loadPF(){
       if(el)el.value=(d[f]||0)>0?d[f]:'';
     });
   });
+}
+function calcPFCheck(pf){
+  var prefix=pf==='M'?'mf_':'af_';
+  var g=function(id){return Math.max(0,parseInt((document.getElementById(prefix+id)||{}).value)||0);};
+  var total=g('wpp_asig');
+  var gestionados=g('mc_cot')+g('mc_reu')+g('mc_nc')+g('mc_otros')+g('mc_ali_gc')+g('mc_ali_cv')+g('mc_ali_cred');
+  var chk=document.getElementById('pf-chk-'+pf);
+  if(!chk)return;
+  if(total===0&&gestionados===0){chk.style.display='none';return;}
+  var diff=total-gestionados;
+  if(diff===0){
+    chk.style.display='block';
+    chk.style.background='#F0FDF4';chk.style.borderColor='#86EFAC';chk.style.color='#16A34A';
+    chk.textContent='✅ Cuadra: '+total+' chats asignados = '+gestionados+' gestionados';
+  } else {
+    chk.style.display='block';
+    chk.style.background='#FEF2F2';chk.style.borderColor='#FCA5A5';chk.style.color='#DC2626';
+    chk.textContent='⚠️ No cuadra: '+total+' asignados vs '+gestionados+' gestionados (diferencia: '+Math.abs(diff)+' '+(diff>0?'sin clasificar':'de más')+')';
+  }
 }
 async function savePF(pf){
   var key=getPer().sISO;
@@ -1159,6 +1222,13 @@ async function savePF(pf){
   var btn=document.querySelector('[onclick="savePF(\''+pf+'\')"]');
   if(btn)btn.textContent='&#9989; Guardado';
   setTimeout(function(){if(btn)btn.innerHTML='&#128190; Guardar '+(pf==='M'?'Marcela':'Andr&#233;s');},1800);
+  /* ── Push a la nube ── */
+  try{
+    fetch('/api/datos?tipo=pf&week='+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(pfAll[key])})
+      .then(function(r){return r.json();})
+      .then(function(j){if(j&&j.ok)toastNube('☁️ '+((pf==='M'?'Marcela':'Andrés'))+' guardado en la nube');})
+      .catch(function(){});
+  }catch(e){}
 }
 /* ── CARGA MENSUAL MANUAL ── */
 var showFormMes=false;
@@ -1188,7 +1258,7 @@ function saveLeadsMes(){
   var LFM=[['wpp','lm_wpp'],['total','lm_total'],['ver','lm_ver'],['nver','lm_nver'],
     ['cno','lm_cno'],['sr','lm_sr'],['sr2','lm_sr2'],['int','lm_int'],['ni','lm_ni'],
     ['ci','lm_ci'],['ci_org','lm_ci_org'],['ci_ali','lm_ci_ali'],
-    ['gc','lm_gc'],['lag','lm_lag'],['cv','lm_cv'],['cred','lm_cred']];
+    ['gc','lm_gc'],['cv','lm_cv'],['cred','lm_cred']];
   var o={};
   LFM.forEach(function(p){var el=document.getElementById(p[1]);o[p[0]]=el?Math.max(0,parseInt(el.value)||0):0;});
   o.manual=true;
@@ -1236,7 +1306,7 @@ function renderLeadsMensual(){
   Object.keys(allLW).forEach(function(wk){
     if(!/^\d{4}-\d{2}-\d{2}$/.test(wk))return;
     var mk=wk.substr(0,7);
-    if(!allLM[mk])allLM[mk]={wpp:0,total:0,ver:0,cno:0,sr:0,sr2:0,int:0,ci_org:0,ci_ali:0,ci:0,gc:0,lag:0,cv:0,cred:0,nver:0,ni:0,_auto:true};
+    if(!allLM[mk])allLM[mk]={wpp:0,total:0,ver:0,cno:0,sr:0,sr2:0,int:0,ci_org:0,ci_ali:0,ci:0,gc:0,cv:0,cred:0,nver:0,ni:0,_auto:true};
     var w=allLW[wk]||{};
     allLM[mk].wpp+=(w.wpp||0);
     allLM[mk].total+=(w.total||0);
@@ -1246,8 +1316,8 @@ function renderLeadsMensual(){
     allLM[mk].sr2+=(w.sr2||0);
     allLM[mk].int+=(w.int||0);
     allLM[mk].ci_org+=(w.ci_org||0)+(w.ci_ant||0);
-    allLM[mk].ci_ali+=(w.ci_gc||0)+(w.ci_lag||0)+(w.ci_cv||0)+(w.ci_cred||0);
-    allLM[mk].gc+=(w.gc||0);allLM[mk].lag+=(w.lag||0);
+    allLM[mk].ci_ali+=(w.ci_gc||0)+(w.ci_cv||0)+(w.ci_cred||0);
+    allLM[mk].gc+=(w.gc||0);
     allLM[mk].cv+=(w.cv||0);allLM[mk].cred+=(w.cred||0);
   });
   /* 2. Deriva campos calculados en meses auto */
@@ -1313,13 +1383,12 @@ function renderLeadsMensual(){
         '<div style="font-size:.65rem;font-weight:700;color:#166534;margin-bottom:6px;text-transform:uppercase">&#127942; Cierres del mes</div>'+
         '<div class="fg">'+
           iM('lm_ci_org',dm.ci_org||0,'&#127822; Org&#225;nicos',false,'#16A34A')+
-          iM('lm_ci_ali',dm.ci_ali||0,'&#129309; Alianzas (GC/Lagom/CV/Cred)',false,'#059669')+
+          iM('lm_ci_ali',dm.ci_ali||0,'&#129309; Alianzas (GC/CV/Cred)',false,'#059669')+
           iM('lm_ci',dm.ci||0,'&#127942; Total cierres',true,'#166534')+
         '</div></div>'+
       '<div class="sec">Leads por alianza</div>'+
       '<div class="fg" style="margin-bottom:12px">'+
         iM('lm_gc',dm.gc||0,'&#127968; Gran Central',false,'#92400E')+
-        iM('lm_lag',dm.lag||0,'&#128156; Lagom',false,'#7C3AED')+
         iM('lm_cv',dm.cv||0,'&#127774; Corner View',false,'#0891B2')+
         iM('lm_cred',dm.cred||0,'&#128179; Credifamilia',false,'#059669')+
       '</div>'+
@@ -1359,7 +1428,7 @@ function renderLeadsMensual(){
   var nverM=Math.max(0,totalM-verM);
   var cnoM=d2.cno||0,srM=d2.sr||0,intM=d2.int||0,niM=Math.max(0,verM-cnoM-srM-intM);
   var ciM=d2.ci||0,ciOrgM=d2.ci_org||0,ciAliM=d2.ci_ali||0;
-  var gcM=d2.gc||0,lagM=d2.lag||0,cvM=d2.cv||0,credM=d2.cred||0;
+  var gcM=d2.gc||0,cvM=d2.cv||0,credM=d2.cred||0;
   var pWppCalcM=wppM>0?pct(totalM,wppM,1):'0.0';
   var pVerM=totalM>0?pct(verM,totalM,1):'0.0';
   var pVerIntM=verM>0?pct(intM,verM,1):'0.0';
@@ -1377,7 +1446,6 @@ function renderLeadsMensual(){
     '<div class="kp" style="border-left:3px solid #64748B"><div class="kl">&#128172; Sin respuesta</div><div class="kv" style="color:#64748B">'+(d2.sr2||0)+'</div><div class="ks">'+(srM>0?pct(d2.sr2||0,srM,1)+'% de msg':'—')+'</div></div>'+
     (ciM>0?'<div class="kp" style="background:#F0FDF4;border-top:3px solid #16A34A"><div class="kl">&#127942; Cierres del mes</div><div class="kv" style="color:#16A34A">'+ciM+'</div><div class="ks">'+(ciOrgM?'Org. '+ciOrgM+' ':'')+(ciAliM?'Ali. '+ciAliM:'')+'</div></div>':'<div class="kp" style="border-left:3px solid #D1D5DB"><div class="kl">Cierres</div><div class="kv" style="color:#9CA3AF">0</div></div>')+
     (gcM>0?'<div class="kp" style="border-left:4px solid #92400E"><div class="kl">GC leads</div><div class="kv" style="color:#92400E">'+gcM+'</div></div>':'')+
-    (lagM>0?'<div class="kp" style="border-left:4px solid #7C3AED"><div class="kl">Lagom leads</div><div class="kv" style="color:#7C3AED">'+lagM+'</div></div>':'')+
     (cvM>0?'<div class="kp" style="border-left:4px solid #0891B2"><div class="kl">CV leads</div><div class="kv" style="color:#0891B2">'+cvM+'</div></div>':'')+
     (credM>0?'<div class="kp" style="border-left:4px solid #059669"><div class="kl">Cred. leads</div><div class="kv" style="color:#059669">'+credM+'</div></div>':'');
   /* EMBUDO */
@@ -1545,31 +1613,49 @@ function renderLeads(){
   /* datos perfiladores — pipeline unificado */
   var pfAll2=gLS(LS_PF),pfW2=pfAll2[p2.sISO]||{};
   var pfM=pfW2.M||{},pfA=pfW2.A||{};
-  /* Marcela */
-  var mWppAsig=pfM.wpp_asig||0,mWppInt=pfM.wpp_int||0,mWppSr=pfM.wpp_sr||0,mWppRet=pfM.wpp_ret||0;
-  var mCalAsig=pfM.cal_asig||0,mCalVer=pfM.cal_ver||0,mCalInc=pfM.cal_inc||0,mCalNver=pfM.cal_nver||0,mCalDup=pfM.cal_dup||0;
+  /* Marcela — ManyChat */
+  var mWppAsig=pfM.wpp_asig||0;
+  var mMcCot=pfM.mc_cot||0,mMcReu=pfM.mc_reu||0,mMcNc=pfM.mc_nc||0,mMcOtros=pfM.mc_otros||0;
+  var mMcAliGc=pfM.mc_ali_gc||0,mMcAliCv=pfM.mc_ali_cv||0,mMcAliCred=pfM.mc_ali_cred||0;
+  /* Marcela — Bitrix */
+  var mCalAsig=pfM.cal_asig||0,mCalResp=pfM.cal_resp||0,mCalHace=pfM.cal_hace||0;
+  var mCalVer=pfM.cal_ver||0,mCalInc=pfM.cal_inc||0,mCalNver=pfM.cal_nver||0,mCalDup=pfM.cal_dup||0;
+  var mCalNcV1=pfM.cal_nc_v1||0,mCalNcV2=pfM.cal_nc_v2||0,mCalNcV3=pfM.cal_nc_v3||0;
   var mVerResp=pfM.ver_resp||0,mVerSr=pfM.ver_sr||0,mVerCiu=pfM.ver_ciu||0,mVerNi=pfM.ver_ni||0;
   var mNverResp=pfM.nver_resp||0,mNverComp=pfM.nver_comp||0,mNverCob=pfM.nver_cob||0,mNverNi=pfM.nver_ni||0,mNverReal=pfM.nver_real||0;
-  var mReuAg=pfM.reu_ag||0,mReuEf=pfM.reu_ef||0,mReuPot=pfM.reu_pot||0;
-  /* Andrés */
-  var aWppAsig=pfA.wpp_asig||0,aWppInt=pfA.wpp_int||0,aWppSr=pfA.wpp_sr||0,aWppRet=pfA.wpp_ret||0;
-  var aCalAsig=pfA.cal_asig||0,aCalVer=pfA.cal_ver||0,aCalInc=pfA.cal_inc||0,aCalNver=pfA.cal_nver||0,aCalDup=pfA.cal_dup||0;
+  /* Marcela — Reuniones */
+  var mReuAg=pfM.reu_ag||0,mReuConf24=pfM.reu_conf24||0,mReuReag=pfM.reu_reag||0,mReuEf=pfM.reu_ef||0,mReuPot=pfM.reu_pot||0;
+  var mVal=pfM.val||0;
+  /* Andrés — ManyChat */
+  var aWppAsig=pfA.wpp_asig||0;
+  var aMcCot=pfA.mc_cot||0,aMcReu=pfA.mc_reu||0,aMcNc=pfA.mc_nc||0,aMcOtros=pfA.mc_otros||0;
+  var aMcAliGc=pfA.mc_ali_gc||0,aMcAliCv=pfA.mc_ali_cv||0,aMcAliCred=pfA.mc_ali_cred||0;
+  /* Andrés — Bitrix */
+  var aCalAsig=pfA.cal_asig||0,aCalResp=pfA.cal_resp||0,aCalHace=pfA.cal_hace||0;
+  var aCalVer=pfA.cal_ver||0,aCalInc=pfA.cal_inc||0,aCalNver=pfA.cal_nver||0,aCalDup=pfA.cal_dup||0;
+  var aCalNcV1=pfA.cal_nc_v1||0,aCalNcV2=pfA.cal_nc_v2||0,aCalNcV3=pfA.cal_nc_v3||0;
   var aVerResp=pfA.ver_resp||0,aVerSr=pfA.ver_sr||0,aVerCiu=pfA.ver_ciu||0,aVerNi=pfA.ver_ni||0;
   var aNverResp=pfA.nver_resp||0,aNverComp=pfA.nver_comp||0,aNverCob=pfA.nver_cob||0,aNverNi=pfA.nver_ni||0,aNverReal=pfA.nver_real||0;
-  var aReuAg=pfA.reu_ag||0,aReuEf=pfA.reu_ef||0,aReuPot=pfA.reu_pot||0;
+  /* Andrés — Reuniones */
+  var aReuAg=pfA.reu_ag||0,aReuConf24=pfA.reu_conf24||0,aReuReag=pfA.reu_reag||0,aReuEf=pfA.reu_ef||0,aReuPot=pfA.reu_pot||0;
+  var aVal=pfA.val||0;
   /* Combinados */
-  var totWppAsig=mWppAsig+aWppAsig,totWppInt=mWppInt+aWppInt,totWppSr=mWppSr+aWppSr,totWppRet=mWppRet+aWppRet;
-  var totCalAsig=mCalAsig+aCalAsig,totCalVer=mCalVer+aCalVer,totCalInc=mCalInc+aCalInc,totCalNver=mCalNver+aCalNver,totCalDup=mCalDup+aCalDup;
+  var totWppAsig=mWppAsig+aWppAsig;
+  var totMcCot=mMcCot+aMcCot,totMcReu=mMcReu+aMcReu,totMcNc=mMcNc+aMcNc,totMcOtros=mMcOtros+aMcOtros;
+  var totCalAsig=mCalAsig+aCalAsig,totCalResp=mCalResp+aCalResp,totCalHace=mCalHace+aCalHace;
+  var totCalVer=mCalVer+aCalVer,totCalInc=mCalInc+aCalInc,totCalNver=mCalNver+aCalNver,totCalDup=mCalDup+aCalDup;
+  var totCalNcV1=mCalNcV1+aCalNcV1,totCalNcV2=mCalNcV2+aCalNcV2,totCalNcV3=mCalNcV3+aCalNcV3;
   var totVerResp=mVerResp+aVerResp,totVerSr=mVerSr+aVerSr,totVerCiu=mVerCiu+aVerCiu,totVerNi=mVerNi+aVerNi;
   var totNverResp=mNverResp+aNverResp,totNverComp=mNverComp+aNverComp,totNverCob=mNverCob+aNverCob,totNverNi=mNverNi+aNverNi,totNverReal=mNverReal+aNverReal;
-  var totReuAg=mReuAg+aReuAg,totReuEf=mReuEf+aReuEf,totReuPot=mReuPot+aReuPot;
+  var totReuAg=mReuAg+aReuAg,totReuConf24=mReuConf24+aReuConf24,totReuReag=mReuReag+aReuReag,totReuEf=mReuEf+aReuEf,totReuPot=mReuPot+aReuPot;
+  var totVal=mVal+aVal;
   var hasPFM=mWppAsig>0||mCalAsig>0||mReuAg>0;
   var hasPFA=aWppAsig>0||aCalAsig>0||aReuAg>0;
   var hasPF=hasPFM||hasPFA;
   var _lbl=document.getElementById('l_ci_total_lbl');if(_lbl)_lbl.textContent=d2.ci||0;
   /* ── KPIs PERFILADORES ── */
   var kEl=document.getElementById('l-kpis');
-  var ci2total=d2.ci||0,ci2org=d2.ci_org||0,ci2ant=d2.ci_ant||0,ci2gc=d2.ci_gc||0,ci2lag=d2.ci_lag||0,ci2cv=d2.ci_cv||0,ci2cred=d2.ci_cred||0;
+  var ci2total=d2.ci||0,ci2org=d2.ci_org||0,ci2ant=d2.ci_ant||0,ci2gc=d2.ci_gc||0,ci2cv=d2.ci_cv||0,ci2cred=d2.ci_cred||0;
   function kp(bg,bt,lbl,val,sub){return'<div class="kp" style="background:'+bg+';border-top:3px solid '+bt+'"><div class="kl">'+lbl+'</div><div class="kv" style="color:'+bt+'">'+val+'</div><div class="ks">'+sub+'</div></div>';}
   function kpL(col,lbl,val,sub){return'<div class="kp" style="border-left:4px solid '+col+'"><div class="kl">'+lbl+'</div><div class="kv" style="color:'+col+'">'+val+'</div><div class="ks">'+sub+'</div></div>';}
   function secHdr(col,txt){return'<div style="grid-column:1/-1;font-size:.65rem;font-weight:800;color:'+col+';text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid '+col+'30;padding-bottom:3px;margin:4px 0 2px">'+txt+'</div>';}
@@ -1577,34 +1663,82 @@ function renderLeads(){
   /* KPI Marcela */
   if(hasPFM){
     kHtml+=secHdr('#0891B2','&#128100; Marcela');
-    if(mWppAsig>0)kHtml+=kp('#ECFDF5','#059669','&#128172; WPP asignadas',mWppAsig,mWppInt+' con interacci&#243;n · '+mWppSr+' sin resp. · '+mWppRet+' retomadas');
-    if(mCalAsig>0)kHtml+=kp('#FFF8F0','#F97316','&#129518; Calc. asignadas',mCalAsig,mCalVer+' verif. · '+mCalNver+' no verif. · '+(mCalDup>0?mCalDup+' dup.':''));
+    if(mWppAsig>0){var mGest=mMcCot+mMcReu+mMcNc+mMcOtros+mMcAliGc+mMcAliCv+mMcAliCred;var mAliTot=mMcAliGc+mMcAliCv+mMcAliCred;kHtml+=kp('#ECFDF5','#059669','&#128172; ManyChat asignados',mWppAsig,'Cot.'+mMcCot+' · Reu.'+mMcReu+' · NC '+mMcNc+' · Otros '+mMcOtros+(mAliTot>0?' · Ali.'+mAliTot:''));}
+    if(mCalAsig>0){var mNcTot=mCalNcV1+mCalNcV2+mCalNcV3;kHtml+=kp('#FFF8F0','#F97316','&#129518; Bitrix llegaron',mCalAsig,'Resp.'+mCalResp+' · Calc.'+mCalHace+' · Verif.'+mCalVer+' · NoVer.'+mCalNver+(mNcTot>0?' · NC:1v'+mCalNcV1+'/calc'+mCalNcV2+'/post'+mCalNcV3:''));}
     if(mCalVer>0)kHtml+=kpL('#0891B2','&#9989; Verif.: con resp.',mVerResp,mVerSr+' sin resp. · '+mVerCiu+' otras ciu. · '+mVerNi+' sin inter&#233;s');
     if(mCalNver>0)kHtml+=kpL('#64748B','&#10060; No verif.: con resp.',mNverResp,mNverComp+' completaron · '+mNverCob+' fuera cob. · '+mNverReal+' real no verif.');
-    if(mReuAg>0)kHtml+=kp('#EFF6FF','#2563EB','&#128197; Reuniones agendadas',mReuAg,mReuEf+' efectivas · '+mReuPot+' potenciales');
+    if(mReuAg>0)kHtml+=kp('#EFF6FF','#2563EB','&#128197; Reuniones',mReuAg,'Conf.24h '+mReuConf24+' · Reag.'+mReuReag+' · Efec.'+mReuEf+' · Pot.'+mReuPot);
+    if(mVal>0)kHtml+=kp('#FFFBEB','#C2410C','&#128176; Valor proyectado','$'+mVal+'M','cierre estimado');
   }
   /* KPI Andrés */
   if(hasPFA){
     kHtml+=secHdr('#7C3AED','&#128100; Andr&#233;s S.');
-    if(aWppAsig>0)kHtml+=kp('#ECFDF5','#059669','&#128172; WPP asignadas',aWppAsig,aWppInt+' con interacci&#243;n · '+aWppSr+' sin resp. · '+aWppRet+' retomadas');
-    if(aCalAsig>0)kHtml+=kp('#FFF8F0','#F97316','&#129518; Calc. asignadas',aCalAsig,aCalVer+' verif. · '+aCalNver+' no verif. · '+(aCalDup>0?aCalDup+' dup.':''));
+    if(aWppAsig>0){var aGest=aMcCot+aMcReu+aMcNc+aMcOtros+aMcAliGc+aMcAliCv+aMcAliCred;var aAliTot=aMcAliGc+aMcAliCv+aMcAliCred;kHtml+=kp('#ECFDF5','#059669','&#128172; ManyChat asignados',aWppAsig,'Cot.'+aMcCot+' · Reu.'+aMcReu+' · NC '+aMcNc+' · Otros '+aMcOtros+(aAliTot>0?' · Ali.'+aAliTot:''));}
+    if(aCalAsig>0){var aNcTot=aCalNcV1+aCalNcV2+aCalNcV3;kHtml+=kp('#FFF8F0','#F97316','&#129518; Bitrix llegaron',aCalAsig,'Resp.'+aCalResp+' · Calc.'+aCalHace+' · Verif.'+aCalVer+' · NoVer.'+aCalNver+(aNcTot>0?' · NC:1v'+aCalNcV1+'/calc'+aCalNcV2+'/post'+aCalNcV3:''));}
     if(aCalVer>0)kHtml+=kpL('#0891B2','&#9989; Verif.: con resp.',aVerResp,aVerSr+' sin resp. · '+aVerCiu+' otras ciu. · '+aVerNi+' sin inter&#233;s');
     if(aCalNver>0)kHtml+=kpL('#64748B','&#10060; No verif.: con resp.',aNverResp,aNverComp+' completaron · '+aNverCob+' fuera cob. · '+aNverReal+' real no verif.');
-    if(aReuAg>0)kHtml+=kp('#EFF6FF','#2563EB','&#128197; Reuniones agendadas',aReuAg,aReuEf+' efectivas · '+aReuPot+' potenciales');
+    if(aReuAg>0)kHtml+=kp('#EFF6FF','#2563EB','&#128197; Reuniones',aReuAg,'Conf.24h '+aReuConf24+' · Reag.'+aReuReag+' · Efec.'+aReuEf+' · Pot.'+aReuPot);
+    if(aVal>0)kHtml+=kp('#FFFBEB','#C2410C','&#128176; Valor proyectado','$'+aVal+'M','cierre estimado');
   }
   /* KPI Combinado M+A */
   if(hasPF){
     kHtml+=secHdr('#1E40AF','&#9889; Total Equipo (M+A)');
-    if(totWppAsig>0)kHtml+=kp('#ECFDF5','#059669','&#128172; WPP total equipo',totWppAsig,totWppInt+' interacción · '+totWppSr+' sin resp. · '+totWppRet+' retomadas');
-    if(totCalAsig>0)kHtml+=kp('#FFF8F0','#F97316','&#129518; Calc. total equipo',totCalAsig,totCalVer+' verif. · '+totCalNver+' no verif.'+(totCalDup>0?' · '+totCalDup+' dup.':''));
-    if(totReuAg>0)kHtml+=kp('#EFF6FF','#2563EB','&#128197; Reuniones total equipo',totReuAg,totReuEf+' efectivas · '+totReuPot+' potenciales');
+    if(totWppAsig>0)kHtml+=kp('#ECFDF5','#059669','&#128172; ManyChat total equipo',totWppAsig,'Cot.'+totMcCot+' · Reu.'+totMcReu+' · NC '+totMcNc+' · Otros '+totMcOtros);
+    if(totCalAsig>0)kHtml+=kp('#FFF8F0','#F97316','&#129518; Bitrix total equipo',totCalAsig,'Resp.'+totCalResp+' · Calc.'+totCalHace+' · Verif.'+totCalVer+' · NoVer.'+totCalNver);
+    if(totReuAg>0)kHtml+=kp('#EFF6FF','#2563EB','&#128197; Reuniones total equipo',totReuAg,'Conf.24h '+totReuConf24+' · Reag.'+totReuReag+' · Efec.'+totReuEf+' · Pot.'+totReuPot);
+    if(totVal>0)kHtml+=kp('#FFFBEB','#C2410C','&#128176; Valor proyectado total','$'+totVal+'M','M $'+mVal+'M + A $'+aVal+'M');
   }
   if(!hasPF)kHtml+='<div style="grid-column:1/-1;padding:12px;background:#F8FAFC;border-radius:8px;border:1px dashed #CBD5E1;font-size:.75rem;color:#64748B;text-align:center">&#128100; Sin datos de perfiladores esta semana — ingresa los datos en el formulario</div>';
   kHtml+=secHdr('#16A34A','&#127942; Cierres semana');
-  var ciPartes=[];if(ci2org)ciPartes.push('Org.est.'+ci2org);if(ci2ant)ciPartes.push('Ant.'+ci2ant);if(ci2gc)ciPartes.push('GC '+ci2gc);if(ci2lag)ciPartes.push('Lag '+ci2lag);if(ci2cv)ciPartes.push('CV '+ci2cv);if(ci2cred)ciPartes.push('Cred.'+ci2cred);
+  var ciPartes=[];if(ci2org)ciPartes.push('Org.est.'+ci2org);if(ci2ant)ciPartes.push('Ant.'+ci2ant);if(ci2gc)ciPartes.push('GC '+ci2gc);if(ci2cv)ciPartes.push('CV '+ci2cv);if(ci2cred)ciPartes.push('Cred.'+ci2cred);
   kHtml+=ci2total>0?kp('#F0FDF4','#16A34A','&#127942; Total cierres',ci2total,ciPartes.join(' · ')||'—'):kpL('#D1D5DB','Cierres','0','—');
   if((d2.remo_tot||0)>0)kHtml+=kp('#FFF7ED','#F97316','&#128296; Remo NM — llegaron',d2.remo_tot||0,((d2.remo_int||0)>0?'&#11088; '+d2.remo_int+' int · ':'')+((d2.remo_ci||0)>0?'&#127942; '+d2.remo_ci+' cierre'+(d2.remo_ci>1?'s':''):'— cierres'));
   if(kEl)kEl.innerHTML=kHtml;
+  /* ── LISTA DE CHEQUEO ── */
+  var clEl=document.getElementById('l-checklist');
+  if(clEl&&hasPF){
+    var rWppR=rD2.wpp||0,rCalR=d2.total||0;
+    function fmtPesos(m){return m>0?'$'+m+'M':'—';}
+    function clRow(lbl,mV,aV,ref,col){
+      var tot=mV+aV;var ok=ref>0?(tot===ref):true;
+      var icon=ref>0?(ok?'✅':'⚠️'):'';
+      var diff=ref>0?(tot-ref):0;
+      var diffTxt=ref>0&&!ok?'<span style="color:#DC2626;font-size:.65rem"> (dif.'+diff+')</span>':'';
+      return'<tr><td style="padding:5px 8px;font-size:.72rem;color:#334155">'+icon+' '+lbl+'</td>'+
+        '<td style="text-align:right;padding:5px 8px;font-size:.75rem;font-weight:700;color:#0891B2">'+mV+'</td>'+
+        '<td style="text-align:right;padding:5px 8px;font-size:.75rem;font-weight:700;color:#7C3AED">'+aV+'</td>'+
+        '<td style="text-align:right;padding:5px 8px;font-size:.85rem;font-weight:800;color:'+(col||'#1E40AF')+'">'+tot+diffTxt+'</td>'+
+        (ref>0?'<td style="text-align:right;padding:5px 8px;font-size:.7rem;color:#64748B">'+ref+'</td>':'<td></td>')+
+        '</tr>';
+    }
+    var clHtml='<div style="background:#fff;border:1px solid #E2E8F0;border-top:3px solid #1E40AF;border-radius:10px;padding:12px 14px;margin-bottom:12px">';
+    clHtml+='<div style="font-size:.68rem;font-weight:800;color:#1E40AF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">&#9989; Lista de chequeo &#8212; Pipeline perfiladores vs Redes · '+wShort(p2)+'</div>';
+    clHtml+='<table style="width:100%;border-collapse:collapse">';
+    clHtml+='<thead><tr style="background:#F8FAFC"><th style="text-align:left;padding:5px 8px;font-size:.62rem;color:#64748B;text-transform:uppercase;border-bottom:1px solid #E2E8F0">Indicador</th><th style="text-align:right;padding:5px 8px;font-size:.62rem;color:#0891B2">Marcela</th><th style="text-align:right;padding:5px 8px;font-size:.62rem;color:#7C3AED">Andr&#233;s</th><th style="text-align:right;padding:5px 8px;font-size:.62rem;color:#1E40AF">Total</th><th style="text-align:right;padding:5px 8px;font-size:.62rem;color:#64748B">Ref.Redes</th></tr></thead>';
+    clHtml+='<tbody>';
+    clHtml+=clRow('&#128172; Chats ManyChat asignados',mWppAsig,aWppAsig,rWppR,'#059669');
+    clHtml+=clRow('&nbsp;&nbsp;├ Env&#237;a cotizaci&#243;n',mMcCot,aMcCot,0,'#0891B2');
+    clHtml+=clRow('&nbsp;&nbsp;├ Agenda reuni&#243;n',mMcReu,aMcReu,0,'#EA580C');
+    clHtml+=clRow('&nbsp;&nbsp;├ No contesta',mMcNc,aMcNc,0,'#64748B');
+    clHtml+=clRow('&nbsp;&nbsp;└ Alianzas (GC+CV+Cred)',mMcAliGc+mMcAliCv+mMcAliCred,aMcAliGc+aMcAliCv+aMcAliCred,0,'#92400E');
+    clHtml+='<tr><td colspan="5" style="padding:2px;background:#F1F5F9"></td></tr>';
+    clHtml+=clRow('&#129518; Bitrix llegan',mCalAsig,aCalAsig,rCalR,'#F97316');
+    clHtml+=clRow('&nbsp;&nbsp;├ Atienden y responden',mCalResp,aCalResp,0,'#16A34A');
+    clHtml+=clRow('&nbsp;&nbsp;├ Hacen la calculadora',mCalHace,aCalHace,0,'#059669');
+    clHtml+=clRow('&nbsp;&nbsp;├ Verificadas',mCalVer,aCalVer,0,'#0891B2');
+    clHtml+=clRow('&nbsp;&nbsp;└ No contactados: 1vc.+'+(mCalNcV1+aCalNcV1)+' / calc.+'+(mCalNcV2+aCalNcV2)+' / post.+'+(mCalNcV3+aCalNcV3),mCalNcV1+mCalNcV2+mCalNcV3,aCalNcV1+aCalNcV2+aCalNcV3,0,'#DC2626');
+    clHtml+='<tr><td colspan="5" style="padding:2px;background:#F1F5F9"></td></tr>';
+    clHtml+=clRow('&#128197; Reuniones agendadas',mReuAg,aReuAg,0,'#2563EB');
+    clHtml+=clRow('&nbsp;&nbsp;├ Confirmadas 24h antes',mReuConf24,aReuConf24,0,'#D97706');
+    clHtml+=clRow('&nbsp;&nbsp;├ Reagendadas',mReuReag,aReuReag,0,'#4F46E5');
+    clHtml+=clRow('&nbsp;&nbsp;└ Efectivas',mReuEf,aReuEf,0,'#16A34A');
+    if(totVal>0){
+      clHtml+='<tr><td colspan="5" style="padding:2px;background:#F1F5F9"></td></tr>';
+      clHtml+='<tr style="background:#FEF9C3"><td style="padding:7px 8px;font-size:.75rem;font-weight:800;color:#C2410C">&#128176; Valor proyectado cierre</td><td style="text-align:right;padding:7px 8px;font-size:.8rem;font-weight:800;color:#0891B2">'+fmtPesos(mVal)+'</td><td style="text-align:right;padding:7px 8px;font-size:.8rem;font-weight:800;color:#7C3AED">'+fmtPesos(aVal)+'</td><td style="text-align:right;padding:7px 8px;font-size:.95rem;font-weight:800;color:#C2410C">'+fmtPesos(totVal)+'</td><td></td></tr>';
+    }
+    clHtml+='</tbody></table></div>';
+    clEl.innerHTML=clHtml;
+  }else if(clEl){clEl.innerHTML='';}
   /* ── PIPELINE PERFILADORES ── */
   var wpp2=d2.wpp||0;
   var fEl=document.getElementById('l-funnel');
@@ -1653,18 +1787,24 @@ function renderLeads(){
       pfHTML+='<div style="margin-top:10px;padding:10px 12px;background:linear-gradient(135deg,#EFF6FF,#F5F3FF);border:1.5px solid #C7D2FE;border-radius:10px;border-top:3px solid #1E40AF">';
       pfHTML+='<div style="font-size:.7rem;font-weight:800;color:#1E40AF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;justify-content:space-between"><span>&#9889; Total Equipo — '+wShort(p2)+'</span><span style="font-size:.62rem;font-weight:600;color:#6366F1">M = Marcela &nbsp;|&nbsp; A = Andr&#233;s</span></div>';
       pfHTML+='<div style="display:flex;gap:6px;font-size:.6rem;font-weight:700;color:#555;margin-bottom:4px"><span style="flex:1"></span><span style="min-width:28px;text-align:right;color:#0891B2">M</span><span style="min-width:14px;text-align:center"></span><span style="min-width:28px;text-align:right;color:#7C3AED">A</span><span style="min-width:14px;text-align:center"></span><span style="min-width:32px;text-align:right;color:#1E40AF">&#931;</span></div>';
-      pfHTML+=pfCombRow('#059669','&#128172; WPP asignadas',mWppAsig,aWppAsig);
-      pfHTML+=pfCombRow('#059669','&#128483; WPP con interacci&#243;n',mWppInt,aWppInt);
-      pfHTML+=pfCombRow('#F97316','&#129518; Calc. asignadas',mCalAsig,aCalAsig);
+      pfHTML+=pfCombRow('#059669','&#128172; ManyChat asignados',mWppAsig,aWppAsig);
+      pfHTML+=pfCombRow('#0891B2','&#128241; Env&#237;a cotizaci&#243;n',mMcCot,aMcCot);
+      pfHTML+=pfCombRow('#EA580C','&#128197; Agenda reuni&#243;n',mMcReu,aMcReu);
+      pfHTML+=pfCombRow('#F97316','&#129518; Llegan a Bitrix',mCalAsig,aCalAsig);
+      pfHTML+=pfCombRow('#16A34A','&#128172; Resp. en Bitrix',mCalResp,aCalResp);
+      pfHTML+=pfCombRow('#059669','&#129518; Hacen calculadora',mCalHace,aCalHace);
       pfHTML+=pfCombRow('#0891B2','&#9989; Calc. verificadas',mCalVer,aCalVer);
       pfHTML+=pfCombRow('#64748B','&#10060; Calc. no verif.',mCalNver,aCalNver);
       pfHTML+=pfCombRow('#059669','&#8627; Completaron calc.',mNverComp,aNverComp);
       pfHTML+=pfCombRow('#2563EB','&#128197; Reuniones agendadas',mReuAg,aReuAg);
+      pfHTML+=pfCombRow('#D97706','&#9203; Confirmadas 24h',mReuConf24,aReuConf24);
+      pfHTML+=pfCombRow('#4F46E5','&#128260; Reagendadas',mReuReag,aReuReag);
       pfHTML+=pfCombRow('#16A34A','&#9989; Reuniones efectivas',mReuEf,aReuEf);
       pfHTML+=pfCombRow('#F97316','&#11088; Clientes potenciales',mReuPot,aReuPot);
+      if((mVal||0)+(aVal||0)>0)pfHTML+=pfCombRow('#C2410C','&#128176; Valor proyectado ($M)',mVal,aVal);
       pfHTML+='</div>';
     }
-    var ciP3=[];if(ci2org)ciP3.push('Org.est.'+ci2org);if(ci2ant)ciP3.push('Ant.'+ci2ant);if(ci2gc)ciP3.push('GC '+ci2gc);if(ci2lag)ciP3.push('Lagom '+ci2lag);if(ci2cv)ciP3.push('CV '+ci2cv);if(ci2cred)ciP3.push('Cred.'+ci2cred);
+    var ciP3=[];if(ci2org)ciP3.push('Org.est.'+ci2org);if(ci2ant)ciP3.push('Ant.'+ci2ant);if(ci2gc)ciP3.push('GC '+ci2gc);if(ci2cv)ciP3.push('CV '+ci2cv);if(ci2cred)ciP3.push('Cred.'+ci2cred);
     pfHTML+='<div style="margin-top:10px;padding-top:8px;border-top:2px solid #86EFAC">';
     pfHTML+=ci2total>0?'<div style="padding:10px 12px;background:#F0FDF4;border-radius:8px;border:1px solid #86EFAC;display:flex;align-items:center;gap:12px"><span style="font-size:1.5rem;font-weight:800;color:#16A34A">'+ci2total+'</span><div style="flex:1"><div style="font-size:.72rem;font-weight:700;color:#166534">&#127942; Cierres semana</div>'+(ciP3.length?'<div style="font-size:.68rem;color:#4B7563;margin-top:2px">'+ciP3.join(' · ')+'</div>':'')+'</div></div>':'<div style="padding:8px 12px;background:#F9FAFB;border-radius:8px;border:1px dashed #D1D5DB;font-size:.75rem;color:#9CA3AF">&#127942; Sin cierres registrados esta semana</div>';
     pfHTML+='</div>';
@@ -2742,7 +2882,8 @@ function renderAll(){try{renderRedes();}catch(e){console.error('Redes:',e);}try{
   var w3=[ getPer(off-2),getPer(off-1),getPer(off) ].map(function(w){return w.sISO;});
   syncDatosAPI('leads',w3).then(function(ch){if(ch)renderLeads();});
   syncDatosAPI('reuniones',w3).then(function(ch){if(ch)renderReunionesLocal();});
-  /* Auto-refresh redes, leads y reuniones cada 60s */
+  syncDatosAPI('pf',w3).then(function(ch){if(ch){loadPF();renderLeads();}});
+  /* Auto-refresh redes, leads, reuniones y pf cada 60s */
   setInterval(function(){
     syncDatosAPI('redes',w6).then(function(ch){
       if(ch){renderRedes();toastNube('☁️ Redes actualizado');}
@@ -2752,6 +2893,7 @@ function renderAll(){try{renderRedes();}catch(e){console.error('Redes:',e);}try{
     });
     syncDatosAPI('leads',w3).then(function(ch){if(ch)renderLeads();});
     syncDatosAPI('reuniones',w3).then(function(ch){if(ch)renderReunionesLocal();});
+    syncDatosAPI('pf',w3).then(function(ch){if(ch){loadPF();renderLeads();toastNube('☁️ Perfiladores actualizado');}});
   },60000);
   // Restaurar Excel desde localStorage al refrescar
   try{
