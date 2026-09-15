@@ -1682,9 +1682,6 @@ function renderLeads(){
     if(totReuAg>0)kHtml+=kp('#EFF6FF','#2563EB','&#128197; Reuniones total equipo',totReuAg,'Conf.24h '+totReuConf24+' · Reag.'+totReuReag+' · Efec.'+totReuEf+' · Pot.'+totReuPot);
   }
   if(!hasPF)kHtml+='<div style="grid-column:1/-1;padding:12px;background:#F8FAFC;border-radius:8px;border:1px dashed #CBD5E1;font-size:.75rem;color:#64748B;text-align:center">&#128100; Sin datos de perfiladores esta semana — ingresa los datos en el formulario</div>';
-  kHtml+=secHdr('#16A34A','&#127942; Cierres semana');
-  var ciPartes=[];if(ci2org)ciPartes.push('Org.est.'+ci2org);if(ci2ant)ciPartes.push('Ant.'+ci2ant);if(ci2gc)ciPartes.push('GC '+ci2gc);if(ci2cv)ciPartes.push('CV '+ci2cv);if(ci2cred)ciPartes.push('Cred.'+ci2cred);
-  kHtml+=ci2total>0?kp('#F0FDF4','#16A34A','&#127942; Total cierres',ci2total,ciPartes.join(' · ')||'—'):kpL('#D1D5DB','Cierres','0','—');
   if((d2.remo_tot||0)>0)kHtml+=kp('#FFF7ED','#F97316','&#128296; Remo NM — llegaron',d2.remo_tot||0,((d2.remo_int||0)>0?'&#11088; '+d2.remo_int+' int · ':'')+((d2.remo_ci||0)>0?'&#127942; '+d2.remo_ci+' cierre'+(d2.remo_ci>1?'s':''):'— cierres'));
   if(kEl)kEl.innerHTML=kHtml;
   /* ── LISTA DE CHEQUEO ── */
