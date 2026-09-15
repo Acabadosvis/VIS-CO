@@ -24,8 +24,8 @@ module.exports = async function handler(req, res) {
   const tipo = (req.query.tipo || '').replace(/[^a-z]/g, '');
   const week = (req.query.week || '').replace(/[^0-9\-]/g, '');
 
-  if (!['redes', 'leads', 'reuniones'].includes(tipo)) {
-    return res.status(400).json({ ok: false, error: 'tipo debe ser redes|leads|reuniones' });
+  if (!['redes', 'leads', 'reuniones', 'pf'].includes(tipo)) {
+    return res.status(400).json({ ok: false, error: 'tipo debe ser redes|leads|reuniones|pf' });
   }
 
   const GH_URL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
