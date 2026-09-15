@@ -584,15 +584,10 @@ body.modo-comite .brow{display:none!important}
     </div>
     <div class="brow"><button class="btn btn-o" onclick="savePF('A')">&#128190; Guardar Andr&#233;s</button><button class="btn btn-s" onclick="renderLeads()">&#8617; Cancelar</button></div>
   </div>
-    <div class="brow">
-      <button class="btn btn-o" onclick="saveLeads()">&#128190; Guardar semana</button>
-      <button class="btn btn-s" onclick="renderLeads()">&#8617; Cancelar</button>
-    </div>
-  </div>
   </div><!-- /l-form-semanal -->
   <div id="l-dbg" style="display:none;background:#1E293B;color:#94A3B8;font-size:.72rem;padding:8px 12px;border-radius:6px;margin:6px 0;font-family:monospace;line-height:1.6"></div>
-  <div id="l-kpis" class="kg"></div>
   <div id="l-checklist"></div>
+  <div id="l-kpis" class="kg"></div>
   <div id="l-ver-kpi" class="kg" style="display:none"></div>
   <div id="l-funnel" class="fn-wrap"></div>
   <div id="l-form-mes"></div>
@@ -1701,7 +1696,7 @@ function renderLeads(){
   if(kEl)kEl.innerHTML=kHtml;
   /* ── LISTA DE CHEQUEO ── */
   var clEl=document.getElementById('l-checklist');
-  if(clEl&&hasPF){
+  if(clEl){
     var rWppR=rD2.wpp||0,rCalR=d2.total||0;
     function fmtPesos(m){return m>0?'$'+m+'M':'—';}
     function clRow(lbl,mV,aV,ref,col){
@@ -1748,7 +1743,7 @@ function renderLeads(){
     clHtml+=clRow('&nbsp;&nbsp;&#11088; Cant interesados',mAliCantInt,aAliCantInt,0,'#7C3AED');
     clHtml+='</tbody></table></div>';
     clEl.innerHTML=clHtml;
-  }else if(clEl){clEl.innerHTML='';}
+  }
   /* ── PIPELINE PERFILADORES ── */
   var wpp2=d2.wpp||0;
   var fEl=document.getElementById('l-funnel');
