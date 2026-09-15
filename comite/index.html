@@ -784,13 +784,14 @@ async function syncDatosAPI(tipo,weeks){
         var merged;
         if(tipo==='reuniones'){merged=_maxMergeR(all[w]||{},j.data);}
         else if(tipo==='pf'){
-          // merge profundo por perfilador (M y A)
+          // merge: nube base, local gana solo donde tiene valor real (>0)
           var local=all[w]||{};
           merged={};
           ['M','A'].forEach(function(p){
-            merged[p]=Object.assign({},j.data[p]||{},local[p]||{});
-            // si local tiene valor>0 en algún campo, gana local; si solo en nube, usar nube
-            if(local[p]){Object.keys(local[p]).forEach(function(k){if((local[p][k]||0)===0&&(j.data[p]||{})[k]>0)merged[p][k]=(j.data[p]||{})[k];});}
+            var cloud=j.data[p]||{},loc=local[p]||{};
+            merged[p]={};
+            var allKeys=Object.keys(Object.assign({},cloud,loc));
+            allKeys.forEach(function(k){var cv=cloud[k]||0,lv=loc[k]||0;merged[p][k]=lv>0?lv:cv;});
           });
         }else{merged=Object.assign({},all[w]||{},j.data);}
         if(JSON.stringify(all[w])!==JSON.stringify(merged)){all[w]=merged;changed=true;}
@@ -1230,9 +1231,10 @@ async function savePF(pf){
   var btn=document.querySelector('[onclick="savePF(\''+pf+'\')"]');
   if(btn)btn.textContent='&#9989; Guardado';
   setTimeout(function(){if(btn)btn.innerHTML='&#128190; Guardar '+(pf==='M'?'Marcela':'Andr&#233;s');},1800);
-  /* ── Push a la nube ── */
+  /* ── Push a la nube — solo el perfilador que se guardó ── */
   try{
-    fetch('/api/datos?tipo=pf&week='+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(pfAll[key])})
+    var payload={};payload[pf]=d;
+    fetch('/api/datos?tipo=pf&week='+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
       .then(function(r){return r.json();})
       .then(function(j){if(j&&j.ok)toastNube('☁️ '+((pf==='M'?'Marcela':'Andrés'))+' guardado en la nube');})
       .catch(function(){});
