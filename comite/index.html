@@ -569,46 +569,6 @@ body.modo-comite .brow{display:none!important}
     </div>
     <div class="brow"><button class="btn btn-o" onclick="savePF('A')">&#128190; Guardar Andr&#233;s</button><button class="btn btn-s" onclick="renderLeads()">&#8617; Cancelar</button></div>
   </div>
-    <!-- LEADS POR ALIANZA -->
-    <div style="background:#FAFAFA;border:1px solid #E2E8F0;border-top:3px solid #92400E;border-radius:10px;padding:12px 14px;margin-bottom:12px">
-      <div style="font-size:.68rem;font-weight:800;color:#78350F;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">&#127968; Leads por Alianza <span style="font-size:.6rem;font-weight:400;color:#94A3B8;background:#F1F5F9;border-radius:4px;padding:1px 6px;margin-left:6px">No cuentan en Bitrix</span></div>
-      <!-- Gran Central -->
-      <div style="border-left:3px solid #92400E;padding-left:10px;margin-bottom:10px">
-        <div style="font-size:.65rem;font-weight:700;color:#92400E;margin-bottom:6px;text-transform:uppercase">&#127968; Gran Central / Convenio</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div style="background:#fff;border:1.5px solid #D6B99A;border-radius:7px;padding:8px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#92400E;display:block;margin-bottom:3px">&#128222; Llegaron</label><input type="number" id="l_gc" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#92400E;background:transparent"></div>
-          <div style="background:#FFF8F0;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:3px">&#11088; Interesados</label><input type="number" id="l_gc_int" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#16A34A;background:transparent"></div>
-        </div>
-
-      </div>
-      <!-- Corner View -->
-      <div style="border-left:3px solid #0891B2;padding-left:10px;margin-bottom:10px">
-        <div style="font-size:.65rem;font-weight:700;color:#0891B2;margin-bottom:6px;text-transform:uppercase">&#127774; Corner View</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div style="background:#fff;border:1.5px solid #93C5FD;border-radius:7px;padding:8px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#0891B2;display:block;margin-bottom:3px">&#128222; Llegaron</label><input type="number" id="l_cv" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#0891B2;background:transparent"></div>
-          <div style="background:#EFF6FF;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:3px">&#11088; Interesados</label><input type="number" id="l_cv_int" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#16A34A;background:transparent"></div>
-        </div>
-
-      </div>
-      <!-- Credifamilia -->
-      <div style="border-left:3px solid #059669;padding-left:10px;margin-bottom:4px">
-        <div style="font-size:.65rem;font-weight:700;color:#059669;margin-bottom:6px;text-transform:uppercase">&#128179; Credifamilia</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div style="background:#fff;border:1.5px solid #6EE7B7;border-radius:7px;padding:8px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:3px">&#128222; Llegaron</label><input type="number" id="l_cred" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#059669;background:transparent"></div>
-          <div style="background:#ECFDF5;border:1.5px solid #86EFAC;border-radius:7px;padding:8px 10px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:3px">&#11088; Interesados</label><input type="number" id="l_cred_int" min="0" placeholder="0" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#16A34A;background:transparent"></div>
-        </div>
-
-      </div>
-    </div>
-    <!-- CIERRES ORGÁNICOS — AL FINAL -->
-    <div style="background:#F0FDF4;border:1px solid #86EFAC;border-top:3px solid #16A34A;border-radius:10px;padding:12px 14px;margin-bottom:12px">
-      <div style="font-size:.68rem;font-weight:700;color:#166534;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">&#127942; Cierres org&#225;nicos Bitrix &#8212; <span id="l_ci_total_lbl" style="font-size:.85rem;font-weight:800;color:#16A34A">0</span> total <span style="font-weight:400;color:#4B7563">auto</span></div>
-      <input type="number" id="l_ci" style="display:none" min="0" value="0">
-      <div class="fg" style="grid-template-columns:repeat(auto-fill,minmax(145px,1fr));margin-bottom:0">
-        <div class="fl" style="border-left:3px solid #16A34A;padding-left:8px"><label style="color:#16A34A">&#127822; Org&#225;nicos esta sem.</label><input type="number" id="l_ci_org" min="0" placeholder="0" oninput="calcCierres()"></div>
-        <div class="fl" style="border-left:3px solid #65A30D;padding-left:8px"><label style="color:#65A30D">&#128197; Org&#225;nicos sems. ant.</label><input type="number" id="l_ci_ant" min="0" placeholder="0" oninput="calcCierres()"></div>
-      </div>
-    </div>
     <div class="brow">
       <button class="btn btn-o" onclick="saveLeads()">&#128190; Guardar semana</button>
       <button class="btn btn-s" onclick="renderLeads()">&#8617; Cancelar</button>
@@ -1690,10 +1650,8 @@ function renderLeads(){
   var hasPFM=mWppAsig>0||mCalAsig>0||mReuAg>0;
   var hasPFA=aWppAsig>0||aCalAsig>0||aReuAg>0;
   var hasPF=hasPFM||hasPFA;
-  var _lbl=document.getElementById('l_ci_total_lbl');if(_lbl)_lbl.textContent=d2.ci||0;
   /* ── KPIs PERFILADORES ── */
   var kEl=document.getElementById('l-kpis');
-  var ci2total=d2.ci||0,ci2org=d2.ci_org||0,ci2ant=d2.ci_ant||0,ci2gc=d2.ci_gc||0,ci2cv=d2.ci_cv||0,ci2cred=d2.ci_cred||0;
   function kp(bg,bt,lbl,val,sub){return'<div class="kp" style="background:'+bg+';border-top:3px solid '+bt+'"><div class="kl">'+lbl+'</div><div class="kv" style="color:'+bt+'">'+val+'</div><div class="ks">'+sub+'</div></div>';}
   function kpL(col,lbl,val,sub){return'<div class="kp" style="border-left:4px solid '+col+'"><div class="kl">'+lbl+'</div><div class="kv" style="color:'+col+'">'+val+'</div><div class="ks">'+sub+'</div></div>';}
   function secHdr(col,txt){return'<div style="grid-column:1/-1;font-size:.65rem;font-weight:800;color:'+col+';text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid '+col+'30;padding-bottom:3px;margin:4px 0 2px">'+txt+'</div>';}
@@ -1795,52 +1753,7 @@ function renderLeads(){
         '<div style="font-size:.8rem;font-weight:800;color:'+col+';min-width:32px;text-align:right">'+tot+'</div>'+
       '</div>';
     }
-    var pfHTML='<div class="fn-title">Pipeline Perfiladores &#8212; '+wShort(p2)+'</div>';
-    var gMx=Math.max(totWppAsig,totCalAsig,totReuAg,mWppAsig,aWppAsig,mCalAsig,aCalAsig,1);
-    /* ── MARCELA ── */
-    if(hasPFM){
-      if(mWppAsig>0){pfHTML+=pfH('#059669','&#128100; Marcela &#8212; WhatsApp');pfHTML+=fnB(mWppAsig,'#25D366','Asignadas','',null,false,gMx);pfHTML+=fnB(mWppInt,'#16A34A','&#8627; Con interacci&#243;n',mWppAsig>0?Math.round(mWppInt/mWppAsig*100)+'%':null,null,true,gMx);pfHTML+=fnB(mWppSr,'#94A3B8','&#8627; Sin respuesta',null,null,true,gMx);pfHTML+=fnB(mWppRet,'#4F46E5','&#8627; Retomadas sem. pasadas',null,null,true,gMx);}
-      if(mCalAsig>0){pfHTML+=pfH('#F97316','&#128100; Marcela &#8212; Bitrix Calculadoras');pfHTML+=fnB(mCalAsig,'#F97316','Asignadas','',null,false,gMx);pfHTML+=fnB(mCalVer,'#0891B2','&#8627; Verificadas',mCalAsig>0?Math.round(mCalVer/mCalAsig*100)+'%':null,null,true,gMx);pfHTML+=fnB(mCalInc,'#D97706','&#8627; Incompletas',null,null,true,gMx);pfHTML+=fnB(mCalNver,'#64748B','&#8627; No verificadas',null,null,true,gMx);if(mCalDup>0)pfHTML+=fnB(mCalDup,'#DC2626','&#8627; Duplicados',null,null,true,gMx);}
-      if(mCalVer>0){pfHTML+=pfH('#0891B2','&#128100; Marcela &#8212; De las Verificadas');pfHTML+=fnB(mVerResp,'#16A34A','&#8627; Con respuesta',mCalVer>0?Math.round(mVerResp/mCalVer*100)+'%':null,null,false,gMx);pfHTML+=fnB(mVerSr,'#94A3B8','&#8627; Sin respuesta',null,null,true,gMx);pfHTML+=fnB(mVerCiu,'#EA580C','&#8627; Otras ciudades',null,null,true,gMx);pfHTML+=fnB(mVerNi,'#DC2626','&#8627; Sin inter&#233;s',null,null,true,gMx);}
-      if(mCalNver>0){pfHTML+=pfH('#64748B','&#128100; Marcela &#8212; De las No Verificadas');pfHTML+=fnB(mNverResp,'#16A34A','&#8627; Contacto con respuesta',mCalNver>0?Math.round(mNverResp/mCalNver*100)+'%':null,null,false,gMx);pfHTML+=fnB(mNverComp,'#059669','&#8627; Completaron calc. (&#8594;verif)',null,null,true,gMx);pfHTML+=fnB(mNverCob,'#EA580C','&#8627; Fuera de cobertura',null,null,true,gMx);pfHTML+=fnB(mNverNi,'#DC2626','&#8627; Sin inter&#233;s',null,null,true,gMx);pfHTML+=fnB(mNverReal,'#475569','&#8627; Realmente no verif.',null,null,true,gMx);}
-      if(mReuAg>0){pfHTML+=pfH('#2563EB','&#128100; Marcela &#8212; Reuniones');pfHTML+=fnB(mReuAg,'#2563EB','Agendadas','',null,false,gMx);pfHTML+=fnB(mReuEf,'#16A34A','&#8627; Efectivas',mReuAg>0?Math.round(mReuEf/mReuAg*100)+'%':null,null,true,gMx);pfHTML+=fnB(mReuPot,'#F97316','&#8627; Clientes potenciales',null,null,true,gMx);}
-    }
-    /* ── ANDRÉS ── */
-    if(hasPFA){
-      if(aWppAsig>0){pfHTML+=pfH('#059669','&#128100; Andr&#233;s &#8212; WhatsApp');pfHTML+=fnB(aWppAsig,'#25D366','Asignadas','',null,false,gMx);pfHTML+=fnB(aWppInt,'#16A34A','&#8627; Con interacci&#243;n',aWppAsig>0?Math.round(aWppInt/aWppAsig*100)+'%':null,null,true,gMx);pfHTML+=fnB(aWppSr,'#94A3B8','&#8627; Sin respuesta',null,null,true,gMx);pfHTML+=fnB(aWppRet,'#4F46E5','&#8627; Retomadas sem. pasadas',null,null,true,gMx);}
-      if(aCalAsig>0){pfHTML+=pfH('#F97316','&#128100; Andr&#233;s &#8212; Bitrix Calculadoras');pfHTML+=fnB(aCalAsig,'#F97316','Asignadas','',null,false,gMx);pfHTML+=fnB(aCalVer,'#0891B2','&#8627; Verificadas',aCalAsig>0?Math.round(aCalVer/aCalAsig*100)+'%':null,null,true,gMx);pfHTML+=fnB(aCalInc,'#D97706','&#8627; Incompletas',null,null,true,gMx);pfHTML+=fnB(aCalNver,'#64748B','&#8627; No verificadas',null,null,true,gMx);if(aCalDup>0)pfHTML+=fnB(aCalDup,'#DC2626','&#8627; Duplicados',null,null,true,gMx);}
-      if(aCalVer>0){pfHTML+=pfH('#0891B2','&#128100; Andr&#233;s &#8212; De las Verificadas');pfHTML+=fnB(aVerResp,'#16A34A','&#8627; Con respuesta',aCalVer>0?Math.round(aVerResp/aCalVer*100)+'%':null,null,false,gMx);pfHTML+=fnB(aVerSr,'#94A3B8','&#8627; Sin respuesta',null,null,true,gMx);pfHTML+=fnB(aVerCiu,'#EA580C','&#8627; Otras ciudades',null,null,true,gMx);pfHTML+=fnB(aVerNi,'#DC2626','&#8627; Sin inter&#233;s',null,null,true,gMx);}
-      if(aCalNver>0){pfHTML+=pfH('#64748B','&#128100; Andr&#233;s &#8212; De las No Verificadas');pfHTML+=fnB(aNverResp,'#16A34A','&#8627; Contacto con respuesta',aCalNver>0?Math.round(aNverResp/aCalNver*100)+'%':null,null,false,gMx);pfHTML+=fnB(aNverComp,'#059669','&#8627; Completaron calc. (&#8594;verif)',null,null,true,gMx);pfHTML+=fnB(aNverCob,'#EA580C','&#8627; Fuera de cobertura',null,null,true,gMx);pfHTML+=fnB(aNverNi,'#DC2626','&#8627; Sin inter&#233;s',null,null,true,gMx);pfHTML+=fnB(aNverReal,'#475569','&#8627; Realmente no verif.',null,null,true,gMx);}
-      if(aReuAg>0){pfHTML+=pfH('#2563EB','&#128100; Andr&#233;s &#8212; Reuniones');pfHTML+=fnB(aReuAg,'#2563EB','Agendadas','',null,false,gMx);pfHTML+=fnB(aReuEf,'#16A34A','&#8627; Efectivas',aReuAg>0?Math.round(aReuEf/aReuAg*100)+'%':null,null,true,gMx);pfHTML+=fnB(aReuPot,'#F97316','&#8627; Clientes potenciales',null,null,true,gMx);}
-    }
-    /* ── TOTAL EQUIPO ── */
-    if(hasPF){
-      pfHTML+='<div style="margin-top:10px;padding:10px 12px;background:linear-gradient(135deg,#EFF6FF,#F5F3FF);border:1.5px solid #C7D2FE;border-radius:10px;border-top:3px solid #1E40AF">';
-      pfHTML+='<div style="font-size:.7rem;font-weight:800;color:#1E40AF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;justify-content:space-between"><span>&#9889; Total Equipo — '+wShort(p2)+'</span><span style="font-size:.62rem;font-weight:600;color:#6366F1">M = Marcela &nbsp;|&nbsp; A = Andr&#233;s</span></div>';
-      pfHTML+='<div style="display:flex;gap:6px;font-size:.6rem;font-weight:700;color:#555;margin-bottom:4px"><span style="flex:1"></span><span style="min-width:28px;text-align:right;color:#0891B2">M</span><span style="min-width:14px;text-align:center"></span><span style="min-width:28px;text-align:right;color:#7C3AED">A</span><span style="min-width:14px;text-align:center"></span><span style="min-width:32px;text-align:right;color:#1E40AF">&#931;</span></div>';
-      pfHTML+=pfCombRow('#059669','&#128172; ManyChat asignados',mWppAsig,aWppAsig);
-      pfHTML+=pfCombRow('#0891B2','&#128241; Env&#237;a cotizaci&#243;n',mMcCot,aMcCot);
-      pfHTML+=pfCombRow('#EA580C','&#128197; Agenda reuni&#243;n',mMcReu,aMcReu);
-      pfHTML+=pfCombRow('#F97316','&#129518; Llegan a Bitrix',mCalAsig,aCalAsig);
-      pfHTML+=pfCombRow('#16A34A','&#128172; Resp. en Bitrix',mCalResp,aCalResp);
-      pfHTML+=pfCombRow('#059669','&#129518; Hacen calculadora',mCalHace,aCalHace);
-      pfHTML+=pfCombRow('#0891B2','&#9989; Calc. verificadas',mCalVer,aCalVer);
-      pfHTML+=pfCombRow('#64748B','&#10060; Calc. no verif.',mCalNver,aCalNver);
-      pfHTML+=pfCombRow('#059669','&#8627; Completaron calc.',mNverComp,aNverComp);
-      pfHTML+=pfCombRow('#2563EB','&#128197; Reuniones agendadas',mReuAg,aReuAg);
-      pfHTML+=pfCombRow('#D97706','&#9203; Confirmadas 24h',mReuConf24,aReuConf24);
-      pfHTML+=pfCombRow('#4F46E5','&#128260; Reagendadas',mReuReag,aReuReag);
-      pfHTML+=pfCombRow('#16A34A','&#9989; Reuniones efectivas',mReuEf,aReuEf);
-      pfHTML+=pfCombRow('#F97316','&#11088; Clientes potenciales',mReuPot,aReuPot);
-      pfHTML+='</div>';
-    }
-    var ciP3=[];if(ci2org)ciP3.push('Org.est.'+ci2org);if(ci2ant)ciP3.push('Ant.'+ci2ant);if(ci2gc)ciP3.push('GC '+ci2gc);if(ci2cv)ciP3.push('CV '+ci2cv);if(ci2cred)ciP3.push('Cred.'+ci2cred);
-    pfHTML+='<div style="margin-top:10px;padding-top:8px;border-top:2px solid #86EFAC">';
-    pfHTML+=ci2total>0?'<div style="padding:10px 12px;background:#F0FDF4;border-radius:8px;border:1px solid #86EFAC;display:flex;align-items:center;gap:12px"><span style="font-size:1.5rem;font-weight:800;color:#16A34A">'+ci2total+'</span><div style="flex:1"><div style="font-size:.72rem;font-weight:700;color:#166534">&#127942; Cierres semana</div>'+(ciP3.length?'<div style="font-size:.68rem;color:#4B7563;margin-top:2px">'+ciP3.join(' · ')+'</div>':'')+'</div></div>':'<div style="padding:8px 12px;background:#F9FAFB;border-radius:8px;border:1px dashed #D1D5DB;font-size:.75rem;color:#9CA3AF">&#127942; Sin cierres registrados esta semana</div>';
-    pfHTML+='</div>';
-    if(!hasPF&&!ci2total)pfHTML='<div class="fn-title">Pipeline Perfiladores</div><div style="padding:14px;background:#F8FAFC;border-radius:8px;border:1px dashed #CBD5E1;font-size:.8rem;color:#64748B;text-align:center">&#128100; Ingresa los datos en el formulario para ver el pipeline semanal</div>';
-    fEl.innerHTML=pfHTML;
-  }
+
   /* ── MINI-FUNNEL REMODELACIONES NM ── */
   var remoTot2=d2.remo_tot||0,remoInt2=d2.remo_int||0,remoCi2=d2.remo_ci||0;
   var remoFEl=document.getElementById('l-remo-funnel');
