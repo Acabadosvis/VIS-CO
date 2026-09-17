@@ -1702,8 +1702,8 @@ function renderLeads(){
     var rWppR=rD2.wpp||0,rBitrixR=rD2.cli_calc||0,rVerR=rD2.cli_ver||0;
     /* Reuniones Karen+Nathalia */
     var allC2=gLS(LS_C);var curC2=allC2[p2.sISO]||{};
-    var knReuAg=(curC2.KM?.prog||0)+(curC2.NM?.prog||0);
-    var knReuEf=(curC2.KM?.ef||0)+(curC2.NM?.ef||0);
+    var knReuAg=((curC2.KM&&curC2.KM.prog)||0)+((curC2.NM&&curC2.NM.prog)||0);
+    var knReuEf=((curC2.KM&&curC2.KM.ef)||0)+((curC2.NM&&curC2.NM.ef)||0);
     function fmtPesos(m){return m>0?'$'+m+'M':'—';}
     function clRow(lbl,mV,aV,ref,col){
       var tot=mV+aV;var ok=ref>0?(tot===ref):true;
