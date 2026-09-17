@@ -1565,6 +1565,7 @@ function renderLeadsMensual(){
   },80);
 }
 function renderLeads(){
+  console.log('%c[VIS-CO] renderLeads INICIO','color:#0891B2;font-weight:bold');
   /* Restaurar gráficas semanales */
   var chartsElW=document.querySelector('#p1 .chg2');
   if(chartsElW)chartsElW.style.display='';
@@ -1697,6 +1698,7 @@ function renderLeads(){
   if(!hasPF)kHtml+='<div style="grid-column:1/-1;padding:12px;background:#F8FAFC;border-radius:8px;border:1px dashed #CBD5E1;font-size:.75rem;color:#64748B;text-align:center">&#128100; Sin datos de perfiladores esta semana — ingresa los datos en el formulario</div>';
   if((d2.remo_tot||0)>0)kHtml+=kp('#FFF7ED','#F97316','&#128296; Remo NM — llegaron',d2.remo_tot||0,((d2.remo_int||0)>0?'&#11088; '+d2.remo_int+' int · ':'')+((d2.remo_ci||0)>0?'&#127942; '+d2.remo_ci+' cierre'+(d2.remo_ci>1?'s':''):'— cierres'));
   if(kEl)kEl.innerHTML=kHtml;
+  console.log('[VIS-CO] KPIs renderizados. hasPF='+hasPF);
   /* ── LISTA DE CHEQUEO ── */
   var clEl=document.getElementById('l-checklist');
   if(clEl){
@@ -1745,6 +1747,7 @@ function renderLeads(){
     clHtml+=clRow('&nbsp;&nbsp;└ Efectivas',mReuEf,aReuEf,knReuEf,'#16A34A');
     clHtml+='</tbody></table></div>';
     clEl.innerHTML=clHtml;
+    console.log('[VIS-CO] Checklist renderizado OK');
   }
   /* ── PIPELINE PERFILADORES ── */
   var wpp2=d2.wpp||0;
@@ -1848,6 +1851,7 @@ function renderLeads(){
     ]);
   },80);
   renderRemo();
+  console.log('%c[VIS-CO] renderLeads FIN OK','color:#16A34A;font-weight:bold');
 }
 
 function renderAlianzas(){
@@ -2818,7 +2822,7 @@ function toggleModoComite(){
   var btn=document.getElementById('btn-comite-toggle');
   if(btn){btn.textContent=mc?'＋':'－';btn.title=mc?'Expandir para ingresar datos':'Colapsar para comité';}
 }
-function renderAll(){try{renderRedes();}catch(e){console.error('Redes:',e);}try{renderLeads();}catch(e){console.error('Leads:',e);}try{renderReuniones();}catch(e){console.error('Reun:',e);}if(xlR){try{renderVentas();}catch(e){console.error('Ventas:',e);}try{renderAlianzas();}catch(e){console.error('Ali:',e);}try{renderAptos();}catch(e){console.error('Aptos:',e);}}try{document.getElementById('c-period').textContent=wLbl(getPer());}catch(e){}}
+function renderAll(){console.log('%c[VIS-CO] renderAll ▶','color:#7C3AED;font-weight:bold');try{renderRedes();}catch(e){console.error('Redes:',e);}try{renderLeads();}catch(e){console.error('Leads ERR:',e);}try{renderReuniones();}catch(e){console.error('Reun ERR:',e);}if(xlR){try{renderVentas();}catch(e){console.error('Ventas:',e);}try{renderAlianzas();}catch(e){console.error('Ali:',e);}try{renderAptos();}catch(e){console.error('Aptos:',e);}}try{document.getElementById('c-period').textContent=wLbl(getPer());}catch(e){}}
 (async function init(){
   await initStorage();
   upWLbl();renderAll();
