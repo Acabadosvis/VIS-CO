@@ -832,6 +832,7 @@ function goTab(i){
     var wL=[getPer(off-2),getPer(off-1),getPer(off)].map(w=>w.sISO);
     syncDatosAPI('leads',wL).then(function(ch){if(ch)renderLeads();});
   }
+  if(i===2){setTimeout(function(){renderReunionesLocal();},50);}
   if(i===3&&xlR){setTimeout(function(){renderVentas();},50);}
   if(i===4&&xlR){setTimeout(function(){renderAptos();},50);}
   if(i===5&&xlR){setTimeout(function(){renderAlianzas();},50);}
@@ -1701,9 +1702,8 @@ function renderLeads(){
   if(clEl){
     var rWppR=rD2.wpp||0,rBitrixR=rD2.cli_calc||0,rVerR=rD2.cli_ver||0;
     /* Reuniones Karen+Nathalia */
-    var allC2=gLS(LS_C);var curC2=allC2[p2.sISO]||{};
-    var knReuAg=((curC2.KM&&curC2.KM.prog)||0)+((curC2.NM&&curC2.NM.prog)||0);
-    var knReuEf=((curC2.KM&&curC2.KM.ef)||0)+((curC2.NM&&curC2.NM.ef)||0);
+    var knReuAg=0,knReuEf=0;
+    try{var allC2=gLS(LS_C)||{};var curC2=allC2[p2.sISO]||{};knReuAg=((curC2.KM&&curC2.KM.prog)||0)+((curC2.NM&&curC2.NM.prog)||0);knReuEf=((curC2.KM&&curC2.KM.ef)||0)+((curC2.NM&&curC2.NM.ef)||0);}catch(e){}
     function fmtPesos(m){return m>0?'$'+m+'M':'—';}
     function clRow(lbl,mV,aV,ref,col){
       var tot=mV+aV;var ok=ref>0?(tot===ref):true;
