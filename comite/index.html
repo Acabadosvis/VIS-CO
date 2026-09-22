@@ -602,9 +602,22 @@ const _IDB_NAME='vc3db',_IDB_ST='kv';
 let _idb=null;
 function _openIDB(){return new Promise(function(res,rej){var r=indexedDB.open(_IDB_NAME,1);r.onupgradeneeded=function(e){e.target.result.createObjectStore(_IDB_ST);};r.onsuccess=function(e){_idb=e.target.result;res(_idb);};r.onerror=function(){res(null);};});}
 function _idbGet(k){return new Promise(function(res){if(!_idb){res(null);return;}try{var tx=_idb.transaction(_IDB_ST,'readonly');var rq=tx.objectStore(_IDB_ST).get(k);rq.onsuccess=function(){res(rq.result||null);};rq.onerror=function(){res(null);};}catch(e){res(null);}});}
-function _idbSet(k,d){if(!_idb)return;try{var tx=_idb.transaction(_IDB_ST,'readwrite');tx.objectStore(_IDB_ST).put(d,k);}catch(e){}}
+function _idbSet(k,d){
+  return new Promise(function(res){
+    if(!_idb){res({ok:false,err:'IndexedDB no disponible'});return;}
+    try{
+      var tx=_idb.transaction(_IDB_ST,'readwrite');
+      tx.objectStore(_IDB_ST).put(d,k);
+      tx.oncomplete=function(){res({ok:true});};
+      tx.onerror=tx.onabort=function(){res({ok:false,err:(tx.error&&tx.error.name)||'error de escritura'});};
+    }catch(e){res({ok:false,err:e.name||String(e)});}
+  });
+}
 async function initStorage(){
   await _openIDB();
+  /* Si el navegador cierra la conexion (pestana vieja, actualizacion de version),
+     se reabre para no quedarse sin almacenamiento local. */
+  if(_idb){_idb.onclose=function(){_idb=null;_openIDB();};}
   var keys=[LS_R,LS_L,LS_C,LS_P,LS_XL,LS_XLA,LS_LM,LS_PF];
   for(var i=0;i<keys.length;i++){
     var v=await _idbGet(keys[i]);
@@ -613,7 +626,26 @@ async function initStorage(){
   }
 }
 const gLS=function(k){return VC3[k]||{};};
-const sLS=function(k,d){VC3[k]=d;_idbSet(k,d);try{localStorage.setItem(k,JSON.stringify(d));}catch(e){}};
+/* Claves grandes (Excel): solo IndexedDB. Si fueran a localStorage llenarian
+   la cuota de ~5MB y harian fallar el guardado de TODO lo demas en silencio. */
+var _SOLO_IDB=['vc3_xl_v1','vc3_xla_v1'];
+var _ultimoFalloGuardado=null;
+const sLS=function(k,d){
+  VC3[k]=d;
+  var lsOk=false,lsErr=null;
+  if(_SOLO_IDB.indexOf(k)<0){
+    try{localStorage.setItem(k,JSON.stringify(d));lsOk=true;}
+    catch(e){lsErr=e.name||'QuotaExceededError';}
+  }
+  return _idbSet(k,d).then(function(r){
+    var persistio=r.ok||lsOk;
+    if(!persistio){
+      _ultimoFalloGuardado={clave:k,idb:r.err,ls:lsErr,cuando:Date.now()};
+      console.error('[VIS-CO] NO se pudo guardar "'+k+'" — IndexedDB: '+r.err+' / localStorage: '+lsErr);
+    }
+    return {ok:persistio,idb:r.ok,ls:lsOk,idbErr:r.err,lsErr:lsErr};
+  });
+};
 const iso=d=>d.toISOString().split('T')[0];
 const dS=d=>`${d.getDate()} ${MES3[d.getMonth()]}`;
 function parseD(v){if(!v)return null;try{var d=new Date(v);if(isNaN(d.getTime()))return null;return new Date(d.getFullYear(),d.getMonth(),d.getDate());}catch(e){return null;}}
@@ -666,7 +698,11 @@ async function syncDatosAPI(tipo,weeks){
           var cloudM=j.data.M||{},locM=local.M||{};
           var cTs=parseInt(cloudM._ts)||0,lTs=parseInt(locM._ts)||0;
           merged={};
-          if(cTs>lTs){
+          if(locM._dirty){
+            /* Hay cambios guardados aqui que todavia no confirmo la nube.
+               Mandan ellos: sincronizar no puede borrar trabajo reciente. */
+            merged.M=locM;
+          }else if(cTs>lTs){
             merged.M=cloudM;
           }else if(lTs>cTs){
             merged.M=locM;
@@ -1102,7 +1138,10 @@ function loadPF(){
      lo que guardo el otro equipo. */
   var ts=document.getElementById('pf-ts-M');
   if(ts){
-    if(d._ts){
+    if(d._dirty){
+      ts.textContent='\u26a0\ufe0f Guardado aqu\u00ed, pendiente de subir';
+      ts.style.color='#D97706';
+    }else if(d._ts){
       var f=new Date(parseInt(d._ts));
       var dd=f.toLocaleDateString('es-CO',{day:'2-digit',month:'short'});
       var hh=f.toTimeString().slice(0,5);
@@ -1154,21 +1193,46 @@ async function savePF(pf){
     /* si el campo ya no existe en el formulario, se conserva el valor historico */
     d[f]=el?Math.max(0,parseInt(el.value)||0):(parseInt(prev[f])||0);
   });
-  d._ts=Date.now();
-  d._src=(navigator.platform||'equipo');
+  d._ts=Date.now();          /* provisional: lo reemplaza el sello del servidor */
+  d._dirty=1;                /* aun no confirmado en la nube -> intocable al sincronizar */
   pfAll[key].M=d;
-  sLS(LS_PF,pfAll);
+  var _guardado=sLS(LS_PF,pfAll);
   renderLeads();
   var btn=document.querySelector('[onclick="savePF(\''+pf+'\')"]');
-  if(btn)btn.textContent='&#9989; Guardado';
-  setTimeout(function(){if(btn)btn.innerHTML='&#128190; Guardar Marcela';},1800);
+  _guardado.then(function(r){
+    if(!btn)return;
+    if(r.ok){btn.innerHTML='&#9989; Guardado';}
+    else{
+      btn.innerHTML='&#9888;&#65039; NO se guard&#243;';
+      btn.style.background='#DC2626';
+      alert('No se pudo guardar en este equipo.\n\nIndexedDB: '+(r.idbErr||'-')+'\nlocalStorage: '+(r.lsErr||'-')+
+            '\n\nSuele pasar en modo inc\u00f3gnito o con el almacenamiento del navegador bloqueado. '+
+            'Los datos NO se perder\u00e1n si mantienes la pesta\u00f1a abierta, pero no sobrevivir\u00e1n a un refresco.');
+    }
+    setTimeout(function(){if(btn){btn.innerHTML='&#128190; Guardar Marcela';btn.style.background='';}},2200);
+  });
   /* ── Push a la nube — solo el perfilador que se guardó ── */
   try{
-    var payload={};payload[pf]=d;
+    var payload={};payload.M=d;
     fetch('/api/datos?tipo=pf&week='+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
       .then(function(r){return r.json();})
-      .then(function(j){if(j&&j.ok)toastNube('☁️ Marcela guardado en la nube');})
-      .catch(function(){});
+      .then(function(j){
+        if(j&&j.ok){
+          /* Adoptar el reloj del servidor y quitar el pendiente: desde aqui ya
+             se puede comparar de igual a igual contra los otros equipos. */
+          var a=gLS(LS_PF);
+          if(a[key]&&a[key].M){
+            if(j.ts)a[key].M._ts=j.ts;
+            delete a[key].M._dirty;
+            sLS(LS_PF,a);
+          }
+          loadPF();
+          toastNube('☁️ Guardado y sincronizado');
+        }else{
+          toastNube('⚠️ Guardado solo en este equipo — sin conexión');
+        }
+      })
+      .catch(function(){toastNube('⚠️ Guardado solo en este equipo — sin conexión');});
   }catch(e){}
 }
 /* ── CARGA MENSUAL MANUAL ── */
