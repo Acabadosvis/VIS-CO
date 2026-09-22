@@ -695,7 +695,8 @@ async function syncDatosAPI(tipo,weeks){
           /* Gana el guardado mas reciente (_ts). Antes el valor local siempre
              pisaba al de la nube, asi que nunca se veian los datos del otro equipo. */
           var local=all[w]||{};
-          var cloudM=j.data.M||{},locM=local.M||{};
+          var cloudM=Object.assign({},j.data.M||{}),locM=local.M||{};
+          delete cloudM._dirty;   /* lo pendiente solo tiene sentido en el equipo local */
           var cTs=parseInt(cloudM._ts)||0,lTs=parseInt(locM._ts)||0;
           merged={};
           if(locM._dirty){
@@ -1213,7 +1214,10 @@ async function savePF(pf){
   });
   /* ── Push a la nube — solo el perfilador que se guardó ── */
   try{
-    var payload={};payload.M=d;
+    /* _dirty es una marca SOLO local. Si se sube, todos los equipos quedan
+       marcados como pendientes y la sincronizacion deja de funcionar. */
+    var dNube={};Object.keys(d).forEach(function(k){if(k!=='_dirty')dNube[k]=d[k];});
+    var payload={};payload.M=dNube;
     fetch('/api/datos?tipo=pf&week='+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
       .then(function(r){return r.json();})
       .then(function(j){
