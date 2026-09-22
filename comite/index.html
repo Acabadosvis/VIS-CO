@@ -693,36 +693,44 @@ async function syncDatosAPI(tipo,weeks){
         var merged;
         if(tipo==='reuniones'){merged=_maxMergeR(all[w]||{},j.data);}
         else if(tipo==='pf'){
-          /* Gana el guardado mas reciente (_ts). Antes el valor local siempre
-             pisaba al de la nube, asi que nunca se veian los datos del otro equipo. */
+          /* Regla de convivencia entre equipos:
+             - La nube SIEMPRE trae el sello del reloj del servidor.
+             - Un sello local solo es comparable si tambien vino del servidor (_srv).
+               Si no, salio del reloj del PC y puede ir adelantado: no puede ganar.
+             - Lo pendiente de subir solo manda si la nube no tiene algo mas nuevo;
+               asi una marca colgada no bloquea la bajada ni pisa datos ajenos. */
           var local=all[w]||{};
           var cloudM=Object.assign({},j.data.M||{}),locM=local.M||{};
-          delete cloudM._dirty;   /* lo pendiente solo tiene sentido en el equipo local */
+          delete cloudM._dirty;
           if(cloudM._ts)cloudM._srv=1;
           var cTs=parseInt(cloudM._ts)||0,lTs=parseInt(locM._ts)||0;
+          var localComparable=!!locM._srv;
           merged={};
           if(locM._dirty){
-            /* Cambios locales sin confirmar: se SUBEN ahora y mandan ellos.
-               Antes solo se quedaban bloqueando la bajada indefinidamente. */
-            merged.M=locM;
-            _subirPendiente(w,locM);
-          }else if(cTs>0&&!locM._srv){
-            /* La nube siempre esta sellada por el reloj del servidor.
-               Este registro local trae un sello del reloj del propio PC, que
-               puede ir adelantado y ganarle indebidamente. Manda la nube. */
+            var localGana=(cTs===0)||(localComparable&&lTs>cTs);
+            if(localGana){
+              merged.M=locM;
+              _subirPendiente(w,locM);
+            }else{
+              /* La nube avanzo mas que lo que hay pendiente aqui. Gana la nube,
+                 pero se avisa para que nadie pierda trabajo sin enterarse. */
+              merged.M=cloudM;
+              console.warn('[VIS-CO] Habia cambios locales sin subir en '+w+' y la nube tenia datos mas recientes. Se aplico la nube.');
+              try{toastNube('\u2b07\ufe0f Se aplicaron datos m\u00e1s recientes de otro equipo');}catch(e){}
+            }
+          }else if(cTs>0&&!localComparable){
             merged.M=cloudM;
           }else if(cTs>lTs){
             merged.M=cloudM;
           }else if(lTs>cTs){
             merged.M=locM;
           }else{
-            /* Sin marcas de tiempo (datos viejos): union conservadora, no se pierde nada */
             merged.M={};
             Object.keys(Object.assign({},cloudM,locM)).forEach(function(k){
               var cv=cloudM[k]||0,lv=locM[k]||0;merged.M[k]=lv>0?lv:cv;
             });
           }
-        }else{merged=Object.assign({},all[w]||{},j.data);}
+                }else{merged=Object.assign({},all[w]||{},j.data);}
         if(JSON.stringify(all[w])!==JSON.stringify(merged)){all[w]=merged;changed=true;}
       }
     }catch(e){}
