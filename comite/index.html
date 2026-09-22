@@ -392,6 +392,7 @@ body.modo-comite .brow{display:none!important}
     <span id="btn-pf-M" style="font-size:.78rem;font-weight:800;color:var(--o)">&#128100; Marcela</span>
     <span style="font-size:.64rem;color:var(--g);font-weight:600">Perfiladora &#250;nica</span>
     <span id="pf-ts-M" style="margin-left:auto;font-size:.63rem;color:var(--g);font-weight:700"></span>
+    <button onclick="traerPF()" title="Descarga ahora lo que guardaron los otros equipos" style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:6px;padding:3px 10px;font-size:.66rem;cursor:pointer;font-family:Syne,sans-serif;font-weight:700;color:#2563EB;white-space:nowrap">&#8681; Traer ahora</button>
   </div>
   <!-- ═══ MARCELA ═══ -->
   <div id="pf-M">
@@ -697,12 +698,19 @@ async function syncDatosAPI(tipo,weeks){
           var local=all[w]||{};
           var cloudM=Object.assign({},j.data.M||{}),locM=local.M||{};
           delete cloudM._dirty;   /* lo pendiente solo tiene sentido en el equipo local */
+          if(cloudM._ts)cloudM._srv=1;
           var cTs=parseInt(cloudM._ts)||0,lTs=parseInt(locM._ts)||0;
           merged={};
           if(locM._dirty){
-            /* Hay cambios guardados aqui que todavia no confirmo la nube.
-               Mandan ellos: sincronizar no puede borrar trabajo reciente. */
+            /* Cambios locales sin confirmar: se SUBEN ahora y mandan ellos.
+               Antes solo se quedaban bloqueando la bajada indefinidamente. */
             merged.M=locM;
+            _subirPendiente(w,locM);
+          }else if(cTs>0&&!locM._srv){
+            /* La nube siempre esta sellada por el reloj del servidor.
+               Este registro local trae un sello del reloj del propio PC, que
+               puede ir adelantado y ganarle indebidamente. Manda la nube. */
+            merged.M=cloudM;
           }else if(cTs>lTs){
             merged.M=cloudM;
           }else if(lTs>cTs){
@@ -721,6 +729,26 @@ async function syncDatosAPI(tipo,weeks){
   }));
   if(changed)sLS(storeKey,all);
   return changed;
+}
+/* Sube un registro que quedo pendiente y adopta el sello del servidor. */
+function _subirPendiente(week,rec){
+  try{
+    var env={};Object.keys(rec).forEach(function(k){if(k!=='_dirty')env[k]=rec[k];});
+    fetch('/api/datos?tipo=pf&week='+week,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({M:env})})
+      .then(function(r){return r.json();})
+      .then(function(j){
+        if(!j||!j.ok)return;
+        var a=gLS(LS_PF);
+        if(a[week]&&a[week].M){
+          if(j.ts)a[week].M._ts=j.ts;
+          a[week].M._srv=1;
+          delete a[week].M._dirty;
+          sLS(LS_PF,a);
+          loadPF();
+          toastNube('\u2601\ufe0f Pendiente subido a la nube');
+        }
+      }).catch(function(){});
+  }catch(e){}
 }
 function toastNube(msg){
   var t=document.createElement('div');
@@ -1154,6 +1182,25 @@ function loadPF(){
     }
   }
 }
+/* Descarga manual: trae lo que hayan guardado los otros equipos y dice que paso. */
+async function traerPF(){
+  var wk=getPer().sISO;
+  var antes=JSON.stringify((gLS(LS_PF)[wk]||{}).M||{});
+  try{
+    await syncDatosAPI('pf',[wk]);
+  }catch(e){
+    alert('No se pudo conectar con la nube.\n\nRevisa la conexi\u00f3n e int\u00e9ntalo de nuevo.');return;
+  }
+  loadPF();renderLeads();
+  var d=(gLS(LS_PF)[wk]||{}).M||{};
+  if(JSON.stringify(d)!==antes){
+    toastNube('\u2b07\ufe0f Datos actualizados desde la nube');
+  }else{
+    var cual=d._ts?('El \u00faltimo guardado en la nube es del '+new Date(parseInt(d._ts)).toLocaleString('es-CO')):'La nube no tiene datos de esta semana';
+    alert('Ya tienes la versi\u00f3n m\u00e1s reciente.\n\nSemana: '+wk+'\n'+cual+
+          '\n\nSi esperabas ver datos de otra persona, revisa que est\u00e9 parada en esta misma semana.');
+  }
+}
 function calcPFCheck(pf){
   var g=function(id){return Math.max(0,parseInt((document.getElementById('mf_'+id)||{}).value)||0);};
   var total=g('wpp_asig'),inter=g('mc_inter'),sinR=g('mc_nc');
@@ -1227,6 +1274,7 @@ async function savePF(pf){
           var a=gLS(LS_PF);
           if(a[key]&&a[key].M){
             if(j.ts)a[key].M._ts=j.ts;
+            a[key].M._srv=1;        /* sello del servidor: ya comparable entre equipos */
             delete a[key].M._dirty;
             sLS(LS_PF,a);
           }
