@@ -91,7 +91,14 @@ module.exports = async function handler(req, res) {
             // merge profundo por perfilador para no borrar datos del otro
             const existing = state[tipo][week] || {};
             // _dirty es una marca local del navegador: no debe viajar ni almacenarse
-            ['M','A'].forEach(p => { if (body[p]) { const inc = Object.assign({}, body[p]); delete inc._dirty; existing[p] = Object.assign({}, existing[p] || {}, inc); } });
+            ['M','A'].forEach(p => {
+              if (!body[p]) return;
+              const inc = Object.assign({}, body[p]);
+              delete inc._dirty;
+              existing[p] = Object.assign({}, existing[p] || {}, inc);
+              // borrarlo tambien si quedo almacenado de antes: el merge lo conservaria
+              delete existing[p]._dirty;
+            });
             // Sello de tiempo del SERVIDOR: un solo reloj para todos los equipos.
             // Si se usara el reloj de cada PC, un equipo atrasado perderia siempre
             // y sus datos serian sobrescritos al sincronizar.
