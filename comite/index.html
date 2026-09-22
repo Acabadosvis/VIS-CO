@@ -390,7 +390,8 @@ body.modo-comite .brow{display:none!important}
   <!-- PESTAÑAS PERFILADOR -->
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding:8px 12px;background:var(--gc);border:1px solid var(--brd);border-radius:10px">
     <span id="btn-pf-M" style="font-size:.78rem;font-weight:800;color:var(--o)">&#128100; Marcela</span>
-    <span style="font-size:.64rem;color:var(--g);font-weight:600">Perfiladora &#250;nica &#8212; hist&#243;rico de Andr&#233;s S. fusionado</span>
+    <span style="font-size:.64rem;color:var(--g);font-weight:600">Perfiladora &#250;nica</span>
+    <span id="pf-ts-M" style="margin-left:auto;font-size:.63rem;color:var(--g);font-weight:700"></span>
   </div>
   <!-- ═══ MARCELA ═══ -->
   <div id="pf-M">
@@ -659,15 +660,23 @@ async function syncDatosAPI(tipo,weeks){
         var merged;
         if(tipo==='reuniones'){merged=_maxMergeR(all[w]||{},j.data);}
         else if(tipo==='pf'){
-          // merge: nube base, local gana solo donde tiene valor real (>0)
+          /* Gana el guardado mas reciente (_ts). Antes el valor local siempre
+             pisaba al de la nube, asi que nunca se veian los datos del otro equipo. */
           var local=all[w]||{};
+          var cloudM=j.data.M||{},locM=local.M||{};
+          var cTs=parseInt(cloudM._ts)||0,lTs=parseInt(locM._ts)||0;
           merged={};
-          ['M','A'].forEach(function(p){
-            var cloud=j.data[p]||{},loc=local[p]||{};
-            merged[p]={};
-            var allKeys=Object.keys(Object.assign({},cloud,loc));
-            allKeys.forEach(function(k){var cv=cloud[k]||0,lv=loc[k]||0;merged[p][k]=lv>0?lv:cv;});
-          });
+          if(cTs>lTs){
+            merged.M=cloudM;
+          }else if(lTs>cTs){
+            merged.M=locM;
+          }else{
+            /* Sin marcas de tiempo (datos viejos): union conservadora, no se pierde nada */
+            merged.M={};
+            Object.keys(Object.assign({},cloudM,locM)).forEach(function(k){
+              var cv=cloudM[k]||0,lv=locM[k]||0;merged.M[k]=lv>0?lv:cv;
+            });
+          }
         }else{merged=Object.assign({},all[w]||{},j.data);}
         if(JSON.stringify(all[w])!==JSON.stringify(merged)){all[w]=merged;changed=true;}
       }
@@ -1061,13 +1070,22 @@ const PF_FIELDS={M:PF_UNIFIED,A:PF_UNIFIED};
 function migrarAndresAMarcela(){
   try{
     var pfAll=gLS(LS_PF),semanas=0;
+    var MIGK='vc3_merge_A_v1';
+    var hechas=[];try{hechas=JSON.parse(localStorage.getItem(MIGK)||'[]');}catch(e){hechas=[];}
     Object.keys(pfAll||{}).forEach(function(k){
       var w=pfAll[k];
       if(!w||!w.A)return;
+      /* Si esta semana ya se fusiono antes, no volver a sumar aunque la nube
+         reenvie el registro de Andres (evita duplicar cifras). */
+      if(hechas.indexOf(k)>=0){delete w.A;return;}
       var m=w.M||{},a=w.A;
-      Object.keys(a).forEach(function(f){m[f]=(parseInt(m[f])||0)+(parseInt(a[f])||0);});
-      w.M=m;delete w.A;semanas++;
+      Object.keys(a).forEach(function(f){
+        if(f.charAt(0)==='_')return;
+        m[f]=(parseInt(m[f])||0)+(parseInt(a[f])||0);
+      });
+      w.M=m;delete w.A;hechas.push(k);semanas++;
     });
+    try{localStorage.setItem(MIGK,JSON.stringify(hechas));}catch(e){}
     if(semanas>0){sLS(LS_PF,pfAll);console.log('%c[VIS-CO] Historico de Andres S. fusionado en Marcela: '+semanas+' semana(s)','color:#16A34A;font-weight:bold');}
   }catch(e){console.warn('[VIS-CO] migracion A->M fallo',e);}
 }
@@ -1080,6 +1098,21 @@ function loadPF(){
     var el=document.getElementById('mf_'+f);
     if(el)el.value=(d[f]||0)>0?d[f]:'';
   });
+  /* Sello de ultima actualizacion: deja ver si lo que hay en pantalla ya trae
+     lo que guardo el otro equipo. */
+  var ts=document.getElementById('pf-ts-M');
+  if(ts){
+    if(d._ts){
+      var f=new Date(parseInt(d._ts));
+      var dd=f.toLocaleDateString('es-CO',{day:'2-digit',month:'short'});
+      var hh=f.toTimeString().slice(0,5);
+      ts.textContent='\u2601\ufe0f Actualizado '+dd+' '+hh;
+      ts.style.color='#16A34A';
+    }else{
+      ts.textContent='\u2601\ufe0f Sin registro de sincronizaci\u00f3n';
+      ts.style.color='var(--g)';
+    }
+  }
 }
 function calcPFCheck(pf){
   var g=function(id){return Math.max(0,parseInt((document.getElementById('mf_'+id)||{}).value)||0);};
@@ -1121,6 +1154,8 @@ async function savePF(pf){
     /* si el campo ya no existe en el formulario, se conserva el valor historico */
     d[f]=el?Math.max(0,parseInt(el.value)||0):(parseInt(prev[f])||0);
   });
+  d._ts=Date.now();
+  d._src=(navigator.platform||'equipo');
   pfAll[key].M=d;
   sLS(LS_PF,pfAll);
   renderLeads();
