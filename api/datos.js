@@ -80,6 +80,7 @@ module.exports = async function handler(req, res) {
     let body = req.body;
     if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
 
+    let stampTs = null;
     // Reintentos por conflicto de SHA (máx 3)
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
@@ -90,6 +91,11 @@ module.exports = async function handler(req, res) {
             // merge profundo por perfilador para no borrar datos del otro
             const existing = state[tipo][week] || {};
             ['M','A'].forEach(p => { if (body[p]) existing[p] = Object.assign({}, existing[p] || {}, body[p]); });
+            // Sello de tiempo del SERVIDOR: un solo reloj para todos los equipos.
+            // Si se usara el reloj de cada PC, un equipo atrasado perderia siempre
+            // y sus datos serian sobrescritos al sincronizar.
+            stampTs = Date.now();
+            ['M','A'].forEach(p => { if (body[p] && existing[p]) existing[p]._ts = stampTs; });
             state[tipo][week] = existing;
           } else {
             state[tipo][week] = Object.assign({}, state[tipo][week] || {}, body);
@@ -98,7 +104,7 @@ module.exports = async function handler(req, res) {
           Object.assign(state[tipo], body);
         }
         const newSha = await writeState(state, sha);
-        return res.json({ ok: true, tipo, week, sha: newSha, saved: Object.keys(body) });
+        return res.json({ ok: true, tipo, week, sha: newSha, ts: stampTs, saved: Object.keys(body) });
       } catch (e) {
         if (e.conflict && attempt < 2) continue; // reintentar
         return res.status(500).json({ ok: false, error: e.message });
