@@ -90,7 +90,8 @@ module.exports = async function handler(req, res) {
           if (tipo === 'pf') {
             // merge profundo por perfilador para no borrar datos del otro
             const existing = state[tipo][week] || {};
-            ['M','A'].forEach(p => { if (body[p]) existing[p] = Object.assign({}, existing[p] || {}, body[p]); });
+            // _dirty es una marca local del navegador: no debe viajar ni almacenarse
+            ['M','A'].forEach(p => { if (body[p]) { const inc = Object.assign({}, body[p]); delete inc._dirty; existing[p] = Object.assign({}, existing[p] || {}, inc); } });
             // Sello de tiempo del SERVIDOR: un solo reloj para todos los equipos.
             // Si se usara el reloj de cada PC, un equipo atrasado perderia siempre
             // y sus datos serian sobrescritos al sincronizar.
