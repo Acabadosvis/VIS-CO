@@ -674,10 +674,13 @@ function _maxMergeR(local,cloud){
   var m=Object.assign({},cloud);
   for(var k in local){if(!local.hasOwnProperty(k))continue;
     var lv=local[k],cv=m[k];
-    if(lv&&cv&&typeof lv==='object'&&lv.prog!==undefined&&cv.prog!==undefined){
-      m[k]={prog:Math.max(lv.prog||0,cv.prog||0),ef:Math.max(lv.ef||0,cv.ef||0)};
-    }else if(lv&&cv&&typeof lv==='object'&&typeof cv==='object'){
+    if(lv&&cv&&typeof lv==='object'&&typeof cv==='object'&&!Array.isArray(lv)&&!Array.isArray(cv)){
+      /* Baja recursivamente y toma el maximo campo por campo.
+         Antes este caso reconstruia el nodo como {prog,ef} y borraba
+         cualquier otra clave — entre ellas 'con' (personas conectadas). */
       m[k]=_maxMergeR(lv,cv);
+    }else if(typeof lv==='number'&&typeof cv==='number'){
+      m[k]=Math.max(lv,cv);
     }else{m[k]=lv;}
   }return m;
 }
