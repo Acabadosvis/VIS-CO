@@ -2229,6 +2229,9 @@ const eAli=r=>{
   return ALIANZA.some(a=>p.includes(a))||CONV_KW.some(k=>p.includes(k));
 };
 const gV=r=>{const v=fv(r[19]);return v>0?v:fv(r[14])+fv(r[16]);};
+/* Remodelacion: se marca con PP en la columna ORIGEN LEAD del Excel.
+   No es negocio VIS, por eso no debe inflar la meta del mes. */
+const esRemoPP=r=>((r&&r[13]||'').toString().trim().toUpperCase()==='PP');
 const gAIU=r=>fv(r[16]);
 /* Origen: r[13] tiene prioridad para identificar partner; caer a r[9] si vacío */
 /* Alias: VANTI → WELL (Vanti ya no opera, sus ventas se consolidan en WELL) */
@@ -2298,8 +2301,12 @@ function renderVentas(){
   const aliAIU=aliR.reduce((s,r)=>s+gAIUD(r),0),orgAIU=orgR.reduce((s,r)=>s+gAIUD(r),0),remAIU=remR.reduce((s,r)=>s+gAIUD(r),0);
   /* Meta automática: valor mismo mes año anterior × 1.5 ÷ ticket promedio $37M */
   const TICKET_PROM=37000000;
-  const vmPrevYr=(xlR||[]).filter(r=>{const raw=(r[3]||'').toString().toLowerCase().trim();const m=MN[raw];const est=(r[8]||'').toString().toUpperCase().trim();return m===p.mi&&(parseInt(r[4])||0)===(p.yr-1)&&est!=='CAIDO'&&est!=='';});
+  const vmPrevYr=(xlR||[]).filter(r=>{const raw=(r[3]||'').toString().toLowerCase().trim();const m=MN[raw];const est=(r[8]||'').toString().toUpperCase().trim();return m===p.mi&&(parseInt(r[4])||0)===(p.yr-1)&&est!=='CAIDO'&&est!==''&&!esRemoPP(r);});
   const vmPrevYrVal=vmPrevYr.reduce((s,r)=>s+gV(r),0);
+  /* Remodelaciones (PP) del mismo mes del anio anterior: se informan aparte */
+  const vmPrevRemo=(xlR||[]).filter(r=>{const raw=(r[3]||'').toString().toLowerCase().trim();const m=MN[raw];const est=(r[8]||'').toString().toUpperCase().trim();
+    return m===p.mi&&(parseInt(r[4])||0)===(p.yr-1)&&est!=='CAIDO'&&est!==''&&esRemoPP(r);});
+  const vmPrevRemoVal=vmPrevRemo.reduce((s,r)=>s+gV(r),0);
   const metaValorTarget=vmPrevYrVal>0?vmPrevYrVal*1.5:0;
   const autoMetaV=metaValorTarget>0?Math.ceil(metaValorTarget/TICKET_PROM):null;
   /* Metas dinámicas — leídas de localStorage */
@@ -2409,6 +2416,7 @@ function renderVentas(){
           <div style="font-size:1.1rem;font-weight:700;color:${parseFloat(pV)>=100?'#4ADE80':'#fff'};margin-top:4px">${tv} <span style="font-size:.7rem;font-weight:600;color:#fff">/ ${META_V} · ${pV}%</span></div>
           <div style="margin-top:10px;border-top:1px solid #444;padding-top:8px;font-size:.72rem;color:#fff;line-height:2.1">
             ${autoMetaV?`<div>${p.mes} ${p.yr-1}: <strong style="color:var(--o)">${fmt(vmPrevYrVal)}</strong></div>
+            ${vmPrevRemo.length?`<div style="font-size:.66rem;color:#FCA5A5">\u2296 ${vmPrevRemo.length} remodelaci\u00f3n${vmPrevRemo.length>1?'es':''} (PP) excluida${vmPrevRemo.length>1?'s':''}: ${fmt(vmPrevRemoVal)}</div>`:''}
             <div>× 1.5 → <strong style="color:var(--y)">${fmt(metaValorTarget)}</strong></div>
             <div>÷ $37M = <strong style="color:#4ADE80">${META_V} ventas</strong></div>
             <div style="border-top:1px solid #444;margin-top:4px;padding-top:4px">`:'<div>'}
