@@ -1205,6 +1205,7 @@ function calcPFCheck(pf){
     if(ll===0&&ia===0&&nr===0)return;
     if(ll!==ia+nr){ok=false;msgs.push('\u26a0\ufe0f '+a[1]+': llegaron '+ll+' vs '+(ia+nr)+' (interacci\u00f3n '+ia+' + no responden '+nr+')');}
   });
+  if(!msgs.length){chk.style.display='none';return;}   /* sin nada que decir, no ocupa espacio */
   chk.style.display='block';
   chk.style.border='1.5px solid '+(ok?'#86EFAC':'#FCA5A5');
   chk.style.background=ok?'#F0FDF4':'#FEF2F2';
