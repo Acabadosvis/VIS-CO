@@ -1143,6 +1143,9 @@ function loadPF(){
   });
   /* Sello de ultima actualizacion: deja ver si lo que hay en pantalla ya trae
      lo que guardo el otro equipo. */
+  /* Recalcular el cuadre tras cargar: antes solo aparecia al teclear, asi que
+     los datos que llegaban del otro equipo no se validaban hasta tocar algo. */
+  try{calcPFCheck('M');}catch(e){}
   var ts=document.getElementById('pf-ts-M');
   if(ts){
     if(d._dirty){
