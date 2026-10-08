@@ -281,6 +281,10 @@ body.modo-comite .brow{display:none!important}
 </style>
 </head>
 <body>
+<div id="sync-alerta" style="display:none;background:#FEF2F2;border-bottom:2px solid #DC2626;color:#991B1B;padding:9px 16px;font-family:Syne,sans-serif;font-size:.78rem;font-weight:700;text-align:center;line-height:1.5">
+  <span id="sync-alerta-txt"></span>
+  <button onclick="revisarNube()" style="margin-left:10px;background:#DC2626;color:#fff;border:none;border-radius:6px;padding:3px 11px;font-size:.7rem;font-weight:700;cursor:pointer;font-family:Syne,sans-serif">Reintentar</button>
+</div>
 <header>
   <div class="hlogo">VIS<span>-CO</span></div>
   <div class="hm3">M3</div>
@@ -430,7 +434,6 @@ body.modo-comite .brow{display:none!important}
   </div>
   </div><!-- /l-form-semanal -->
   <div id="l-dbg" style="display:none;background:#1E293B;color:#94A3B8;font-size:.72rem;padding:8px 12px;border-radius:6px;margin:6px 0;font-family:monospace;line-height:1.6"></div>
-  <div id="l-checklist"></div>
   <div id="l-kpis" class="kg"></div>
   <div id="l-ver-kpi" class="kg" style="display:none"></div>
   <div id="l-funnel" class="fn-wrap"></div>
@@ -652,6 +655,29 @@ function _maxMergeR(local,cloud){
   }return m;
 }
 /* ── syncDatosAPI: descarga datos de la nube y mezcla con local ── */
+var _nubeCaida=false;
+/* Marca el estado de la nube y muestra/oculta el aviso de arriba.
+   Antes los fallos se tragaban en silencio y nadie se enteraba. */
+function _marcarNube(ok,detalle){
+  if(_nubeCaida===!ok)return;
+  _nubeCaida=!ok;
+  var b=document.getElementById('sync-alerta'),t=document.getElementById('sync-alerta-txt');
+  if(!b||!t)return;
+  if(ok){b.style.display='none';}
+  else{
+    t.innerHTML='\u26a0\ufe0f <strong>Sin sincronizaci\u00f3n entre equipos.</strong> Lo que guardes queda solo en este dispositivo y no lo ver\u00e1n los dem\u00e1s.'
+      +(detalle?' <span style="font-weight:600;opacity:.8">('+detalle+')</span>':'');
+    b.style.display='block';
+  }
+}
+async function revisarNube(){
+  try{
+    var r=await fetch('/api/datos?tipo=pf&week='+getPer().sISO);
+    var j=await r.json();
+    if(j&&j.ok){_marcarNube(true);toastNube('\u2601\ufe0f Conexi\u00f3n restablecida');renderAll();}
+    else{_marcarNube(false,(j&&j.error)||('HTTP '+r.status));}
+  }catch(e){_marcarNube(false,'sin red');}
+}
 async function syncDatosAPI(tipo,weeks){
   var storeKey=tipo==='redes'?LS_R:tipo==='reuniones'?LS_C:tipo==='pf'?LS_PF:LS_L;
   var all=gLS(storeKey);var changed=false;
@@ -659,6 +685,8 @@ async function syncDatosAPI(tipo,weeks){
     try{
       var r=await fetch('/api/datos?tipo='+tipo+'&week='+w);
       var j=await r.json();
+      if(j&&j.ok===false){_marcarNube(false,j.error||('HTTP '+r.status));}
+      else if(j&&j.ok){_marcarNube(true);}
       if(j.ok&&j.data&&Object.keys(j.data).length>0){
         var merged;
         if(tipo==='reuniones'){merged=_maxMergeR(all[w]||{},j.data);}
@@ -1748,56 +1776,6 @@ function renderLeads(){
   if((d2.remo_tot||0)>0)kHtml+=kp('#FFF7ED','#F97316','&#128296; Remo NM — llegaron',d2.remo_tot||0,((d2.remo_int||0)>0?'&#11088; '+d2.remo_int+' int · ':'')+((d2.remo_ci||0)>0?'&#127942; '+d2.remo_ci+' cierre'+(d2.remo_ci>1?'s':''):'— cierres'));
   if(kEl)kEl.innerHTML=kHtml;
   console.log('[VIS-CO] KPIs renderizados. hasPF='+hasPF);
-  /* ── LISTA DE CHEQUEO ── */
-  var clEl=document.getElementById('l-checklist');
-  if(clEl){
-    var rWppR=rD2.wpp||0,rBitrixR=rD2.cli_calc||0,rVerR=rD2.cli_ver||0;
-    /* Reuniones Karen+Nathalia */
-    var knReuAg=0,knReuEf=0;
-    try{var allC2=gLS(LS_C)||{};var curC2=allC2[p2.sISO]||{};knReuAg=((curC2.KM&&curC2.KM.prog)||0)+((curC2.NM&&curC2.NM.prog)||0);knReuEf=((curC2.KM&&curC2.KM.ef)||0)+((curC2.NM&&curC2.NM.ef)||0);}catch(e){}
-    function fmtPesos(m){return m>0?'$'+m+'M':'—';}
-    function clRow(lbl,mV,aV,ref,col){
-      var tot=mV+aV;var ok=ref>0?(tot===ref):true;
-      var icon=ref>0?(ok?'✅':'❌'):'';
-      var diff=ref>0?(tot-ref):0;
-      var diffTxt=ref>0&&!ok?'<span style="color:#DC2626;font-size:.65rem"> (dif.'+diff+')</span>':'';
-      return'<tr><td style="padding:5px 8px;font-size:.72rem;color:#334155">'+icon+' '+lbl+'</td>'+
-        '<td style="text-align:right;padding:5px 8px;font-size:.75rem;font-weight:700;color:#0891B2">'+mV+'</td>'+
-        '<td style="text-align:right;padding:5px 8px;font-size:.75rem;font-weight:700;color:#7C3AED">'+aV+'</td>'+
-        '<td style="text-align:right;padding:5px 8px;font-size:.85rem;font-weight:800;color:'+(col||'#1E40AF')+'">'+tot+diffTxt+'</td>'+
-        (ref>0?'<td style="text-align:right;padding:5px 8px;font-size:.7rem;color:#64748B">'+ref+'</td>':'<td></td>')+
-        '</tr>';
-    }
-    /* helper para separador de sección */
-    function clSec(txt,col){return'<tr><td colspan="5" style="padding:4px 8px 2px;background:'+col+'15;font-size:.6rem;font-weight:800;color:'+col+';text-transform:uppercase;letter-spacing:.4px;border-top:2px solid '+col+'30">'+txt+'</td></tr>';}
-    var clHtml='<div style="background:#fff;border:1px solid #E2E8F0;border-top:3px solid #1E40AF;border-radius:10px;padding:12px 14px;margin-bottom:12px">';
-    clHtml+='<div style="font-size:.68rem;font-weight:800;color:#1E40AF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">&#9989; Lista de chequeo &#8212; Redes · Leads · Reuniones · '+wShort(p2)+'</div>';
-    clHtml+='<table style="width:100%;border-collapse:collapse">';
-    clHtml+='<thead><tr style="background:#F8FAFC"><th style="text-align:left;padding:5px 8px;font-size:.62rem;color:#64748B;text-transform:uppercase;border-bottom:1px solid #E2E8F0">Indicador</th><th style="text-align:right;padding:5px 8px;font-size:.62rem;color:#0891B2">Marcela</th><th style="text-align:right;padding:5px 8px;font-size:.62rem;color:#7C3AED">Andr&#233;s</th><th style="text-align:right;padding:5px 8px;font-size:.62rem;color:#1E40AF">Total</th><th style="text-align:right;padding:5px 8px;font-size:.62rem;color:#64748B">REF.</th></tr></thead>';
-    clHtml+='<tbody>';
-    /* ─ SECCIÓN 1: ManyChat vs Redes Ángela ─ */
-    clHtml+=clSec('&#128172; ManyChat / WhatsApp &mdash; vs. Redes (&#193;ngela)','#059669');
-    clHtml+=clRow('Chats ManyChat asignados',mWppAsig,aWppAsig,rWppR,'#059669');
-    clHtml+=clRow('&nbsp;&nbsp;├ Env&#237;a cotizaci&#243;n',mMcCot,aMcCot,0,'#0891B2');
-    clHtml+=clRow('&nbsp;&nbsp;├ Agenda reuni&#243;n',mMcReu,aMcReu,0,'#EA580C');
-    clHtml+=clRow('&nbsp;&nbsp;└ No contesta',mMcNc,aMcNc,0,'#64748B');
-    /* ─ SECCIÓN 2: Bitrix vs Redes Ángela ─ */
-    clHtml+=clSec('&#129518; Bitrix &mdash; vs. Redes (&#193;ngela)','#F97316');
-    clHtml+=clRow('Bitrix llegan',mCalAsig,aCalAsig,rBitrixR,'#F97316');
-    clHtml+=clRow('&nbsp;&nbsp;├ Atienden y responden',mCalResp,aCalResp,0,'#16A34A');
-    clHtml+=clRow('&nbsp;&nbsp;├ Hacen la calculadora',mCalHace,aCalHace,0,'#059669');
-    clHtml+=clRow('&nbsp;&nbsp;├ Verificadas',mCalVer,aCalVer,rVerR,'#0891B2');
-    clHtml+=clRow('&nbsp;&nbsp;└ No contactados',mCalNcV1+mCalNcV2+mCalNcV3,aCalNcV1+aCalNcV2+aCalNcV3,0,'#DC2626');
-    /* ─ SECCIÓN 3: Reuniones vs Karen+Nathalia ─ */
-    clHtml+=clSec('&#128197; Reuniones &mdash; vs. Karen + Nathalia','#2563EB');
-    clHtml+=clRow('Agendadas',mReuAg,aReuAg,knReuAg,'#2563EB');
-    clHtml+=clRow('&nbsp;&nbsp;├ Confirmadas 24h antes',mReuConf24,aReuConf24,0,'#D97706');
-    clHtml+=clRow('&nbsp;&nbsp;├ Reagendadas',mReuReag,aReuReag,0,'#4F46E5');
-    clHtml+=clRow('&nbsp;&nbsp;└ Efectivas',mReuEf,aReuEf,knReuEf,'#16A34A');
-    clHtml+='</tbody></table></div>';
-    clEl.innerHTML=clHtml;
-    console.log('[VIS-CO] Checklist renderizado OK');
-  }
   /* ── PIPELINE PERFILADORES ── */
   var wpp2=d2.wpp||0;
   var fEl=document.getElementById('l-funnel');
@@ -1852,51 +1830,78 @@ function renderLeads(){
   }
   var vkEl=document.getElementById('l-ver-kpi');if(vkEl)vkEl.style.display='none';
 
-  /* ── TABLA: base = VERIFICADOS, comparación semana a semana ── */
-  var ver0=d0.ver||0,ver1=d1.ver||0,ver2b=d2.ver||0;
-  var cats2=[
-    {k:'ver',lbl:'✅ Base: Verificados',base0:null,base1:null,base2:null,bold:true},
-    {k:'int',lbl:'⭐ Interesados',base0:ver0,base1:ver1,base2:ver2b},
-    {k:'sr', lbl:'📨 Mensajes en proceso',base0:ver0,base1:ver1,base2:ver2b},
-    {k:'sr2',lbl:'💬 Sin respuesta',base0:null,base1:null,base2:null},
-    {k:'ni', lbl:'👎 No interesados', base0:ver0,base1:ver1,base2:ver2b},
-    {k:'cno',lbl:'📋 Incompletas',    base0:ver0,base1:ver1,base2:ver2b}
+  /* ── TABLA COMPARATIVA — ahora sobre los datos de PERFILADORES ──
+     Antes leia de vc3_leads_v1, un almacen que dejo de llenarse cuando el
+     formulario viejo fue reemplazado: por eso salia todo en cero. */
+  function _pfW(per){var a=gLS(LS_PF)[per.sISO]; return (a&&a.M)||{};}
+  function _g(o,k){return parseInt(o[k])||0;}
+  function _interesados(o){
+    return _g(o,'mc_cant_interes')+_g(o,'mc_gc_interes')+_g(o,'mc_cv_interes')+_g(o,'gest_pot');
+  }
+  var q0=_pfW(p0),q1=_pfW(p1),q2=_pfW(p2);
+  var filas=[
+    {sec:'\u{1F4AC} ManyChat'},
+    {lbl:'Chats asignados',   f:function(o){return _g(o,'wpp_asig');}, bold:true},
+    {lbl:'Interacci\u00f3n',      f:function(o){return _g(o,'mc_inter');}, base:'wpp_asig'},
+    {lbl:'Sin respuesta',     f:function(o){return _g(o,'mc_nc');}, base:'wpp_asig', inv:true},
+    {lbl:'Cotizaciones enviadas', f:function(o){return _g(o,'mc_cot');}, base:'wpp_asig'},
+    {sec:'\u{1F9EE} Calculadoras (Bitrix)'},
+    {lbl:'Asignadas',         f:function(o){return _g(o,'cal_asig');}, bold:true},
+    {lbl:'Verificadas',       f:function(o){return _g(o,'cal_ver');}, base:'cal_asig'},
+    {lbl:'Incompletas',       f:function(o){return _g(o,'cal_inc');}, base:'cal_asig', inv:true},
+    {lbl:'No verificadas',    f:function(o){return _g(o,'cal_nver');}, base:'cal_asig', inv:true},
+    {lbl:'Duplicadas',        f:function(o){return _g(o,'cal_dup');}, base:'cal_asig', inv:true},
+    {sec:'\u{1F3AF} Resultado'},
+    {lbl:'Interesados',       f:_interesados, bold:true},
+    {lbl:'Fuera de cobertura',f:function(o){return _g(o,'mc_cob');}, inv:true},
+    {lbl:'Sin inter\u00e9s',      f:function(o){return _g(o,'mc_ni');}, inv:true}
   ];
-  function pctOf(v,b){return b>0?'<span style="font-size:.65rem;color:#888;font-weight:400"> ('+Math.round(v/b*100)+'%)</span>':'';}
-  var rows2=cats2.map(function(cat){
-    var v0=d0[cat.k]||0,v1=d1[cat.k]||0,v2=d2[cat.k]||0;
-    var b=cat.bold;
-    return'<tr'+(b?' class="tot"':'')+'><td class="mc">'+(b?'<strong>':'')+cat.lbl+(b?'</strong>':'')+'</td>'+
-      '<td class="tr">'+(b?'<strong>':'')+v0+(b?'</strong>':'')+pctOf(v0,cat.base0)+'</td>'+
-      '<td class="tr">'+(b?'<strong>':'')+v1+(b?'</strong>':'')+pctOf(v1,cat.base1)+'</td>'+
-      '<td class="tr">'+(b?'<strong>':'')+v2+(b?'</strong>':'')+pctOf(v2,cat.base2)+'</td>'+
-      '<td class="tr">'+dH(v1,v0,cat.k!='int'&&cat.k!='ver')+'</td>'+
-      '<td class="tr">'+dH(v2,v1,cat.k!='int'&&cat.k!='ver')+'</td></tr>';
+  function _pctOf(v,b){return b>0?'<span style="font-size:.65rem;color:#888;font-weight:400"> ('+Math.round(v/b*100)+'%)</span>':'';}
+  var rows2=filas.map(function(c){
+    if(c.sec)return'<tr style="background:#F8FAFC"><td class="mc" colspan="6" style="font-size:.64rem;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.5px;padding:7px 10px">'+c.sec+'</td></tr>';
+    var v0=c.f(q0),v1=c.f(q1),v2=c.f(q2);
+    var b0=c.base?_g(q0,c.base):0,b1=c.base?_g(q1,c.base):0,b2=c.base?_g(q2,c.base):0;
+    var B=c.bold;
+    return'<tr'+(B?' class="tot"':'')+'><td class="mc">'+(B?'<strong>':'')+c.lbl+(B?'</strong>':'')+'</td>'+
+      '<td class="tr">'+(B?'<strong>':'')+v0+(B?'</strong>':'')+_pctOf(v0,b0)+'</td>'+
+      '<td class="tr">'+(B?'<strong>':'')+v1+(B?'</strong>':'')+_pctOf(v1,b1)+'</td>'+
+      '<td class="tr">'+(B?'<strong>':'')+v2+(B?'</strong>':'')+_pctOf(v2,b2)+'</td>'+
+      '<td class="tr">'+dH(v1,v0,!!c.inv)+'</td>'+
+      '<td class="tr">'+dH(v2,v1,!!c.inv)+'</td></tr>';
   }).join('');
-  var calc0=d0.total||0,calc1=d1.total||0,calc2=d2.total||0;
-  var convRow='<tr style="background:#EFF6FF"><td class="mc" style="font-size:.68rem;color:#0891B2;font-weight:700">% Verificados / Calc.</td>'+
-    '<td class="tr" style="font-size:.72rem;color:#0891B2;font-weight:700">'+(calc0>0?Math.round(ver0/calc0*100)+'%':'—')+'</td>'+
-    '<td class="tr" style="font-size:.72rem;color:#0891B2;font-weight:700">'+(calc1>0?Math.round(ver1/calc1*100)+'%':'—')+'</td>'+
-    '<td class="tr" style="font-size:.72rem;color:#0891B2;font-weight:700">'+(calc2>0?Math.round(ver2b/calc2*100)+'%':'—')+'</td><td></td><td></td></tr>';
+  function _tasa(o){var a=_g(o,'wpp_asig');return a>0?Math.round(_g(o,'mc_inter')/a*100):null;}
+  function _tasaV(o){var a=_g(o,'cal_asig');return a>0?Math.round(_g(o,'cal_ver')/a*100):null;}
+  function _celdaT(v){return'<td class="tr" style="font-size:.72rem;color:#0891B2;font-weight:700">'+(v===null?'\u2014':v+'%')+'</td>';}
+  var tasaRow='<tr style="background:#EFF6FF"><td class="mc" style="font-size:.68rem;color:#0891B2;font-weight:700">% Interacci\u00f3n / Asignados</td>'+
+    _celdaT(_tasa(q0))+_celdaT(_tasa(q1))+_celdaT(_tasa(q2))+'<td></td><td></td></tr>'+
+    '<tr style="background:#EFF6FF"><td class="mc" style="font-size:.68rem;color:#0891B2;font-weight:700">% Verificadas / Asignadas</td>'+
+    _celdaT(_tasaV(q0))+_celdaT(_tasaV(q1))+_celdaT(_tasaV(q2))+'<td></td><td></td></tr>';
   var cmpEl=document.getElementById('l-cmp');
-  if(cmpEl)cmpEl.innerHTML='<div class="card lct"><div class="card-hd">Leads verificados — comparativo semanal <span class="card-hd-sub" style="color:#0891B2">base: verificados</span></div><div class="tw"><table><thead><tr><th>Clasificación</th><th class="tr">'+wShort(p0)+'</th><th class="tr">'+wShort(p1)+'</th><th class="tr">'+wShort(p2)+'</th><th class="tr">Var ant</th><th class="tr">Var act</th></tr></thead><tbody>'+rows2+convRow+'</tbody></table></div></div>';
-  /* Gráficas */
+  if(cmpEl)cmpEl.innerHTML='<div class="card lct"><div class="card-hd">Comparativo semanal \u2014 perfiladores <span class="card-hd-sub" style="color:#0891B2">ManyChat \u00b7 Bitrix \u00b7 resultado</span></div><div class="tw"><table><thead><tr><th>Indicador</th><th class="tr">'+wShort(p0)+'</th><th class="tr">'+wShort(p1)+'</th><th class="tr">'+wShort(p2)+'</th><th class="tr">Var ant</th><th class="tr">Var act</th></tr></thead><tbody>'+rows2+tasaRow+'</tbody></table></div></div>';
+
+  /* ── GRAFICAS ── */
   var w6=[pm3,pm2,pm1,p0,p1,p2];
   var wlbls6=w6.map(function(w){return wShort(w);});
-  var tot6=w6.map(function(w){return(allL[w.sISO]||{}).total||0;});
-  var int6=w6.map(function(w){return(allL[w.sISO]||{}).int||0;});
+  var q6=w6.map(_pfW);
+  var mc6=q6.map(function(o){return _g(o,'wpp_asig');});
+  var bx6=q6.map(function(o){return _g(o,'cal_asig');});
+  var int6=q6.map(_interesados);
+  var tasa6=q6.map(function(o){var a=_g(o,'wpp_asig');return a>0?Math.round(_g(o,'mc_inter')/a*100):0;});
+  var tasaV6=q6.map(function(o){var a=_g(o,'cal_asig');return a>0?Math.round(_g(o,'cal_ver')/a*100):0;});
   setTimeout(function(){
     mkBarG('lc_evo',wlbls6,[
-      {label:'Total leads',data:tot6,backgroundColor:'#FDBA74',borderColor:'#F97316',borderWidth:1.5,borderRadius:5,type:'bar'},
-      {label:'Interesados ★',data:int6,backgroundColor:'#16A34A',borderRadius:5,type:'bar'}
+      {label:'ManyChat asignados',data:mc6,backgroundColor:'#FDBA74',borderColor:'#F97316',borderWidth:1.5,borderRadius:5,type:'bar'},
+      {label:'Bitrix asignadas',data:bx6,backgroundColor:'#93C5FD',borderColor:'#2563EB',borderWidth:1.5,borderRadius:5,type:'bar'},
+      {label:'Interesados \u2605',data:int6,backgroundColor:'#16A34A',borderRadius:5,type:'bar'}
     ]);
+    /* Dona: reparto de las calculadoras, que si son categorias excluyentes */
     mkDona('lc_pie',
-      ['Incompletas','Msg proceso','Sin respuesta','No interesados','Interesados ★'],
-      [d2.cno||0,d2.sr||0,d2.sr2||0,d2.ni||0,d2.int||0],
-      ['#F97316','#6366F1','#64748B','#94A3B8','#16A34A']);
+      ['Verificadas','Incompletas','No verificadas','Duplicadas'],
+      [_g(q2,'cal_ver'),_g(q2,'cal_inc'),_g(q2,'cal_nver'),_g(q2,'cal_dup')],
+      ['#0891B2','#D97706','#64748B','#DC2626']);
     mkLine('lc_trend',wlbls6,[
-      {label:'Total leads',data:tot6,borderColor:'#F97316',backgroundColor:'rgba(249,115,22,.08)',fill:true,tension:.3},
-      {label:'Interesados',data:int6,borderColor:'#16A34A',backgroundColor:'rgba(22,163,74,.08)',fill:true}
+      {label:'% Interacci\u00f3n (ManyChat)',data:tasa6,borderColor:'#F97316',backgroundColor:'rgba(249,115,22,.08)',fill:true,tension:.3},
+      {label:'% Verificadas (Bitrix)',data:tasaV6,borderColor:'#0891B2',backgroundColor:'rgba(8,145,178,.08)',fill:true,tension:.3}
     ]);
   },80);
   renderRemo();
