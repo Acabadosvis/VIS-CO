@@ -689,7 +689,20 @@ async function syncDatosAPI(tipo,weeks){
       else if(j&&j.ok){_marcarNube(true);}
       if(j.ok&&j.data&&Object.keys(j.data).length>0){
         var merged;
-        if(tipo==='reuniones'){merged=_maxMergeR(all[w]||{},j.data);}
+        if(tipo==='reuniones'){
+          merged=_maxMergeR(all[w]||{},j.data);
+          /* Si este equipo tiene datos que la nube no tiene, subirlos ahora.
+             Antes, si el guardado no alcanzaba a subir (sin conexion, o la nube
+             caida como paso del 2 al 8 de octubre), el dato quedaba atrapado
+             aqui para siempre y nadie mas lo veia. */
+          try{
+            if(JSON.stringify(merged)!==JSON.stringify(j.data)){
+              fetch('/api/datos?tipo=reuniones&week='+w,{method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify(merged)}).catch(function(){});
+            }
+          }catch(e){}
+        }
         else if(tipo==='pf'){
           /* Regla de convivencia entre equipos:
              - La nube SIEMPRE trae el sello del reloj del servidor.
