@@ -1511,20 +1511,31 @@ function renderPagoCellRow(c) {
   const activeBlocks = (c.blocks||[]).filter(b=>b.saldo>0);
   const usaGEN = activeBlocks.length===0;
 
-  // Estado de soportes ya registrados
-  const anyPend = usaGEN
-    ? (sops[pagoKey(c.cid,'GEN')]||{}).estado==='pendiente'
-    : activeBlocks.some(b=>{ const s=sops[pagoKey(c.cid,b.etapa)]; return s&&s.estado==='pendiente'; });
-  const anyEntro = usaGEN
-    ? (sops[pagoKey(c.cid,'GEN')]||{}).estado==='entro'
-    : activeBlocks.some(b=>{ const s=sops[pagoKey(c.cid,b.etapa)]; return s&&s.estado==='entro'; });
+  // Estado de soportes ya registrados — evaluar bloque a bloque
+  if(usaGEN){
+    const s=(sops[pagoKey(c.cid,'GEN')]||{}).estado;
+    if(s==='pendiente') return `<span class="pago-badge pendiente" onclick="openModal('${c.cid}')" style="cursor:pointer">📤 Pend. contab.</span>`;
+    if(s==='entro')     return `<span class="pago-badge entro"     onclick="openModal('${c.cid}')" style="cursor:pointer">✅ Entró</span>`;
+    return `<label class="fbtn upload" style="padding:3px 9px;font-size:10px;display:inline-flex" title="Cargar soporte de pago">
+    📤 Soporte<input type="file" accept="image/*,.pdf" onchange="onSoporteRapido('${c.cid}',this,'GEN')"></label>`;
+  }
 
+  // Bloques activos: si alguno está pendiente contab → mostrar eso primero
+  const anyPend = activeBlocks.some(b=>{ const s=sops[pagoKey(c.cid,b.etapa)]; return s&&s.estado==='pendiente'; });
   if(anyPend) return `<span class="pago-badge pendiente" onclick="openModal('${c.cid}')" style="cursor:pointer">📤 Pend. contab.</span>`;
-  if(anyEntro)return `<span class="pago-badge entro"     onclick="openModal('${c.cid}')" style="cursor:pointer">✅ Entró</span>`;
 
-  // Siempre mostrar botón — nunca "—"
-  return `<label class="fbtn upload" style="padding:3px 9px;font-size:10px;display:inline-flex" title="Cargar soporte de pago">
-    📤 Soporte<input type="file" accept="image/*,.pdf" onchange="onSoporteRapido('${c.cid}',this${usaGEN?`,'GEN'`:''})">\n  </label>`;
+  // Si hay bloques sin soporte → mostrar botón de subir (aunque otros ya hayan entrado)
+  const sinSoporte = activeBlocks.filter(b=>{ const s=sops[pagoKey(c.cid,b.etapa)]; return !s||!s.estado; });
+  if(sinSoporte.length>0){
+    // Si solo hay un bloque sin soporte, subir directo; si hay varios, abrir modal
+    const etapaFija = sinSoporte.length===1 ? `,'${sinSoporte[0].etapa}'` : '';
+    const titulo = sinSoporte.length>1 ? `${sinSoporte.length} bloques sin soporte` : `Soporte ${sinSoporte[0].etapa}`;
+    return `<label class="fbtn upload" style="padding:3px 9px;font-size:10px;display:inline-flex" title="${titulo}">
+    📤 Soporte<input type="file" accept="image/*,.pdf" onchange="onSoporteRapido('${c.cid}',this${etapaFija})"></label>`;
+  }
+
+  // Todos los bloques activos ya entraron
+  return `<span class="pago-badge entro" onclick="openModal('${c.cid}')" style="cursor:pointer">✅ Entró</span>`;
 }
 function onSoporteRapido(cid,input,etapaFija){
   const f=input.files[0]; if(!f) return;
@@ -1634,7 +1645,9 @@ function renderCola(){
   const pending      =all.filter(([k,v])=>v.estado==='pendiente');
   const entrado      =all.filter(([k,v])=>v.estado==='entro');
   const rechazados   =all.filter(([k,v])=>v.estado==='rechazado');
-  const entradoSemana=entrado.filter(([k,v])=>v.fecha_entro&&v.fecha_entro>=WEEK.ss&&v.fecha_entro<=WEEK.es);
+  // "Confirmados esta semana" = soportes cuyo soporte fue SUBIDO esta semana y luego confirmados
+  // (no por fecha_entro, que es cuando contabilidad hizo clic — puede ser semana siguiente)
+  const entradoSemana=entrado.filter(([k,v])=>v.semana===WEEK.ss||(v.fecha_soporte&&v.fecha_soporte>=WEEK.ss&&v.fecha_soporte<=WEEK.es));
   const pendMonto       = pending.reduce((a,[k,v])=>a+(v.monto||0),0);
   const entroMonto      = entradoSemana.reduce((a,[k,v])=>a+(v.monto||0),0);
   const entroTotalMonto = entrado.reduce((a,[k,v])=>a+(v.monto||0),0);
