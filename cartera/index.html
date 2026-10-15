@@ -552,37 +552,69 @@ function saveProjField(cid, key, val){
   parseAndRender(null);   // reclasifica + renderiza con nuevo dato
 }
 
-// Inyecta fechas calculadas para clientes WELL (desde fecha_inicio del proyecto)
-// Schedule WELL: P1 (OB+Mezz) → +50d, P2 (Carp) → +70d, P3 (Entrega) → +80d
+// Reconstruye bloques WELL desde cero usando lógica de pagos propia.
+// Ignora fechas del Excel. Usa total+recaudado+fecha_inicio para calcular
+// qué está pagado y cuándo vence cada tramo.
+// Estructura WELL:
+//   Congelación (SEP): ~$5M o 5% del total  — al firmar
+//   Anticipo (ANT):    ~45% del total         — al inicio de obra (fecha_inicio)
+//   OB + Mezzanine:    ~20% del total         — fecha_inicio + 50d
+//   Carpintería:       ~20% del total         — fecha_inicio + 70d
+//   Entrega:           ~10% del total         — fecha_inicio + 80d
 function injectWellDates(){
   const pd=getProjData();
   const wStart=WEEK.start, wEnd=WEEK.end;
+  const _sops=JSON.parse(localStorage.getItem('visco_sop2')||'{}');
+
   for(const c of DATA){
     if((c.origen||'').toUpperCase()!=='WELL') continue;
-    const p=pd[c.cid]; if(!p?.fecha_inicio) continue;
+    const p=pd[c.cid];
+    if(!p?.fecha_inicio) continue; // sin fecha_inicio no se puede calcular
+
     const d0=new Date(p.fecha_inicio+'T12:00:00');
     const addD=n=>{ const x=new Date(d0); x.setDate(x.getDate()+n); return x.toISOString().slice(0,10); };
-    // WELL: P1=Congelación, P2=Anticipo (sin fecha fija), luego:
-    // P3 → +50d (OB+Mezz), P4 → +70d (Carp), P5 → +80d (Entrega)
-    const WELL_FC={P3:addD(50),P4:addD(70),P5:addD(80)};
-    const WELL_LBL={P1:'Congelación',P2:'Anticipo',P3:'OB + Mezzanine',P4:'Carpintería',P5:'Entrega'};
+    const tot=c.total; if(tot<=0) continue;
+
+    // Definir tramos WELL con % del contrato y fecha de vencimiento
+    const TRAMOS=[
+      {etapa:'SEP', label:'Congelación',    pct:0.05, fc:null},          // al firmar, sin fecha de cobro
+      {etapa:'ANT', label:'Anticipo',       pct:0.45, fc:p.fecha_inicio}, // al iniciar obra
+      {etapa:'P1',  label:'OB + Mezzanine', pct:0.20, fc:addD(50)},
+      {etapa:'P2',  label:'Carpintería',    pct:0.20, fc:addD(70)},
+      {etapa:'P3',  label:'Entrega',        pct:0.10, fc:addD(80)},
+    ];
+
+    // Distribuir recaudado sobre los tramos en orden
+    let rem=c.recaudado;
     let vencAmt=0,semAmt=0,proxAmt=0,oldestVenc=null;
-    for(const b of c.blocks){
-      if(WELL_LBL[b.etapa]) b.label=WELL_LBL[b.etapa];
-      const newFc=WELL_FC[b.etapa]||b.fc;
-      b.fc=newFc;
-      if(b.etapa==='P1' || b.etapa==='P2') { b.bst='proximo'; continue; } // sin fecha = no vence
-      if(newFc){
-        const fd=new Date(newFc+'T12:00:00');
-        if(fd<wStart){b.bst='vencido';vencAmt+=b.saldo;if(!oldestVenc||newFc<oldestVenc)oldestVenc=newFc;}
-        else if(fd<=wEnd){b.bst='semana';semAmt+=b.saldo;}
-        else b.bst='proximo';
-      } else b.bst='proximo';
+    const newBlocks=[];
+
+    for(const t of TRAMOS){
+      const mc=Math.round(tot*t.pct);
+      const credit=Math.min(mc,Math.max(0,rem));
+      rem=Math.max(0,rem-mc);
+      const saldo=Math.max(0,mc-credit);
+      if(saldo<1) continue; // pagado
+
+      // Si contabilidad confirmó este bloque → considerar pagado
+      if(_sops[c.cid+'_'+t.etapa]?.estado==='entro') continue;
+
+      let bst='proximo';
+      if(t.fc){
+        const fd=new Date(t.fc+'T12:00:00');
+        if(fd<wStart){bst='vencido';vencAmt+=saldo;if(!oldestVenc||t.fc<oldestVenc)oldestVenc=t.fc;}
+        else if(fd<=wEnd){bst='semana';semAmt+=saldo;}
+        else proxAmt+=saldo;
+      }
+      newBlocks.push({etapa:t.etapa,label:t.label,mc,mr:credit,saldo,fc:t.fc,fr:null,bst});
     }
+
+    // Reemplazar bloques y recalcular totales del cliente
+    c.blocks=newBlocks;
     c.vencAmt=vencAmt; c.semAmt=semAmt; c.proxAmt=proxAmt;
     c.oldestVenc=oldestVenc;
     c.diasMora=oldestVenc?Math.max(0,Math.floor((TODAY.getTime()-new Date(oldestVenc+'T12:00:00').getTime())/86400000)):0;
-    if(c.ep==='EN EJECUCIÓN'){
+    if(c.ep==='EN EJECUCIÓN'||c.ep==='X RECIBIR'){
       if(vencAmt>0)c.cat='vencido';
       else if(semAmt>0)c.cat='semana';
       else c.cat='aldia';
@@ -1279,9 +1311,10 @@ function openModal(cid) {
   const noteSaved = notes[cid]||'';
 
   // ── CRONOGRAMA DE OBRA ──────────────────────────────────────
-  const proj = getProjData()[cid]||{};
   const isWell = (c.origen||'').toUpperCase()==='WELL';
-  const plazoDias = proj.plazo||(isWell?90:60);
+  const proj = getProjData()[cid]||{};
+  // Para WELL: si no hay plazo guardado O el guardado es el default 60 → usar 90
+  const plazoDias = proj.plazo && !(isWell && proj.plazo===60) ? proj.plazo : (isWell?90:60);
   const diasAdic  = proj.dias_adicionales||0;
   const plazoEfectivo = plazoDias + diasAdic; // plazo real aplicado
   let cronoTimeline = '';
@@ -1296,11 +1329,11 @@ function openModal(cid) {
       {lbl:'OB+CARP 40%',  pct:'40%',    when:'+30d: '+fmtD(addD(30)),             d:addD(30)},
       {lbl:'Entrega 10%',  pct:'10%',    when:'+40d: '+fmtD(addD(40)),             d:addD(40)},
     ] : plazoDias===90 ? [
-      {lbl:'Congelación',       pct:'',    when:'Al firmar',                           d:null},
-      {lbl:'Anticipo',          pct:'',    when:'Inicio: '+fmtD(proj.fecha_inicio),    d:proj.fecha_inicio},
-      {lbl:'OB + Mezzanine',    pct:'',    when:'+50d: '+fmtD(addD(50)),              d:addD(50)},
-      {lbl:'Carpintería',       pct:'',    when:'+70d: '+fmtD(addD(70)),              d:addD(70)},
-      {lbl:'Entrega',           pct:'',    when:'+80d: '+fmtD(addD(80)),              d:addD(80)},
+      {lbl:'Congelación',    pct:'SEP',  when:'Al firmar contrato',                  d:null},
+      {lbl:'Anticipo',       pct:'ANT',  when:'Inicio obra: '+fmtD(proj.fecha_inicio),d:proj.fecha_inicio},
+      {lbl:'OB + Mezzanine', pct:'+50d', when:fmtD(addD(50)),                       d:addD(50)},
+      {lbl:'Carpintería',    pct:'+70d', when:fmtD(addD(70)),                       d:addD(70)},
+      {lbl:'Entrega',        pct:'+80d', when:fmtD(addD(80)),                       d:addD(80)},
     ] : [
       {lbl:'Separación',   pct:'$5M',    when:'Al firmar',                          d:null},
       {lbl:'Anticipo 50%', pct:'50%',    when:'Inicio: '+fmtD(proj.fecha_inicio),   d:proj.fecha_inicio},
