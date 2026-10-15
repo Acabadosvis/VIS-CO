@@ -188,6 +188,7 @@ tbody td{padding:8px 12px;font-size:12px;white-space:nowrap;}
 .btable tr.bv-row{background:var(--venc-bg);}
 .btable tr.bs-row{background:var(--sem-bg);}
 .btable tr.bok-row{background:var(--ok-bg);}
+.btable tr.bp-row{background:#f0fff4;opacity:.85;}
 .bstatus{display:inline-block;padding:2px 7px;border-radius:10px;font-family:'Syne',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;}
 
 .bpri{background:var(--r);border:none;border-radius:8px;padding:8px 18px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;color:#fff;cursor:pointer;transition:.15s;}
@@ -552,75 +553,106 @@ function saveProjField(cid, key, val){
   parseAndRender(null);   // reclasifica + renderiza con nuevo dato
 }
 
-// Reconstruye bloques WELL desde cero usando lógica de pagos propia.
-// Ignora fechas del Excel. Usa total+recaudado+fecha_inicio para calcular
-// qué está pagado y cuándo vence cada tramo.
-// Estructura WELL:
-//   Congelación (SEP): ~$5M o 5% del total  — al firmar
-//   Anticipo (ANT):    ~45% del total         — al inicio de obra (fecha_inicio)
-//   OB + Mezzanine:    ~20% del total         — fecha_inicio + 50d
-//   Carpintería:       ~20% del total         — fecha_inicio + 70d
-//   Entrega:           ~10% del total         — fecha_inicio + 80d
-function injectWellDates(){
+// ── LÓGICA FINANCIERA REAL DE PAGOS ──────────────────────────────────────────
+// Aplica a todo cliente EN EJECUCIÓN con fecha_inicio configurado.
+// Ignora fechas del Excel. Calcula cuotas desde total+recaudado+plazo+fecha_inicio.
+//
+// Cronogramas:
+//   45d → ANT 50% d0 | 2°Pago 40% d30 | Último 10% d37
+//   60d → ANT 50% d0 | 2°Pago 20% d30 | 3°Pago 20% d45 | Último 10% d52
+//   90d → ANT 50% d0 | OB+Mezz 20% d50 | Carpintería 20% d70 | Último 10% d82
+//
+// Distribución: el recaudado se aplica en orden de cuotas (primero cubre ANT,
+// luego 2°, etc.). El saldo por cuota = max(0, mc_acumulado - recaudado).
+// La congelación y abonos anticipados quedan absorbidos en el ANT automáticamente.
+
+const SCHEDULES={
+  45:[
+    {etapa:'ANT',label:'Anticipo 50%',       pct:0.50, day:0},
+    {etapa:'P1', label:'2° Pago 40%',         pct:0.40, day:30},
+    {etapa:'P3', label:'Último Pago 10%',     pct:0.10, day:37},
+  ],
+  60:[
+    {etapa:'ANT',label:'Anticipo 50%',       pct:0.50, day:0},
+    {etapa:'P1', label:'2° Pago 20%',         pct:0.20, day:30},
+    {etapa:'P2', label:'3° Pago 20%',         pct:0.20, day:45},
+    {etapa:'P3', label:'Último Pago 10%',     pct:0.10, day:52},
+  ],
+  90:[
+    {etapa:'ANT',label:'Anticipo 50%',       pct:0.50, day:0},
+    {etapa:'P1', label:'OB + Mezzanine 20%', pct:0.20, day:50},
+    {etapa:'P2', label:'Carpintería 20%',    pct:0.20, day:70},
+    {etapa:'P3', label:'Último Pago 10%',    pct:0.10, day:82},
+  ],
+};
+
+function applyScheduleLogic(){
   const pd=getProjData();
   const wStart=WEEK.start, wEnd=WEEK.end;
   const _sops=JSON.parse(localStorage.getItem('visco_sop2')||'{}');
 
   for(const c of DATA){
-    if((c.origen||'').toUpperCase()!=='WELL') continue;
+    if(c.ep!=='EN EJECUCIÓN'&&c.ep!=='X RECIBIR') continue;
     const p=pd[c.cid];
-    if(!p?.fecha_inicio) continue; // sin fecha_inicio no se puede calcular
+    if(!p?.fecha_inicio) continue;          // sin fecha_inicio → usa lógica Excel
 
-    const d0=new Date(p.fecha_inicio+'T12:00:00');
-    const addD=n=>{ const x=new Date(d0); x.setDate(x.getDate()+n); return x.toISOString().slice(0,10); };
+    const isWell=(c.origen||'').toUpperCase()==='WELL';
+    const plazo=p.plazo||(isWell?90:60);
+    const sched=SCHEDULES[plazo]||SCHEDULES[60];
     const tot=c.total; if(tot<=0) continue;
 
-    // Definir tramos WELL con % del contrato y fecha de vencimiento
-    const TRAMOS=[
-      {etapa:'SEP', label:'Congelación',    pct:0.05, fc:null},          // al firmar, sin fecha de cobro
-      {etapa:'ANT', label:'Anticipo',       pct:0.45, fc:p.fecha_inicio}, // al iniciar obra
-      {etapa:'P1',  label:'OB + Mezzanine', pct:0.20, fc:addD(50)},
-      {etapa:'P2',  label:'Carpintería',    pct:0.20, fc:addD(70)},
-      {etapa:'P3',  label:'Entrega',        pct:0.10, fc:addD(80)},
-    ];
+    const d0=new Date(p.fecha_inicio+'T12:00:00');
+    const addD=n=>{const x=new Date(d0);x.setDate(x.getDate()+n);return x.toISOString().slice(0,10);};
 
-    // Distribuir recaudado sobre los tramos en orden
+    // Distribuir recaudado sobre las cuotas en orden
     let rem=c.recaudado;
     let vencAmt=0,semAmt=0,proxAmt=0,oldestVenc=null;
     const newBlocks=[];
 
-    for(const t of TRAMOS){
-      const mc=Math.round(tot*t.pct);
+    // ── Congelación: mostrar abono previo (SEP) si existe ──────
+    const sepMc = c.sepMc||0;
+    const congelAmt = Math.min(sepMc, c.recaudado);
+    if (congelAmt > 0) {
+      newBlocks.push({
+        etapa:'SEP', label:'Congelación',
+        mc: sepMc, mr: congelAmt, saldo: 0,
+        fc: null, fr: null, bst:'pagado'
+      });
+    }
+
+    for(const s of sched){
+      const mc=Math.round(tot*s.pct);
       const credit=Math.min(mc,Math.max(0,rem));
       rem=Math.max(0,rem-mc);
       const saldo=Math.max(0,mc-credit);
-      if(saldo<1) continue; // pagado
+      if(saldo<1) continue;                 // cuota cubierta
 
-      // Si contabilidad confirmó este bloque → considerar pagado
-      if(_sops[c.cid+'_'+t.etapa]?.estado==='entro') continue;
+      // Si contabilidad ya confirmó → considerar pagado
+      if(_sops[c.cid+'_'+s.etapa]?.estado==='entro') continue;
 
+      const fc=s.day===0?p.fecha_inicio:addD(s.day);
       let bst='proximo';
-      if(t.fc){
-        const fd=new Date(t.fc+'T12:00:00');
-        if(fd<wStart){bst='vencido';vencAmt+=saldo;if(!oldestVenc||t.fc<oldestVenc)oldestVenc=t.fc;}
+      if(fc){
+        const fd=new Date(fc+'T12:00:00');
+        if(fd<wStart){bst='vencido';vencAmt+=saldo;if(!oldestVenc||fc<oldestVenc)oldestVenc=fc;}
         else if(fd<=wEnd){bst='semana';semAmt+=saldo;}
         else proxAmt+=saldo;
       }
-      newBlocks.push({etapa:t.etapa,label:t.label,mc,mr:credit,saldo,fc:t.fc,fr:null,bst});
+      newBlocks.push({etapa:s.etapa,label:s.label,mc,mr:credit,saldo,fc,fr:null,bst});
     }
 
-    // Reemplazar bloques y recalcular totales del cliente
     c.blocks=newBlocks;
     c.vencAmt=vencAmt; c.semAmt=semAmt; c.proxAmt=proxAmt;
     c.oldestVenc=oldestVenc;
     c.diasMora=oldestVenc?Math.max(0,Math.floor((TODAY.getTime()-new Date(oldestVenc+'T12:00:00').getTime())/86400000)):0;
-    if(c.ep==='EN EJECUCIÓN'||c.ep==='X RECIBIR'){
-      if(vencAmt>0)c.cat='vencido';
-      else if(semAmt>0)c.cat='semana';
-      else c.cat='aldia';
-    }
+    if(vencAmt>0)     c.cat='vencido';
+    else if(semAmt>0) c.cat='semana';
+    else              c.cat='aldia';
   }
 }
+
+// Alias para compatibilidad con llamadas existentes
+function injectWellDates(){ applyScheduleLogic(); }
 
 // Reclasifica clientes VENCIDOS cuyo avance de pago es coherente con el tiempo transcurrido
 function reclassifyByProjData(){
@@ -671,7 +703,7 @@ const BLOCKS = [
   {n:'P5',  mc:57, fc:58, mr:60,   fr:61},
   {n:'P6',  mc:63, fc:64, mr:66,   fr:67},
 ];
-const ETAPA_LABELS = {SEP:'Separación',ANT:'Anticipo',P1:'Obra Blanca',P2:'Carpintería',P3:'Entrega',P4:'Pago 4',P5:'Pago 5',P6:'Pago 6'};
+const ETAPA_LABELS = {SEP:'Congelación',ANT:'Anticipo',P1:'Obra Blanca',P2:'Carpintería',P3:'Entrega',P4:'Pago 4',P5:'Pago 5',P6:'Pago 6'};
 const VALID_ESTADOS = new Set(['EN EJECUCIÓN','EN EJECUCION','ENTREGADO','X RECIBIR']);
 // CONVENIOS: proyectos bono (KLIK, Gran Central bono)
 const CONVENIO_PROYECTOS = new Set(['KLIK CONVENIO','GRAN CENTRAL - CONVENIO','GRAN CENTRAL CONVENIO','KLIK']);
@@ -834,12 +866,14 @@ function parseBuffer(buf) {
     let vencAmt=0, semAmt=0, proxAmt=0, oldestVenc=null;
     const blocks = [];
     let remPagado = recaudado; // dinero disponible para cubrir bloques en orden
+    let sepMc = 0; // mc de Congelación (SEP) del Excel para mostrar abono previo
     // Soportes confirmados por contabilidad cuentan como pago adicional
     const _sops = JSON.parse(localStorage.getItem('visco_sop2')||'{}');
 
     for (const b of BLOCKS) {
       const mc = xlM(r[b.mc]);
       if (mc <= 0) continue;
+      if (b.n==='SEP') sepMc = mc; // guardar para mostrar Congelación
       const fc = xlDate(r[b.fc]);
       const mr = b.mr!==null ? xlM(r[b.mr]) : 0; // monto real pagado en este bloque
       const fr = b.fr!==null ? xlDate(r[b.fr]) : null;
@@ -852,7 +886,13 @@ function parseBuffer(buf) {
       // siempre cancela el bloque correctamente.
       const credit = Math.max(mr, applied);
       const saldo = Math.max(0, mc - credit);
-      if (saldo < 1) continue; // bloque cubierto — omitir
+      if (saldo < 1) {
+        // SEP pagado: guardar como bloque informativo de Congelación ✓
+        if (b.n==='SEP' && credit > 0) {
+          blocks.push({etapa:'SEP',label:'Congelación',mc,mr:credit,saldo:0,fc,fr:null,bst:'pagado'});
+        }
+        continue;
+      }
 
       // Si contabilidad confirmó este bloque como 'entró', tratarlo como pagado
       const _pk = cid+'_'+b.n;
@@ -923,6 +963,7 @@ function parseBuffer(buf) {
       total, recaudado, xrec, adic, pending_adic, cotiz,
       vencAmt, semAmt, proxAmt, diasMora, oldestVenc,
       pct: total>0 ? recaudado/total : 0,
+      sepMc,
       cat, blocks
     });
   }
@@ -1245,25 +1286,29 @@ function openModal(cid) {
     <tbody>`;
 
   for (const b of c.blocks) {
-    const rowCls = b.bst==='vencido'?'bv-row':b.bst==='semana'?'bs-row':'';
+    const isPagado = b.bst==='pagado';
+    const rowCls = b.bst==='vencido'?'bv-row':b.bst==='semana'?'bs-row':isPagado?'bp-row':'';
     const stBadge = b.bst==='vencido'?`<span class="bstatus bv" style="background:var(--venc-bg);color:var(--venc)">Vencido</span>`:
       b.bst==='semana'?`<span class="bstatus bs" style="background:var(--sem-bg);color:var(--sem)">Esta semana</span>`:
+      isPagado?`<span class="bstatus" style="background:#d4edda;color:#155724;padding:2px 7px;border-radius:4px;font-size:10px">✅ Pagado</span>`:
       `<span class="bstatus bn" style="background:var(--gc);color:var(--g)">Próximo</span>`;
     const dias = b.fc ? daysDiff(b.fc) : null;
     const fechaLabel = b.fc ? (dias<0?`⚠ ${fmtD(b.fc)} (${Math.abs(dias)}d)`:fmtD(b.fc)) : '—';
-    // Flujo de pago con soporte upload
+    // Flujo de pago con soporte upload — bloque 'pagado' no necesita soporte
     const pk = pagoKey(cid, b.etapa);
     const sops_all = getSoportes();
     const sopB = sops_all[pk]||{};
     const sopEst = sopB.estado||'';
     const sopCfgB = SOP_ESTADOS[sopEst]||SOP_ESTADOS[''];
-    const flujoHtml = sopEst===''
-      ? `<label class="fbtn upload" style="padding:3px 9px;font-size:10px" onclick="event.stopPropagation()">📤 Cargar<input type="file" accept="image/*,.pdf" onchange="onSoporteFile('${pk}',this)"></label>`
-      : sopEst==='pendiente'
-        ? `<span class="pago-badge soporte" style="cursor:pointer" title="${sopB.filename||''}">📤 Pend. contab.</span>
-           <button class="fbtn entro" style="padding:2px 7px;font-size:9px;margin-left:4px" onclick="event.stopPropagation();setSoporteEstado('${pk}','entro');openModal('${cid}')">✅ Entró</button>`
-        : `<span class="pago-badge entro" title="${sopB.fecha_entro||''}">✅ Entró ${sopB.fecha_entro||''}</span>
-           <button class="fbtn reset" style="padding:2px 6px;font-size:9px;margin-left:4px" onclick="event.stopPropagation();setSoporteEstado('${pk}','');openModal('${cid}')">↩</button>`;
+    const flujoHtml = isPagado
+      ? `<span style="color:#155724;font-size:11px;font-weight:500">✓ Abonado al Anticipo</span>`
+      : sopEst===''
+        ? `<label class="fbtn upload" style="padding:3px 9px;font-size:10px" onclick="event.stopPropagation()">📤 Cargar<input type="file" accept="image/*,.pdf" onchange="onSoporteFile('${pk}',this)"></label>`
+        : sopEst==='pendiente'
+          ? `<span class="pago-badge soporte" style="cursor:pointer" title="${sopB.filename||''}">📤 Pend. contab.</span>
+             <button class="fbtn entro" style="padding:2px 7px;font-size:9px;margin-left:4px" onclick="event.stopPropagation();setSoporteEstado('${pk}','entro');openModal('${cid}')">✅ Entró</button>`
+          : `<span class="pago-badge entro" title="${sopB.fecha_entro||''}">✅ Entró ${sopB.fecha_entro||''}</span>
+             <button class="fbtn reset" style="padding:2px 6px;font-size:9px;margin-left:4px" onclick="event.stopPropagation();setSoporteEstado('${pk}','');openModal('${cid}')">↩</button>`;
     blocksHtml += `<tr class="${rowCls}">
       <td><strong>${b.label}</strong></td>
       <td class="m">${fmtMF(b.mc)}</td>
@@ -1278,7 +1323,7 @@ function openModal(cid) {
 
   // Soporte block details for modal
   const sops_modal = getSoportes();
-  const pendingSops = c.blocks.filter(b=>{ const s=sops_modal[pagoKey(cid,b.etapa)]; return s&&s.estado&&s.estado!=='entro'; });
+  const pendingSops = c.blocks.filter(b=>{ if(b.bst==='pagado') return false; const s=sops_modal[pagoKey(cid,b.etapa)]; return s&&s.estado&&s.estado!=='entro'; });
   const sopSummaryHtml = pendingSops.length>0 ? `
   <div class="sep"></div>
   <div class="mst">💳 SOPORTES EN PROCESO</div>
@@ -1323,24 +1368,14 @@ function openModal(cid) {
     const addD = n=>{ const x=new Date(d0); x.setDate(x.getDate()+n); return x.toISOString().slice(0,10); };
     const TODAY_ms = TODAY.getTime();
     // Los hitos base del contrato (no cambian con días adicionales)
-    const steps = plazoDias===45 ? [
-      {lbl:'Separación',   pct:'$5M',    when:'Al firmar',                          d:null},
-      {lbl:'Anticipo 50%', pct:'50%',    when:'Inicio: '+fmtD(proj.fecha_inicio),   d:proj.fecha_inicio},
-      {lbl:'OB+CARP 40%',  pct:'40%',    when:'+30d: '+fmtD(addD(30)),             d:addD(30)},
-      {lbl:'Entrega 10%',  pct:'10%',    when:'+40d: '+fmtD(addD(40)),             d:addD(40)},
-    ] : plazoDias===90 ? [
-      {lbl:'Congelación',    pct:'SEP',  when:'Al firmar contrato',                  d:null},
-      {lbl:'Anticipo',       pct:'ANT',  when:'Inicio obra: '+fmtD(proj.fecha_inicio),d:proj.fecha_inicio},
-      {lbl:'OB + Mezzanine', pct:'+50d', when:fmtD(addD(50)),                       d:addD(50)},
-      {lbl:'Carpintería',    pct:'+70d', when:fmtD(addD(70)),                       d:addD(70)},
-      {lbl:'Entrega',        pct:'+80d', when:fmtD(addD(80)),                       d:addD(80)},
-    ] : [
-      {lbl:'Separación',   pct:'$5M',    when:'Al firmar',                          d:null},
-      {lbl:'Anticipo 50%', pct:'50%',    when:'Inicio: '+fmtD(proj.fecha_inicio),   d:proj.fecha_inicio},
-      {lbl:'Obra blanca',  pct:'20%',    when:'+30d: '+fmtD(addD(30)),             d:addD(30)},
-      {lbl:'Carpintería',  pct:'20%',    when:'+45d: '+fmtD(addD(45)),             d:addD(45)},
-      {lbl:'Entrega 10%',  pct:'10%',    when:'+60d: '+fmtD(addD(60)),             d:addD(60)},
-    ];
+    // Usar SCHEDULES para que el modal sea consistente con la lógica de bloques
+    const schedDef=SCHEDULES[plazoDias]||SCHEDULES[60];
+    const steps=schedDef.map(s=>({
+      lbl:s.label,
+      pct:s.pct*100+'%',
+      when:s.day===0?('Inicio obra: '+fmtD(proj.fecha_inicio)):('+'+s.day+'d: '+fmtD(addD(s.day))),
+      d:s.day===0?proj.fecha_inicio:addD(s.day),
+    }));
     // Si hay días adicionales, agregar un hito extra al final
     if(diasAdic>0){
       steps.push({lbl:`+${diasAdic}d Adic.`, pct:'🔧', when:'Nueva entrega: '+fmtD(addD(plazoEfectivo)), d:addD(plazoEfectivo)});
