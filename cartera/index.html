@@ -552,6 +552,44 @@ function saveProjField(cid, key, val){
   parseAndRender(null);   // reclasifica + renderiza con nuevo dato
 }
 
+// Inyecta fechas calculadas para clientes WELL (desde fecha_inicio del proyecto)
+// Schedule WELL: P1 (OB+Mezz) → +50d, P2 (Carp) → +70d, P3 (Entrega) → +80d
+function injectWellDates(){
+  const pd=getProjData();
+  const wStart=WEEK.start, wEnd=WEEK.end;
+  for(const c of DATA){
+    if((c.origen||'').toUpperCase()!=='WELL') continue;
+    const p=pd[c.cid]; if(!p?.fecha_inicio) continue;
+    const d0=new Date(p.fecha_inicio+'T12:00:00');
+    const addD=n=>{ const x=new Date(d0); x.setDate(x.getDate()+n); return x.toISOString().slice(0,10); };
+    // WELL: P1=Congelación, P2=Anticipo (sin fecha fija), luego:
+    // P3 → +50d (OB+Mezz), P4 → +70d (Carp), P5 → +80d (Entrega)
+    const WELL_FC={P3:addD(50),P4:addD(70),P5:addD(80)};
+    const WELL_LBL={P1:'Congelación',P2:'Anticipo',P3:'OB + Mezzanine',P4:'Carpintería',P5:'Entrega'};
+    let vencAmt=0,semAmt=0,proxAmt=0,oldestVenc=null;
+    for(const b of c.blocks){
+      if(WELL_LBL[b.etapa]) b.label=WELL_LBL[b.etapa];
+      const newFc=WELL_FC[b.etapa]||b.fc;
+      b.fc=newFc;
+      if(b.etapa==='P1' || b.etapa==='P2') { b.bst='proximo'; continue; } // sin fecha = no vence
+      if(newFc){
+        const fd=new Date(newFc+'T12:00:00');
+        if(fd<wStart){b.bst='vencido';vencAmt+=b.saldo;if(!oldestVenc||newFc<oldestVenc)oldestVenc=newFc;}
+        else if(fd<=wEnd){b.bst='semana';semAmt+=b.saldo;}
+        else b.bst='proximo';
+      } else b.bst='proximo';
+    }
+    c.vencAmt=vencAmt; c.semAmt=semAmt; c.proxAmt=proxAmt;
+    c.oldestVenc=oldestVenc;
+    c.diasMora=oldestVenc?Math.max(0,Math.floor((TODAY.getTime()-new Date(oldestVenc+'T12:00:00').getTime())/86400000)):0;
+    if(c.ep==='EN EJECUCIÓN'){
+      if(vencAmt>0)c.cat='vencido';
+      else if(semAmt>0)c.cat='semana';
+      else c.cat='aldia';
+    }
+  }
+}
+
 // Reclasifica clientes VENCIDOS cuyo avance de pago es coherente con el tiempo transcurrido
 function reclassifyByProjData(){
   const pd=getProjData();
@@ -1242,7 +1280,8 @@ function openModal(cid) {
 
   // ── CRONOGRAMA DE OBRA ──────────────────────────────────────
   const proj = getProjData()[cid]||{};
-  const plazoDias = proj.plazo||60;
+  const isWell = (c.origen||'').toUpperCase()==='WELL';
+  const plazoDias = proj.plazo||(isWell?90:60);
   const diasAdic  = proj.dias_adicionales||0;
   const plazoEfectivo = plazoDias + diasAdic; // plazo real aplicado
   let cronoTimeline = '';
@@ -1256,6 +1295,12 @@ function openModal(cid) {
       {lbl:'Anticipo 50%', pct:'50%',    when:'Inicio: '+fmtD(proj.fecha_inicio),   d:proj.fecha_inicio},
       {lbl:'OB+CARP 40%',  pct:'40%',    when:'+30d: '+fmtD(addD(30)),             d:addD(30)},
       {lbl:'Entrega 10%',  pct:'10%',    when:'+40d: '+fmtD(addD(40)),             d:addD(40)},
+    ] : plazoDias===90 ? [
+      {lbl:'Congelación',       pct:'',    when:'Al firmar',                           d:null},
+      {lbl:'Anticipo',          pct:'',    when:'Inicio: '+fmtD(proj.fecha_inicio),    d:proj.fecha_inicio},
+      {lbl:'OB + Mezzanine',    pct:'',    when:'+50d: '+fmtD(addD(50)),              d:addD(50)},
+      {lbl:'Carpintería',       pct:'',    when:'+70d: '+fmtD(addD(70)),              d:addD(70)},
+      {lbl:'Entrega',           pct:'',    when:'+80d: '+fmtD(addD(80)),              d:addD(80)},
     ] : [
       {lbl:'Separación',   pct:'$5M',    when:'Al firmar',                          d:null},
       {lbl:'Anticipo 50%', pct:'50%',    when:'Inicio: '+fmtD(proj.fecha_inicio),   d:proj.fecha_inicio},
@@ -1329,6 +1374,7 @@ function openModal(cid) {
       <select class="fi" onchange="saveProjField('${cid}','plazo',+this.value)">
         <option value="60" ${plazoDias===60?'selected':''}>60 días</option>
         <option value="45" ${plazoDias===45?'selected':''}>45 días</option>
+        <option value="90" ${plazoDias===90?'selected':''}>90 días (WELL)</option>
       </select>
     </div>
     ${diasAdicHtml}
@@ -1897,7 +1943,7 @@ function setLBar(on){
 function parseAndRender(buf) {
   if (MODO_CONTAB && !buf) { renderCola(); return; }
   if (buf) {
-    try { DATA = parseBuffer(buf); reclassifyByProjData(); }
+    try { DATA = parseBuffer(buf); injectWellDates(); reclassifyByProjData(); }
     catch(e) { toast('Error: '+e.message,'err'); setLBar(false); return; }
   } else {
     // Re-classify with new week
@@ -1935,6 +1981,7 @@ function parseAndRender(buf) {
       }
     }
   }
+  injectWellDates();       // fechas dinámicas WELL (50/70/80d desde inicio)
   reclassifyByProjData(); // ajuste fino por fecha_inicio real del cliente
   populateFilters();
   showDash();
