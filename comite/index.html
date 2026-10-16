@@ -2149,8 +2149,17 @@ function renderReunionesLocal(){
   const actReu=['KM','NM'];
   const totP=actReu.reduce((s,a)=>s+(cur[a]?.prog||0),0);
   const totE=actReu.reduce((s,a)=>s+(cur[a]?.ef||0),0);
-  // Base: calculadoras VERIFICADAS desde módulo Leads
-  const lb2=allL[p2.sISO]?.ver||0,lb1=allL[p1.sISO]?.ver||0,lb0=allL[p0.sISO]?.ver||0;
+  /* Base: calculadoras VERIFICADAS.
+     Se toman del formulario de perfiladores (Leads > Calculadoras Bitrix >
+     Verificadas). Antes se leian de vc3_leads_v1, un almacen que dejo de
+     llenarse cuando ese formulario fue reemplazado: por eso salia siempre 0.
+     Se conserva el valor viejo como respaldo para semanas historicas. */
+  const _allPF=gLS(LS_PF);
+  const _verPF=function(per){
+    var a=_allPF[per.sISO],v=a&&a.M?(parseInt(a.M.cal_ver)||0):0;
+    return v>0?v:(allL[per.sISO]?.ver||0);
+  };
+  const lb2=_verPF(p2),lb1=_verPF(p1),lb0=_verPF(p0);
   const conv2=lb2>0?pct(totP,lb2,2):0,conv1=lb1>0?pct((allC[p1.sISO]?.KM?.prog||0)+(allC[p1.sISO]?.AB?.prog||0)+(allC[p1.sISO]?.NM?.prog||0),lb1,2):0;
   const remoNM=cur['ali_NM']?.remo||{prog:0,ef:0};
   const remoLeadsNM=allL[p2.sISO]?.remo_tot||0;
@@ -2192,15 +2201,20 @@ function renderReunionesLocal(){
         ${reuRow('Atendidas (K+A+N)',ef0,ef1,totE,lb0,lb1,lb2,false)}
       </tbody>
     </table></div>
-    ${lb2===0?`<div class="msg msg-a" style="margin-top:8px;margin-bottom:0">Calculadoras verificadas en 0 — guarda el número de verificadas en la pestaña Leads (campo ✅ Verificados).</div>`:''}
+    ${lb2===0?`<div class="msg msg-a" style="margin-top:8px;margin-bottom:0">Calculadoras verificadas en 0 — diligencia <strong>Verificadas</strong> en la pestaña Leads, sección <strong>Calculadoras de Marcela (Bitrix)</strong>.</div>`:''}
   </div>`;
   // Charts
   const ws=[p0,p1,p2];const wlbls=ws.map(w=>wShort(w));
   const chTitleEl=document.querySelector('#p2 .chl');
   if(chTitleEl)chTitleEl.textContent='Comparativo últimas 3 semanas — Calculadoras · Verificadas · Reuniones ef.';
   setTimeout(()=>{
-    const lbTot=ws.map(w=>allL[w.sISO]?.total||0);
-    const lbVer=ws.map(w=>allL[w.sISO]?.ver||0);
+    /* Tambien desde perfiladores, con respaldo al almacen viejo para historicos */
+    const _asigPF=function(per){
+      var a=_allPF[per.sISO],v=a&&a.M?(parseInt(a.M.cal_asig)||0):0;
+      return v>0?v:(allL[per.sISO]?.total||0);
+    };
+    const lbTot=ws.map(_asigPF);
+    const lbVer=ws.map(_verPF);
     const lbEf=ws.map(w=>actReu.reduce((s,a)=>s+(allC[w.sISO]?.[a]?.ef||0),0));
     mkBarG('rc_trend',wlbls,[
       {label:'Calculadoras',data:lbTot,backgroundColor:'rgba(249,115,22,.7)',borderColor:'#F97316',borderWidth:1.5},
