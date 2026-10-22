@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.07.02.05 -->
+<!-- v2026.07.02.07 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -307,9 +307,7 @@ body.modo-comite .brow{display:none!important}
   <div class="tab"    onclick="goTab(1)">&#128101; Leads</div>
   <div class="tab"    onclick="goTab(2)">&#128197; Reuniones</div>
   <div class="tab"    onclick="goTab(3)">&#128176; Ventas</div>
-  <div class="tab"    onclick="goTab(4)">&#127968; Aptos</div>
-  <div class="tab"    onclick="goTab(5)">🤝 Alianzas</div>
-  <div class="tab"    onclick="goTab(6)">&#128296; Remo</div>
+  <div class="tab"    onclick="goTab(4)">🤝 Alianzas</div>
 </nav>
 
 <!-- P0 REDES -->
@@ -482,18 +480,6 @@ body.modo-comite .brow{display:none!important}
   <div id="v-out"></div>
 </div>
 
-<!-- P4 APTOS -->
-<div class="panel" id="p4">
-  <div class="apt-header">
-    <label class="hbtn pri" style="cursor:pointer">&#128194; Excel Ventas<input type="file" accept=".xlsx,.xls" style="position:absolute;width:1px;height:1px;opacity:0;top:0;left:0" onchange="onFiles(this)"></label>
-    <label class="hbtn" style="cursor:pointer;margin-left:8px">&#127968; Proyectos Ejecucion<input type="file" accept=".xlsx,.xls" style="position:absolute;width:1px;height:1px;opacity:0;top:0;left:0" onchange="onFilesAptos(this)"></label>
-    <span id="axst" style="font-size:.72rem;color:var(--g);margin-left:8px"></span>
-  </div>
-  <div class="msg msg-a" id="a-noex" style="display:none">&#128194; Carga el Excel de Proyectos en Ejecucion para ver los apartamentos.</div>
-  <div id="a-out"></div>
-</div>
-
-
 <!-- P5 ALIANZAS -->
 <div class="panel" id="p5">
   <div class="card">
@@ -507,38 +493,6 @@ body.modo-comite .brow{display:none!important}
       <div class="card-hd">Detalle de cierres por alianza</div>
       <div id="ali-tabla" style="overflow-x:auto"></div>
     </div>
-  </div>
-</div>
-
-<!-- P6 REMODELACIONES -->
-<div class="panel" id="p6">
-  <div class="card" id="card-remo" style="border-top:3px solid #F97316">
-    <div class="card-hd" style="color:#C2410C;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
-      <span>&#128296; Remodelaciones <span style="font-size:.7rem;font-weight:600;color:#EA580C;background:#FFF7ED;border:1px solid #FED7AA;border-radius:4px;padding:1px 8px;margin-left:6px">NM · Nathalia</span></span>
-      <div style="display:flex;align-items:center;gap:6px">
-        <button onclick="off--;renderAll()" style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:6px;padding:3px 10px;font-size:.8rem;cursor:pointer;color:#C2410C;font-weight:700">&#8592;</button>
-        <span id="remo-per-lbl" style="font-size:.72rem;font-weight:700;color:#C2410C;min-width:80px;text-align:center"></span>
-        <button onclick="off++;renderAll()" style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:6px;padding:3px 10px;font-size:.8rem;cursor:pointer;color:#C2410C;font-weight:700">&#8594;</button>
-      </div>
-    </div>
-    <div id="remo-form-wrap">
-      <div style="font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#C2410C;margin-bottom:6px">&#128200; Pipeline leads</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:12px">
-        <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#C2410C;display:block;margin-bottom:3px">&#128222; Llegaron</label><input type="number" id="l_remo_tot" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#C2410C;background:transparent"></div>
-        <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#16A34A;display:block;margin-bottom:3px">&#11088; Interesados</label><input type="number" id="l_remo_int" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#16A34A;background:transparent"></div>
-        <div style="background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#1D4ED8;display:block;margin-bottom:3px">&#128197; Reun. agendadas</label><input type="number" id="l_remo_ag" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#1D4ED8;background:transparent"></div>
-        <div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#059669;display:block;margin-bottom:3px">&#9989; Reun. efectivas</label><input type="number" id="l_remo_ef" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#059669;background:transparent"></div>
-        <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-top:2px solid #166534;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#166534;display:block;margin-bottom:3px">&#127942; Cierres</label><input type="number" id="l_remo_ci" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#166534;background:transparent"></div>
-      </div>
-      <div style="font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#C2410C;margin-bottom:6px">&#128176; Pagos de visitas</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:12px">
-        <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-top:2px solid #D97706;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#92400E;display:block;margin-bottom:3px">&#128176; Visitas cobradas</label><input type="number" id="l_remo_vis" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#92400E;background:transparent"></div>
-        <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-top:2px solid #D97706;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#92400E;display:block;margin-bottom:3px">&#128181; Valor cobrado ($)</label><input type="number" id="l_remo_vis_val" min="0" placeholder="0" oninput="renderRemo()" style="width:100%;border:none;outline:none;font-size:.95rem;font-weight:700;color:#92400E;background:transparent"></div>
-      </div>
-      <div class="brow"><button class="btn btn-o" style="background:#F97316" onclick="saveLeads()">&#128190; Guardar Remodelaciones</button></div>
-    </div>
-    <div id="remo-tabla" style="overflow-x:auto;margin:12px 0"></div>
-    <div id="l-remo-funnel" class="fn-wrap" style="margin-top:10px;border-top:2px solid #FED7AA;padding-top:10px"></div>
   </div>
 </div>
 
@@ -619,6 +573,7 @@ const sLS=function(k,d){
 };
 const iso=d=>d.toISOString().split('T')[0];
 const dS=d=>`${d.getDate()} ${MES3[d.getMonth()]}`;
+function mesDeSemana(wk){var e=new Date(wk+'T00:00:00');e.setDate(e.getDate()+6);return e.getFullYear()+'-'+String(e.getMonth()+1).padStart(2,'0');}
 function parseD(v){if(!v)return null;try{var d=new Date(v);if(isNaN(d.getTime()))return null;return new Date(d.getFullYear(),d.getMonth(),d.getDate());}catch(e){return null;}}
 
 function dH(c,p,inv){
@@ -802,9 +757,7 @@ function goTab(i){
   }
   if(i===2){setTimeout(function(){renderReunionesLocal();},50);}
   if(i===3&&xlR){setTimeout(function(){renderVentas();},50);}
-  if(i===4&&xlR){setTimeout(function(){renderAptos();},50);}
-  if(i===5&&xlR){setTimeout(function(){renderAlianzas();},50);}
-  if(i===6){setTimeout(function(){renderRemo();},50);}
+  if(i===4&&xlR){setTimeout(function(){renderAlianzas();},50);}
 }
 
 /* ═══ CHARTS ═══ */
@@ -828,39 +781,7 @@ function circle(p){const r=40,c=2*Math.PI*r,d=Math.min(100,p)/100*c;return`<div 
 
 /* ═══ EXCEL ═══ */
 function onFiles(inp){const files=Array.from(inp.files);inp.value='';files.forEach(file=>{const st=document.getElementById('xlst');if(typeof XLSX==='undefined'){st.textContent='❌ SheetJS no cargó';return;}st.textContent='⏳ Leyendo '+file.name.slice(0,14)+'...';const rd=new FileReader();rd.onload=e=>{try{const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});const wsV=wb.SheetNames.find(n=>n==='REPORTE VENTAS')||wb.SheetNames.find(n=>n.toUpperCase().includes('VENTAS'));if(wsV)xlR=XLSX.utils.sheet_to_json(wb.Sheets[wsV],{header:1,defval:null,raw:false}).slice(4).filter(r=>r&&r[0]);const wsO=wb.SheetNames.find(n=>n.includes('EJECUCION'))||wb.SheetNames.find(n=>n.toUpperCase().includes('OPERACIONES'));if(wsO)opR=XLSX.utils.sheet_to_json(wb.Sheets[wsO],{header:1,defval:null,raw:false}).slice(2).filter(r=>r&&r[8]);st.textContent='✅ '+file.name.slice(0,16)+' ('+xlR.length+'v)';
-      try{localStorage.setItem(LS_XL,JSON.stringify(xlR));}catch(e){console.warn('localStorage lleno',e);}document.getElementById('v-noex').style.display='none';document.getElementById('a-noex').style.display='none';renderVentas();renderAptos();renderAlianzas();sLS(LS_XL,xlR);}catch(err){st.textContent='❌ '+err.message.slice(0,28);}};rd.readAsArrayBuffer(file);});}
-
-function onFilesAptos(inp){
-  var files=Array.from(inp.files);inp.value='';if(!files.length)return;
-  var file=files[0];var st=document.getElementById('axst');
-  if(typeof XLSX==='undefined'){st.textContent='SheetJS no cargo';return;}
-  st.textContent='Leyendo...';
-  var rd=new FileReader();
-  rd.onload=function(e){
-    try{
-      var wb=XLSX.read(e.target.result,{type:'array',cellDates:true,raw:false});
-      /* buscar hoja que contenga EJECUCION (sin tilde) */
-      var wsN=null;
-      wb.SheetNames.forEach(function(n){if(n.toUpperCase().replace(/[ÁÉÍÓÚÑ]/g,function(c){return {Á:'A',É:'E',Í:'I',Ó:'O',Ú:'U',Ñ:'N'}[c]||c;}).includes('EJECUCION'))wsN=n;});
-      if(!wsN)wsN=wb.SheetNames[0];
-      var raw=XLSX.utils.sheet_to_json(wb.Sheets[wsN],{header:1,defval:'',raw:false});
-      /* fila 0 vacía o filtros, fila 1 headers → datos desde fila 2 */
-      var data=[];
-      for(var i=2;i<raw.length;i++){
-        var r=raw[i];
-        /* skip completely empty rows */
-        var hasVal=false;for(var j=0;j<r.length;j++){if(r[j]&&r[j].toString().trim()){hasVal=true;break;}}
-        if(hasVal)data.push(r);
-      }
-      xlA=data;
-      try{localStorage.setItem(LS_XLA,JSON.stringify(xlA));}catch(e){console.warn('xlA storage',e);}
-      st.textContent=(xlA.length>0?'OK ':'VACIO ')+file.name.slice(0,16)+' ('+xlA.length+' filas)';
-      document.getElementById('a-noex').style.display=xlA.length?'none':'block';
-      renderAptos();
-    }catch(err){st.textContent='Error: '+err.message.slice(0,40);console.error('onFilesAptos',err);}
-  };
-  rd.readAsArrayBuffer(file);
-}
+      document.getElementById('v-noex').style.display='none';renderVentas();renderAlianzas();sLS(LS_XL,xlR);}catch(err){st.textContent='❌ '+err.message.slice(0,28);}};rd.readAsArrayBuffer(file);});}
 
 /* ═══ REDES ═══ */
 const RF=[['wpp','r_wpp'],['wpp_calc','r_wpp_calc'],['cli_calc','r_cli_calc'],['cli_ver','r_cli_ver'],['msg_redes','r_msg_redes'],['cierres_org','r_cierres_org'],['ig_alc','r_ig_alc'],['ig_imp','r_ig_imp'],['ig_int','r_ig_int'],['fb_alc','r_fb_alc'],['fb_imp','r_fb_imp'],['fb_int','r_fb_int'],['tk_alc','r_tk_alc'],['tk_imp','r_tk_imp'],['tk_int','r_tk_int']];
@@ -924,7 +845,7 @@ function renderRedes(){
       rFunEl.innerHTML='<div class="fn-title">&#128241; Pipeline WPP &#8594; Calculadora &#8594; Verificados</div>'+
         rfBar(wpp2,'#25D366','&#128172; WPP','llegaron')+
         rfBar(wppCalc2,'#DB2777','&#128172;&#8594;&#129518; WPP→Calc',wpp2>0?Math.round(wppCalc2/wpp2*100)+'%':'—')+
-        rfBar(calc2,'#F97316','&#129518; Calc. Bitrix',wppCalc2>0?Math.round(calc2/wppCalc2*100)+'% de WPP calc':'todas fuentes')+
+        rfBar(calc2,'#F97316','&#129518; Calc. Bitrix','todas fuentes')+
         rfBar(ver2r,'#0891B2','&#9989; Verificados',calc2>0?Math.round(ver2r/calc2*100)+'% de calc':'—');
     } else {
       rFunEl.style.display='none';
@@ -959,7 +880,7 @@ function renderRedes(){
     calcRow('conversión WPP → Calculadora',d0.wpp_calc||0,d0.wpp||0,d1.wpp_calc||0,d1.wpp||0,d2.wpp_calc||0,d2.wpp||0)+
     metRow('Calc. Bitrix (todas fuentes)',d0.cli_calc||0,d1.cli_calc||0,d2.cli_calc||0,'🧮')+
     metRow('Calculadoras verificadas',d0.cli_ver||0,d1.cli_ver||0,d2.cli_ver||0,'✅')+
-    calcRow('% verificadas / calculadora',d0.cli_ver||0,d0.wpp_calc||0,d1.cli_ver||0,d1.wpp_calc||0,d2.cli_ver||0,d2.wpp_calc||0)+
+    calcRow('verificadas / calculadora',d0.cli_ver||0,d0.cli_calc||0,d1.cli_ver||0,d1.cli_calc||0,d2.cli_ver||0,d2.cli_calc||0)+
     metRow('Cierres orgánicos',d0.cierres_org||0,d1.cierres_org||0,d2.cierres_org||0,'🏆')+
     secRow('📸 Instagram')+
     metRow('Alcance',d0.ig_alc||0,d1.ig_alc||0,d2.ig_alc||0)+
@@ -1012,111 +933,6 @@ function calcNI(){
   var ni=Math.max(0,ver-cno-sr-sr2-int2);
   var el=document.getElementById('l_ni');
   if(el){el.value=ni>0?ni:'';el.style.background=ni>0?'#FFF3E6':'';}
-}
-async function saveLeads(){
-  calcNI();
-  /* leer formulario */
-  const o={};
-  LF.forEach(function(pair){
-    var k=pair[0],id=pair[1];
-    var el=document.getElementById(id);
-    if(el)o[k]=Math.max(0,parseInt(el.value)||0);
-  });
-  /* guardar local — merge con datos existentes */
-  var key=getPer().sISO;
-  var store=gLS(LS_L);
-  store[key]=Object.assign(store[key]||{},o);sLS(LS_L,store);
-  /* mostrar debug */
-  var dbgEl=document.getElementById('l-dbg');
-  if(dbgEl){var readback=gLS(LS_L)[key]||{};dbgEl.style.display='block';dbgEl.innerHTML='Semana: '+key+' | Total: '+readback.total+' | WPP: '+readback.wpp+' | Interesados: '+readback.int+' | Cierres: '+readback.ci;}
-  renderLeads();
-  /* ☁️ Subir a la nube */
-  var btn=document.querySelector('[onclick="saveLeads()"]');
-  if(btn)btn.textContent='☁️ Guardando…';
-  try{
-    var r=await fetch('/api/datos?tipo=leads&week='+key,{
-      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(o)
-    });
-    var j=await r.json();
-    if(btn){btn.textContent=j.ok?'✅ Guardado en la nube ☁️':'⚠️ Solo local';setTimeout(function(){btn.innerHTML='💾 Guardar leads';},2000);}
-  }catch(e){
-    if(btn){btn.textContent='⚠️ Sin conexión — guardado local';setTimeout(function(){btn.innerHTML='💾 Guardar leads';},2000);}
-  }
-}
-function renderRemo(){
-  var allL=gLS(LS_L)||{};
-  var _off=typeof off!=='undefined'?off:0;
-  var p2=getPer(_off),p1=getPer(_off-1),p0=getPer(_off-2);
-  var d2=allL[p2.sISO]||{},d1=allL[p1.sISO]||{},d0=allL[p0.sISO]||{};
-  /* período label */
-  var perEl=document.getElementById('remo-per-lbl');if(perEl)perEl.textContent=wShort(p2);
-  /* leer valores del DOM */
-  var tot=parseInt(document.getElementById('l_remo_tot')?.value)||0;
-  var int2=parseInt(document.getElementById('l_remo_int')?.value)||0;
-  var ag=parseInt(document.getElementById('l_remo_ag')?.value)||0;
-  var ef=parseInt(document.getElementById('l_remo_ef')?.value)||0;
-  var ci=parseInt(document.getElementById('l_remo_ci')?.value)||0;
-  var vis=parseInt(document.getElementById('l_remo_vis')?.value)||0;
-  var visVal=parseInt(document.getElementById('l_remo_vis_val')?.value)||0;
-  /* tabla comparativo semanal */
-  function tRow(lbl,v2,v1,v0,isCur){
-    function cell(v,vp){var d=v-vp;var col=d>0?'#16A34A':d<0?'#DC2626':'#888';return '<td style="padding:5px 8px;font-size:.74rem;font-weight:700;text-align:right;color:'+(v>0?col:'#ccc')+'">'+(v>0?v:'—')+(vp>0&&d!==0?'<span style="font-size:.58rem"> '+(d>0?'↑':'↓')+'</span>':'')+'</td>';}
-    return '<tr style="border-bottom:1px solid #f0ede8"><td style="padding:5px 8px;font-size:.71rem;color:#555;font-weight:600">'+lbl+'</td>'+cell(v0,0)+cell(v1,v0)+cell(v2,v1)+'</tr>';
-  }
-  var tEl=document.getElementById('remo-tabla');
-  if(tEl)tEl.innerHTML='<div style="font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--g);margin-bottom:6px">Comparativo semanal &#128200;</div>'+
-    '<table style="width:100%;border-collapse:collapse;font-family:Syne,sans-serif;border-radius:8px;overflow:hidden;border:1px solid var(--brd)">'+
-    '<thead><tr style="background:#f5f3f0"><th style="padding:6px 8px;font-size:.62rem;text-align:left;color:#888;font-weight:700">Métrica</th>'+
-    '<th style="padding:6px 8px;font-size:.62rem;text-align:right;color:#aaa;font-weight:600">'+wShort(p0)+'</th>'+
-    '<th style="padding:6px 8px;font-size:.62rem;text-align:right;color:#888;font-weight:600">'+wShort(p1)+'</th>'+
-    '<th style="padding:6px 8px;font-size:.62rem;text-align:right;color:var(--o);font-weight:800">'+wShort(p2)+' ★</th></tr></thead><tbody>'+
-    tRow('&#128222; Llegaron',tot,d1.remo_tot||0,d0.remo_tot||0)+
-    tRow('&#11088; Interesados',int2,d1.remo_int||0,d0.remo_int||0)+
-    tRow('&#128197; Reun. agendadas',ag,d1.remo_ag||0,d0.remo_ag||0)+
-    tRow('&#9989; Reun. efectivas',ef,d1.remo_ef||0,d0.remo_ef||0)+
-    tRow('&#127942; Cierres',ci,d1.remo_ci||0,d0.remo_ci||0)+
-    tRow('&#128176; Visitas cobradas',vis,d1.remo_vis||0,d0.remo_vis||0)+
-    (visVal||d1.remo_vis_val||d0.remo_vis_val?'<tr style="border-bottom:1px solid #f0ede8"><td style="padding:5px 8px;font-size:.71rem;color:#555;font-weight:600">&#128181; Valor visitas</td>'+
-    '<td style="padding:5px 8px;font-size:.72rem;text-align:right;color:#aaa">'+(d0.remo_vis_val>0?fmt(d0.remo_vis_val):'—')+'</td>'+
-    '<td style="padding:5px 8px;font-size:.72rem;text-align:right;color:#888">'+(d1.remo_vis_val>0?fmt(d1.remo_vis_val):'—')+'</td>'+
-    '<td style="padding:5px 8px;font-size:.72rem;text-align:right;color:var(--o);font-weight:800">'+(visVal>0?fmt(visVal):'—')+'</td></tr>':'')+
-    /* fila métrica: % conversión lead → cierre */
-    (function(){
-      function pctC(ci,tot){return tot>0?Math.round(ci/tot*100)+'%':'—';}
-      var c2=pctC(ci,tot),c1=pctC(d1.remo_ci||0,d1.remo_tot||0),c0=pctC(d0.remo_ci||0,d0.remo_tot||0);
-      var col2=ci>0&&tot>0?(ci/tot>=0.15?'#166534':ci/tot>=0.07?'#D97706':'#DC2626'):'#ccc';
-      return '<tr style="background:#FFF7ED"><td style="padding:6px 8px;font-size:.71rem;color:#C2410C;font-weight:800">&#128200; Conv. Lead→Cierre</td>'+
-      '<td style="padding:6px 8px;font-size:.74rem;text-align:right;color:#aaa;font-weight:700">'+c0+'</td>'+
-      '<td style="padding:6px 8px;font-size:.74rem;text-align:right;color:#888;font-weight:700">'+c1+'</td>'+
-      '<td style="padding:6px 8px;font-size:.8rem;text-align:right;color:'+col2+';font-weight:800">'+c2+'</td></tr>';
-    })()+
-    '</tbody></table>'+
-    /* insight inteligente */
-    (function(){
-      if(!tot)return'';
-      var conv=tot>0?ci/tot:0;
-      var msg='',col='#C2410C',bg='#FFF7ED',brd='#FED7AA';
-      if(ci===0&&tot>0){msg='&#9888;&#65039; Sin cierres esta semana — '+tot+' leads llegaron. '+(ef>0?'Hay '+ef+' reuniones efectivas que pueden convertir.':'Revisar seguimiento.');}
-      else if(conv>=0.15){msg='&#127942; Excelente conversión: '+Math.round(conv*100)+'% de leads cerró. '+ci+' cierre'+(ci>1?'s':'')+'  de '+tot+' leads.';col='#166534';bg='#F0FDF4';brd='#86EFAC';}
-      else if(conv>=0.07){msg='&#128200; Conversión media: '+Math.round(conv*100)+'%. '+(ef>ci?'Hay '+ef+' reuniones efectivas, '+(ef-ci)+' sin cerrar aún.':'Reforzar seguimiento post-reunión.');col='#92400E';bg='#FFFBEB';brd='#FDE68A';}
-      else if(conv>0){msg='&#128270; Conversión baja ('+Math.round(conv*100)+'%). '+(ag>0&&ef<ag?'Solo '+(ag>0?Math.round(ef/ag*100):0)+'% de reuniones agendadas fueron efectivas — revisar confirmaciones.':'Reforzar cierre en reuniones efectivas.');}
-      if(!msg)return'';
-      return '<div style="margin-top:8px;padding:8px 12px;background:'+bg+';border-left:3px solid '+brd+';border-radius:6px;font-size:.72rem;color:'+col+';line-height:1.5">'+msg+'</div>';
-    })()+'';
-  /* funnel visual */
-  var fEl=document.getElementById('l-remo-funnel');if(!fEl)return;
-  if(tot<=0&&!ci&&!vis){fEl.innerHTML='';return;}
-  var mx=Math.max(tot,1);
-  function fR(v,col,lbl,pctLbl){if(v<=0)return'';var pw=Math.max(5,Math.round(v/mx*100));return'<div class="fn-row"><div class="fn-lbl">'+lbl+'</div><div class="fn-bar-wrap"><div class="fn-bar" style="width:'+pw+'%;background:'+col+'"><span style="padding:0 6px;font-weight:700;font-size:.72rem;color:#fff">'+v+'</span></div></div><div class="fn-conv" style="font-size:.7rem;font-weight:700;color:#555;text-align:right">'+pctLbl+'</div></div>';}
-  var html='<div class="fn-title" style="color:#C2410C">&#128296; Pipeline Remodelaciones — '+wShort(p2)+'</div>';
-  html+=fR(tot,'#F97316','&#128222; Llegaron','100%');
-  html+=fR(int2,'#16A34A','&#11088; Interesados',tot>0?Math.round(int2/tot*100)+'%':'');
-  html+=fR(ag,'#1D4ED8','&#128197; Reun. agendadas',int2>0?Math.round(ag/int2*100)+'% de int':'');
-  html+=fR(ef,'#059669','&#9989; Reun. efectivas',ag>0?Math.round(ef/ag*100)+'% de ag':'');
-  if(vis>0)html+=fR(vis,'#D97706','&#128176; Visitas cobradas'+(visVal>0?' ('+fmt(visVal)+')':''),tot>0?Math.round(vis/tot*100)+'%':'');
-  html+=fR(ci,'#9A3412','&#127942; Cierres',ef>0?Math.round(ci/ef*100)+'% de ef':tot>0?Math.round(ci/tot*100)+'%':'');
-  if(!ci)html+='<div style="padding:6px 12px;background:#FFF7ED;border-radius:6px;border:1px dashed #FED7AA;font-size:.72rem;color:#C2410C;margin-top:4px">Sin cierres remo esta semana</div>';
-  fEl.innerHTML=html;
 }
 function calcCierres(){
   var org=parseInt(document.getElementById('l_ci_org')?.value)||0;
@@ -1359,7 +1175,7 @@ var showMonthlyLeads=false;
 function toggleMesLeads(){
   showMonthlyLeads=!showMonthlyLeads;
   var btn=document.getElementById('btn-mes-leads');
-  if(btn)btn.textContent=showMonthlyLeads?'&#128336; Vista semanal':'&#128197; Vista mensual';
+  if(btn)btn.innerHTML=showMonthlyLeads?'&#128336; Vista semanal':'&#128197; Vista mensual';
   if(showMonthlyLeads){
     /* Sincronizar las últimas 12 semanas (~3 meses) para cubrir julio completo */
     var wMes=[];for(var _i=11;_i>=0;_i--)wMes.push(getPer(off-_i).sISO);
@@ -1372,7 +1188,7 @@ function navMes(dir){
   var _lManual=gLS(LS_LM);var _lW=gLS(LS_L);
   var _mSet={};
   Object.keys(_lManual).forEach(function(k){if(/^\d{4}-\d{2}$/.test(k))_mSet[k]=1;});
-  Object.keys(_lW).forEach(function(k){if(/^\d{4}-\d{2}-\d{2}$/.test(k))_mSet[k.substr(0,7)]=1;});
+  Object.keys(_lW).forEach(function(k){if(/^\d{4}-\d{2}-\d{2}$/.test(k))_mSet[mesDeSemana(k)]=1;});
   var mk=Object.keys(_mSet).sort();
   if(!mk.length)return;
   var idx=mk.indexOf(viewMesKey);
@@ -1389,7 +1205,7 @@ function renderLeadsMensual(){
   /* 1. Suma cada semana en su mes */
   Object.keys(allLW).forEach(function(wk){
     if(!/^\d{4}-\d{2}-\d{2}$/.test(wk))return;
-    var mk=wk.substr(0,7);
+    var mk=mesDeSemana(wk);
     if(!allLM[mk])allLM[mk]={wpp:0,total:0,ver:0,cno:0,sr:0,sr2:0,int:0,ci_org:0,ci_ali:0,ci:0,gc:0,cv:0,cred:0,nver:0,ni:0,_auto:true};
     var w=allLW[wk]||{};
     allLM[mk].wpp+=(w.wpp||0);
@@ -1638,7 +1454,10 @@ function renderLeadsMensual(){
   },80);
 }
 function renderLeads(){
+  if(showMonthlyLeads){renderLeadsMensual();return;}
   console.log('%c[VIS-CO] renderLeads INICIO','color:#0891B2;font-weight:bold');
+  var _fm=document.getElementById('l-form-mes');if(_fm)_fm.innerHTML='';
+  var _ff=document.getElementById('l-funnel');if(_ff)_ff.innerHTML='';
   /* Restaurar gráficas semanales */
   var chartsElW=document.querySelector('#p1 .chg2');
   if(chartsElW)chartsElW.style.display='';
@@ -1670,7 +1489,7 @@ function renderLeads(){
   /* ── BANNER BASE REDES (Ángela) ── */
   var rBanner=document.getElementById('l-redes-banner');
   if(rBanner){
-    var rWpp=rD2.wpp||0,rWppCalc=rD2.wpp_calc||0,rTotal=d2.total||0,rVer=d2.ver||0,rMsj=rD2.mensajes||d2.sr||0;
+    var rWpp=rD2.wpp||0,rWppCalc=rD2.wpp_calc||0,rTotal=(rD2.cli_calc||d2.total||0),rVer=(rD2.cli_ver||d2.ver||0),rMsj=rD2.mensajes||d2.sr||0;
     var hasBanner=rWpp>0||rTotal>0;
     if(hasBanner){
       function rCard(bg,col,lbl,val,sub){return'<div style="background:'+bg+';border:1.5px solid '+col+'40;border-top:2px solid '+col+';border-radius:8px;padding:9px 11px;text-align:center"><div style="font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:'+col+';margin-bottom:2px">'+lbl+'</div><div style="font-size:1.25rem;font-weight:800;color:'+col+'">'+val+'</div>'+(sub?'<div style="font-size:.6rem;color:#888;margin-top:1px">'+sub+'</div>':'')+'</div>';}
@@ -1684,7 +1503,7 @@ function renderLeads(){
       var rNver=(rTotal>0&&rVer>0)?Math.max(0,rTotal-rVer):0;
       if(rNver>0)bannerHTML+=rCard('#F8FAFC','#64748B','&#10060; No verif.',rNver,rTotal>0?Math.round(rNver/rTotal*100)+'% de calc':'');
       /* Lógica: qué % gestionan los perfiladores */
-      var totPFasig=(mCalAsig||0)+(aCalAsig||0);
+      var totPFasig=(((gLS(LS_PF)[p2.sISO]||{}).M)||{}).cal_asig||0;
       if(totPFasig>0&&rTotal>0){
         var cob=Math.round(totPFasig/rTotal*100);
         bannerHTML+='<div style="grid-column:1/-1;margin-top:4px;padding:6px 10px;background:rgba(249,115,22,.08);border-radius:6px;border:1px dashed #FDBA74;font-size:.65rem;color:#C2410C;font-weight:700">&#128203; Equipo gestion&#243; '+totPFasig+' / '+rTotal+' calculadoras ('+cob+'% cobertura)</div>';
@@ -1786,7 +1605,6 @@ function renderLeads(){
     if(aReuAg>0)kHtml+=kp('#EFF6FF','#2563EB','&#128197; Reuniones',aReuAg,'Conf.24h '+aReuConf24+' · Reag.'+aReuReag+' · Efec.'+aReuEf+' · Pot.'+aReuPot);
   }
   if(!hasPF)kHtml+='<div style="grid-column:1/-1;padding:12px;background:#F8FAFC;border-radius:8px;border:1px dashed #CBD5E1;font-size:.75rem;color:#64748B;text-align:center">&#128100; Sin datos de perfiladores esta semana — ingresa los datos en el formulario</div>';
-  if((d2.remo_tot||0)>0)kHtml+=kp('#FFF7ED','#F97316','&#128296; Remo NM — llegaron',d2.remo_tot||0,((d2.remo_int||0)>0?'&#11088; '+d2.remo_int+' int · ':'')+((d2.remo_ci||0)>0?'&#127942; '+d2.remo_ci+' cierre'+(d2.remo_ci>1?'s':''):'— cierres'));
   if(kEl)kEl.innerHTML=kHtml;
   console.log('[VIS-CO] KPIs renderizados. hasPF='+hasPF);
   /* ── PIPELINE PERFILADORES ── */
@@ -1816,31 +1634,6 @@ function renderLeads(){
     }
   }
 
-  /* ── MINI-FUNNEL REMODELACIONES NM ── */
-  var remoTot2=d2.remo_tot||0,remoInt2=d2.remo_int||0,remoCi2=d2.remo_ci||0;
-  var remoFEl=document.getElementById('l-remo-funnel');
-  if(remoFEl){
-    if(remoTot2>0){
-      var maxR=Math.max(remoTot2,1);
-      function fnRBar(val,color,label,conv){
-        var pw=Math.max(4,Math.round(val/maxR*100));
-        return'<div class="fn-row"><div class="fn-lbl">'+label+'</div>'+
-          '<div class="fn-bar-wrap"><div class="fn-bar" style="width:'+pw+'%;background:'+color+';justify-content:center"><span style="padding:0 6px;font-weight:700;font-size:.72rem;color:#fff">'+val+'</span></div></div>'+
-          '<div class="fn-conv" style="font-size:.7rem;font-weight:700;color:#555;text-align:right;white-space:nowrap">'+conv+'</div></div>';
-      }
-      var pRemoInt=remoTot2>0&&remoInt2>0?Math.round(remoInt2/remoTot2*100)+'%':'—';
-      var pRemoCi=remoInt2>0&&remoCi2>0?Math.round(remoCi2/remoInt2*100)+'% de int':remoTot2>0&&remoCi2>0?Math.round(remoCi2/remoTot2*100)+'%':'—';
-      var remoFunnel=
-        fnRBar(remoTot2,'#F97316','&#128221; Llegaron','')+
-        (remoInt2>0?fnRBar(remoInt2,'#16A34A','&#11088; Interesados',pRemoInt):'')+
-        (remoCi2>0?fnRBar(remoCi2,'#9A3412','&#127942; Cierres Remo',pRemoCi):'<div style="padding:6px 12px;background:#FFF7ED;border-radius:6px;border:1px dashed #FED7AA;font-size:.72rem;color:#C2410C;margin-top:4px">&#128296; Sin cierres remo esta semana</div>');
-      remoFEl.style.display='';
-      remoFEl.innerHTML='<div class="fn-title" style="color:#C2410C">&#128296; Embudo Remodelaciones — NM</div>'+remoFunnel;
-    }else{
-      remoFEl.style.display='none';
-      remoFEl.innerHTML='';
-    }
-  }
   var vkEl=document.getElementById('l-ver-kpi');if(vkEl)vkEl.style.display='none';
 
   /* ── TABLA COMPARATIVA — ahora sobre los datos de PERFILADORES ──
@@ -1917,7 +1710,6 @@ function renderLeads(){
       {label:'% Verificadas (Bitrix)',data:tasaV6,borderColor:'#0891B2',backgroundColor:'rgba(8,145,178,.08)',fill:true,tension:.3}
     ]);
   },80);
-  renderRemo();
   console.log('%c[VIS-CO] renderLeads FIN OK','color:#16A34A;font-weight:bold');
 }
 
@@ -2041,8 +1833,12 @@ function renderAlianzas(){
 const ALI_PER={
   KM:[{k:'gc',lbl:'Gran Central',clr:'#92400E'},{k:'cv',lbl:'Corner View',clr:'#0891B2'}],
   AB:[{k:'gc',lbl:'Gran Central',clr:'#92400E'},{k:'cv',lbl:'Corner View',clr:'#0891B2'}],
-  NM:[{k:'gc',lbl:'Gran Central',clr:'#92400E'},{k:'cv',lbl:'Corner View',clr:'#0891B2'},{k:'gomm',lbl:'LAGOM',clr:'#7C3AED'},{k:'remo',lbl:'Remodelaciones',clr:'#E4721B'}]
+  NM:[{k:'gc',lbl:'Gran Central',clr:'#92400E'},{k:'cv',lbl:'Corner View',clr:'#0891B2'},{k:'gomm',lbl:'LAGOM',clr:'#7C3AED'}]
 };
+/* NM deja de atender reuniones: primera semana (sábado) sin ella = 2026-10-17. El histórico anterior se conserva. */
+const NM_BAJA_REU='2026-10-17';
+function reuActivas(sISO){return sISO<NM_BAJA_REU?['KM','NM']:['KM'];}
+function reuTodos(sISO){return sISO<NM_BAJA_REU?['KM','AB','NM']:['KM','AB'];}
 /* ── Identidad multi-dispositivo ── */
 const YO_LS='vc3_yo';
 function getYo(){return localStorage.getItem(YO_LS)||'';}
@@ -2067,10 +1863,11 @@ async function saveConf(){
   /* qué comerciales guarda este dispositivo */
   /* AB editable solo semana 2026-06-27 */
   const abUlt='2026-06-27';
-  const actBase=p.sISO===abUlt?['KM','NM','AB']:['KM','NM'];
+  const actBase=reuActivas(p.sISO).concat(p.sISO===abUlt?['AB']:[]);
   // Si AB está seleccionada pero no tiene campos editables esta semana → guardar todos los activos
   const yoEfectivo=(yo==='AB'&&p.sISO!==abUlt)?'':yo;
-  const toSave=(yoEfectivo===''||yoEfectivo==='ADMIN')?actBase:[yoEfectivo];
+  const toSave=((yoEfectivo===''||yoEfectivo==='ADMIN')?actBase:[yoEfectivo]).filter(a=>actBase.indexOf(a)>=0);
+  if(!toSave.length){const st0=document.getElementById('yo-status');if(st0)st0.textContent='⚠️ Esta persona ya no atiende reuniones desde esta semana — nada que guardar';return;}
   toSave.forEach(a=>{
     const prog=parseInt(document.getElementById('cp_'+a)?.value||'0')||0;
     const con=parseInt(document.getElementById('cc_'+a)?.value||'0')||0;
@@ -2121,10 +1918,11 @@ function renderReunionesLocal(){
   document.getElementById('r2-per').textContent=wShort(p2);
   const allC=gLS(LS_C);const allL=gLS(LS_L);
   const cur=allC[p2.sISO]||{};
+  const activas=reuActivas(p2.sISO);
   // Cards
-  document.getElementById('reu-cards').innerHTML=['KM','NM'].map(a=>{const x=cur[a]||{prog:0,con:0,ef:0};const pA=x.prog>0?pct(x.ef,x.prog,0):0;const pC=x.con>0?pct(x.ef,x.con,0):0;return`<div class="rc ${a.toLowerCase()}"><div class="rcn"><span style="width:9px;height:9px;border-radius:50%;background:${VDC[a]};display:inline-block"></span>${a} · ${VDN[a]}</div><div class="rck"><div class="rcm"><div class="rcmv">${x.prog||0}</div><div class="rcml">Programadas</div></div><div class="rcm"><div class="rcmv" style="color:#3B82F6">${x.con||0}</div><div class="rcml">Conectaron</div></div><div class="rcm"><div class="rcmv" style="color:var(--up)">${x.ef||0}</div><div class="rcml">Efectivas</div></div><div class="rcm"><div class="rcmv" style="color:var(--o)">${pA}%</div><div class="rcml">Conv.</div></div></div><div class="rcin"><div class="fl" style="margin:0;flex:1"><label>Programadas</label><input type="number" id="cp_${a}" min="0" value="${x.prog||0}" style="padding:5px 7px;font-size:.8rem"></div><div class="fl" style="margin:0;flex:1"><label>Conectaron</label><input type="number" id="cc_${a}" min="0" value="${x.con||0}" style="padding:5px 7px;font-size:.8rem;border-color:#3B82F6"></div><div class="fl" style="margin:0;flex:1"><label>Efectivas</label><input type="number" id="ce_${a}" min="0" value="${x.ef||0}" style="padding:5px 7px;font-size:.8rem"></div></div></div>`;}).join('');
+  document.getElementById('reu-cards').innerHTML=activas.map(a=>{const x=cur[a]||{prog:0,con:0,ef:0};const pA=x.prog>0?pct(x.ef,x.prog,0):0;const pC=x.con>0?pct(x.ef,x.con,0):0;return`<div class="rc ${a.toLowerCase()}"><div class="rcn"><span style="width:9px;height:9px;border-radius:50%;background:${VDC[a]};display:inline-block"></span>${a} · ${VDN[a]}</div><div class="rck"><div class="rcm"><div class="rcmv">${x.prog||0}</div><div class="rcml">Programadas</div></div><div class="rcm"><div class="rcmv" style="color:#3B82F6">${x.con||0}</div><div class="rcml">Conectaron</div></div><div class="rcm"><div class="rcmv" style="color:var(--up)">${x.ef||0}</div><div class="rcml">Efectivas</div></div><div class="rcm"><div class="rcmv" style="color:var(--o)">${pA}%</div><div class="rcml">Conv.</div></div></div><div class="rcin"><div class="fl" style="margin:0;flex:1"><label>Programadas</label><input type="number" id="cp_${a}" min="0" value="${x.prog||0}" style="padding:5px 7px;font-size:.8rem"></div><div class="fl" style="margin:0;flex:1"><label>Conectaron</label><input type="number" id="cc_${a}" min="0" value="${x.con||0}" style="padding:5px 7px;font-size:.8rem;border-color:#3B82F6"></div><div class="fl" style="margin:0;flex:1"><label>Efectivas</label><input type="number" id="ce_${a}" min="0" value="${x.ef||0}" style="padding:5px 7px;font-size:.8rem"></div></div></div>`;}).join('');
   /* Tarjetas de alianzas por asesora */
-  document.getElementById('reu-proj-cards').innerHTML=['KM','NM'].map(a=>{
+  document.getElementById('reu-proj-cards').innerHTML=activas.map(a=>{
     const aliData=cur['ali_'+a]||{};
     const aliList=ALI_PER[a];
     const aliRows=aliList.map(({k,lbl,clr})=>{
@@ -2146,7 +1944,7 @@ function renderReunionesLocal(){
     </div>`;
   }).join('');
   // KPIs semana + totales
-  const actReu=['KM','NM'];
+  const actReu=['KM','AB'].concat(activas.indexOf('NM')>=0?['NM']:[]);
   const totP=actReu.reduce((s,a)=>s+(cur[a]?.prog||0),0);
   const totE=actReu.reduce((s,a)=>s+(cur[a]?.ef||0),0);
   /* Base: calculadoras VERIFICADAS.
@@ -2161,44 +1959,32 @@ function renderReunionesLocal(){
   };
   const lb2=_verPF(p2),lb1=_verPF(p1),lb0=_verPF(p0);
   const conv2=lb2>0?pct(totP,lb2,2):0,conv1=lb1>0?pct((allC[p1.sISO]?.KM?.prog||0)+(allC[p1.sISO]?.AB?.prog||0)+(allC[p1.sISO]?.NM?.prog||0),lb1,2):0;
-  const remoNM=cur['ali_NM']?.remo||{prog:0,ef:0};
-  const remoLeadsNM=allL[p2.sISO]?.remo_tot||0;
-  const remoLeadsIntNM=allL[p2.sISO]?.remo_int||0;
-  const remoLeadsCiNM=allL[p2.sISO]?.remo_ci||0;
-  const hasRemo=!!(remoNM.prog||remoNM.ef||remoLeadsNM);
   document.getElementById('reu-kpis').innerHTML=`
     <div class="kp o"><div class="kl">✅ Calc. verificadas</div><div class="kv">${lb2}</div><div class="ks">Base para % de reuniones</div></div>
-    <div class="kp b"><div class="kl">Agendadas total</div><div class="kv">${totP}</div><div class="ks">${conv2}% de leads</div></div>
-    <div class="kp g"><div class="kl">Efectivas total</div><div class="kv">${totE}</div><div class="ks">${lb2>0?pct(totE,lb2,2):0}% de leads</div></div>
+    <div class="kp b"><div class="kl">Agendadas total</div><div class="kv">${totP}</div><div class="ks">${conv2}% de calc. verificadas</div></div>
+    <div class="kp g"><div class="kl">Efectivas total</div><div class="kv">${totE}</div><div class="ks">${lb2>0?pct(totE,lb2,2):0}% de calc. verificadas</div></div>
     <div class="kp p"><div class="kl">KM</div><div class="kv">${cur.KM?.ef||0}/${cur.KM?.prog||0}</div><div class="ks">${cur.KM?.prog>0?pct(cur.KM.ef,cur.KM.prog,0):0}% conv</div></div>
-    <div class="kp a"><div class="kl">NM</div><div class="kv">${cur.NM?.ef||0}/${cur.NM?.prog||0}</div><div class="ks">${cur.NM?.prog>0?pct(cur.NM.ef,cur.NM.prog,0):0}% conv</div></div>
-    ${hasRemo?`<div class="kp" style="background:#FFF7ED;border:2px solid #F97316;border-top:4px solid #C2410C;border-radius:10px;min-width:140px">
-      <div class="kl" style="color:#C2410C;font-weight:800;font-size:.72rem">&#128296; REMO — NM</div>
-      <div class="kv" style="color:#C2410C;font-size:1.45rem;font-weight:800">${remoNM.ef||0}<span style="font-size:.8rem;font-weight:600;color:#9A3412"> ef / ${remoNM.prog||0} ag</span></div>
-      <div class="ks" style="font-size:.68rem;color:#92400E;margin-top:3px;line-height:1.4">
-        ${remoLeadsNM?'📝 '+remoLeadsNM+' llegaron':''}${remoLeadsIntNM?' · ⭐ '+remoLeadsIntNM+' int':''}${remoLeadsCiNM?' · 🏆 '+remoLeadsCiNM+' cierre'+(remoLeadsCiNM>1?'s':''):''}<br>
-        ${remoNM.prog>0?pct(remoNM.ef,remoNM.prog,0)+'% conv reuniones':'—'}
-      </div>
-    </div>`:''}
+    ${activas.indexOf('NM')>=0?`<div class="kp a"><div class="kl">NM</div><div class="kv">${cur.NM?.ef||0}/${cur.NM?.prog||0}</div><div class="ks">${cur.NM?.prog>0?pct(cur.NM.ef,cur.NM.prog,0):0}% conv</div></div>`:''}
+    
     ` ;
   // Tabla estilo PDF (Leads base / Agendadas / Atendidas) — 3 semanas
   function reuRow(lbl,v0,v1,v2,lb0,lb1,lb2,inv){
     const ps0=lb0>0?`(${pct(v0,lb0,2)}%)`:'';const ps1=lb1>0?`(${pct(v1,lb1,2)}%)`:'';const ps2=lb2>0?`(${pct(v2,lb2,2)}%)`:'';
     return`<tr><td class="mc">${lbl}</td><td class="tr">${v0} <span class="pval">${ps0}</span></td><td class="tr">${v1} <span class="pval">${ps1}</span></td><td class="tr"><strong>${v2}</strong> <span class="pval">${ps2}</span></td><td class="tr">${dH(v1,v0,inv)}</td><td class="tr">${dH(v2,v1,inv)}</td></tr>`;
   }
-  const ag0=['KM','AB','NM'].reduce((s,a)=>s+(allC[p0.sISO]?.[a]?.prog||0),0);
-  const ag1=['KM','AB','NM'].reduce((s,a)=>s+(allC[p1.sISO]?.[a]?.prog||0),0);
-  const ef0=['KM','AB','NM'].reduce((s,a)=>s+(allC[p0.sISO]?.[a]?.ef||0),0);
-  const ef1=['KM','AB','NM'].reduce((s,a)=>s+(allC[p1.sISO]?.[a]?.ef||0),0);
+  const ag0=reuTodos(p0.sISO).reduce((s,a)=>s+(allC[p0.sISO]?.[a]?.prog||0),0);
+  const ag1=reuTodos(p1.sISO).reduce((s,a)=>s+(allC[p1.sISO]?.[a]?.prog||0),0);
+  const ef0=reuTodos(p0.sISO).reduce((s,a)=>s+(allC[p0.sISO]?.[a]?.ef||0),0);
+  const ef1=reuTodos(p1.sISO).reduce((s,a)=>s+(allC[p1.sISO]?.[a]?.ef||0),0);
   document.getElementById('reu-tabla').innerHTML=`
   <div class="card lct">
     <div class="card-hd">Evoluci&#243;n reuniones comerciales <span class="card-hd-sub">Base = calculadoras verificadas ✅ (GC / Corner View se miden aparte)</span></div>
     <div class="tw"><table>
       <thead><tr><th>Concepto</th><th class="tr">${wShort(p0)}</th><th class="tr">${wShort(p1)}</th><th class="tr">${wShort(p2)}</th><th class="tr">Var. ant→pre</th><th class="tr">Var. pre→act</th></tr></thead>
       <tbody>
-        ${reuRow('✅ Calc. verificadas',lb0,lb1,lb2,lb0,lb1,lb2,false)}
-        ${reuRow('Agendadas (K+A+N)',ag0,ag1,totP,lb0,lb1,lb2,false)}
-        ${reuRow('Atendidas (K+A+N)',ef0,ef1,totE,lb0,lb1,lb2,false)}
+        ${reuRow('✅ Calc. verificadas',lb0,lb1,lb2,0,0,0,false)}
+        ${reuRow('Agendadas',ag0,ag1,totP,lb0,lb1,lb2,false)}
+        ${reuRow('Atendidas',ef0,ef1,totE,lb0,lb1,lb2,false)}
       </tbody>
     </table></div>
     ${lb2===0?`<div class="msg msg-a" style="margin-top:8px;margin-bottom:0">Calculadoras verificadas en 0 — diligencia <strong>Verificadas</strong> en la pestaña Leads, sección <strong>Calculadoras de Marcela (Bitrix)</strong>.</div>`:''}
@@ -2215,7 +2001,7 @@ function renderReunionesLocal(){
     };
     const lbTot=ws.map(_asigPF);
     const lbVer=ws.map(_verPF);
-    const lbEf=ws.map(w=>actReu.reduce((s,a)=>s+(allC[w.sISO]?.[a]?.ef||0),0));
+    const lbEf=ws.map(w=>reuTodos(w.sISO).reduce((s,a)=>s+(allC[w.sISO]?.[a]?.ef||0),0));
     mkBarG('rc_trend',wlbls,[
       {label:'Calculadoras',data:lbTot,backgroundColor:'rgba(249,115,22,.7)',borderColor:'#F97316',borderWidth:1.5},
       {label:'Verificadas',data:lbVer,backgroundColor:'rgba(8,145,178,.7)',borderColor:'#0891B2',borderWidth:1.5},
@@ -2619,246 +2405,6 @@ function renderVentas(){
     }
   },90);
 }
-/* === APTOS - usa xlA (PROYECTOS EN EJECUCION xlsx) === */
-/* Cols xlA: [0]# [1]CARPINTERIA [2]CLIENTE [3]CONJUNTO [4]ANTICIPO [5]PORCENTAJE [6]FECHA_ENTREGA [7]RESPONSABLE [8]ESTADO */
-var RES_COLS={'JULIAN':'#7C3AED','DAVID':'#0891B2','DANNY':'#E4721B','ABEL':'#16A34A','JENY':'#DB2777','OMAR':'#92400E'};
-function renderAptos(){
-  var el=document.getElementById('a-out');
-  var norm=function(s){return(s||'').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toUpperCase().trim();};
-
-  /* ── Datos de xlR (VENTAS): X RECIBIR + GC Convenio separado por estado ── */
-  var xrR=[],gcConvEj=[],gcConvXR=[];
-  if(xlR){
-    xrR=xlR.filter(function(r){return norm(r[8])==='X RECIBIR';});
-    var gcAll=xlR.filter(function(r){return eConv(r)&&(r[9]||'').toString().toUpperCase().includes('GRAN CENTRAL');});
-    gcConvEj=gcAll.filter(function(r){var e=norm(r[8]);return e==='EN EJECUCION'||e.includes('EJECUCI');});
-    gcConvXR=gcAll.filter(function(r){return norm(r[8])==='X RECIBIR';}); /* GC Convenio por recibir */
-  }
-
-  /* ── Datos de xlA (PROYECTOS EN EJECUCION) ── */
-  var ejR=[],convR=[];
-  if(xlA){
-    ejR=xlA.filter(function(r){var e=norm(r[8]);return e==='EN EJECUCION'||e.includes('EJECUCI');});
-    convR=ejR.filter(function(r){return norm(r[1])==='CONVENIO';});
-    document.getElementById('a-noex').style.display='none';
-  } else if(!xlR){
-    el.innerHTML='';
-    document.getElementById('a-noex').style.display='block';
-    return;
-  } else {
-    document.getElementById('a-noex').style.display='none';
-  }
-
-  /* ── Lagom: todos los aptos del proyecto, dedup por cliente+torre+apto ── */
-  var lagomAllR=xlR?xlR.filter(function(r){return norm(r[9]).includes('LAGOM')&&norm(r[8])!=='CAIDO';}).filter(function(r){var e=norm(r[8]);return e!=='';})  :[];
-  var lagK3=function(r){return(r[7]||'').toString().trim().toUpperCase();};var lagomByAptP={};lagomAllR.forEach(function(r){var k=lagK3(r);(lagomByAptP[k]=lagomByAptP[k]||[]).push(r);});
-  var lagomApts=Object.values(lagomByAptP);
-
-  /* ── xrR dedup: Lagom X RECIBIR cuenta una vez por apto único ── */
-  var xrNoLag=xrR.filter(function(r){return !norm(r[9]).includes('LAGOM');});
-  var lagXRGrps=lagomApts.filter(function(g){return g.some(function(r){return norm(r[8])==='X RECIBIR';});});
-  var xrRDedup=xrNoLag.concat(lagXRGrps.map(function(g){return g[0];}));
-  /* Desglose de Por Recibir — separar Lagom Etapa 1 y Etapa 2 */
-  var lagXRGrps2=lagXRGrps.filter(function(g){return g.some(function(r){return(r[9]||'').toUpperCase().includes('FASE 2')||(r[9]||'').toUpperCase().includes('ETAPA 2');});});
-  var lagXRGrps1=lagXRGrps.filter(function(g){return !lagXRGrps2.includes(g);});
-  var xrCntLagom=lagXRGrps.length;
-  var xrCntLagom1=lagXRGrps1.length;
-  var xrCntLagom2=lagXRGrps2.length;
-  var xrCntGC=gcConvXR.filter(function(r){return !norm(r[9]).includes('LAGOM');}).length;
-  var xrCntOtros=xrRDedup.length-xrCntLagom-xrCntGC;
-
-  /* ── Donut por RESPONSABLE (residente) ── */
-  var byRes={};
-  ejR.forEach(function(r){var k=(r[7]||'Sin residente').toString().trim().toUpperCase();byRes[k]=(byRes[k]||0)+1;});
-  var rK=Object.keys(byRes).sort(function(a,b){return byRes[b]-byRes[a];});
-  var rClrs=rK.map(function(k,i){return RES_COLS[k]||COLS[i%COLS.length];});
-
-  /* ── X RECIBIR: agrupado por mes de entrega (Lagom deduplicado) ── */
-  var byXR={};
-  xrRDedup.forEach(function(r){
-    var l='Sin fecha';
-    try{
-      var raw=r[12]; /* FECHA DE RECIBIDO col 12 */
-      if(raw){
-        var rawS=raw.toString().trim();
-        var d=new Date(rawS);
-        if(!isNaN(d.getTime())&&d.getFullYear()>1970){
-          l=MES[d.getMonth()]+' '+d.getFullYear();
-        } else {
-          /* parseo texto español: "Diciembre 2025", "dic-25", etc. */
-          var parts=rawS.toLowerCase().split(/[\s\-\/,]+/);
-          var mIdx=-1,yr=0;
-          parts.forEach(function(p){
-            if(MN[p]!==undefined)mIdx=MN[p];
-            var n=parseInt(p);
-            if(!isNaN(n)&&n>2000&&n<2100)yr=n;
-            else if(!isNaN(n)&&n>=24&&n<=35)yr=2000+n;
-          });
-          if(mIdx>=0)l=MES[mIdx]+(yr?' '+yr:'');
-          else if(rawS.length>1)l=rawS.slice(0,20);
-        }
-      }
-    }catch(e){}
-    byXR[l]=(byXR[l]||0)+1;
-  });
-  var xrK=Object.keys(byXR).sort();
-  var xrClrs=xrK.map(function(_,i){return COLS[i%COLS.length];});
-
-  /* ── Tarjetas de aptos en ejecucion ── */
-  var aptCards=ejR.map(function(r){
-    var pct=norm(r[5]);
-    var pctColor=pct==='INSTALADO'?'var(--up)':pct.includes('INSTALAC')?'var(--o)':pct==='FABRICACION'||pct==='FABRICACI'?'var(--am)':'var(--g)';
-    var rc=RES_COLS[(r[7]||'').toString().toUpperCase()]||'var(--g)';
-    return '<div class="apt-card">'
-      +'<div class="apt-proj">'+(r[3]||'--').toString().replace('\xa0',' ')+'</div>'
-      +'<div class="apt-cli">'+(r[2]||'--')+'</div>'
-      +'<div class="apt-info">'
-        +'<span class="apt-res" style="color:'+rc+'">'+(r[7]||'--').toString()+'</span>'
-        +'<span class="apt-carp">'+(r[1]||'--')+'</span>'
-        +(r[5]?'<span class="apt-pct" style="color:'+pctColor+'">'+(r[5]||'')+'</span>':'')
-      +'</div>'
-    +'</div>';
-  }).join('');
-
-  /* ── HTML ── */
-  var html='';
-
-  /* ══ FILA DE KPIs ══ */
-  html+='<div class="apt-kpg">';
-  /* En Ejecución (KLIK) */
-  if(ejR.length){
-    html+='<div class="apt-kp dark"><div class="apt-kpn">'+ejR.length+'</div><div class="apt-kpl">En Ejecuci&#243;n</div><div class="apt-kps">'+rK.length+' residentes</div></div>';
-  }
-  /* Por Recibir — con desglose */
-  if(xrRDedup.length){
-    var brkParts=[];
-    if(xrCntLagom1>0)brkParts.push(xrCntLagom1+' Lagom E1');
-    if(xrCntLagom2>0)brkParts.push(xrCntLagom2+' Lagom E2 ★');
-    if(xrCntGC>0)brkParts.push(xrCntGC+' GC Convenio');
-    if(xrCntOtros>0)brkParts.push(xrCntOtros+' otros');
-    html+='<div class="apt-kp navy"><div class="apt-kpn">'+xrRDedup.length+'</div><div class="apt-kpl">Por Recibir</div><div class="apt-kps">'+brkParts.join(' · ')+'</div></div>';
-  }
-  /* GC Convenio en ejecución */
-  if(gcConvEj.length){
-    html+='<div class="apt-kp" style="background:#92400E;color:#fff"><div class="apt-kpn" style="color:#FCD34D">'+gcConvEj.length+'</div><div class="apt-kpl">GC Convenio</div><div class="apt-kps">Gran Central en ejecuci&#243;n</div></div>';
-  }
-  /* Lagom */
-  if(lagomApts.length){
-    var lagMultiC=lagomApts.filter(function(g){return g.length>1;}).length;
-    var lagXR=lagomApts.filter(function(g){return g.some(function(r){return norm(r[8])==='X RECIBIR';});});
-    var lagEj=lagomApts.filter(function(g){return g.some(function(r){return norm(r[8]).includes('EJECUCI');});});
-    var lagSub=(lagEj.length?lagEj.length+' en ejec.':'')+(lagEj.length&&lagXR.length?' · ':'')+(lagXR.length?lagXR.length+' por recibir':'');
-    html+='<div class="apt-kp" style="background:#3B0764;color:#fff"><div class="apt-kpn" style="color:#C4B5FD">'+lagomApts.length+'</div><div class="apt-kpl">Lagom</div><div class="apt-kps">'+(lagMultiC?lagMultiC+' en 2 fases · ':'')+lagSub+'</div></div>';
-  }
-  html+='</div>';
-
-  /* Aviso si falta xlA */
-  if(!xlA&&ejR.length===0){
-    html+='<div class="msg msg-a" style="margin-bottom:12px">Carga PROYECTOS EN EJECUCION 2026.xlsx para ver residentes y detalle de obras.</div>';
-  }
-
-  /* ══ CHARTS — dos columnas ══ */
-  if(ejR.length||xrRDedup.length){
-    html+='<div class="apt-charts">';
-
-    /* Columna 1: En Ejecución (KLIK) */
-    if(ejR.length){
-      html+='<div class="apt-ch">';
-      html+='<div class="apt-ch-hd">🏗️ En Ejecuci&#243;n — por residente</div>';
-      html+='<canvas id="ca_ej" height="240"></canvas>';
-      html+='<div class="apt-legend">';
-      rK.forEach(function(k,i){
-        var col=RES_COLS[k]||COLS[i%COLS.length];
-        html+='<div class="apt-leg-item"><span class="apt-dot" style="background:'+col+'"></span><span>'+k+' — '+byRes[k]+' apt ('+Math.round(byRes[k]/ejR.length*100)+'%)</span></div>';
-      });
-      if(gcConvEj.length)html+='<div style="margin-top:6px;padding:4px 8px;background:#92400E11;border-left:2px solid #92400E;font-size:.63rem;color:#92400E;font-weight:700">🏢 '+gcConvEj.length+' incluyen GC Convenio</div>';
-      html+='</div></div>';
-    }
-
-    /* Columna 2: Por Recibir */
-    if(xrRDedup.length){
-      html+='<div class="apt-ch">';
-      html+='<div class="apt-ch-hd">📦 Por Recibir — cronograma por mes</div>';
-      html+='<canvas id="ca_xr" height="240"></canvas>';
-      html+='<div class="apt-legend">';
-      xrK.forEach(function(k,i){
-        html+='<div class="apt-leg-item"><span class="apt-dot" style="background:'+xrClrs[i]+'"></span><span>'+k+' — '+byXR[k]+' apt</span></div>';
-      });
-      /* Desglose por tipo */
-      html+='<div style="margin-top:8px;border-top:1px solid #e5e7eb;padding-top:7px;font-size:.63rem;font-weight:700;color:#555">Composici&#243;n:</div>';
-      if(xrCntLagom1>0)html+='<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><span style="width:8px;height:8px;border-radius:50%;background:#7C3AED;flex-shrink:0"></span><span style="font-size:.63rem;color:#3B0764;font-weight:700">'+xrCntLagom1+' Lagom Etapa 1</span></div>';
-      if(xrCntLagom2>0)html+='<div style="display:flex;align-items:center;gap:5px;margin-top:3px;padding:2px 6px;background:#ECFEFF;border-radius:4px;border:1px solid #67E8F9"><span style="width:8px;height:8px;border-radius:50%;background:#0891B2;flex-shrink:0"></span><span style="font-size:.63rem;color:#0E7490;font-weight:800">'+xrCntLagom2+' Lagom Etapa 2</span></div>';
-      if(xrCntGC>0)html+='<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><span style="width:8px;height:8px;border-radius:50%;background:#92400E;flex-shrink:0"></span><span style="font-size:.63rem;color:#92400E;font-weight:700">'+xrCntGC+' GC Convenio</span></div>';
-      if(xrCntOtros>0)html+='<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><span style="width:8px;height:8px;border-radius:50%;background:#0891B2;flex-shrink:0"></span><span style="font-size:.63rem;color:#0C4A6E;font-weight:700">'+xrCntOtros+' otros proyectos</span></div>';
-      html+='</div></div>';
-    }
-    html+='</div>';
-  }
-
-  /* ══ LAGOM DETALLE ══ */
-  if(lagomApts.length){
-    html+='<div style="margin-top:4px;border:1.5px solid #DDD6FE;border-top:3px solid #7C3AED;border-radius:10px;overflow:hidden">';
-    /* Mini-header */
-    html+='<div style="background:#F5F3FF;padding:9px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:1px solid #EDE9FE">';
-    html+='<span style="font-family:Syne,sans-serif;font-weight:800;font-size:.72rem;color:#3B0764;letter-spacing:.4px">🏠 LAGOM — detalle por apto</span>';
-    if(lagMultiC)html+='<span style="font-size:.6rem;background:#7C3AED;color:#fff;border-radius:4px;padding:1px 7px;font-weight:700">'+lagMultiC+' en 2 fases</span>';
-    if(lagEj.length)html+='<span style="font-size:.6rem;background:#16A34A;color:#fff;border-radius:4px;padding:1px 7px;font-weight:700">🏗️ '+lagEj.length+' en ejecuci&#243;n</span>';
-    if(lagXR.length)html+='<span style="font-size:.6rem;background:#1E3A5F;color:#fff;border-radius:4px;padding:1px 7px;font-weight:700">📦 '+lagXR.length+' por recibir</span>';
-    html+='</div>';
-    /* Grid */
-    html+='<div style="padding:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:7px;background:#FAFAFE">';
-    lagomApts.forEach(function(grp){
-      var totalVal=grp.reduce(function(s,rx){return s+gV(rx);},0);
-      var apto=(grp[0][10]?'T'+grp[0][10]+' ':'')+('A'+(grp[0][11]||'—'));
-      var cliente=grp[0][7]||'—';
-      var tieneEj=grp.some(function(r){return norm(r[8]).includes('EJECUCI');});
-      var tieneXR=grp.some(function(r){return norm(r[8])==='X RECIBIR';});
-      var topCol=tieneEj&&tieneXR?'#7C3AED':tieneXR?'#1E3A5F':'#16A34A';
-      /* Detectar Etapa 2 de Lagom */
-      var esFase2=grp.some(function(r){return(r[9]||'').toUpperCase().includes('FASE 2')||( r[9]||'').toUpperCase().includes('ETAPA 2');});
-      var cardBg=esFase2?'#ECFEFF':'#fff';
-      var cardBorder=esFase2?'1px solid #67E8F9':'1px solid #E9D5FF';
-      var cardLeftBorder=esFase2?'4px solid #0891B2':'4px solid '+topCol;
-      html+='<div style="background:'+cardBg+';border:'+cardBorder+';border-left:'+cardLeftBorder+';border-radius:8px;padding:9px 11px">';
-      html+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">';
-      html+='<span style="font-weight:900;font-size:.8rem;color:'+(esFase2?'#0E7490':'#3B0764')+'">'+apto+'</span>';
-      if(esFase2)html+='<span style="font-size:.5rem;background:#0891B2;color:#fff;border-radius:3px;padding:1px 5px;font-weight:800;letter-spacing:.3px">ETAPA 2</span>';
-      if(grp.length>1)html+='<span style="font-size:.52rem;background:'+(esFase2?'#0891B2':'#7C3AED')+';color:#fff;border-radius:3px;padding:0 4px;font-weight:700;margin-left:auto">2F</span>';
-      html+='</div>';
-      html+='<div style="font-size:.6rem;color:#6D28D9;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+cliente+'">'+cliente+'</div>';
-      grp.forEach(function(r,i){
-        var est=norm(r[8]);
-        var esXR=est==='X RECIBIR',esEj=est.includes('EJECUCI');
-        var fCol=esXR?'#1E40AF':esEj?'#166534':'#64748B';
-        var fBg=esXR?'#EFF6FF':esEj?'#DCFCE7':'#F1F5F9';
-        var fIcon=esXR?'📦':esEj?'🏗️':'·';
-        var fLbl=esXR?'Por Recibir':esEj?'En Ejecuci&#243;n':(r[8]||'—');
-        var fnLbl=(r[9]||'').toUpperCase().includes('FASE 2')?'F2':(r[9]||'').toUpperCase().includes('FASE 1')?'F1':grp.length>1?'F'+(i+1):'';
-        var fecha=r[12]?r[12].toString().trim():'';
-        html+='<div style="background:'+fBg+';border-radius:5px;padding:4px 7px;margin-bottom:'+(i<grp.length-1?'4':'0')+'px">';
-        html+='<div style="display:flex;align-items:center;gap:4px">';
-        if(fnLbl)html+='<span style="font-size:.55rem;color:#94A3B8;font-weight:700">'+fnLbl+'</span>';
-        html+='<span style="font-size:.58rem;font-weight:700;color:'+fCol+'">'+fIcon+' '+fLbl+'</span>';
-        html+='<span style="font-size:.62rem;font-weight:700;color:#3B0764;margin-left:auto">'+fmt(gV(r))+'</span>';
-        html+='</div>';
-        if(fecha)html+='<div style="font-size:.54rem;color:#94A3B8;margin-top:2px">📅 '+fecha+'</div>';
-        html+='</div>';
-      });
-      if(grp.length>1)html+='<div style="margin-top:5px;font-size:.62rem;font-weight:700;color:#3B0764;text-align:right;border-top:1px solid #EDE9FE;padding-top:4px">'+fmt(totalVal)+'</div>';
-      html+='</div>';
-    });
-    html+='</div></div>';
-  }
-
-  el.innerHTML=html;
-
-  setTimeout(function(){
-    if(rK.length)mkDona('ca_ej',rK,rK.map(function(k){return byRes[k];}),rClrs);
-    if(xrK.length)mkDona('ca_xr',xrK,xrK.map(function(k){return byXR[k];}),xrClrs);
-  },150);
-}
-
-
 /* ═══ INFORME ═══ */
 function genInforme(){
   const p=getPer();const cl=gLS(LS_L)[p.sISO]||{};const cr=gLS(LS_R)[p.sISO]||{};const cc=gLS(LS_C)[p.sISO]||{};
@@ -2911,7 +2457,7 @@ function toggleModoComite(){
   var btn=document.getElementById('btn-comite-toggle');
   if(btn){btn.textContent=mc?'＋':'－';btn.title=mc?'Expandir para ingresar datos':'Colapsar para comité';}
 }
-function renderAll(){console.log('%c[VIS-CO] renderAll ▶','color:#7C3AED;font-weight:bold');try{renderRedes();}catch(e){console.error('Redes:',e);}try{renderLeads();}catch(e){console.error('Leads ERR:',e);}try{renderReuniones();}catch(e){console.error('Reun ERR:',e);}if(xlR){try{renderVentas();}catch(e){console.error('Ventas:',e);}try{renderAlianzas();}catch(e){console.error('Ali:',e);}try{renderAptos();}catch(e){console.error('Aptos:',e);}}try{document.getElementById('c-period').textContent=wLbl(getPer());}catch(e){}}
+function renderAll(){console.log('%c[VIS-CO] renderAll ▶','color:#7C3AED;font-weight:bold');try{renderRedes();}catch(e){console.error('Redes:',e);}try{renderLeads();}catch(e){console.error('Leads ERR:',e);}try{renderReuniones();}catch(e){console.error('Reun ERR:',e);}if(xlR){try{renderVentas();}catch(e){console.error('Ventas:',e);}try{renderAlianzas();}catch(e){console.error('Ali:',e);}}try{document.getElementById('c-period').textContent=wLbl(getPer());}catch(e){}}
 (async function init(){
   await initStorage();
   migrarAndresAMarcela();
@@ -2965,20 +2511,6 @@ function renderAll(){console.log('%c[VIS-CO] renderAll ▶','color:#7C3AED;font-
     }
   }catch(e){
     document.getElementById('v-noex').style.display='block';
-  }
-  try{
-    var savedA=VC3[LS_XLA]?JSON.stringify(VC3[LS_XLA]):null;
-    if(savedA){
-      xlA=JSON.parse(savedA);
-      var sta=document.getElementById('axst');
-      if(sta)sta.textContent='✅ Proyectos ('+xlA.length+' filas — guardado)';
-      document.getElementById('a-noex').style.display='none';
-      renderAptos();
-    } else {
-      document.getElementById('a-noex').style.display='block';
-    }
-  }catch(e){
-    document.getElementById('a-noex').style.display='block';
   }
 })();
 </script>
