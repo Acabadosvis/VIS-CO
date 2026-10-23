@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.07.02.08 -->
+<!-- v2026.07.02.09 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -279,91 +279,91 @@ body.modo-comite .brow{display:none!important}
 /* Fuerza Syne en td numéricos de tablas y spans con strong/b */
 .panel td strong,.panel td b,.panel .tr strong{font-family:'Syne',sans-serif!important;font-weight:700!important}
 
-/* ═══ ALISTAMIENTO (reemplaza Aptos) ═══ */
-.dc-hero{background:linear-gradient(135deg,#0A2540 0%,#12385f 60%,#1b4a7a 100%);color:#fff;border-radius:16px;padding:20px 24px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;position:relative;overflow:hidden;box-shadow:var(--sh)}
-.dc-hero::after{content:'';position:absolute;right:-50px;top:-70px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(228,114,27,.38),transparent 70%)}
-.dc-hero h2{margin:0;font-size:1.1rem;font-weight:800}
-.dc-hero p{margin:5px 0 0;font-size:.7rem;opacity:.72;max-width:600px;line-height:1.55}
-.dc-hn-w{text-align:right}
-.dc-hn{font-size:3rem;font-weight:800;line-height:1;color:#F5B800}
-.dc-hl{font-size:.72rem;font-weight:700;margin-top:3px}
-.dc-hs{font-size:.64rem;opacity:.65;margin-top:2px}
-.dc-alerta{background:#FEF2F2;border:1px solid #FCA5A5;border-left:5px solid #DC2626;border-radius:12px;padding:12px 14px;margin-bottom:12px}
-.dc-al-t{font-weight:800;font-size:.8rem;color:#991B1B;margin-bottom:8px}
-.dc-chips{display:flex;flex-wrap:wrap;gap:6px}
-.dc-chip{background:#fff;border:1px solid #FCA5A5;color:#7F1D1D;border-radius:20px;padding:4px 10px;font-size:.68rem;font-weight:700;cursor:pointer;transition:all .15s}
-.dc-chip small{font-weight:500;color:#B45309;margin-left:3px}
-.dc-chip:hover{background:#DC2626;color:#fff;border-color:#DC2626}.dc-chip:hover small{color:#FEE2E2}
-.dc-chip.mas{background:#7F1D1D;color:#fff;border-color:#7F1D1D}
-.dc-kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
-.dc-k{background:#fff;border:1px solid var(--brd);border-radius:14px;padding:14px 15px 13px 18px;box-shadow:var(--sh);cursor:pointer;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
-.dc-k::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--kc,#999)}
-.dc-k:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.11)}
-.dc-kn{font-size:2.2rem;font-weight:800;line-height:1;color:var(--kc,#1a1a1a)}
-.dc-kl{font-size:.72rem;font-weight:800;color:var(--n);margin-top:5px;line-height:1.3}
-.dc-ks{font-size:.62rem;color:var(--g);margin-top:3px;line-height:1.45}
-.dc-kring{display:flex;align-items:center;gap:12px}
-.dc-ring{--p:0;width:64px;height:64px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;position:relative;background:conic-gradient(#16A34A calc(var(--p)*1%),#FECACA 0)}
-.dc-ring::after{content:'';position:absolute;inset:8px;border-radius:50%;background:#fff}
-.dc-ring b{position:relative;z-index:1;font-size:.86rem;font-weight:800;color:#166534}
-.dc-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-bottom:12px}
-.dc-sc{background:#fff;border:1px solid var(--brd);border-top:4px solid var(--sc,#999);border-radius:14px;padding:15px 16px;box-shadow:var(--sh)}
-.dc-sch{display:flex;align-items:center;gap:10px;font-weight:800;font-size:.84rem;margin-bottom:10px}
-.dc-sch small{display:block;font-weight:500;font-size:.64rem;color:var(--g)}
-.dc-sci{font-size:1.5rem}
-.dc-row{display:grid;grid-template-columns:138px 1fr 108px;gap:10px;align-items:center;padding:7px 6px;border-radius:9px}
-.dc-row[onclick]{cursor:pointer}.dc-row[onclick]:hover{background:#FAF8F5}
-.dc-rl{font-size:.7rem;font-weight:700;color:var(--n);white-space:nowrap}
-.dc-bar{height:10px;border-radius:6px;background:#FECACA;overflow:hidden}
-.dc-bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#16A34A,#4ADE80);transition:width .5s}
-.dc-bar.na,.dc-bar.nd{background:repeating-linear-gradient(45deg,#EDEBE6,#EDEBE6 5px,#F5F3EF 5px,#F5F3EF 10px)}
-.dc-rt{font-size:.65rem;text-align:right;color:var(--g);white-space:nowrap}.dc-rt b{color:var(--n)}.dc-rt em{font-style:normal;color:var(--dn);font-weight:800}
-.dc-tb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
-.dc-tb input,.dc-tb select{border:1px solid var(--brd);border-radius:9px;padding:8px 10px;font-size:.72rem;background:#fff;color:var(--n);outline:none;font-family:'Syne',sans-serif}
-.dc-tb input{flex:1;min-width:190px}
-.dc-tb input:focus,.dc-tb select:focus{border-color:var(--o);box-shadow:0 0 0 3px rgba(228,114,27,.16)}
-.dc-btn{border:1px solid var(--brd);background:#fff;color:var(--n);border-radius:9px;padding:8px 12px;font-size:.7rem;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;transition:all .15s}
-.dc-btn:hover{border-color:var(--o);color:var(--o)}.dc-btn.pri{background:var(--o);border-color:var(--od);color:#fff}.dc-btn.pri:hover{background:var(--od);color:#fff}
-.dc-proj{border:1px solid var(--brd);border-radius:12px;margin-bottom:8px;background:#fff;overflow:hidden;transition:box-shadow .15s}
-.dc-proj:hover{box-shadow:0 3px 12px rgba(0,0,0,.07)}
-.dc-proj.open{border-color:#D6CFC2;box-shadow:0 4px 16px rgba(0,0,0,.08)}
-.dc-ph{display:grid;grid-template-columns:20px minmax(150px,1.3fr) 2.8fr 128px;gap:12px;align-items:center;padding:12px 14px;cursor:pointer}
-.dc-caret{font-size:.8rem;color:var(--gl);transition:transform .2s}.dc-proj.open .dc-caret{transform:rotate(90deg);color:var(--o)}
-.dc-pn b{display:block;font-size:.8rem;color:var(--n);line-height:1.25}.dc-pn small{font-size:.62rem;color:var(--g)}
-.dc-ms{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.dc-m span{display:block;font-size:.62rem;color:var(--g);margin-bottom:3px;white-space:nowrap}.dc-m b{color:var(--n)}.dc-m b.bad{color:var(--dn)}
-.dc-m .dc-bar{height:7px}
-.dc-pend{font-size:.64rem;font-weight:800;text-align:center;padding:5px 8px;border-radius:20px;background:#FEE2E2;color:#991B1B;white-space:nowrap}
-.dc-pend.ok{background:#DCFCE7;color:#166534}
-.dc-body{border-top:1px dashed var(--brd);background:#FDFCFA;padding:6px 10px 10px}
+/* ═══ PENDIENTES POR APARTAMENTO (reemplaza Aptos) ═══ */
+#p4{font-size:15px}
+.dc-top{margin-bottom:14px}
+.dc-top h2{margin:0 0 8px;font-size:1.35rem;font-weight:800;color:var(--n)}
+.dc-sum{margin:0;font-size:1rem;line-height:1.7;color:#4B5563;max-width:900px}
+.dc-sum b{color:var(--n)}
+.dc-card{padding:20px}
+.dc-h3{font-weight:800;font-size:1.05rem;color:var(--n);margin-bottom:12px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.dc-cuenta{font-size:.78rem;font-weight:500;color:var(--g)}
 .dc-tw{overflow-x:auto}
-.dc-t{width:100%;border-collapse:collapse;font-size:.7rem}
-.dc-t th{text-align:left;font-size:.6rem;text-transform:uppercase;letter-spacing:.4px;color:var(--g);padding:7px 8px;border-bottom:2px solid var(--brd);white-space:nowrap}
-.dc-t th.c,.dc-t td.c{text-align:center}
-.dc-t td{padding:8px;border-bottom:1px solid #F0EDE7;vertical-align:middle}
-.dc-t td small{display:block;font-size:.58rem;color:var(--gl);font-weight:500}
-.dc-t tr.crit td{background:#FEF2F2}
-.dc-t tr:hover td{background:#FAF5EE}.dc-t tr.crit:hover td{background:#FEE2E2}
-.dc-est{font-size:.6rem;font-weight:800;padding:3px 8px;border-radius:20px;white-space:nowrap}
+.dc-nota{font-size:.78rem;color:var(--g);margin:10px 0 0;line-height:1.5}
+
+/* Atención */
+.dc-urg{background:#FFFBEB;border:1px solid #FCD34D;border-left:6px solid #F59E0B;border-radius:12px;padding:15px 18px;margin-bottom:14px;font-size:.95rem;color:#78350F}
+.dc-urg ul{margin:10px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:0 22px}
+.dc-urg li{cursor:pointer;padding:7px 2px;border-bottom:1px dashed #FDE68A;font-weight:700;color:var(--n)}
+.dc-urg li:hover{color:#B45309}
+.dc-urg li small{display:block;font-weight:500;font-size:.78rem;color:#92400E}
+.dc-mas{display:inline-block;margin-top:10px;font-weight:800;font-size:.85rem;color:#B45309;cursor:pointer}
+
+/* Tabla resumen */
+.dc-res{width:100%;border-collapse:separate;border-spacing:0;min-width:620px}
+.dc-res thead th{font-size:.8rem;font-weight:700;color:var(--g);padding:8px 10px;text-align:center;border-bottom:2px solid var(--brd);line-height:1.3}
+.dc-res tbody th{text-align:left;font-size:1rem;font-weight:800;padding:16px 12px;white-space:nowrap;border-bottom:1px solid #EFEBE4;color:var(--n)}
+.dc-res td{text-align:center;padding:12px 10px;border-bottom:1px solid #EFEBE4;vertical-align:middle}
+.dc-res td.n{font-size:1.5rem;font-weight:800;color:var(--n)}
+.dc-res td b{display:block;font-size:1.7rem;line-height:1.1;font-weight:800}
+.dc-res td small{display:block;font-size:.72rem;font-weight:500;margin-top:2px}
+.dc-res td.bad{background:#FEF2F2;color:#B91C1C;cursor:pointer;transition:background .15s}
+.dc-res td.bad small{color:#B45309}
+.dc-res td.bad:hover{background:#FECACA}
+.dc-res td.good{color:#15803D;font-size:1.5rem;font-weight:800;line-height:1.1}
+.dc-res td.good small{color:#4B7A5A}
+.dc-res td.na{color:#C4C0B8;font-size:1.2rem}
+.dc-res td.nd{color:#9CA3AF;font-size:.78rem;font-style:italic}
+.dc-res tr.tot th,.dc-res tr.tot td{background:#F8F6F2;border-top:2px solid #D6CFC2;border-bottom:none}
+
+/* Filtros */
+.dc-tb{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.dc-tb input,.dc-tb select{border:1px solid #D6CFC2;border-radius:9px;padding:10px 12px;font-size:.88rem;background:#fff;color:var(--n);outline:none;font-family:'Syne',sans-serif}
+.dc-tb input{flex:1;min-width:230px}
+.dc-tb input:focus,.dc-tb select:focus{border-color:var(--o);box-shadow:0 0 0 3px rgba(228,114,27,.16)}
+.dc-btn{border:1px solid var(--od);background:var(--o);color:#fff;border-radius:9px;padding:10px 14px;font-size:.84rem;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;transition:background .15s}
+.dc-btn:hover{background:var(--od)}
+
+/* Tabla por proyecto */
+.dc-pt{width:100%;border-collapse:collapse;min-width:640px}
+.dc-pt thead th{font-size:.78rem;color:var(--g);font-weight:700;padding:8px 10px;text-align:center;border-bottom:2px solid var(--brd);line-height:1.3;background:#fff}
+.dc-pt thead th:first-child{text-align:left}
+.dc-pt tr.p{cursor:pointer}
+.dc-pt tr.p td{padding:14px 10px;border-bottom:1px solid #EFEBE4;font-size:1rem;vertical-align:middle}
+.dc-pt tr.p:hover td{background:#FAF7F2}
+.dc-pt tr.p.open td{background:#FFF7ED;border-bottom-color:#FDBA74}
+.dc-pt td.c{text-align:center}
+.dc-pt td.nm b{display:block;font-size:.98rem;color:var(--n)}
+.dc-pt td.nm small{display:block;font-size:.76rem;color:var(--g);font-weight:500;margin-top:2px}
+.dc-pt b.bad{display:inline-block;min-width:34px;background:#FEE2E2;color:#B91C1C;padding:3px 10px;border-radius:16px;font-size:1rem}
+.dc-pt .ok{color:#16A34A;font-weight:800;font-size:1.1rem}
+.dc-chev{color:var(--gl);font-size:.9rem}
+.dc-pt tr.d>td{padding:0 0 16px;background:#FFFCF8;border-bottom:2px solid #D6CFC2}
+
+/* Detalle de aptos */
+.dc-dt{width:100%;border-collapse:collapse;min-width:620px}
+.dc-dt th{font-size:.74rem;color:var(--g);font-weight:700;text-align:left;padding:10px 12px;border-bottom:1px solid var(--brd);white-space:nowrap}
+.dc-dt td{padding:10px 12px;border-bottom:1px solid #F3EFE8;font-size:.9rem;vertical-align:middle}
+.dc-dt th.c,.dc-dt td.c{text-align:center}
+.dc-dt tr.crit td{background:#FEF2F2}
+.dc-yes{color:#15803D;font-weight:800;white-space:nowrap}
+.dc-no{display:inline-block;color:#B91C1C;font-weight:800;background:#FEE2E2;padding:3px 10px;border-radius:14px;font-size:.82rem;white-space:nowrap}
+.dc-na{color:#B5B0A6}
+.dc-est{font-size:.76rem;font-weight:800;padding:4px 10px;border-radius:20px;white-space:nowrap}
 .dc-est.EJ{background:#FFEDD5;color:#C2410C}.dc-est.XR{background:#DBEAFE;color:#1E40AF}
-.dc-s{display:inline-block;font-size:.62rem;font-weight:800;padding:3px 8px;border-radius:20px;white-space:nowrap}
-.dc-s.si{background:#DCFCE7;color:#166534}.dc-s.no{background:#FEE2E2;color:#B91C1C}.dc-s.na{background:#F3F4F6;color:#9CA3AF}
-.dc-f{font-size:.56rem;font-weight:800;background:#EDE9FE;color:#6D28D9;border-radius:10px;padding:1px 6px;margin-left:4px}
-.dc-nota{font-size:.62rem;color:var(--g);padding:6px 8px 0}
-.dc-vacio{text-align:center;padding:26px;color:var(--g);font-size:.8rem;font-weight:700}
-.dc-det{background:#fff;border:1px solid var(--brd);border-radius:12px;padding:10px 14px;margin-bottom:12px}
-.dc-det summary{cursor:pointer;font-size:.74rem;font-weight:800;color:var(--n)}
-.dc-detb{margin-top:10px;font-size:.7rem;line-height:1.6;color:#374151}
-.dc-detb p{margin:0 0 8px}
+.dc-f{font-size:.68rem;font-weight:800;background:#EDE9FE;color:#6D28D9;border-radius:10px;padding:2px 8px;margin-left:6px}
+.dc-vacio{text-align:center;padding:30px;color:var(--g);font-size:.95rem;font-weight:700}
+
+/* Cómo se lee */
+.dc-det{background:#fff;border:1px solid var(--brd);border-radius:12px;padding:14px 18px;margin-bottom:12px}
+.dc-det summary{cursor:pointer;font-size:.9rem;font-weight:800;color:var(--n)}
+.dc-detb{margin-top:12px;font-size:.88rem;line-height:1.65;color:#374151}
+.dc-detb p{margin:0 0 10px}
 .dc-x{color:#B91C1C;font-weight:800}.dc-v{color:#166534;font-weight:800}
-.dc-tv td{vertical-align:top}
-.dc-vc{display:inline-block;font-size:.62rem;padding:2px 8px;border-radius:12px;margin:0 4px 4px 0;border:1px solid transparent}
+.dc-vc{display:inline-block;font-size:.78rem;padding:3px 10px;border-radius:12px;margin:0 6px 6px 0;border:1px solid transparent}
 .dc-vc.si{background:#F0FDF4;border-color:#BBF7D0;color:#166534}.dc-vc.no{background:#FEF2F2;border-color:#FECACA;color:#991B1B}.dc-vc.na{background:#F3F4F6;border-color:#E5E7EB;color:#6B7280}
-@media(max-width:760px){
-  .dc-ph{grid-template-columns:18px 1fr;row-gap:8px}.dc-ms{grid-column:1/-1;grid-template-columns:repeat(2,1fr)}.dc-pend{grid-column:1/-1}
-  .dc-row{grid-template-columns:112px 1fr 92px}.dc-hn-w{text-align:left}
-}
-@media print{.dc-btn,.dc-tb{display:none!important}.dc-proj .dc-body{display:block}}
+@media(max-width:700px){#p4{font-size:14px}.dc-card{padding:14px}.dc-urg ul{grid-template-columns:1fr}.dc-tb input{min-width:100%}}
+@media print{.dc-btn,.dc-tb{display:none!important}}
 </style>
 </head>
 <body>
@@ -393,7 +393,7 @@ body.modo-comite .brow{display:none!important}
   <div class="tab"    onclick="goTab(1)">&#128101; Leads</div>
   <div class="tab"    onclick="goTab(2)">&#128197; Reuniones</div>
   <div class="tab"    onclick="goTab(3)">&#128176; Ventas</div>
-  <div class="tab"    onclick="goTab(4)">&#128203; Alistamiento</div>
+  <div class="tab"    onclick="goTab(4)">&#128203; Pendientes</div>
   <div class="tab"    onclick="goTab(5)">🤝 Alianzas</div>
 </nav>
 
@@ -1807,7 +1807,7 @@ function renderLeads(){
   console.log('%c[VIS-CO] renderLeads FIN OK','color:#16A34A;font-weight:bold');
 }
 
-/* ═══ ALISTAMIENTO · contrato · especificación · app (reemplaza a Aptos) ═══
+/* ═══ PENDIENTES POR APARTAMENTO · contrato · especificación · app (reemplaza a Aptos) ═══
    Fuente: hoja REPORTE VENTAS del Excel ya cargado (xlR). Solo aptos EN EJECUCIÓN y X RECIBIR.
    Columnas: [2] VD · [7] CLIENTE · [8] ESTADO · [9] PROYECTO · [10] TORRE · [11] APTO · [12] FECHA DE RECIBIDO · [13] ORIGEN LEAD
              [20] CONTRATO U OTROSIES · [21] ESPECIFICACIONES (ACTUALIZADAS/FIRMADAS)
@@ -1882,32 +1882,22 @@ function dcFiltrar(){
     return true;
   });
 }
-function dcMeter(us,c){
-  var ap=us.filter(function(u){return u[c.k]!=='na';}),si=ap.filter(function(u){return u[c.k]==='si';}).length;
-  return {ap:ap.length,si:si,no:ap.length-si,p:ap.length?Math.round(si/ap.length*100):0};
-}
-function dcBarra(m,sinDato){
-  if(!m.ap)return '<div class="dc-bar na"></div>';
-  return '<div class="dc-bar'+(sinDato?' nd':'')+'"><i style="width:'+m.p+'%"></i></div>';
-}
 
 /* ── Interacción ── */
 function dcSyncUI(){
-  [['dc-est','est'],['dc-fil','fil'],['dc-ase','ase'],['dc-ord','ord']].forEach(function(p){var e=document.getElementById(p[0]);if(e)e.value=DC[p[1]];});
+  [['dc-est','est'],['dc-fil','fil'],['dc-ase','ase']].forEach(function(p){var e=document.getElementById(p[0]);if(e)e.value=DC[p[1]];});
   var q=document.getElementById('dc-q');if(q&&q.value!==DC.q)q.value=DC.q;
 }
 function dcSet(k,v){DC[k]=v;if(k!=='q')dcSyncUI();dcLista();}
 function dcIr(fil,est){
   DC.fil=fil;if(est)DC.est=est;DC.q='';dcSyncUI();dcLista();
-  var el=document.getElementById('dc-lista');if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'start'});
+  var el=document.getElementById('dc-lista-top');if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'start'});
 }
-function dcBuscar(enc){DC.q=decodeURIComponent(enc);DC.fil='todos';DC.est='todos';dcSyncUI();dcLista();var el=document.getElementById('dc-lista');if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'start'});}
+function dcBuscar(enc){
+  DC.q=decodeURIComponent(enc);DC.fil='todos';DC.est='todos';DC.ase='todos';dcSyncUI();dcLista();
+  var el=document.getElementById('dc-lista-top');if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'start'});
+}
 function dcTog(enc){var k=decodeURIComponent(enc);DC.open[k]=!DC.open[k];dcLista();}
-function dcTodo(abrir){
-  var pu={};dcFiltrar().forEach(function(u){pu[u.proy]=1;});
-  Object.keys(pu).forEach(function(p){DC.open[p]=abrir;});
-  dcLista();
-}
 function dcCsv(){
   var us=dcFiltrar().filter(dcCumple);
   var t=function(x){return x==='si'?'OK':x==='no'?'FALTA':'N/A';};
@@ -1919,10 +1909,11 @@ function dcCsv(){
   var csv='﻿'+L.map(function(r){return r.map(function(c){return '"'+String(c==null?'':c).replace(/"/g,'""')+'"';}).join(';');}).join('\r\n');
   var a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-  a.download='alistamiento-aptos-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.download='pendientes-aptos-'+new Date().toISOString().slice(0,10)+'.csv';
   document.body.appendChild(a);a.click();
   setTimeout(function(){try{URL.revokeObjectURL(a.href);a.remove();}catch(e){}},600);
 }
+function dcP(n,s,p){return n+' '+(n===1?s:p);}
 
 /* ── Render principal ── */
 function renderAlistamiento(){
@@ -1934,133 +1925,115 @@ function renderAlistamiento(){
   if(!us.length){out.innerHTML='<div class="msg msg-a">No hay aptos <strong>EN EJECUCIÓN</strong> ni <strong>X RECIBIR</strong> en el Excel cargado.</div>';return;}
   DC_CK.forEach(function(c){DC._hay[c.k]=us.some(function(u){return u[c.k]==='si';});});
 
-  var tot=us.length,EJ=us.filter(function(u){return u.est==='EJ';}),XR=us.filter(function(u){return u.est==='XR';});
-  var sinCon=us.filter(function(u){return u.con==='no';}),sinEsp=us.filter(function(u){return u.esp==='no';});
-  var ambos=us.filter(function(u){return u.con==='no'&&u.esp==='no';});
-  var listos=us.filter(function(u){return u.con==='si'&&u.esp==='si';});
-  var sinApp=us.filter(function(u){return u.app==='no';}),sinProg=us.filter(function(u){return u.prog==='no';});
-  var split=function(a){var e=a.filter(function(u){return u.est==='EJ';}).length;return e+' en ejecución · '+(a.length-e)+' por recibir';};
-  var pct=function(n){return tot?Math.round(n/tot*100):0;};
-  var pl=pct(listos.length);
+  var EJ=us.filter(function(u){return u.est==='EJ';}),XR=us.filter(function(u){return u.est==='XR';});
+  var listos=us.filter(function(u){return u.con==='si'&&u.esp==='si';}).length;
+  var cnt=function(arr,k){var ap=arr.filter(function(u){return u[k]!=='na';});return {ap:ap.length,no:ap.filter(function(u){return u[k]==='no';}).length};};
   var h='';
 
-  /* Encabezado */
-  h+='<div class="dc-hero"><div style="position:relative;z-index:1"><h2>📋 Alistamiento de aptos</h2>'
-    +'<p>Qué le falta a cada apartamento <b>en ejecución</b> y <b>por recibir</b>: contrato, especificación y si ya está creado y programado en la app. Se lee del Excel de ventas; no incluye caídos ni entregados.</p></div>'
-    +'<div class="dc-hn-w" style="position:relative;z-index:1"><div class="dc-hn">'+tot+'</div><div class="dc-hl">aptos en seguimiento</div>'
-    +'<div class="dc-hs">'+EJ.length+' en ejecución · '+XR.length+' por recibir</div></div></div>';
+  /* 1. Resumen en una frase */
+  var falt=[];
+  if(DC._hay.con)falt.push('<b>'+dcP(cnt(us,'con').no,'contrato','contratos')+'</b>');
+  if(DC._hay.esp)falt.push('<b>'+dcP(cnt(us,'esp').no,'especificación','especificaciones')+'</b>');
+  if(DC._hay.app)falt.push('<b>'+cnt(us,'app').no+'</b> por crear en la app');
+  h+='<div class="dc-top"><h2>📋 Pendientes por apartamento</h2><p class="dc-sum">Hay <b>'+us.length+'</b> aptos en seguimiento (<b>'+EJ.length+'</b> en ejecución y <b>'+XR.length+'</b> por recibir). '
+    +'<b>'+listos+'</b> ya tienen contrato y especificación.'+(falt.length?' En total faltan '+falt.join(', ')+'.':'')+'</p></div>';
 
-  /* Alerta crítica: en ejecución sin contrato */
+  /* 2. Atención: en ejecución sin contrato */
   var crit=EJ.filter(function(u){return u.con==='no';});
   if(crit.length&&DC._hay.con){
-    h+='<div class="dc-alerta"><div class="dc-al-t">⚠️ '+crit.length+(crit.length===1?' apto en ejecución sin contrato':' aptos en ejecución sin contrato')+'</div><div class="dc-chips">'
-      +crit.slice(0,12).map(function(u){return '<span class="dc-chip" onclick="dcBuscar(\''+dcK(u.cli)+'\')" title="Ver en la lista">'+dcE(u.cli)+' <small>'+dcE(u.proy)+(u.torre||u.apto?' · '+dcE(u.torre)+(u.torre&&u.apto?'-':'')+dcE(u.apto):'')+'</small></span>';}).join('')
-      +(crit.length>12?'<span class="dc-chip mas" onclick="dcIr(\'con\',\'EJ\')">+'+(crit.length-12)+' más</span>':'')+'</div></div>';
+    h+='<div class="dc-urg"><b>⚠️ '+(crit.length===1?'1 apto en ejecución todavía no tiene contrato':crit.length+' aptos en ejecución todavía no tienen contrato')+'</b><ul>'
+      +crit.slice(0,10).map(function(u){return '<li onclick="dcBuscar(\''+dcK(u.cli)+'\')">'+dcE(u.cli)+'<small>'+dcE(u.proy)+(u.torre||u.apto?' · '+dcE(u.torre)+(u.torre&&u.apto?'-':'')+dcE(u.apto):'')+'</small></li>';}).join('')
+      +'</ul>'+(crit.length>10?'<a class="dc-mas" onclick="dcIr(\'con\',\'EJ\')">Ver los '+crit.length+' →</a>':'')+'</div>';
   }
 
-  /* KPIs */
-  var nd=function(k,sub){return DC._hay[k]?sub:'La columna no tiene datos en el Excel';};
-  h+='<div class="dc-kg">'
-    +'<div class="dc-k dc-kring" onclick="dcIr(\'ok\')" style="--kc:#16A34A"><div class="dc-ring" style="--p:'+pl+'"><b>'+pl+'%</b></div><div><div class="dc-kl">Con contrato y especificación</div><div class="dc-ks">'+listos.length+' de '+tot+' listos para obra</div></div></div>'
-    +'<div class="dc-k" onclick="dcIr(\'con\')" style="--kc:#DC2626"><div class="dc-kn">'+(DC._hay.con?sinCon.length:'—')+'</div><div class="dc-kl">📄 Sin contrato</div><div class="dc-ks">'+nd('con',split(sinCon))+'</div></div>'
-    +'<div class="dc-k" onclick="dcIr(\'esp\')" style="--kc:#D97706"><div class="dc-kn">'+(DC._hay.esp?sinEsp.length:'—')+'</div><div class="dc-kl">📐 Sin especificación</div><div class="dc-ks">'+nd('esp',split(sinEsp))+'</div></div>'
-    +'<div class="dc-k" onclick="dcIr(\'ambos\')" style="--kc:#7F1D1D"><div class="dc-kn">'+ambos.length+'</div><div class="dc-kl">🚨 Sin ninguno de los dos</div><div class="dc-ks">'+split(ambos)+'</div></div>'
-    +'<div class="dc-k" onclick="dcIr(\'app\')" style="--kc:#2563EB"><div class="dc-kn">'+(DC._hay.app?sinApp.length:'—')+'</div><div class="dc-kl">📲 No creados en la app</div><div class="dc-ks">'+nd('app',split(sinApp))+'</div></div>'
-    +'<div class="dc-k" onclick="dcIr(\'prog\',\'EJ\')" style="--kc:#7C3AED"><div class="dc-kn">'+(DC._hay.prog?sinProg.length:'—')+'</div><div class="dc-kl">🗓️ Sin programación</div><div class="dc-ks">'+nd('prog','de '+EJ.length+' aptos en ejecución')+'</div></div>'
-    +'</div>';
-
-  /* Dos tarjetas: En ejecución · Por recibir */
-  var tarjeta=function(titulo,ico,arr,est,clr){
-    var s='<div class="dc-sc" style="--sc:'+clr+'"><div class="dc-sch"><span class="dc-sci">'+ico+'</span><div><div>'+titulo+'</div><small>'+arr.length+' aptos</small></div></div>';
-    DC_CK.forEach(function(c){
-      var m=dcMeter(arr,c),sd=!DC._hay[c.k];
-      var cola=!m.ap?'<span class="dc-rt"><em style="color:var(--gl)">No aplica</em></span>'
-        :sd?'<span class="dc-rt"><em style="color:var(--gl)">sin datos</em></span>'
-        :'<span class="dc-rt"><b>'+m.si+'</b> de '+m.ap+(m.no?' · <em>faltan '+m.no+'</em>':' · <b style="color:var(--up)">✔</b>')+'</span>';
-      s+='<div class="dc-row" '+(m.ap&&!sd?'onclick="dcIr(\''+c.k+'\',\''+est+'\')"':'')+'><span class="dc-rl">'+c.ico+' '+c.lbl+'</span>'+dcBarra(m,sd)+cola+'</div>';
-    });
-    return s+'</div>';
+  /* 3. Tabla resumen: cuántos faltan */
+  var celda=function(arr,k,est){
+    if(!DC._hay[k])return '<td class="nd" title="La columna está vacía en el Excel">sin datos</td>';
+    var m=cnt(arr,k);
+    if(!m.ap)return '<td class="na">—</td>';
+    if(!m.no)return '<td class="good" data-k="'+k+'" data-n="0">✔<small>todos al día</small></td>';
+    return '<td class="bad" data-k="'+k+'" data-n="'+m.no+'" onclick="dcIr(\''+k+'\',\''+est+'\')"><b>'+m.no+'</b><small>de '+m.ap+'</small></td>';
   };
-  h+='<div class="dc-2">'+tarjeta('En ejecución','🏗️',EJ,'EJ','#E4721B')+tarjeta('Por recibir','📦',XR,'XR','#0A2540')+'</div>';
+  var fila=function(tit,arr,est,cls){
+    return '<tr class="'+(cls||'')+'"><th>'+tit+'</th><td class="n" data-k="aptos" data-n="'+arr.length+'">'+arr.length+'</td>'
+      +DC_CK.map(function(c){return celda(arr,c.k,est);}).join('')+'</tr>';
+  };
+  h+='<div class="card dc-card"><div class="dc-h3">Cuántos faltan</div><div class="dc-tw"><table class="dc-res"><thead><tr><th></th><th>Aptos</th>'
+    +'<th>Sin<br>contrato</th><th>Sin<br>especificación</th><th>No creados<br>en la app</th><th>Sin programación<br>en la app</th></tr></thead><tbody>'
+    +fila('🏗️ En ejecución',EJ,'EJ')+fila('📦 Por recibir',XR,'XR')+fila('Total',us,'todos','tot')+'</tbody></table></div>'
+    +'<p class="dc-nota">Toca un número rojo para ver cuáles aptos son. La programación en la app solo se pide a los aptos que ya están en ejecución.</p></div>';
 
-  /* Lista por proyecto */
+  /* 4. Por proyecto */
   var ases={};us.forEach(function(u){ases[u.vd]=(ases[u.vd]||0)+1;});
-  var opAse='<option value="todos">Todos los asesores</option>'+Object.keys(ases).sort().map(function(a){return '<option value="'+dcE(a)+'">'+dcE(a)+' ('+ases[a]+')</option>';}).join('');
-  h+='<div class="card"><div class="card-hd">🏢 Por proyecto <span class="card-hd-sub" id="dc-cuenta"></span></div>'
+  var opAse='<option value="todos">Todos los asesores</option>'+Object.keys(ases).sort().map(function(a){return '<option value="'+dcE(a)+'">'+dcE(a)+'</option>';}).join('');
+  h+='<div class="card dc-card" id="dc-lista-top"><div class="dc-h3">Por proyecto <span class="dc-cuenta" id="dc-cuenta"></span></div>'
     +'<div class="dc-tb">'
-    +'<input id="dc-q" type="search" placeholder="🔎 Buscar cliente, proyecto, torre, apto…" oninput="dcSet(\'q\',this.value)" value="'+dcE(DC.q)+'">'
-    +'<select id="dc-est" onchange="dcSet(\'est\',this.value)"><option value="todos">Todos los estados</option><option value="EJ">En ejecución</option><option value="XR">Por recibir</option></select>'
-    +'<select id="dc-fil" onchange="dcSet(\'fil\',this.value)"><option value="todos">Todos los aptos</option><option value="pend">Con algún pendiente</option><option value="con">Sin contrato</option><option value="esp">Sin especificación</option><option value="ambos">Sin contrato ni especificación</option><option value="app">No creados en la app</option><option value="prog">Sin programación</option><option value="ok">Completos (todo en orden)</option></select>'
+    +'<input id="dc-q" type="search" placeholder="Buscar cliente, proyecto, torre o apto…" oninput="dcSet(\'q\',this.value)" value="'+dcE(DC.q)+'">'
+    +'<select id="dc-fil" onchange="dcSet(\'fil\',this.value)"><option value="todos">Ver todos los aptos</option><option value="pend">Solo los que tienen algo pendiente</option><option value="con">Sin contrato</option><option value="esp">Sin especificación</option><option value="ambos">Sin contrato ni especificación</option><option value="app">No creados en la app</option><option value="prog">Sin programación</option><option value="ok">Los que están completos</option></select>'
+    +'<select id="dc-est" onchange="dcSet(\'est\',this.value)"><option value="todos">En ejecución y por recibir</option><option value="EJ">Solo en ejecución</option><option value="XR">Solo por recibir</option></select>'
     +'<select id="dc-ase" onchange="dcSet(\'ase\',this.value)">'+opAse+'</select>'
-    +'<select id="dc-ord" onchange="dcSet(\'ord\',this.value)"><option value="pend">Más pendientes primero</option><option value="az">Proyecto A–Z</option><option value="tam">Más aptos primero</option></select>'
-    +'<button class="dc-btn" onclick="dcTodo(true)">Expandir</button><button class="dc-btn" onclick="dcTodo(false)">Contraer</button>'
-    +'<button class="dc-btn pri" onclick="dcCsv()" title="Descarga la lista filtrada">⬇ CSV</button>'
+    +'<button class="dc-btn" onclick="dcCsv()" title="Descarga en Excel lo que ves en la lista">⬇ Descargar lista</button>'
     +'</div><div id="dc-lista"></div></div>';
 
-  /* Cómo se lee el Excel (transparencia) */
+  /* 5. Cómo se lee el Excel */
   h+='<details class="dc-det"><summary>🔎 Cómo se lee el Excel</summary><div class="dc-detb">'
-    +'<p><b>Qué cuenta:</b> filas con estado <b>EN EJECUCIÓN</b> o <b>X RECIBIR</b>. Lagom: un apto con dos fases cuenta una sola vez y está completo solo si ambas fases lo están. La programación en app solo se exige a los aptos en ejecución.</p>'
-    +'<p><b>Cómo se interpreta cada celda:</b> vacío, NO, PENDIENTE, ERROR o «en proceso» = <span class="dc-x">falta</span> · N/A = no aplica · cualquier otro dato (OK, un número de contrato, una fecha) = <span class="dc-v">tiene</span>.</p>'
-    +'<table class="dc-t dc-tv"><thead><tr><th>Columna del Excel</th><th>Valores encontrados en los '+DC._base.length+' registros</th></tr></thead><tbody>'
+    +'<p><b>Qué cuenta:</b> filas con estado <b>EN EJECUCIÓN</b> o <b>X RECIBIR</b>. Un apto Lagom con dos fases cuenta una sola vez y está completo solo si ambas fases lo están.</p>'
+    +'<p><b>Cómo se interpreta cada celda:</b> vacía, NO, PENDIENTE, ERROR o «en proceso» = <span class="dc-x">falta</span> · N/A = no aplica · cualquier otro dato (OK, un número de contrato, una fecha) = <span class="dc-v">tiene</span>.</p>'
+    +'<div class="dc-tw"><table class="dc-dt"><thead><tr><th>Columna del Excel</th><th>Valores encontrados en los '+DC._base.length+' registros</th></tr></thead><tbody>'
     +DC_CK.map(function(c){
       var cn={};DC._base.forEach(function(r){var v=(r[c.i]==null||String(r[c.i]).trim()==='')?'(vacío)':String(r[c.i]).trim().slice(0,28);cn[v]=(cn[v]||0)+1;});
       var ks=Object.keys(cn).sort(function(a,b){return cn[b]-cn[a];});
       var chips=ks.slice(0,8).map(function(v){var e=v==='(vacío)'?'no':dcVal(v);return '<span class="dc-vc '+e+'">'+dcE(v)+' <b>×'+cn[v]+'</b> '+(e==='si'?'✔':e==='no'?'✖':'—')+'</span>';}).join('')+(ks.length>8?'<span class="dc-vc na">+'+(ks.length-8)+' valores más</span>':'');
-      return '<tr><td>'+c.ico+' <b>'+dcE(c.col2.toUpperCase())+'</b></td><td>'+chips+'</td></tr>';
-    }).join('')+'</tbody></table>'
-    +'<p style="font-size:.64rem;color:var(--g);margin-top:8px">Si algún valor está mal clasificado (por ejemplo un «✔» que debería ser «✖»), dímelo y se ajusta la regla.</p></div></details>';
+      return '<tr><td><b>'+dcE(c.col2.toUpperCase())+'</b></td><td>'+chips+'</td></tr>';
+    }).join('')+'</tbody></table></div>'
+    +'<p class="dc-nota">Si algún valor está mal clasificado (por ejemplo un «✔» que debería ser «✖»), dímelo y se ajusta la regla.</p></div></details>';
 
   out.innerHTML=h;
   dcSyncUI();
   dcLista();
 }
 
-/* ── Lista de proyectos (se repinta con cada filtro sin perder el foco del buscador) ── */
+/* ── Lista por proyecto (se repinta con cada filtro sin perder el foco del buscador) ── */
 function dcLista(){
   var el=document.getElementById('dc-lista');if(!el)return;
   var us=dcFiltrar(),porP={};
   us.forEach(function(u){(porP[u.proy]=porP[u.proy]||[]).push(u);});
   var proys=Object.keys(porP).map(function(p){
-    var pu=porP[p],mt=pu.filter(dcCumple);
-    return {p:p,pu:pu,mt:mt,conPend:pu.filter(function(u){return dcPend(u)>0;}).length};
+    var pu=porP[p];
+    return {p:p,pu:pu,mt:pu.filter(dcCumple),conPend:pu.filter(function(u){return dcPend(u)>0;}).length};
   }).filter(function(x){return x.mt.length>0;});
-  proys.sort(function(a,b){
-    if(DC.ord==='az')return a.p.localeCompare(b.p,'es');
-    if(DC.ord==='tam')return b.pu.length-a.pu.length||a.p.localeCompare(b.p,'es');
-    return b.conPend-a.conPend||b.pu.length-a.pu.length||a.p.localeCompare(b.p,'es');
-  });
+  proys.sort(function(a,b){return b.conPend-a.conPend||b.pu.length-a.pu.length||a.p.localeCompare(b.p,'es');});
   var nA=proys.reduce(function(s,x){return s+x.mt.length;},0);
   var cu=document.getElementById('dc-cuenta');if(cu)cu.textContent=proys.length+' proyectos · '+nA+' aptos';
-  if(!proys.length){el.innerHTML='<div class="dc-vacio">Ningún apto coincide con este filtro 🎉</div>';return;}
+  if(!proys.length){el.innerHTML='<div class="dc-vacio">Ningún apto coincide con lo que buscas 🎉</div>';return;}
   var busq=!!DC.q;
-  var s='';
+  var num=function(arr,k){
+    if(!DC._hay[k])return '<td class="c">—</td>';
+    var ap=arr.filter(function(u){return u[k]!=='na';}),n=ap.filter(function(u){return u[k]==='no';}).length;
+    if(!ap.length)return '<td class="c">—</td>';
+    return '<td class="c">'+(n?'<b class="bad">'+n+'</b>':'<span class="ok">✔</span>')+'</td>';
+  };
+  var si=function(v){return v==='si'?'<span class="dc-yes">✔ Sí</span>':v==='no'?'<span class="dc-no">✖ Falta</span>':'<span class="dc-na">—</span>';};
+  var s='<div class="dc-tw"><table class="dc-pt"><thead><tr><th>Proyecto</th><th class="c">Aptos</th><th class="c">Sin<br>contrato</th><th class="c">Sin<br>especificación</th><th class="c">No creados<br>en la app</th><th class="c">Sin<br>programación</th><th></th></tr></thead><tbody>';
   proys.forEach(function(x){
     var abierto=DC.open[x.p]===true||(busq&&DC.open[x.p]!==false);
     var ej=x.pu.filter(function(u){return u.est==='EJ';}).length,xr=x.pu.length-ej;
-    s+='<div class="dc-proj'+(abierto?' open':'')+'"><div class="dc-ph" onclick="dcTog(\''+dcK(x.p)+'\')"><span class="dc-caret">▸</span>'
-      +'<div class="dc-pn"><b>'+dcE(x.p)+'</b><small>'+x.pu.length+' aptos · '+(ej?ej+' en ejecución':'')+(ej&&xr?' · ':'')+(xr?xr+' por recibir':'')+'</small></div><div class="dc-ms">';
-    DC_CK.forEach(function(c){
-      var m=dcMeter(x.pu,c),sd=!DC._hay[c.k];
-      s+='<div class="dc-m" title="'+dcE(c.lbl)+'"><span>'+c.ico+' '+(m.ap?(sd?'—':'<b'+(m.no?' class="bad"':'')+'>'+m.si+'/'+m.ap+'</b>'):'<b>—</b>')+'</span>'+dcBarra(m,sd)+'</div>';
-    });
-    s+='</div><span class="dc-pend'+(x.conPend?'':' ok')+'">'+(x.conPend?x.conPend+' con pendientes':'✔ Todo en orden')+'</span></div>';
+    s+='<tr class="p'+(abierto?' open':'')+'" onclick="dcTog(\''+dcK(x.p)+'\')"><td class="nm"><b>'+dcE(x.p)+'</b><small>'+(ej?ej+' en ejecución':'')+(ej&&xr?' · ':'')+(xr?xr+' por recibir':'')+'</small></td>'
+      +'<td class="c">'+x.pu.length+'</td>'+num(x.pu,'con')+num(x.pu,'esp')+num(x.pu,'app')+num(x.pu,'prog')
+      +'<td class="c dc-chev">'+(abierto?'▾':'▸')+'</td></tr>';
     if(abierto){
       var rows=x.mt.slice().sort(function(a,b){return(a.est===b.est?0:a.est==='EJ'?-1:1)||dcPend(b)-dcPend(a)||a.cli.localeCompare(b.cli,'es');});
-      s+='<div class="dc-body"><div class="dc-tw"><table class="dc-t"><thead><tr><th>Cliente</th><th>Torre · Apto</th><th>Estado</th><th>Asesor</th><th>Recibido</th>'
-        +DC_CK.map(function(c){return '<th class="c">'+c.ico+' '+c.lbl+'</th>';}).join('')+'</tr></thead><tbody>';
+      s+='<tr class="d"><td colspan="7"><div class="dc-tw"><table class="dc-dt"><thead><tr><th>Cliente</th><th>Torre · Apto</th><th>Estado</th><th>Asesor</th><th class="c">Contrato</th><th class="c">Especificación</th><th class="c">En la app</th><th class="c">Programado</th></tr></thead><tbody>';
       rows.forEach(function(u){
-        var crit=u.est==='EJ'&&u.con==='no';
-        s+='<tr class="'+(crit?'crit':'')+'"><td><b>'+dcE(u.cli)+'</b>'+(u.fases>1?' <span class="dc-f">'+u.fases+' fases</span>':'')+(u.org?'<small>'+dcE(u.org)+'</small>':'')+'</td>'
+        s+='<tr class="'+(u.est==='EJ'&&u.con==='no'?'crit':'')+'"><td><b>'+dcE(u.cli)+'</b>'+(u.fases>1?' <span class="dc-f">'+u.fases+' fases</span>':'')+'</td>'
           +'<td>'+dcE(u.torre)+(u.torre&&u.apto?' · ':'')+dcE(u.apto)+(u.torre||u.apto?'':'—')+'</td>'
-          +'<td><span class="dc-est '+u.est+'">'+(u.est==='EJ'?'En ejecución':'Por recibir')+'</span></td>'
-          +'<td>'+dcE(u.vd)+'</td><td>'+(dcE(u.rec)||'—')+'</td>'
-          +DC_CK.map(function(c){var v=u[c.k];return '<td class="c"><span class="dc-s '+v+'" title="'+dcE(c.lbl)+'">'+(v==='si'?'✔':v==='no'?'✖ Falta':'—')+'</span></td>';}).join('')+'</tr>';
+          +'<td><span class="dc-est '+u.est+'">'+(u.est==='EJ'?'En ejecución':'Por recibir')+'</span></td><td>'+dcE(u.vd)+'</td>'
+          +'<td class="c">'+si(u.con)+'</td><td class="c">'+si(u.esp)+'</td><td class="c">'+si(u.app)+'</td><td class="c">'+si(u.prog)+'</td></tr>';
       });
-      s+='</tbody></table></div>'+(x.mt.length<x.pu.length?'<div class="dc-nota">Mostrando '+x.mt.length+' de '+x.pu.length+' aptos del proyecto (según el filtro).</div>':'')+'</div>';
+      s+='</tbody></table></div>'+(x.mt.length<x.pu.length?'<div class="dc-nota" style="padding:6px 12px 0">Se muestran '+x.mt.length+' de los '+x.pu.length+' aptos de este proyecto, según el filtro.</div>':'')+'</td></tr>';
     }
-    s+='</div>';
   });
-  el.innerHTML=s;
+  el.innerHTML=s+'</tbody></table></div>';
 }
 
 function renderAlianzas(){
