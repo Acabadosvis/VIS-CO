@@ -255,12 +255,15 @@ textarea.fi{resize:vertical;min-height:64px;}
 .dash-title span.ali{color:#7C3AED;}
 .dash-title span.ppto{color:#D97706;}
 /* ── TOTAL POR RECAUDAR (todos los pipelines) ────────────────── */
-.tp-wrap{margin:14px 20px 0;background:var(--w);border:1.5px solid var(--brd);border-radius:14px;box-shadow:var(--sh);overflow:hidden;display:grid;grid-template-columns:minmax(260px,330px) 1fr;}
-.tp-hero{background:var(--n);color:#fff;padding:20px 24px;display:flex;flex-direction:column;justify-content:center;gap:6px;}
-.tp-hero-tag{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#FDDDD0;}
-.tp-hero-amt{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;line-height:1.05;font-variant-numeric:tabular-nums;}
-.tp-hero-sub{font-size:12px;color:#CFCAC2;line-height:1.5;}
-.tp-hero-sub b{color:#fff;}
+.tp-wrap{margin:14px 20px 0;background:var(--w);border:1.5px solid var(--brd);border-radius:14px;box-shadow:var(--sh);overflow:hidden;display:grid;grid-template-columns:minmax(360px,420px) 1fr;}
+.tp-hero{background:var(--n);color:#fff;padding:22px 24px;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0;}
+.tp-hero-tag{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#FDDDD0;line-height:1.4;}
+.tp-hero-amt{font-family:'DM Sans',sans-serif;font-size:44px;font-weight:700;line-height:1.05;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap;}
+.tp-hero-rows{display:flex;flex-direction:column;gap:6px;margin-top:2px;}
+.tp-hero-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border-radius:9px;background:rgba(255,255,255,.07);font-size:13px;color:#E6E1D8;}
+.tp-hero-row b{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;color:#fff;}
+.tp-hero-row i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;}
+.tp-hero-week{font-size:11px;color:#A8A39A;}
 .tp-body{padding:6px 8px 10px;overflow-x:auto;}
 .tp-tbl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;}
 .tp-tbl th{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#999;text-align:right;padding:10px 14px 8px;border-bottom:1.5px solid var(--brd);white-space:nowrap;}
@@ -1098,11 +1101,11 @@ function renderTotalPipelines() {
     <div class="tp-hero">
       <div class="tp-hero-tag">Total por recaudar · todos los pipelines</div>
       <div class="tp-hero-amt">${fmtMF(all.tot)}</div>
-      <div class="tp-hero-sub">
-        En mora <b>${fmtMF(all.mora)}</b><br>
-        + Esta semana <b>${fmtMF(all.sem)}</b><br>
-        <span style="opacity:.75">Semana ${fmtD(WEEK.ss)} → ${fmtD(WEEK.es)}</span>
+      <div class="tp-hero-rows">
+        <div class="tp-hero-row"><span><i style="background:#FF8A65"></i>En mora</span><b>${fmtMF(all.mora)}</b></div>
+        <div class="tp-hero-row"><span><i style="background:#7FA8FF"></i>Esta semana</span><b>${fmtMF(all.sem)}</b></div>
       </div>
+      <div class="tp-hero-week">Semana ${fmtD(WEEK.ss)} → ${fmtD(WEEK.es)}</div>
     </div>
     <div class="tp-body">
       <table class="tp-tbl">
@@ -1132,6 +1135,15 @@ function renderTotalPipelines() {
         No incluye «Vencido Ejecución» (${fmtMF(vencEj)}), «Por Recibir» ni «Al Día».
       </div>
     </div>`;
+  // Ajusta el tamaño del total para que siempre quepa completo
+  const amtEl = box.querySelector('.tp-hero-amt');
+  if (amtEl) {
+    let fs = 44;
+    amtEl.style.fontSize = fs+'px';
+    while (amtEl.scrollWidth > amtEl.parentElement.clientWidth - 48 && fs > 20) {
+      fs -= 2; amtEl.style.fontSize = fs+'px';
+    }
+  }
 }
 
 function renderTabs() {
