@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VIS-CO · M3 · Comité Comercial</title>
-<!-- v2026.07.02.11 -->
+<!-- v2026.07.02.12 -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -505,14 +505,16 @@ body.modo-comite .brow{display:none!important}
     <div style="font-size:.62rem;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 5px 2px">&#10060; De las no verificadas &#8594;</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px"><div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:6px;padding:7px 9px"><label style="font-size:.56rem;font-weight:700;text-transform:uppercase;color:#64748B;display:block;margin-bottom:2px">&#128277; Sin respuesta</label><input type="number" id="mf_nver_sr" min="0" placeholder="0" oninput="calcPFCheck('M')" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#64748B;background:transparent"></div><div style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:6px;padding:7px 9px"><label style="font-size:.56rem;font-weight:700;text-transform:uppercase;color:#059669;display:block;margin-bottom:2px">&#9989; Completaron</label><input type="number" id="mf_nver_comp" min="0" placeholder="0" oninput="calcPFCheck('M')" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#059669;background:transparent"></div><div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:6px;padding:7px 9px"><label style="font-size:.56rem;font-weight:700;text-transform:uppercase;color:#EA580C;display:block;margin-bottom:2px">&#127758; Fuera de cobertura</label><input type="number" id="mf_nver_cob" min="0" placeholder="0" oninput="calcPFCheck('M')" style="width:100%;border:none;outline:none;font-size:.9rem;font-weight:700;color:#EA580C;background:transparent"></div></div>
     <!-- REUNIONES EXPANDIDAS -->
-    <div class="sec" style="margin-bottom:6px">&#128197; Reuniones</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:10px">
-      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#2563EB;display:block;margin-bottom:3px">&#128197; Agendadas</label><input type="number" id="mf_reu_ag" min="0" placeholder="0" style="width:100%;border:1.5px solid #93C5FD;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#2563EB;background:#fff;outline:none"></div>
-      <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#D97706;display:block;margin-bottom:3px">&#9203; Confirm. 24h antes</label><input type="number" id="mf_reu_conf24" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDE68A;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#D97706;background:#fff;outline:none"></div>
-      <div style="background:#EEF2FF;border:1.5px solid #A5B4FC;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#4F46E5;display:block;margin-bottom:3px">&#128260; Reagendadas</label><input type="number" id="mf_reu_reag" min="0" placeholder="0" style="width:100%;border:1.5px solid #A5B4FC;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#4F46E5;background:#fff;outline:none"></div>
-      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#16A34A;display:block;margin-bottom:3px">&#9989; Efectivas</label><input type="number" id="mf_reu_ef" min="0" placeholder="0" style="width:100%;border:1.5px solid #86EFAC;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#16A34A;background:#fff;outline:none"></div>
-      <div style="background:#FFF8F0;border:1.5px solid #FDBA74;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#F97316;display:block;margin-bottom:3px">&#11088; Potenciales</label><input type="number" id="mf_reu_pot" min="0" placeholder="0" style="width:100%;border:1.5px solid #FDBA74;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#F97316;background:#fff;outline:none"></div>
+    <div class="sec" style="margin-bottom:4px">&#128197; Reuniones de la semana</div>
+    <div style="font-size:.72rem;color:#6B7280;margin:0 0 8px 2px">Empieza por las <b>agendadas</b>: las demás casillas son una parte de esas.</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:8px;margin-bottom:8px">
+      <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:10px;padding:10px 12px"><label style="font-size:.78rem;font-weight:800;color:#2563EB;display:block;margin-bottom:2px">1. Agendadas</label><div style="font-size:.68rem;color:#6B7280;line-height:1.3;min-height:28px;margin-bottom:6px">Reuniones programadas en la semana</div><input type="number" id="mf_reu_ag" min="0" placeholder="0" oninput="reuCalc()" style="width:100%;border:1.5px solid #93C5FD;border-radius:6px;padding:7px 9px;font-size:1.15rem;font-weight:800;color:#2563EB;background:#fff;outline:none"></div>
+      <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:10px;padding:10px 12px"><label style="font-size:.78rem;font-weight:800;color:#D97706;display:block;margin-bottom:2px">2. Confirmadas un d&#237;a antes</label><div style="font-size:.68rem;color:#6B7280;line-height:1.3;min-height:28px;margin-bottom:6px">De las agendadas, las que el cliente confirm&#243; 24 h antes</div><input type="number" id="mf_reu_conf24" min="0" placeholder="0" oninput="reuCalc()" style="width:100%;border:1.5px solid #FDE68A;border-radius:6px;padding:7px 9px;font-size:1.15rem;font-weight:800;color:#D97706;background:#fff;outline:none"></div>
+      <div style="background:#EEF2FF;border:1.5px solid #A5B4FC;border-radius:10px;padding:10px 12px"><label style="font-size:.78rem;font-weight:800;color:#4F46E5;display:block;margin-bottom:2px">3. Reagendadas</label><div style="font-size:.68rem;color:#6B7280;line-height:1.3;min-height:28px;margin-bottom:6px">Las que se cambiaron de fecha</div><input type="number" id="mf_reu_reag" min="0" placeholder="0" oninput="reuCalc()" style="width:100%;border:1.5px solid #A5B4FC;border-radius:6px;padding:7px 9px;font-size:1.15rem;font-weight:800;color:#4F46E5;background:#fff;outline:none"></div>
+      <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:10px;padding:10px 12px"><label style="font-size:.78rem;font-weight:800;color:#16A34A;display:block;margin-bottom:2px">4. Realizadas</label><div style="font-size:.68rem;color:#6B7280;line-height:1.3;min-height:28px;margin-bottom:6px">Las que s&#237; se hicieron (efectivas)</div><input type="number" id="mf_reu_ef" min="0" placeholder="0" oninput="reuCalc()" style="width:100%;border:1.5px solid #86EFAC;border-radius:6px;padding:7px 9px;font-size:1.15rem;font-weight:800;color:#16A34A;background:#fff;outline:none"></div>
+      <div style="background:#FFF8F0;border:1.5px solid #FDBA74;border-radius:10px;padding:10px 12px"><label style="font-size:.78rem;font-weight:800;color:#F97316;display:block;margin-bottom:2px">5. Con potencial</label><div style="font-size:.68rem;color:#6B7280;line-height:1.3;min-height:28px;margin-bottom:6px">De las realizadas, clientes con buena opci&#243;n de compra</div><input type="number" id="mf_reu_pot" min="0" placeholder="0" oninput="reuCalc()" style="width:100%;border:1.5px solid #FDBA74;border-radius:6px;padding:7px 9px;font-size:1.15rem;font-weight:800;color:#F97316;background:#fff;outline:none"></div>
     </div>
+    <div id="reu-chk" style="font-size:.8rem;font-weight:700;color:#374151;background:#F8FAFC;border:1px solid #E5E7EB;border-radius:8px;padding:8px 12px;margin-bottom:10px;display:none"></div>
     <!-- GESTION -->
     <div class="sec" style="color:#7C3AED;margin-bottom:6px">&#127919; Gesti&#243;n</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:7px;margin-bottom:10px"><div style="background:#F5F3FF;border:1.5px solid #C4B5FD;border-radius:8px;padding:9px 11px"><label style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7C3AED;display:block;margin-bottom:3px">&#11088; Clientes potenciales</label><input type="number" id="mf_gest_pot" min="0" placeholder="0" oninput="calcPFCheck('M')" style="width:100%;border:1.5px solid #C4B5FD;border-radius:5px;padding:5px 7px;font-size:.95rem;font-weight:700;color:#7C3AED;background:#fff;outline:none"></div></div>
@@ -1094,6 +1096,7 @@ function loadPF(){
     if(el)el.value=(d[f]||0)>0?d[f]:'';
   });
   try{tomCalc();}catch(e){}
+  try{reuCalc();}catch(e){}
   /* Sello de ultima actualizacion: deja ver si lo que hay en pantalla ya trae
      lo que guardo el otro equipo. */
   /* Recalcular el cuadre tras cargar: antes solo aparecia al teclear, asi que
@@ -1139,6 +1142,22 @@ function tomCalc(){
   var g=function(id){return Math.max(0,parseInt((document.getElementById('mf_'+id)||{}).value)||0);};
   var el=document.getElementById('tom-total');
   if(el)el.textContent=g('tom_cant')+g('tom_tur')+g('tom_otros');
+}
+function reuCalc(){
+  var g=function(id){return Math.max(0,parseInt((document.getElementById('mf_'+id)||{}).value)||0);};
+  var el=document.getElementById('reu-chk'); if(!el)return;
+  var ag=g('reu_ag'),cf=g('reu_conf24'),rg=g('reu_reag'),ef=g('reu_ef'),pt=g('reu_pot');
+  if(!(ag+cf+rg+ef+pt)){el.style.display='none';el.innerHTML='';return;}
+  var p=function(v){return ag>0?' ('+Math.round(v/ag*100)+'%)':'';};
+  var h='De <b>'+ag+'</b> agendadas: <b>'+cf+'</b> confirmadas'+p(cf)+' &#183; <b>'+rg+'</b> reagendadas'+p(rg)+' &#183; <b>'+ef+'</b> realizadas'+p(ef)+' &#183; <b>'+pt+'</b> con potencial'+(ef>0?' ('+Math.round(pt/ef*100)+'% de las realizadas)':'');
+  var w=[];
+  if(cf>ag)w.push('hay m&#225;s confirmadas que agendadas');
+  if(rg>ag)w.push('hay m&#225;s reagendadas que agendadas');
+  if(ef>ag)w.push('hay m&#225;s realizadas que agendadas');
+  if(pt>ef)w.push('hay m&#225;s con potencial que realizadas');
+  if(w.length){el.style.background='#FFFBEB';el.style.borderColor='#FCD34D';el.style.color='#92400E';h+='<br>&#9888;&#65039; Revisa: '+w.join('; ')+'.';}
+  else{el.style.background='#F8FAFC';el.style.borderColor='#E5E7EB';el.style.color='#374151';}
+  el.innerHTML=h;el.style.display='block';
 }
 function calcPFCheck(pf){
   var g=function(id){return Math.max(0,parseInt((document.getElementById('mf_'+id)||{}).value)||0);};
@@ -1671,6 +1690,15 @@ function renderLeads(){
   var kEl=document.getElementById('l-kpis');
   function kp(bg,bt,lbl,val,sub){return'<div class="kp" style="background:'+bg+';border-top:3px solid '+bt+'"><div class="kl">'+lbl+'</div><div class="kv" style="color:'+bt+'">'+val+'</div><div class="ks">'+sub+'</div></div>';}
   function kpL(col,lbl,val,sub){return'<div class="kp" style="border-left:4px solid '+col+'"><div class="kl">'+lbl+'</div><div class="kv" style="color:'+col+'">'+val+'</div><div class="ks">'+sub+'</div></div>';}
+  function reuCards(ag,cf,rg,ef,pt){
+    var pc=function(v,b){return b>0?Math.round(v/b*100)+'% de las agendadas':'';};
+    var h=kp('#EFF6FF','#2563EB','&#128197; Agendadas',ag,'reuniones programadas');
+    h+=kpL('#D97706','Confirmadas un d&#237;a antes',cf,pc(cf,ag));
+    h+=kpL('#4F46E5','Reagendadas',rg,pc(rg,ag));
+    h+=kpL('#16A34A','Realizadas',ef,pc(ef,ag));
+    h+=kpL('#F97316','Con potencial',pt,ef>0?Math.round(pt/ef*100)+'% de las realizadas':'de las realizadas');
+    return h;
+  }
   function secHdr(col,txt){return'<div style="grid-column:1/-1;font-size:.65rem;font-weight:800;color:'+col+';text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid '+col+'30;padding-bottom:3px;margin:4px 0 2px">'+txt+'</div>';}
   var kHtml='';
   /* KPI Marcela */
@@ -1691,9 +1719,12 @@ function renderLeads(){
       if(mCalInc>0)kHtml+=kpL('#D97706','&#128203; Incompletas',mCalInc,mIncComp+' completadas · '+mIncResp+' respuesta · '+mIncSr+' sin respuesta');
       if(mCalNver>0)kHtml+=kpL('#64748B','&#10060; No verificadas',mCalNver,mNverSr+' sin respuesta · '+mNverComp+' completaron · '+mNverCob+' fuera cob.');
     }
-    if(mReuAg>0||mGestPot>0){
-      kHtml+=secHdr('#7C3AED','&#127919; Gesti&#243;n y reuniones');
-      if(mReuAg>0)kHtml+=kp('#EFF6FF','#2563EB','&#128197; Reuniones',mReuAg,'Conf.24h '+mReuConf24+' · Reag.'+mReuReag+' · Efec.'+mReuEf+' · Pot.'+mReuPot);
+    if(mReuAg>0){
+      kHtml+=secHdr('#2563EB','&#128197; Reuniones de la semana');
+      kHtml+=reuCards(mReuAg,mReuConf24,mReuReag,mReuEf,mReuPot);
+    }
+    if(mGestPot>0){
+      kHtml+=secHdr('#7C3AED','&#127919; Gesti&#243;n');
       if(mGestPot>0)kHtml+=kp('#F5F3FF','#7C3AED','&#11088; Clientes potenciales',mGestPot,'en gesti&#243;n comercial');
     }
   }
@@ -1704,7 +1735,7 @@ function renderLeads(){
     if(aCalAsig>0){var aNcTot=aCalNcV1+aCalNcV2+aCalNcV3;kHtml+=kp('#FFF8F0','#F97316','&#129518; Bitrix llegaron',aCalAsig,'Resp.'+aCalResp+' · Calc.'+aCalHace+' · Verif.'+aCalVer+' · NoVer.'+aCalNver+(aNcTot>0?' · NC:1v'+aCalNcV1+'/calc'+aCalNcV2+'/post'+aCalNcV3:''));}
     if(aCalVer>0)kHtml+=kpL('#0891B2','&#9989; Verif.: con resp.',aVerResp,aVerSr+' sin resp. · '+aVerCiu+' otras ciu. · '+aVerNi+' sin inter&#233;s');
     if(aCalNver>0)kHtml+=kpL('#64748B','&#10060; No verif.: con resp.',aNverResp,aNverComp+' completaron · '+aNverCob+' fuera cob. · '+aNverReal+' real no verif.');
-    if(aReuAg>0)kHtml+=kp('#EFF6FF','#2563EB','&#128197; Reuniones',aReuAg,'Conf.24h '+aReuConf24+' · Reag.'+aReuReag+' · Efec.'+aReuEf+' · Pot.'+aReuPot);
+    if(aReuAg>0){kHtml+=secHdr('#2563EB','&#128197; Reuniones de la semana');kHtml+=reuCards(aReuAg,aReuConf24,aReuReag,aReuEf,aReuPot);}
   }
   /* Leads suministrados por Thomas */
   var tomC=pfM.tom_cant||0,tomT=pfM.tom_tur||0,tomO=pfM.tom_otros||0,tomTot=tomC+tomT+tomO;
@@ -1772,6 +1803,12 @@ function renderLeads(){
     {lbl:'Interesados',       f:_interesados, bold:true},
     {lbl:'Fuera de cobertura',f:function(o){return _g(o,'mc_cob');}, inv:true},
     {lbl:'Sin inter\u00e9s',      f:function(o){return _g(o,'mc_ni');}, inv:true},
+    {sec:'\u{1F4C5} Reuniones'},
+    {lbl:'Agendadas',          f:function(o){return _g(o,'reu_ag');}, bold:true},
+    {lbl:'Confirmadas un d\u00eda antes', f:function(o){return _g(o,'reu_conf24');}, base:'reu_ag'},
+    {lbl:'Reagendadas',        f:function(o){return _g(o,'reu_reag');}, base:'reu_ag', inv:true},
+    {lbl:'Realizadas',         f:function(o){return _g(o,'reu_ef');}, base:'reu_ag'},
+    {lbl:'Con potencial',      f:function(o){return _g(o,'reu_pot');}, base:'reu_ef'},
     {sec:'\u{1F4E5} Leads suministrados por Thomas'},
     {lbl:'Total de la semana', f:function(o){return _g(o,'tom_cant')+_g(o,'tom_tur')+_g(o,'tom_otros');}, bold:true},
     {lbl:'Tinguas',           f:function(o){return _g(o,'tom_cant');}},
