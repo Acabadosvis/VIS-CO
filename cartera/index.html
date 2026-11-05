@@ -254,6 +254,29 @@ textarea.fi{resize:vertical;min-height:64px;}
 .dash-title span.lagom{color:#0891B2;}
 .dash-title span.ali{color:#7C3AED;}
 .dash-title span.ppto{color:#D97706;}
+/* ── TOTAL POR RECAUDAR (todos los pipelines) ────────────────── */
+.tp-wrap{margin:14px 20px 0;background:var(--w);border:1.5px solid var(--brd);border-radius:14px;box-shadow:var(--sh);overflow:hidden;display:grid;grid-template-columns:minmax(260px,330px) 1fr;}
+.tp-hero{background:var(--n);color:#fff;padding:20px 24px;display:flex;flex-direction:column;justify-content:center;gap:6px;}
+.tp-hero-tag{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#FDDDD0;}
+.tp-hero-amt{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;line-height:1.05;font-variant-numeric:tabular-nums;}
+.tp-hero-sub{font-size:12px;color:#CFCAC2;line-height:1.5;}
+.tp-hero-sub b{color:#fff;}
+.tp-body{padding:6px 8px 10px;overflow-x:auto;}
+.tp-tbl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;}
+.tp-tbl th{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#999;text-align:right;padding:10px 14px 8px;border-bottom:1.5px solid var(--brd);white-space:nowrap;}
+.tp-tbl th:first-child{text-align:left;}
+.tp-tbl th.c-mora{color:var(--mora);} .tp-tbl th.c-sem{color:var(--sem);}
+.tp-tbl td{padding:10px 14px;text-align:right;font-size:15px;border-bottom:1px solid var(--gc);white-space:nowrap;}
+.tp-tbl td:first-child{text-align:left;font-weight:700;font-size:13px;}
+.tp-tbl td .n{display:block;font-size:10px;color:#AAA;font-weight:400;}
+.tp-tbl td.c-mora{color:var(--mora);font-weight:600;} .tp-tbl td.c-sem{color:var(--sem);font-weight:600;}
+.tp-tbl td.c-tot{font-weight:800;color:var(--n);}
+.tp-tbl tbody tr{cursor:pointer;transition:.1s;} .tp-tbl tbody tr:hover{background:var(--b);}
+.tp-tbl tbody tr.act td:first-child{color:var(--r);}
+.tp-tbl tfoot td{border-top:2px solid var(--n);border-bottom:none;font-weight:800;font-size:16px;padding-top:12px;}
+.tp-tbl tfoot td:first-child{font-size:12px;text-transform:uppercase;letter-spacing:.05em;font-family:'Syne',sans-serif;}
+.tp-note{font-size:11px;color:var(--g);padding:8px 14px 0;line-height:1.5;}
+@media(max-width:820px){.tp-wrap{grid-template-columns:1fr;}}
 /* adicionales */
 .adic-kpi{background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:10px;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;}
 .adic-kpi-left{display:flex;align-items:center;gap:10px;}
@@ -371,6 +394,7 @@ textarea.fi{resize:vertical;min-height:64px;}
 <!-- ── DASHBOARD ─────────────────────────────────────────────── -->
 <div class="dash" id="dash">
   <div class="dash-title" id="dash-title"><span>Cartera VIS-CO</span></div>
+  <div class="tp-wrap" id="total-pipes"></div>
   <div class="kpi-strip" id="kpis"></div>
   <div class="adic-kpi" id="adic-kpi" style="display:none">
     <div class="adic-kpi-left">
@@ -1040,6 +1064,74 @@ function renderKPIs() {
       adKpi.style.display='none';
     }
   }
+  renderTotalPipelines();
+}
+
+// ── TOTAL POR RECAUDAR · TODOS LOS PIPELINES ──────────────────
+// Suma En Mora (saldo por recaudar de ENTREGADOS con saldo) + Esta Semana
+// (pagos con fecha en la semana seleccionada) — mismos valores de las tarjetas
+// de cada pipeline. No depende de los filtros de la tabla.
+function renderTotalPipelines() {
+  const box = document.getElementById('total-pipes');
+  if (!box) return;
+  const PIPES = [
+    {m:'principal',   lbl:'VIS-CO',       f:c=>!isConvenio(c)&&!isAlianza(c)&&!isPpto(c)&&!isLagom(c)},
+    {m:'convenios',   lbl:'Convenios',    f:isConvenio},
+    {m:'alianzas',    lbl:'Alianzas',     f:isAlianza},
+    {m:'presupuestos',lbl:'Presupuestos', f:isPpto},
+    {m:'lagom',       lbl:'Lagom',        f:isLagom},
+  ];
+  const calc = arr => {
+    const mo = arr.filter(c=>c.cat==='mora');
+    const se = arr.filter(c=>c.cat==='semana');
+    const mora = mo.reduce((a,c)=>a+(c.xrec||0),0);
+    const sem  = se.reduce((a,c)=>a+(c.semAmt||0),0);
+    return {mora, sem, tot:mora+sem, nMora:mo.length, nSem:se.length};
+  };
+  const rows = PIPES.map(p=>({...p, ...calc(DATA.filter(p.f))}));
+  const all  = calc(DATA); // cada cliente se cuenta una sola vez
+  const sumRows = rows.reduce((a,r)=>a+r.tot,0);
+  const overlap = Math.abs(sumRows-all.tot) > 1;
+  const vencEj = DATA.filter(c=>c.cat==='vencido').reduce((a,c)=>a+(c.vencAmt||0),0);
+
+  box.innerHTML = `
+    <div class="tp-hero">
+      <div class="tp-hero-tag">Total por recaudar · todos los pipelines</div>
+      <div class="tp-hero-amt">${fmtMF(all.tot)}</div>
+      <div class="tp-hero-sub">
+        En mora <b>${fmtMF(all.mora)}</b><br>
+        + Esta semana <b>${fmtMF(all.sem)}</b><br>
+        <span style="opacity:.75">Semana ${fmtD(WEEK.ss)} → ${fmtD(WEEK.es)}</span>
+      </div>
+    </div>
+    <div class="tp-body">
+      <table class="tp-tbl">
+        <thead><tr>
+          <th>Pipeline</th>
+          <th class="c-mora">En mora</th>
+          <th class="c-sem">Esta semana</th>
+          <th>Total</th>
+        </tr></thead>
+        <tbody>${rows.map(r=>`
+          <tr class="${carteraMode===r.m?'act':''}" onclick="switchCartera('${r.m}')" title="Ver cartera ${r.lbl}">
+            <td>${r.lbl}</td>
+            <td class="c-mora">${fmtMF(r.mora)}<span class="n">${r.nMora} cliente${r.nMora!==1?'s':''}</span></td>
+            <td class="c-sem">${fmtMF(r.sem)}<span class="n">${r.nSem} cliente${r.nSem!==1?'s':''}</span></td>
+            <td class="c-tot">${fmtMF(r.tot)}</td>
+          </tr>`).join('')}
+        </tbody>
+        <tfoot><tr>
+          <td>Total</td>
+          <td class="c-mora">${fmtMF(all.mora)}</td>
+          <td class="c-sem">${fmtMF(all.sem)}</td>
+          <td class="c-tot">${fmtMF(all.tot)}</td>
+        </tr></tfoot>
+      </table>
+      <div class="tp-note">
+        ${overlap?'Hay clientes que clasifican en más de un pipeline; en el total se cuentan una sola vez. ':''}
+        No incluye «Vencido Ejecución» (${fmtMF(vencEj)}), «Por Recibir» ni «Al Día».
+      </div>
+    </div>`;
 }
 
 function renderTabs() {
